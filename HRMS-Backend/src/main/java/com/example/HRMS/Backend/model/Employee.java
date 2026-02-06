@@ -1,0 +1,88 @@
+package com.example.HRMS.Backend.model;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "employee")
+public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "pk_employee_id", nullable = false)
+    private Integer id;
+
+    @Size(max = 25)
+    @NotNull(message = "Employee first name is required")
+    @Column(name = "employee_first_name", nullable = false)
+    private String employeeFirstName;
+
+    @Size(max = 25)
+    @NotNull(message = "Employee last name is required")
+    @Column(name = "employee_last_name", nullable = false)
+    private String employeeLastName;
+
+    @Size(max = 25)
+    @NotNull(message = "Employee email address is required")
+    @Email(message = "Email is not in perfect formate")
+    @Column(name = "employee_email", nullable = false)
+    private String employeeEmail;
+
+    @Size(max = 50)
+    @NotNull(message = "Employee password is required")
+    @Column(name = "employee_password", nullable = false)
+    private String employeePassword;
+
+    @PastOrPresent(message = "DOB cannot be in the future")
+    @NotNull(message = "Employee DOB is required")
+    @Column(name = "employee_dob", nullable = false)
+    private LocalDate employeeDob;
+
+    @NotNull(message = "Employee Gender is required")
+    @Column(name = "employee_gender", nullable = false)
+    private String employeeGender;
+
+    @NotNull(message = "Employee hire date is required")
+    @Column(name = "employee_hire_date", nullable = false)
+    private LocalDate employeeHireDate;
+
+    @NotNull(message = "Employee salary is required")
+    @Min(value = 0,message = "Salary cannot be negative")
+    @Column(name = "employee_salary", nullable = false)
+    private Integer employeeSalary;
+
+    @ColumnDefault("1")
+    @Column(name = "employee_is_active")
+    private Boolean employeeIsActive;
+
+    @NotNull(message = "Employee department id is required")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "fk_department_id", nullable = false)
+    private Department fkDepartment;
+
+    @NotNull(message = "Employee position id is required")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "fk_position_id", nullable = false)
+    private Position fkPosition;
+
+    @NotNull(message = "Employee role id is required")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "fk_role_id", nullable = false)
+    private Role fkRole;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_manager_employee_id")
+    private Employee fkManagerEmployee;
+
+
+}
