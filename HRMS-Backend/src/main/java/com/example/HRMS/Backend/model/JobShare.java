@@ -18,7 +18,7 @@ public class JobShare {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_job_share_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ColumnDefault("getdate()")
     @Column(name = "job_share_created_at")

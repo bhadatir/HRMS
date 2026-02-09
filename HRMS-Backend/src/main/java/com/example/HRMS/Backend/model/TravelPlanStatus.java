@@ -14,7 +14,7 @@ public class TravelPlanStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_travel_plan_status_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 20)
     @NotNull(message = "travel plan status id is required")

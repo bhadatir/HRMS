@@ -19,7 +19,7 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_comment_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @NotNull(message = "Posi id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -37,7 +37,6 @@ public class Comment {
     private Comment parentComment;
 
     @NotNull(message = "Comment content is required")
-    @Lob
     @Column(name = "comment_content", nullable = false)
     private String commentContent;
 

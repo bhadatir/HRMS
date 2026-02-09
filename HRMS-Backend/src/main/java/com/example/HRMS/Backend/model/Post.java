@@ -19,7 +19,7 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_post_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 255)
     @NotNull(message = "post title is required")
@@ -27,7 +27,6 @@ public class Post {
     private String postTitle;
 
     @NotNull(message = "post content is required")
-    @Lob
     @Column(name = "post_content", nullable = false)
     private String postContent;
 

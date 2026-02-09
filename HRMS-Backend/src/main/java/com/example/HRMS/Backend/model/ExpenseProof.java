@@ -19,7 +19,7 @@ public class ExpenseProof {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_expense_proof_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ColumnDefault("getdate()")
     @Column(name = "expense_proof_uploaded_at")

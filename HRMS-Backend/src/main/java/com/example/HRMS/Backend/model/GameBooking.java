@@ -9,6 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -19,24 +20,21 @@ public class GameBooking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_game_booking_id", nullable = false)
-    private Integer id;
+    private Long id;
 
-    @NotNull(message = "game booking is required")
-    @Column(name = "game_booking_date", nullable = false)
-    private LocalDate gameBookingDate;
-
-    @Min(value = 0,message = "Priority score cannot be negative")
-    @ColumnDefault("0")
-    @Column(name = "game_booking_priority_score")
-    private Integer gameBookingPriorityScore;
+    @Column(name = "game_booking_is_deleted")
+    private Boolean gameBookingIsDeleted = false;
 
     @NotNull(message = "game booking start time is required")
     @Column(name = "game_booking_start_time", nullable = false)
-    private LocalTime gameBookingStartTime;
+    private LocalDateTime gameBookingStartTime;
 
     @NotNull(message = "game booking end is required")
     @Column(name = "game_booking_end_time", nullable = false)
-    private LocalTime gameBookingEndTime;
+    private LocalDateTime gameBookingEndTime;
+
+    @Column(name = "is_second_time_play")
+    private Boolean isSecondTimePlay = false;
 
     @NotNull(message = "game booking status id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

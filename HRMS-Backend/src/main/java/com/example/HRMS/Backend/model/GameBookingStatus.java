@@ -14,7 +14,7 @@ public class GameBookingStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_game_booking_status_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 50)
     @NotNull(message = "game booking status name is required")

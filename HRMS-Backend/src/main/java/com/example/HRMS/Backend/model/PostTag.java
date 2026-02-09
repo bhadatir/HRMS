@@ -15,7 +15,7 @@ public class PostTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_post_tag_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @NotNull(message = "post id is required")
     @ManyToOne(fetch = FetchType.LAZY)

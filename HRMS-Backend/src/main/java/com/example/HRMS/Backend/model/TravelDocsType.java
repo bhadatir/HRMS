@@ -14,7 +14,7 @@ public class TravelDocsType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_travel_docs_type_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 20)
     @NotNull(message = "travel doc type name is required")

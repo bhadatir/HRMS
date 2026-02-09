@@ -14,7 +14,7 @@ public class ExpenseProofType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_expense_proof_type_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 20)
     @NotNull(message = "expense proof name is required")

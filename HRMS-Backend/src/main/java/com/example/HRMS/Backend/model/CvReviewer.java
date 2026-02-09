@@ -19,7 +19,7 @@ public class CvReviewer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_cv_reviewer_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @PastOrPresent(message = "reviewer created date cannot be in the future")
     @ColumnDefault("getdate()")

@@ -14,7 +14,7 @@ public class JobShareTo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_job_share_to_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 255)
     @NotNull(message = "job detail receiver email address is required")

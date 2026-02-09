@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,7 +18,7 @@ public class GameType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_game_type_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 50)
     @NotNull(message = "game name is required")
@@ -39,5 +41,11 @@ public class GameType {
     @Column(name = "game_max_player_per_slot", nullable = false)
     private Integer gameMaxPlayerPerSlot;
 
+    @NotNull(message = "current cycle start datetime is required")
+    @Column(name = "current_cycle_start_datetime")
+    private LocalDateTime currentCycleStartDatetime;
 
 }
+
+
+

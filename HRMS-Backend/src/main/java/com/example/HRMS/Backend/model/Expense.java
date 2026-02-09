@@ -21,7 +21,7 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_expense_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Min(value = 0,message = "expense amount cannot be negative")
     @NotNull(message = "expense amount is required")

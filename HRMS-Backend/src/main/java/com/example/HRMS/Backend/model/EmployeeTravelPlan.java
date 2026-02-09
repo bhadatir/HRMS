@@ -18,7 +18,7 @@ public class EmployeeTravelPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_employee_travel_plan_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ColumnDefault("getdate()")
     @Column(name = "employee_travel_plan_created_at")

@@ -13,7 +13,7 @@ public class EmployeeGameInterest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pk_employee_game_interest_id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @NotNull(message = "Employee(player) id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -25,5 +25,7 @@ public class EmployeeGameInterest {
     @JoinColumn(name = "fk_game_type_id", nullable = false)
     private GameType fkGameType;
 
+    @Column(name = "played_in_current_cycle")
+    private Boolean playedInCurrentCycle = false;
 
 }
