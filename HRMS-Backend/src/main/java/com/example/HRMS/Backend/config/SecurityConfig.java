@@ -35,6 +35,8 @@ public class SecurityConfig implements WebMvcConfigurer {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth ->
              auth.requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/swagger-ui/**").permitAll()
+            .requestMatchers("/v3/api-docs/**").permitAll()
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/hr/**").hasAnyRole("HR", "ADMIN")
             .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")

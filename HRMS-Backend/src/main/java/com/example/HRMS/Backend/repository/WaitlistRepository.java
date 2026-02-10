@@ -13,8 +13,8 @@ public interface WaitlistRepository extends JpaRepository<BookingWaitingList,Lon
     @Query("SELECT COUNT(bookingWaitingList) > 0 FROM BookingWaitingList bookingWaitingList " +
             "WHERE bookingWaitingList.fkHostEmployee.id = :empId " +
             "AND bookingWaitingList.fkGameType.id = :gameId " +
-            "AND bookingWaitingList.targetSlotDatetime >= :cycleStart")
+            "AND bookingWaitingList.targetSlotDatetime > (SELECT gameType.lastCycleResetDatetime FROM GameType gameType " +
+            "WHERE gameType.id = :gameTypeId)")
     boolean hasAppliedInCycle(@Param("empId") Long empId,
-                             @Param("gameId") Long gameId,
-                             @Param("cycleStart") LocalDateTime cycleStart);
+                             @Param("gameId") Long gameId);
 }

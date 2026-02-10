@@ -27,14 +27,20 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     private final BookingParticipantRepository bookingParticipantRepository;
 
+    private final EmployeeGameInterestRepository employeeGameInterestRepository;
+
     @Autowired
-    public GameBookingServiceImpl(GameBookingRepository gameBookingRepository,WaitlistRepository waitlistRepo, EmployeeRepository employeeRepository,GameTypeRepository gameTypeRepository, GameBookingStatusRepository gameBookingStatusRepository, BookingParticipantRepository bookingParticipantRepository){
+    public GameBookingServiceImpl(GameBookingRepository gameBookingRepository,
+                                  WaitlistRepository waitlistRepo, EmployeeRepository employeeRepository,
+                                  GameTypeRepository gameTypeRepository, GameBookingStatusRepository gameBookingStatusRepository,
+                                  BookingParticipantRepository bookingParticipantRepository, EmployeeGameInterestRepository employeeGameInterestRepository){
         this.gameBookingRepository =gameBookingRepository;
         this.waitlistRepo=waitlistRepo;
         this.employeeRepository=employeeRepository;
         this.gameTypeRepository=gameTypeRepository;
         this.gameBookingStatusRepository=gameBookingStatusRepository;
         this.bookingParticipantRepository=bookingParticipantRepository;
+        this.employeeGameInterestRepository=employeeGameInterestRepository;
     }
 
     //it, handle game sloat booking request by checking available sloat
@@ -50,15 +56,23 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         LocalDateTime now = LocalDateTime.now();
 
+        EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id(empId, gameTypeId);
+
+        if(employeeGameInterest == null)
+        {
+            throw new RuntimeException("host employee has not interest in this game ");
+        }
+
         if (bookingParticipants == null || bookingParticipants.isEmpty()) {
             throw new IllegalArgumentException("Participant list cannot be null or empty");
         }
 
         GameType gameType = gameTypeRepository.findGameTypeById(gameTypeId);
-        LocalDateTime cycleStart = gameType.getCurrentCycleStartDatetime();
         int gameSlotDuration = gameType.getGameSlotDuration();
 
-        boolean isSecondTime = gameBookingRepository.hasPlayedInCycle(empId, gameTypeId, cycleStart) || waitlistRepo.hasAppliedInCycle(empId, gameTypeId, cycleStart);
+        boolean isSecondTime = gameBookingRepository.hasPlayedInCycle(empId, gameTypeId)
+                || waitlistRepo.hasAppliedInCycle(empId, gameTypeId)
+                || employeeGameInterest.getPlayedInCurrentCycle();
 
         LocalDateTime sloatEndTime = requestedSlotStartTime.plusMinutes(gameSlotDuration);
 
@@ -98,6 +112,9 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         gameBookingRepository.save(saveGameBooking);
 
+        employeeGameInterest.setPlayedInCurrentCycle(true);
+        employeeGameInterestRepository.save(employeeGameInterest);
+
         for (BookingParticipant participant : bookingParticipants) {
             participant.setFkGameBooking(saveGameBooking);
 
@@ -132,7 +149,6 @@ public class GameBookingServiceImpl implements GameBookingService {
         }
     }
 
-
     //update game booking status to cancel (after get sloat I require cancel booking so this method do that)
     @Override
     public GameBooking updateGameBookingStatus(Long pkGameBookingId,Long fkGameStatusId){
@@ -155,20 +171,3 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
 }
-
-
-//@Scheduled(fixedRate = 60000) // Runs every minute
-//public void promoteWaitlist() {
-//    LocalDateTime now = LocalDateTime.now();
-//    LocalDateTime windowThreshold = now.plusMinutes(30);
-//
-//    // Find slots starting in exactly 30 minutes that aren't full
-//    List<WaitlistEntry> candidates = waitlistRepo.findPromotableEntries(windowThreshold);
-//
-//    for (WaitlistEntry entry : candidates) {
-//        // Double check capacity and promote
-//        if (hasCapacity(entry.getSlot(), entry.getGameId())) {
-//            convertToBooking(entry);
-//        }
-//    }
-//}

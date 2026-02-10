@@ -5,10 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.Default;
 
 import java.sql.Time;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
 
 @Getter
 @Setter
@@ -41,10 +44,17 @@ public class GameType {
     @Column(name = "game_max_player_per_slot", nullable = false)
     private Integer gameMaxPlayerPerSlot;
 
-    @NotNull(message = "current cycle start datetime is required")
-    @Column(name = "current_cycle_start_datetime")
-    private LocalDateTime currentCycleStartDatetime;
+    @Column(name = "total_slots_per_day ")
+    private Integer totalSlotsPerDay;
 
+    @Column(name = "last_cycle_reset_datetime ")
+    private LocalDateTime lastCycleResetDatetime = LocalDateTime.now();
+
+    @PostPersist
+    public void afterInsert() {
+        long minutes = Duration.between((Temporal)operatingStart, (Temporal) operatingEnd).toMinutes();
+        totalSlotsPerDay = (int) minutes / gameSlotDuration ;
+    }
 }
 
 

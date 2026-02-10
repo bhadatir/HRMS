@@ -32,7 +32,6 @@ public class BookingParticipant {
     @JoinColumn(name = "fk_employee_id", nullable = false)
     private Employee fkEmployee;
 
-//
 //    @NotNull(message = "GameBookingStatus id is required")
 //    @ManyToOne(fetch = FetchType.LAZY, optional = false)
 //    @JoinColumn(name = "fk_participant_game_booking_status_id", nullable = false)
