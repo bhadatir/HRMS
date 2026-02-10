@@ -23,13 +23,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<String> handleAccessDenied(AccessDeniedException ex){
-        return new ResponseEntity<>("Access Denied : you do not have permission to access this. "+ex.getMessage(),
+        return new ResponseEntity<>("Access Denied : you do not have permission to access this. => "+ex.getMessage(),
                 HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-        return new ResponseEntity<>("Run time exception" + ex.getMessage(),
+        return new ResponseEntity<>("Run time exception => " + ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
