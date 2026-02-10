@@ -12,6 +12,7 @@ import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.repository.PositionRepository;
 import com.example.HRMS.Backend.repository.RoleRepository;
 import com.example.HRMS.Backend.service.AuthService;
+import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -40,14 +44,17 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
 
     @Autowired
-    public AuthServiceImpl(AuthenticationManager authenticationManager, EmployeeRepository employeeRepository, RoleRepository roleRepository, DepartmentRepository departmentRepository, PositionRepository positionRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil){
-        this.authenticationManager=authenticationManager;
-        this.employeeRepository=employeeRepository;
-        this.roleRepository=roleRepository;
-        this.departmentRepository=departmentRepository;
-        this.passwordEncoder=passwordEncoder;
-        this.positionRepository=positionRepository;
-        this.jwtUtil=jwtUtil;
+    private EmailService emailService;
+
+    @Autowired
+    public AuthServiceImpl(AuthenticationManager authenticationManager, EmployeeRepository employeeRepository, RoleRepository roleRepository, DepartmentRepository departmentRepository, PositionRepository positionRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.employeeRepository = employeeRepository;
+        this.roleRepository = roleRepository;
+        this.departmentRepository = departmentRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.positionRepository = positionRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -91,6 +98,33 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("Role not found"));
         employee.setFkRole(role);
 
+        employeeRepository.save(employee);
+    }
+
+    @Override
+    public void initiateForgotPassword(String email) {
+        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = UUID.randomUUID().toString();
+        employee.setResetToken(token);
+        employee.setResetTokenExpiry(LocalDateTime.now().plusMinutes(1));
+        employeeRepository.save(employee);
+
+        emailService.sendEmail(email, "Password Reset", "Your token is: " + token);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        Employee employee = employeeRepository.findByResetToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+        if (employee.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token expired");
+        }
+
+        employee.setEmployeePassword(passwordEncoder.encode(newPassword));
+        employee.setResetToken(null);
         employeeRepository.save(employee);
     }
 }

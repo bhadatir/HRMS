@@ -14,6 +14,8 @@ public class WaitingListServiceImpl implements WaitingListService {
     {
         this.waitlistRepository=waitlistRepository;
     }
+
+    //change waiting list status to isActive = false
     @Override
     public BookingWaitingList updateWaitingListStatusById(Long waitingListId){
         BookingWaitingList bookingWaitingList = waitlistRepository.findBookingWaitingListsById(waitingListId);

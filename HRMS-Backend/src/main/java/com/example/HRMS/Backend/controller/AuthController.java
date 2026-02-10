@@ -8,10 +8,7 @@ import com.example.HRMS.Backend.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,5 +30,17 @@ public class AuthController {
     public ResponseEntity<Object> register(@Valid @RequestBody RegisterRequest registerRequest) {
         authService.register(registerRequest);
         return ResponseEntity.ok("User registered successfully");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Object> forgotPassword(@RequestParam String email) {
+        authService.initiateForgotPassword(email);
+        return ResponseEntity.ok("Reset link sent to your email.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Object> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        authService.resetPassword(token, newPassword);
+        return ResponseEntity.ok("Password updated successfully.");
     }
 }

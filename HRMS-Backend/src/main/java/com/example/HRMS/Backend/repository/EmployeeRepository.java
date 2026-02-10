@@ -3,6 +3,7 @@ package com.example.HRMS.Backend.repository;
 import java.util.List;
 import java.util.Optional;
 
+//import com.example.HRMS.Backend.dto.ManagerChain;
 import com.example.HRMS.Backend.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Object[]> getUpwardManagerChainEntities(@Param("empId") Long empId);
 
     List<Employee> findByFkManagerEmployeeId(Long managerId);
+
+    Optional<Employee> findByResetToken(String resetToken);
 }

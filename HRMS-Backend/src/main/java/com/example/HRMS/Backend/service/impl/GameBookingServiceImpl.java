@@ -37,6 +37,8 @@ public class GameBookingServiceImpl implements GameBookingService {
         this.bookingParticipantRepository=bookingParticipantRepository;
     }
 
+    //it, handle game sloat booking request by checking available sloat
+    // and in single chain how many times this given host employee play.
     @Override
     @Transactional
     public String attemptBooking(GameBookingRequest gameBookingRequest) {
@@ -69,6 +71,8 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         boolean isSlotFull = gameBookingById.getGameBookingStartTime() == requestedSlotStartTime && gameBookingById.getFkGameBookingStatus().getId() == 3; // "accepted"
 
+        //if given host employee come to book same game in same cycle second time so
+        //it not get sloat directly, but it, go in waiting list
         if (isSecondTime) {
             long minutesUntilSlot = Duration.between(now, requestedSlotStartTime).toMinutes();
 
@@ -128,6 +132,8 @@ public class GameBookingServiceImpl implements GameBookingService {
         }
     }
 
+
+    //update game booking status to cancel (after get sloat I require cancel booking so this method do that)
     @Override
     public GameBooking updateGameBookingStatus(Long pkGameBookingId,Long fkGameStatusId){
         GameBooking gameBooking = gameBookingRepository.findGameBookingById(pkGameBookingId);

@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -62,6 +63,12 @@ public class Employee {
 
     @Column(name = "employee_is_active")
     private Boolean employeeIsActive = true;
+
+    @Column(name = "employee_pass_resetToken")
+    private String resetToken;
+
+    @Column(name = "employee_resetToken_expiry")
+    private LocalDateTime resetTokenExpiry;
 
     @NotNull(message = "Employee department id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
