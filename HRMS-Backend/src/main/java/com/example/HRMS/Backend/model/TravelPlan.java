@@ -1,5 +1,6 @@
 package com.example.HRMS.Backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -42,9 +43,8 @@ public class TravelPlan {
     @Column(name = "travel_plan_to", nullable = false)
     private String travelPlanTo;
 
-    @ColumnDefault("1")
     @Column(name = "travel_plan_is_return")
-    private Boolean travelPlanIsReturn;
+    private Boolean travelPlanIsReturn = true;
 
     @NotNull(message = "travel plan starting date is required")
     @Column(name = "travel_plan_start_date", nullable = false)
@@ -54,15 +54,13 @@ public class TravelPlan {
     @Column(name = "travel_plan_end_date", nullable = false)
     private LocalDate travelPlanEndDate;
 
-    @ColumnDefault("getdate()")
     @Column(name = "travel_plan_created_at")
-    private Instant travelPlanCreatedAt;
+    private Instant travelPlanCreatedAt = Instant.now();
 
-    @NotNull(message = "Employee id is required who create this travel plan")
+    @NotNull(message = "HR Employee id is required who create this travel plan")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "fk_travel_plan_employee_id", nullable = false)
-    private Employee fkTravelPlanEmployee;
-
+    @JoinColumn(name = "fk_travel_plan_HR_employee_id", nullable = false)
+    @JsonIgnore
+    private Employee fkTravelPlanHREmployee;
 
 }

@@ -18,6 +18,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     boolean existsByEmployeeEmail(String employeeEmail);
 
+    //for OrgChart
     @Query(value = "WITH ManagerChain AS (" +
             "SELECT pk_employee_id, employee_first_name, employee_last_name, fk_manager_employee_id, 1 as level " +
             "FROM employee WHERE pk_employee_id = :empId " +
@@ -29,5 +30,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     List<Employee> findByFkManagerEmployeeId(Long managerId);
 
+    //for pass reset
     Optional<Employee> findByResetToken(String resetToken);
 }

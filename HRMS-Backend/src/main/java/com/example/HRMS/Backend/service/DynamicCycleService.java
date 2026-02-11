@@ -9,4 +9,6 @@ public interface DynamicCycleService {
     int calculateCycleDays(GameType game);
 
     void performCycleReset(GameType gameType);
+
+    void resetFlagsByGameTypeId(Long gameTypeId);
 }

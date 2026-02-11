@@ -72,13 +72,11 @@ public class Employee {
 
     @NotNull(message = "Employee department id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_department_id", nullable = false)
     private Department fkDepartment;
 
     @NotNull(message = "Employee position id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_position_id", nullable = false)
     private Position fkPosition;
 

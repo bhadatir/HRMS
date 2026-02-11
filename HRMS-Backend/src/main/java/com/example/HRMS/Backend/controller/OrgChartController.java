@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/employee/org-chart")
+@RequestMapping("/api/org-chart")
 public class OrgChartController {
 
     private final OrgChartServiceImpl orgService;

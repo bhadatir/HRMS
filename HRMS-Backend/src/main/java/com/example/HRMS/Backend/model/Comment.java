@@ -23,7 +23,6 @@ public class Comment {
 
     @NotNull(message = "Posi id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_post_id", nullable = false)
     private Post fkPost;
 
@@ -41,9 +40,8 @@ public class Comment {
     private String commentContent;
 
     @PastOrPresent(message = "comment created date cannot be in the future")
-    @ColumnDefault("getdate()")
     @Column(name = "comment_created_at")
-    private Instant commentCreatedAt;
+    private Instant commentCreatedAt = Instant.now();
 
     @ColumnDefault("0")
     @Column(name = "comment_is_deleted")

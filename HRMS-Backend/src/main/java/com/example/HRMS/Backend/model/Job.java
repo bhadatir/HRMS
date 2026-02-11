@@ -30,28 +30,24 @@ public class Job {
     @Column(name = "job_salary", nullable = false)
     private Integer jobSalary;
 
-    @ColumnDefault("getdate()")
     @Column(name = "job_created_at")
-    private Instant jobCreatedAt;
+    private Instant jobCreatedAt = Instant.now();
 
     @Size(max = 255)
     @NotNull(message = "job description(JD) is required")
     @Column(name = "job_description_url", nullable = false)
     private String jobDescriptionUrl;
 
-    @ColumnDefault("1")
     @Column(name = "job_is_active")
-    private Boolean jobIsActive;
+    private Boolean jobIsActive = true;
 
     @NotNull(message = "job type id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_job_type_id", nullable = false)
     private JobType fkJobType;
 
     @NotNull(message = "job owner(HR) id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_job_owner_employee_id", nullable = false)
     private Employee fkJobOwnerEmployee;
 

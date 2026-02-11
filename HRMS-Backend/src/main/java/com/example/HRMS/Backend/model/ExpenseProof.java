@@ -21,9 +21,8 @@ public class ExpenseProof {
     @Column(name = "pk_expense_proof_id", nullable = false)
     private Long id;
 
-    @ColumnDefault("getdate()")
     @Column(name = "expense_proof_uploaded_at")
-    private Instant expenseProofUploadedAt;
+    private Instant expenseProofUploadedAt = Instant.now();
 
     @Size(max = 255)
     @NotNull(message = "expense proof doc/img is required")
@@ -32,13 +31,11 @@ public class ExpenseProof {
 
     @NotNull(message = "expense id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_expense_id", nullable = false)
     private Expense fkExpense;
 
     @NotNull(message = "expense proof type id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_expense_proof_type_id", nullable = false)
     private ExpenseProofType fkExpenseProofType;
 

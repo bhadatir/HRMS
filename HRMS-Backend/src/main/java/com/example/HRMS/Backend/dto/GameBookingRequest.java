@@ -21,6 +21,6 @@ public class GameBookingRequest {
     private LocalDateTime requestedSlotStartTime;
 
     @NotNull(message = "Participants are required")
-    List<BookingParticipant> bookingParticipants;
+    List<Long> bookingParticipantsEmpId;
 
 }

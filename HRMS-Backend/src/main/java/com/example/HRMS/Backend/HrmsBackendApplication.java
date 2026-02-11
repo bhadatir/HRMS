@@ -10,4 +10,6 @@ public class HrmsBackendApplication {
 		SpringApplication.run(HrmsBackendApplication.class, args);
 	}
 
+	//show image properly is pending
+
 }

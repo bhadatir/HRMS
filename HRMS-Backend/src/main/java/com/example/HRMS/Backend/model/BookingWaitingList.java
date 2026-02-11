@@ -32,7 +32,7 @@ public class BookingWaitingList {
 
     @NotNull(message = "List Creation date and time is required")
     @Column(name = "waiting_list_created_at", nullable = false)
-    private LocalDateTime waitingListCreatedAt;
+    private LocalDateTime waitingListCreatedAt = LocalDateTime.now();
 
     @NotNull(message = "game type id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

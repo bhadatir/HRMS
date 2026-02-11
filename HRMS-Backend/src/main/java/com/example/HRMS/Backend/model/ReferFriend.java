@@ -42,13 +42,11 @@ public class ReferFriend {
     @Column(name = "refer_friend_short_note")
     private String referFriendShortNote;
 
-    @ColumnDefault("getdate()")
     @Column(name = "refer_friend_review_status_changed_at")
-    private Instant referFriendReviewStatusChangedAt;
+    private Instant referFriendReviewStatusChangedAt = Instant.now();
 
     @NotNull(message = "cv status type is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_cv_status_type_id", nullable = false)
     private CvStatusType fkCvStatusType;
 
@@ -59,7 +57,6 @@ public class ReferFriend {
 
     @NotNull(message = "job id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_job_id", nullable = false)
     private Job fkJob;
 

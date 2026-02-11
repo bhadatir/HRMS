@@ -18,6 +18,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 public class SecurityConfig implements WebMvcConfigurer {
 
+    private static final String[] COMMON_ROLES = { "HR", "MANAGER", "EMPLOYEE", "ADMIN" };
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -36,9 +38,12 @@ public class SecurityConfig implements WebMvcConfigurer {
             .authorizeHttpRequests(auth ->
              auth.requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/swagger-ui/**").permitAll()
+                     .requestMatchers("/api/hr/job/**").permitAll()
             .requestMatchers("/v3/api-docs/**").permitAll()
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/hr/**").hasAnyRole("HR", "ADMIN")
+            .requestMatchers("/api/org-chart/**", "/api/gameType/**", "/api/travel/**", "/api/game/**", "/api/job/**")
+            .hasAnyRole(COMMON_ROLES)
             .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
             .requestMatchers("/api/employee/**").hasAnyRole("EMPLOYEE", "ADMIN")
             .anyRequest().authenticated())

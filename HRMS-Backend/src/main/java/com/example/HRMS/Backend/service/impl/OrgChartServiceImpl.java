@@ -1,7 +1,5 @@
 package com.example.HRMS.Backend.service.impl;
 
-
-//import com.example.HRMS.Backend.dto.ManagerChain;
 import com.example.HRMS.Backend.dto.OrgChart;
 import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
@@ -35,11 +33,6 @@ public class OrgChartServiceImpl implements OrgChartService {
 
         OrgChart dto = modelMapper.map(employee, OrgChart.class);
 
-//        List<ManagerChain> parentChain = empRepo.getUpwardManagerChainEntities(empId);
-//        dto.setManagerChain(parentChain.stream()
-//                .map(e -> modelMapper.map(e, OrgChart.class))
-//                .collect(Collectors.toList()));
-
         List<Object[]> parentChain = empRepo.getUpwardManagerChainEntities(empId);
 
         dto.setManagerChain(
@@ -58,7 +51,7 @@ public class OrgChartServiceImpl implements OrgChartService {
 
         List<Employee> reports = empRepo.findByFkManagerEmployeeId(empId);
         dto.setDirectReports(reports.stream()
-                .map(e -> modelMapper.map(e, OrgChart.class))
+                .map(emp -> modelMapper.map(emp, OrgChart.class))
                 .toList()
         );
 

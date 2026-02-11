@@ -34,9 +34,8 @@ public class Like {
     @JoinColumn(name = "fk_comment_id")
     private Comment fkComment;
 
-    @ColumnDefault("getdate()")
     @Column(name = "like_created_at")
-    private Instant likeCreatedAt;
+    private Instant likeCreatedAt = Instant.now();
 
 
 }

@@ -1,5 +1,6 @@
 package com.example.HRMS.Backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -26,13 +27,11 @@ public class TravelDoc {
     @Column(name = "travel_doc_url", nullable = false)
     private String travelDocUrl;
 
-    @ColumnDefault("getdate()")
     @Column(name = "travel_doc_uploaded_at")
-    private Instant travelDocUploadedAt;
+    private Instant travelDocUploadedAt = Instant.now();
 
     @NotNull(message = "travel doc type id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_travel_docs_type_id", nullable = false)
     private TravelDocsType fkTravelDocsType;
 
@@ -43,6 +42,11 @@ public class TravelDoc {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_employee_travel_plan_id")
     private EmployeeTravelPlan fkEmployeeTravelPlan;
+
+    @NotNull(message = "owner employee id is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_owner_employee_id")
+    private Employee fkEmployee;
 
 
 }

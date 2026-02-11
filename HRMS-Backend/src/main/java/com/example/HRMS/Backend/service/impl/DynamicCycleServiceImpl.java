@@ -5,7 +5,6 @@ import com.example.HRMS.Backend.model.GameType;
 import com.example.HRMS.Backend.repository.EmployeeGameInterestRepository;
 import com.example.HRMS.Backend.repository.GameTypeRepository;
 import com.example.HRMS.Backend.service.DynamicCycleService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -16,12 +15,19 @@ import java.util.List;
 @Service
 public class DynamicCycleServiceImpl implements DynamicCycleService {
 
-    @Autowired
-    private GameTypeRepository gameTypeRepo;
+    private final GameTypeRepository gameTypeRepo;
+
+    private final EmployeeGameInterestRepository employeeGameInterestRepository;
 
     @Autowired
-    private EmployeeGameInterestRepository employeeGameInterestRepository;
+    public DynamicCycleServiceImpl(GameTypeRepository gameTypeRepository,
+                                   EmployeeGameInterestRepository employeeGameInterestRepository){
+        this.gameTypeRepo=gameTypeRepository;
+        this.employeeGameInterestRepository=employeeGameInterestRepository;
+    }
 
+    //run every day to check cycle complete or not
+    //if cycle complete so reset isPlayed flag
     @Override
     @Scheduled(cron = "59 59 23 * * *")
     public void checkAndResetCycles() {
@@ -56,7 +62,8 @@ public class DynamicCycleServiceImpl implements DynamicCycleService {
         gameTypeRepo.save(gameType);
     }
 
-    private void resetFlagsByGameTypeId(Long gameTypeId){
+    @Override
+    public void resetFlagsByGameTypeId(Long gameTypeId){
         List<EmployeeGameInterest> employeeGameInterests = employeeGameInterestRepository.getEmployeeGameInterestByFkGameType_Id(gameTypeId);
 
         for(EmployeeGameInterest employeeGameInterest : employeeGameInterests){

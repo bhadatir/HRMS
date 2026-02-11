@@ -20,9 +20,8 @@ public class JobShare {
     @Column(name = "pk_job_share_id", nullable = false)
     private Long id;
 
-    @ColumnDefault("getdate()")
     @Column(name = "job_share_created_at")
-    private Instant jobShareCreatedAt;
+    private Instant jobShareCreatedAt = Instant.now();
 
     @NotNull(message = "share by whom is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -31,7 +30,6 @@ public class JobShare {
 
     @NotNull(message = "which job you share? that job id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_job_id", nullable = false)
     private Job fkJob;
 

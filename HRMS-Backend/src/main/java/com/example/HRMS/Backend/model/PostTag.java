@@ -19,13 +19,11 @@ public class PostTag {
 
     @NotNull(message = "post id is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_post_id")
     private Post fkPost;
 
     @NotNull(message = "tag type id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_tag_type_id", nullable = false)
     private TagType fkTagType;
 }

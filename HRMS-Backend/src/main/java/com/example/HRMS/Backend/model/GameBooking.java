@@ -51,9 +51,8 @@ public class GameBooking {
     @JoinColumn(name = "fk_host_employee_id", nullable = false)
     private Employee fkHostEmployee;
 
-    @ColumnDefault("getdate()")
     @Column(name = "game_booking_created_at")
-    private Instant gameBookingCreatedAt;
+    private Instant gameBookingCreatedAt = Instant.now();
 
 
 }

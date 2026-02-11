@@ -13,6 +13,8 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
 
     GameBooking findGameBookingByFkGameType_Id(Long fkGameTypeId);
 
+    GameBooking findGameBookingByFkHostEmployee_Id(Long fkHostEmployeeId);
+
     GameBooking findGameBookingById(Long pkGameBookingId);
 
     @Query("SELECT COUNT(gameBooking) > 0 FROM GameBooking gameBooking WHERE gameBooking.fkHostEmployee.id = :empId " +
@@ -20,6 +22,6 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
             "AND gameBooking.gameBookingStartTime > (SELECT gameType.lastCycleResetDatetime FROM GameType gameType " +
             "WHERE gameType.id = :gameTypeId)")
     boolean hasPlayedInCycle(@Param("empId") Long empId,
-                             @Param("gameId") Long gameTypeId);
+                             @Param("gameTypeId") Long gameTypeId);
 
 }

@@ -36,7 +36,6 @@ public class EmployeeTravelPlan {
 
     @NotNull(message = "travel plan id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_travel_plan_id", nullable = false)
     private TravelPlan fkTravelPlan;
 

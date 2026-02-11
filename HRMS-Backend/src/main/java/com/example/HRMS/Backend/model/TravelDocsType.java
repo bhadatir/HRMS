@@ -21,5 +21,4 @@ public class TravelDocsType {
     @Column(name = "travel_docs_type_name", nullable = false, length = 20)
     private String travelDocsTypeName;
 
-
 }

@@ -33,16 +33,13 @@ public class Post {
     @Column(name = "post_content_url")
     private String postContentUrl;
 
-    @ColumnDefault("getdate()")
     @Column(name = "post_created_at")
-    private Instant postCreatedAt;
+    private Instant postCreatedAt = Instant.now();
 
-    @ColumnDefault("0")
     @Column(name = "post_is_deleted")
-    private Boolean postIsDeleted;
+    private Boolean postIsDeleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_post_employee_id")
     private Employee fkPostEmployee;
 }

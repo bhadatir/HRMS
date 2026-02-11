@@ -22,9 +22,8 @@ public class CvReviewer {
     private Long id;
 
     @PastOrPresent(message = "reviewer created date cannot be in the future")
-    @ColumnDefault("getdate()")
     @Column(name = "cv_reviewer_created_at")
-    private Instant cvReviewerCreatedAt;
+    private Instant cvReviewerCreatedAt = Instant.now();
 
     @NotNull(message = "Reviewer id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -33,7 +32,6 @@ public class CvReviewer {
 
     @NotNull(message = "job id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_job_id", nullable = false)
     private Job fkJob;
 

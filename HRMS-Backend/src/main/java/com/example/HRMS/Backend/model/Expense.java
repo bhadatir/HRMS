@@ -1,5 +1,6 @@
 package com.example.HRMS.Backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -36,9 +37,8 @@ public class Expense {
     @Column(name = "expense_remark")
     private String expenseRemark;
 
-    @ColumnDefault("getdate()")
     @Column(name = "expense_uploaded_at")
-    private Instant expenseUploadedAt;
+    private Instant expenseUploadedAt = Instant.now();
 
     @NotNull(message = "expense status is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -47,7 +47,6 @@ public class Expense {
 
     @NotNull(message = "Employee travel plan id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fk_employee_travel_plan_id", nullable = false)
     private EmployeeTravelPlan fkEmployeeTravelPlan;
 
