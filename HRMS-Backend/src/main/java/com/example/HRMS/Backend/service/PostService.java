@@ -26,4 +26,12 @@ public interface PostService {
     List<LikeResponse> getLikeByPostId(Long postId);
 
     List<LikeResponse> getLikeByCommentId(Long commentId);
+
+    void removeCommentByHr(Long commentId);
+
+    void removePostByHr(Long postId);
+
+    void removeComment(Long commentId);
+
+    void removePost(Long postId);
 }

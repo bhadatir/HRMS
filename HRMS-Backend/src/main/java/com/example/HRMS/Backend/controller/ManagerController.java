@@ -3,13 +3,11 @@ package com.example.HRMS.Backend.controller;
 import com.example.HRMS.Backend.model.TravelDoc;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.repository.TravelDocRepository;
+import com.example.HRMS.Backend.service.PostService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,10 +20,23 @@ public class ManagerController {
     private final TravelPlanService travelPlanService;
     private final TravelDocRepository travelDocRepository;
     private final EmployeeRepository employeeRepository;
+    private final PostService postService;
 
 //    @GetMapping("/{id}")
 //    public ResponseEntity<List<TravelDoc>> showTravelDocByEmpIdByManager(@PathVariable Long id) {
 //
 //    }
+
+    @PatchMapping("/comment/{commentId}")
+    public ResponseEntity<String> removeComment(@PathVariable("commentId") Long commentId) {
+        postService.removeComment(commentId);
+        return ResponseEntity.ok("comment remove successfully");
+    }
+
+    @PatchMapping("/post/{postId}")
+    public ResponseEntity<String> removePost(@PathVariable("postId") Long postId) {
+        postService.removePost(postId);
+        return ResponseEntity.ok("post remove successfully");
+    }
 
 }

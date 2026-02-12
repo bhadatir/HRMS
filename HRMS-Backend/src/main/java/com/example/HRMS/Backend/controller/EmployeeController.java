@@ -4,6 +4,7 @@ import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.TravelDoc;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.repository.TravelDocRepository;
+import com.example.HRMS.Backend.service.PostService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class EmployeeController {
     private final TravelPlanService travelPlanService;
     private final TravelDocRepository travelDocRepository;
     private final EmployeeRepository employeeRepository;
+    private final PostService postService;
 
     @PostMapping("/travelPlanDoc/{employeeTravelPlanId}")
     public ResponseEntity<String> addTravelPlanDocByEmployee(@PathVariable Long employeeTravelPlanId, @RequestParam("file") MultipartFile file, @RequestParam("docType") Long docTypeId ) throws IOException {
@@ -42,5 +44,17 @@ public class EmployeeController {
         List<TravelDoc> travelDocs = travelDocRepository.findTravelDocByFkEmployee_Id(id);
 
         return ResponseEntity.ok(travelDocs);
+    }
+
+    @PatchMapping("/comment/{commentId}")
+    public ResponseEntity<String> removeComment(@PathVariable("commentId") Long commentId) {
+        postService.removeComment(commentId);
+        return ResponseEntity.ok("comment remove successfully");
+    }
+
+    @PatchMapping("/post/{postId}")
+    public ResponseEntity<String> removePost(@PathVariable("postId") Long postId) {
+        postService.removePost(postId);
+        return ResponseEntity.ok("post remove successfully");
     }
 }

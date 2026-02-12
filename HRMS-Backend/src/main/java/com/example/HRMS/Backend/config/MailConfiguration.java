@@ -14,6 +14,7 @@ public class MailConfiguration {
 
     @Value("${spring.mail.username}")
     private String sender;
+
     @Value("${spring.mail.password}")
     private String password;
 

@@ -11,6 +11,7 @@ import com.example.HRMS.Backend.repository.GameTypeRepository;
 import com.example.HRMS.Backend.repository.JobRepository;
 import com.example.HRMS.Backend.repository.TravelDocRepository;
 import com.example.HRMS.Backend.service.JobService;
+import com.example.HRMS.Backend.service.PostService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class HrController {
     private final TravelDocRepository travelDocRepository;
     private final GameTypeRepository gameTypeRepository;
     private final JobService jobService;
+    private final PostService postService;
 
     @PostMapping("/travelPlan")
     public ResponseEntity<String > addNewTravelPlan(@Valid @RequestBody TravelPlanRequest travelPlanRequest) {
@@ -70,5 +72,17 @@ public class HrController {
     public ResponseEntity<String> addCvReviewer(@PathVariable("jobId") Long jobId, @PathVariable("empCvReviewerId") Long empCvReviewerId) {
         jobService.saveCvReviewer(jobId,empCvReviewerId);
         return ResponseEntity.ok("Cv Reviewer add successfully");
+    }
+
+    @PatchMapping("/comment/{commentId}")
+    public ResponseEntity<String> removeComment(@PathVariable("commentId") Long commentId) {
+        postService.removeCommentByHr(commentId);
+        return ResponseEntity.ok("comment remove successfully");
+    }
+
+    @PatchMapping("/post/{postId}")
+    public ResponseEntity<String> removePost(@PathVariable("postId") Long postId) {
+        postService.removePostByHr(postId);
+        return ResponseEntity.ok("post remove successfully");
     }
 }

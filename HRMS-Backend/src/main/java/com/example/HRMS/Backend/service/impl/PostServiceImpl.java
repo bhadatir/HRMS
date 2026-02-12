@@ -4,6 +4,7 @@ import ch.qos.logback.core.model.Model;
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
+import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,6 +30,7 @@ public class PostServiceImpl implements PostService {
     private final TagTypesRepository tagTypesRepository;
     private final ModelMapper modelMapper;
     private final EmployeeRepository employeeRepository;
+    private final EmailService emailService;
 
     @Value("${img.path}")
     private String folderPath;
@@ -168,4 +170,42 @@ public class PostServiceImpl implements PostService {
 
         return likeResponses;
     }
+
+    @Override
+    public void removeCommentByHr(Long commentId){
+        Comment comment = commentsRepository.findCommentById(commentId);
+
+        comment.setCommentIsDeleted(true);
+
+        String email = comment.getFkCommentEmployee().getEmployeeEmail();
+        emailService.sendEmail(email, "Warning mail", "Do not share this type of content second time :" + comment.getCommentContent());
+
+        commentsRepository.save(comment);
+    }
+
+    @Override
+    public void removePostByHr(Long postId){
+        Post post = postRepository.findPostsById(postId);
+        post.setPostIsDeleted(true);
+
+        String email = post.getFkPostEmployee().getEmployeeEmail();
+        emailService.sendEmail(email, "Warning mail", "Do not share this type of content second time :" + post.getPostContent());
+
+        postRepository.save(post);
+    }
+
+    @Override
+    public void removeComment(Long commentId){
+        Comment comment = commentsRepository.findCommentById(commentId);
+        comment.setCommentIsDeleted(true);
+        commentsRepository.save(comment);
+    }
+
+    @Override
+    public void removePost(Long postId){
+        Post post = postRepository.findPostsById(postId);
+        post.setPostIsDeleted(true);
+        postRepository.save(post);
+    }
+
 }
