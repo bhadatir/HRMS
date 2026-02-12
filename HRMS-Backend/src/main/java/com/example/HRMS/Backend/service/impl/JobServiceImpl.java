@@ -136,7 +136,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public JobResponse showJobByJObId(Long jobId){
+    public JobResponse showJobByJobId(Long jobId){
         return modelMapper.map(jobRepository.findJobById(jobId),JobResponse.class);
     }
 

@@ -42,7 +42,7 @@ public class JobController {
 
     @GetMapping("/{jobId}")
     public ResponseEntity<JobResponse> jobByJobId(@PathVariable Long jobId) {
-        return ResponseEntity.ok(jobService.showJobByJObId(jobId));
+        return ResponseEntity.ok(jobService.showJobByJobId(jobId));
     }
 
 }

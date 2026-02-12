@@ -17,11 +17,17 @@ public class TravelDocResponse {
 
     private Instant travelDocUploadedAt;
 
-    private TravelDocsType fkTravelDocsType;
+    private Long travelDocsTypeId;
 
-    private TravelPlan fkTravelPlan;
+    private String travelDocsTypeName;
 
-    private EmployeeTravelPlan fkEmployeeTravelPlan;
+    private Long travelPlanId;
 
-    private Employee fkEmployee;
+    private String travelPlanName;
+
+    private Long employeeTravelPlanId;
+
+    private Long employeeId;
+
+    private String employeeEmail;
 }

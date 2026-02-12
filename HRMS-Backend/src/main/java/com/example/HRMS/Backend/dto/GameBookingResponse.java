@@ -19,11 +19,11 @@ public class GameBookingResponse {
 
     private Boolean isSecondTimePlay;
 
-    private String gameBookingStatusName;
+    private Long gameBookingStatusId;
 
-    private String gameName;
+    private Long gameTypeId;
 
-    private String employeeEmail;
+    private Long employeeId;
 
     private Instant gameBookingCreatedAt;
 

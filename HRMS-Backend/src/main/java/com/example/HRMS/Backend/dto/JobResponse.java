@@ -24,8 +24,8 @@ public class JobResponse {
 
     private Boolean jobIsActive;
 
-    private String jobTypeName;
+    private Long jobTypeId;
 
-    private String employeeEmail;
+    private Long employeeId;
 
 }

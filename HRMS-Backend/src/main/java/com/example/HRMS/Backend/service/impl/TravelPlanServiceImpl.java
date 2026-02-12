@@ -6,6 +6,7 @@ import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,10 +126,23 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
             travelDocResponse.setTravelDocUploadedAt(travelDoc.getTravelDocUploadedAt());
             travelDocResponse.setTravelDocUrl(travelDoc.getTravelDocUrl());
-            travelDocResponse.setFkTravelDocsType(travelDoc.getFkTravelDocsType());
-            travelDocResponse.setFkEmployeeTravelPlan(travelDoc.getFkEmployeeTravelPlan());
-            travelDocResponse.setFkTravelPlan(travelDoc.getFkTravelPlan());
-            travelDocResponse.setFkEmployee(travelDoc.getFkEmployee());
+
+            travelDocResponse.setTravelDocsTypeId(travelDoc.getFkTravelDocsType().getId());
+
+            Long employeeTravelPlanId = null;
+
+            if (travelDoc != null && travelDoc.getFkEmployeeTravelPlan() != null) {
+                employeeTravelPlanId = travelDoc.getFkEmployeeTravelPlan().getId();
+                travelDocResponse.setEmployeeTravelPlanId(employeeTravelPlanId);
+            }
+
+            travelDocResponse.setTravelPlanId(travelDoc.getFkTravelPlan().getId());
+            travelDocResponse.setEmployeeId(travelDoc.getFkEmployee().getId());
+
+            travelDocResponse.setTravelDocsTypeName(travelDoc.getFkTravelDocsType().getTravelDocsTypeName());
+            travelDocResponse.setTravelPlanName(travelDoc.getFkTravelPlan().getTravelPlanName());
+            travelDocResponse.setEmployeeEmail(travelDoc.getFkEmployee().getEmployeeEmail());
+
             travelDocResponse.setTravelDocImg(getTravelDocImg(travelDoc.getId(),
                     travelDoc.getTravelDocUrl()));
             travelDocResponses.add(travelDocResponse);

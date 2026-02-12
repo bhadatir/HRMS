@@ -1,7 +1,9 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.OrgChart;
+import com.example.HRMS.Backend.service.OrgChartService;
 import com.example.HRMS.Backend.service.impl.OrgChartServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,14 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/org-chart")
+@RequiredArgsConstructor
 public class OrgChartController {
 
-    private final OrgChartServiceImpl orgService;
-    @Autowired
-    public OrgChartController(OrgChartServiceImpl orgChartService)
-    {
-        this.orgService=orgChartService;
-    }
+    private final OrgChartService orgService;
 
     @GetMapping("/{empId}")
     public ResponseEntity<OrgChart> getHierarchy(@PathVariable Long empId) {

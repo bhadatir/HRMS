@@ -67,7 +67,7 @@ public class DynamicCycleServiceImpl implements DynamicCycleService {
         List<EmployeeGameInterest> employeeGameInterests = employeeGameInterestRepository.getEmployeeGameInterestByFkGameType_Id(gameTypeId);
 
         for(EmployeeGameInterest employeeGameInterest : employeeGameInterests){
-            employeeGameInterest.setPlayedInCurrentCycle(false);
+//            employeeGameInterest.setPlayedInCurrentCycle(false);
         }
     }
 }

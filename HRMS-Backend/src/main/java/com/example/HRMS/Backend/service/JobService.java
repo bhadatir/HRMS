@@ -23,5 +23,6 @@ public interface JobService {
 
     List<JobResponse> showAllJobs();
 
-    JobResponse showJobByJObId(Long jobId);
+    JobResponse showJobByJobId(Long jobId);
+
 }

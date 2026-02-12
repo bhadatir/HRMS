@@ -43,9 +43,8 @@ public class Comment {
     @Column(name = "comment_created_at")
     private Instant commentCreatedAt = Instant.now();
 
-    @ColumnDefault("0")
     @Column(name = "comment_is_deleted")
-    private Boolean commentIsDeleted;
+    private Boolean commentIsDeleted = false;
 
 
 }
