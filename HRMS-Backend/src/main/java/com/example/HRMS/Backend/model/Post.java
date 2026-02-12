@@ -40,7 +40,6 @@ public class Post {
     @Column(name = "post_is_deleted")
     private Boolean postIsDeleted = false;
 
-    @NotNull(message = "employee id is require who create this post")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_post_employee_id")
     private Employee fkPostEmployee;

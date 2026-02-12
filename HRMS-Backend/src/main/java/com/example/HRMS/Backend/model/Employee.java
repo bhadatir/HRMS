@@ -52,6 +52,7 @@ public class Employee {
     @Column(name = "employee_gender", nullable = false)
     private String employeeGender;
 
+    @PastOrPresent(message = "DOB cannot be in the future")
     @NotNull(message = "Employee hire date is required")
     @Column(name = "employee_hire_date", nullable = false)
     private LocalDate employeeHireDate;

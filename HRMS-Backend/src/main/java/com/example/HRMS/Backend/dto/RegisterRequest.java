@@ -22,6 +22,7 @@ public class RegisterRequest {
     @NotBlank
     private String gender;
     @NotNull
+    @PastOrPresent
     private LocalDate hireDate;
     @NotNull
     @Min(0)

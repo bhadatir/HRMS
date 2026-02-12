@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.model.GameType;
 import com.example.HRMS.Backend.repository.EmployeeGameInterestRepository;
 import com.example.HRMS.Backend.repository.GameTypeRepository;
 import com.example.HRMS.Backend.service.DynamicCycleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -13,18 +14,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class DynamicCycleServiceImpl implements DynamicCycleService {
 
     private final GameTypeRepository gameTypeRepo;
 
     private final EmployeeGameInterestRepository employeeGameInterestRepository;
-
-    @Autowired
-    public DynamicCycleServiceImpl(GameTypeRepository gameTypeRepository,
-                                   EmployeeGameInterestRepository employeeGameInterestRepository){
-        this.gameTypeRepo=gameTypeRepository;
-        this.employeeGameInterestRepository=employeeGameInterestRepository;
-    }
 
     //run every day to check cycle complete or not
     //if cycle complete so reset isPlayed flag

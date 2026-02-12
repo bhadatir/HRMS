@@ -14,6 +14,5 @@ public class PostRequest {
     @NotNull(message = "post content is required")
     private String postContent;
 
-    @NotNull(message = "employee id is require who create this post")
     private Long fkPostEmployeeId;
 }
