@@ -50,6 +50,8 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         List<BookingParticipant> bookingParticipants = new ArrayList<>();
 
+        System.out.println("hello start");
+
         List<Long> bookingParticipantsEmpId = gameBookingRequest.getBookingParticipantsEmpId();
 
 //        EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id(empId, gameTypeId);
@@ -71,7 +73,7 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         LocalDateTime sloatEndTime = requestedSlotStartTime.plusMinutes(gameSlotDuration);
 
-        GameBooking gameBookingById = gameBookingRepository.findGameBookingByFkGameType_Id(gameTypeId);
+        List<GameBooking> gameBookingById = gameBookingRepository.findGameBookingByFkGameType_Id(gameTypeId);
 
         System.out.println("hello" +gameBookingById);
 
@@ -84,7 +86,9 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         //first time or if sloat is empty then gameBookingById is null so check that
         if(gameBookingById != null) {
-            isSlotFull = gameBookingById.getGameBookingStartTime() == requestedSlotStartTime && gameBookingById.getFkGameBookingStatus().getId() == 1; // "accepted"
+            for(GameBooking gameBooking:gameBookingById) {
+                isSlotFull = gameBooking.getGameBookingStartTime() == requestedSlotStartTime && gameBooking.getFkGameBookingStatus().getId() == 1; // "accepted"
+            }
         }
 
         System.out.println("hello" +isSlotFull);

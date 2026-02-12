@@ -178,7 +178,9 @@ public class PostServiceImpl implements PostService {
         comment.setCommentIsDeleted(true);
 
         String email = comment.getFkCommentEmployee().getEmployeeEmail();
-        emailService.sendEmail(email, "Warning mail", "Do not share this type of content second time :" + comment.getCommentContent());
+        List<String> emails = new ArrayList<>();
+        emails.add(email);
+        emailService.sendEmail(emails, "Warning mail", "Do not share this type of content second time :" + comment.getCommentContent());
 
         commentsRepository.save(comment);
     }
@@ -189,7 +191,9 @@ public class PostServiceImpl implements PostService {
         post.setPostIsDeleted(true);
 
         String email = post.getFkPostEmployee().getEmployeeEmail();
-        emailService.sendEmail(email, "Warning mail", "Do not share this type of content second time :" + post.getPostContent());
+        List<String> emails = new ArrayList<>();
+        emails.add(email);
+        emailService.sendEmail(emails, "Warning mail", "Do not share this type of content second time :" + post.getPostContent());
 
         postRepository.save(post);
     }

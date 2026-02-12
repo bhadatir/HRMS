@@ -7,11 +7,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface GameBookingRepository extends JpaRepository<GameBooking, Long> {
 
-    GameBooking findGameBookingByFkGameType_Id(Long fkGameTypeId);
+    List<GameBooking> findGameBookingByFkGameType_Id(Long fkGameTypeId);
 
     GameBooking findGameBookingByFkHostEmployee_Id(Long fkHostEmployeeId);
 

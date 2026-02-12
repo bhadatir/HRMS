@@ -39,8 +39,8 @@ public class HrController {
         return ResponseEntity.ok("Travel plan add successfully");
     }
 
-    @PostMapping("/travelPlanDoc/{travelPlanId}/{docType}")
-    public ResponseEntity<String > addTravelPlanDocByHR(@PathVariable Long travelPlanId, @RequestParam("file") MultipartFile file, @PathVariable("docType") Long docTypeId ) throws IOException {
+    @PostMapping("/travelPlanDoc/{travelPlanId}/{docTypeId}")
+    public ResponseEntity<String > addTravelPlanDocByHR(@PathVariable Long travelPlanId, @RequestParam("file") MultipartFile file, @PathVariable Long docTypeId ) throws IOException {
         travelPlanService.saveDoc(travelPlanId, file, docTypeId);
         return ResponseEntity.ok("travel plan doc add successfully");
     }
@@ -62,26 +62,26 @@ public class HrController {
     }
 
     @PostMapping(value = "/job", consumes = {"multipart/form-data"})
-    public ResponseEntity<String> addJob(@Valid @RequestPart("jobRequest") JobRequest jobRequest,
+    public ResponseEntity<String> addJob(@Valid @RequestPart JobRequest jobRequest,
                                          @RequestPart("file") MultipartFile file) throws IOException {
         jobService.saveJob(jobRequest,file);
         return ResponseEntity.ok("Job add successfully");
     }
 
     @PostMapping("/cvReviewer/{jobId}/{empCvReviewerId}")
-    public ResponseEntity<String> addCvReviewer(@PathVariable("jobId") Long jobId, @PathVariable("empCvReviewerId") Long empCvReviewerId) {
+    public ResponseEntity<String> addCvReviewer(@PathVariable Long jobId, @PathVariable Long empCvReviewerId) {
         jobService.saveCvReviewer(jobId,empCvReviewerId);
         return ResponseEntity.ok("Cv Reviewer add successfully");
     }
 
     @PatchMapping("/comment/{commentId}")
-    public ResponseEntity<String> removeComment(@PathVariable("commentId") Long commentId) {
+    public ResponseEntity<String> removeComment(@PathVariable Long commentId) {
         postService.removeCommentByHr(commentId);
         return ResponseEntity.ok("comment remove successfully");
     }
 
     @PatchMapping("/post/{postId}")
-    public ResponseEntity<String> removePost(@PathVariable("postId") Long postId) {
+    public ResponseEntity<String> removePost(@PathVariable Long postId) {
         postService.removePostByHr(postId);
         return ResponseEntity.ok("post remove successfully");
     }

@@ -1,11 +1,9 @@
 package com.example.HRMS.Backend.service.impl;
 
 import com.example.HRMS.Backend.dto.ExpenseRequest;
-import com.example.HRMS.Backend.model.EmployeeTravelPlan;
-import com.example.HRMS.Backend.model.Expense;
-import com.example.HRMS.Backend.model.ExpenseProof;
-import com.example.HRMS.Backend.model.TravelPlanStatus;
+import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
+import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.ExpenseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final ExpenseProofTypeRepository expenseProofTypeRepository;
     private final ExpenseProofRepository expenseProofRepository;
+    private final EmailService emailService;
 
     @Override
     public void saveExpense(ExpenseRequest expenseRequest){
@@ -37,6 +38,17 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setFkEmployeeTravelPlan(employeeTravelPlan);
         expense.setFkExpenseTravelPlanStatus(travelPlanStatus);
         expenseRepository.save(expense);
+
+        List<String> emails = new ArrayList<>();
+        TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
+        Employee employee = travelPlan.getFkTravelPlanHREmployee();
+        emails.add(employee.getEmployeeEmail());
+
+        emailService.sendEmail(emails,
+                "Review Expense",
+                "Employee detail : " + employee.getId() +" "+ employee.getEmployeeEmail()
+                + "travel plan detail : " + travelPlan.getTravelPlanDetails() + " "
+                + travelPlan.getTravelPlanTo() + " - " + travelPlan.getTravelPlanFrom());
     }
 
     @Value("${img.path}")

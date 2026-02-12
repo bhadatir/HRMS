@@ -34,7 +34,7 @@ public class GameBookingController {
     }
 
     @PutMapping("/status")
-    public ResponseEntity<GameBooking> changeGameBookingStatus(@RequestParam Long gameBookingId,@RequestParam Long statusId){
+        public ResponseEntity<GameBooking> changeGameBookingStatus(@RequestParam Long gameBookingId,@RequestParam Long statusId){
         return ResponseEntity.ok(gameBookingService.updateGameBookingStatus(gameBookingId,statusId));
     }
 

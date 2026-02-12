@@ -3,10 +3,7 @@ package com.example.HRMS.Backend.service.impl;
 import com.example.HRMS.Backend.dto.AuthRequest;
 import com.example.HRMS.Backend.dto.AuthResponse;
 import com.example.HRMS.Backend.dto.RegisterRequest;
-import com.example.HRMS.Backend.model.Department;
-import com.example.HRMS.Backend.model.Employee;
-import com.example.HRMS.Backend.model.Position;
-import com.example.HRMS.Backend.model.Role;
+import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.DepartmentRepository;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.repository.PositionRepository;
@@ -24,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -111,7 +110,10 @@ public class AuthServiceImpl implements AuthService {
         employee.setResetTokenExpiry(LocalDateTime.now().plusMinutes(1));
         employeeRepository.save(employee);
 
-        emailService.sendEmail(email, "Password Reset", "Your token is: " + token);
+        List<String> emails = new ArrayList<>();
+        emails.add(email);
+
+        emailService.sendEmail(emails, "Password Reset", "Your token is: " + token);
     }
 
     @Override

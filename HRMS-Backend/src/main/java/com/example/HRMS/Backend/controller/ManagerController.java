@@ -28,13 +28,13 @@ public class ManagerController {
 //    }
 
     @PatchMapping("/comment/{commentId}")
-    public ResponseEntity<String> removeComment(@PathVariable("commentId") Long commentId) {
+    public ResponseEntity<String> removeComment(@PathVariable Long commentId) {
         postService.removeComment(commentId);
         return ResponseEntity.ok("comment remove successfully");
     }
 
     @PatchMapping("/post/{postId}")
-    public ResponseEntity<String> removePost(@PathVariable("postId") Long postId) {
+    public ResponseEntity<String> removePost(@PathVariable Long postId) {
         postService.removePost(postId);
         return ResponseEntity.ok("post remove successfully");
     }

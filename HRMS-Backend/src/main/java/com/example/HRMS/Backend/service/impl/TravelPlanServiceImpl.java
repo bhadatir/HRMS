@@ -4,6 +4,7 @@ import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
+import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.Null;
@@ -44,6 +45,8 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
     private final TravelDocsTypeRepository travelDocsTypeRepository;
 
+    private final EmailService emailService;
+
     @Override
     public TravelPlan findTravelPlanByHREmployeeId(Long hrEmployeeId){
         return travelPlanRepository.findTravelPlanByFkTravelPlanHREmployee_Id(hrEmployeeId);
@@ -65,6 +68,8 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         List<Long> empId = travelPlanRequest.getEmployeesInTravelPlanId();
 
+        List<String> emails = new ArrayList<>();
+
         for(Long id : empId){
             Employee employee = employeeRepository.findById(id).orElseThrow(
                     () -> new RuntimeException("Employee not found"));
@@ -75,7 +80,11 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             employeeTravelPlan.setFkTravelPlan(savedTravelplan);
             employeeTravelPlan.setFkTravelPlanStatus(travelPlanStatus);
             employeeTravelPlanRepository.save(employeeTravelPlan);
+
+            emails.add(employee.getEmployeeEmail());
         }
+
+        emailService.sendEmail(emails,"Travel Plan",travelPlanRequest.getTravelPlanDetails());
     }
 
     @Override

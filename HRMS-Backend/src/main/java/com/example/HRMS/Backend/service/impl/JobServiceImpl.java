@@ -6,6 +6,7 @@ import com.example.HRMS.Backend.dto.JobShareRequest;
 import com.example.HRMS.Backend.dto.ReferFriendRequest;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
+import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.JobService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class JobServiceImpl implements JobService {
     private final ReferFriendRepositort referFriendRepositort;
     private final CvStatusTypeRepository cvStatusTypeRepository;
     private final ModelMapper modelMapper;
+    private final EmailService emailService;
 
     @Value("${img.path}")
     private String folderPath;
@@ -49,7 +51,7 @@ public class JobServiceImpl implements JobService {
 
         String time = Instant.now().toString().replace(":","-");
 
-        String filePath = folderPath + jobRequest.getFkJobTypeId()+ " " + jobRequest.getFkJobOwnerEmployeeId()+ " " + time + "_" + file.getOriginalFilename();
+        String filePath = folderPath + "job_description/" + jobRequest.getFkJobTypeId()+ " " + jobRequest.getFkJobOwnerEmployeeId()+ " " + time + "_" + file.getOriginalFilename();
         file.transferTo(new File(System.getProperty("user.dir") + "/" + filePath));
 
         job.setJobCreatedAt(Instant.now());
@@ -74,14 +76,16 @@ public class JobServiceImpl implements JobService {
     @Override
     public void shareJob(JobShareRequest jobShareRequest){
         JobShare jobShare = new JobShare();
-
-        jobShare.setFkJob(jobRepository.findJobById(jobShareRequest.getFkJobId()));
+        Job job = jobRepository.findJobById(jobShareRequest.getFkJobId());
+        jobShare.setFkJob(job);
         jobShare.setJobShareCreatedAt(Instant.now());
         jobShare.setFkJobShareEmployee(employeeRepository.findEmployeeById(jobShareRequest.getFkJobShareEmployeeId()));
 
         jobShareRepository.save(jobShare);
 
         List<String> emails = jobShareRequest.getEmails();
+
+        emailService.sendEmailWithAttachement(emails,job.getJobTitle(),"job summary",job.getJobDescriptionUrl());
 
         for(String email : emails){
             JobShareTo jobShareTo = new JobShareTo();
@@ -100,7 +104,7 @@ public class JobServiceImpl implements JobService {
 
         String time = Instant.now().toString().replace(":","-");
 
-        String filePath = folderPath + fkReferFriendEmployeeId + " " + time + "_" + file.getOriginalFilename();
+        String filePath = folderPath + "refer_friend_cv/" + fkReferFriendEmployeeId + " " + time + "_" + file.getOriginalFilename();
         file.transferTo(new File(System.getProperty("user.dir") + "/" + filePath));
 
         CvStatusType cvStatusType = cvStatusTypeRepository.findById(
@@ -110,15 +114,40 @@ public class JobServiceImpl implements JobService {
         referFriend.setReferFriendShortNote(referFriendRequest.getReferFriendShortNote());
         referFriend.setReferFriendCvUrl(filePath);
         referFriend.setFkCvStatusType(cvStatusType);
-        referFriend.setFkReferFriendEmployee(employeeRepository.findEmployeeById(
-                referFriendRequest.getFkReferFriendEmployeeId()
-        ));
+
+        Employee employee = employeeRepository.findEmployeeById(referFriendRequest.getFkReferFriendEmployeeId());
+        referFriend.setFkReferFriendEmployee(employee);
         referFriend.setReferFriendEmail(referFriendRequest.getReferFriendEmail());
-        referFriend.setFkJob(jobRepository.findJobById(referFriendRequest.getFkJobId()));
+
+        Job job =jobRepository.findJobById(referFriendRequest.getFkJobId());
+
+        referFriend.setFkJob(job);
         referFriend.setReferFriendReviewStatusChangedAt(Instant.now());
         referFriend.setReferFriendName(referFriendRequest.getReferFriendName());
 
+        List<CvReviewer> cvReviewers = cvReviewerRepository.findCvReviewerByFkJob_Id(job.getId());
+
+        List<String> emails = new ArrayList<>();
+        emails.add(referFriendRequest.getReferFriendEmail());
+        emails.add(job.getFkJobOwnerEmployee().getEmployeeEmail());
+        emails.add("tirthbhadani3@gmail.com");
+
+        for(CvReviewer cvReviewer : cvReviewers)
+        {
+            emails.add(cvReviewer.getFkCvReviewerEmployee().getEmployeeEmail());
+        }
+
+
         referFriendRepositort.save(referFriend);
+
+        //it's not working
+        emailService.sendEmailWithAttachement(emails,
+                job.getId() +" "+ job.getJobTitle(),
+                "refer friend details : " + "\n"
+                + "email : " + referFriendRequest.getReferFriendEmail()
+                + "name : " + referFriendRequest.getReferFriendName()
+                + "employee detail : " + employee.getId() + " " + employee.getEmployeeEmail()
+                ,filePath);
     }
 
     @Override
