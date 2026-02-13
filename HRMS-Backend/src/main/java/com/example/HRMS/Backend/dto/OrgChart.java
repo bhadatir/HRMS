@@ -11,6 +11,7 @@ public class OrgChart {
     private String lastName;
     private String positionName;
     private String departmentName;
+    private String employeeProfileUrl;
 
     private List<OrgChart> managerChain;
 

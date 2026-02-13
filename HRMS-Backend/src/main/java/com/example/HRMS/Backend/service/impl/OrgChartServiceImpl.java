@@ -4,6 +4,7 @@ import com.example.HRMS.Backend.dto.OrgChart;
 import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.service.OrgChartService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,19 +12,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class OrgChartServiceImpl implements OrgChartService {
 
     private final EmployeeRepository empRepo;
 
     private final ModelMapper modelMapper;
-
-    @Autowired
-    public OrgChartServiceImpl(EmployeeRepository employeeRepository,
-                               ModelMapper modelMapper)
-    {
-        this.empRepo=employeeRepository;
-        this.modelMapper=modelMapper;
-    }
 
     //it set parent chain and report of sub employees for given employee id
     @Override
@@ -45,6 +39,7 @@ public class OrgChartServiceImpl implements OrgChartService {
                             oc.setLastName((String) object[2]);
                             oc.setDepartmentName(employee1.getFkDepartment().getDepartmentName());
                             oc.setPositionName(employee1.getFkPosition().getPositionName());
+                            oc.setEmployeeProfileUrl(employee1.getEmployeeProfileUrl());
                             return oc;
                         }).toList()
         );

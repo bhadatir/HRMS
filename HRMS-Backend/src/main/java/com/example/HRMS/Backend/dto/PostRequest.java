@@ -1,5 +1,6 @@
 package com.example.HRMS.Backend.dto;
 
+import com.example.HRMS.Backend.model.PostVisibility;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -15,4 +16,6 @@ public class PostRequest {
     private String postContent;
 
     private Long fkPostEmployeeId;
+
+    private Long fkPostVisibilityId = 1L;
 }

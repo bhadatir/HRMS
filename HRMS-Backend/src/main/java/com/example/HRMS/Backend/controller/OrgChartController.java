@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/org-chart")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173",allowCredentials = "true")
 public class OrgChartController {
 
     private final OrgChartService orgService;

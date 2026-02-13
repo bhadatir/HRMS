@@ -28,6 +28,8 @@ public class EmployeeResponse {
 
         private String employeeGender;
 
+        private String employeeProfileUrl;
+
         private LocalDate employeeHireDate;
 
         private Integer employeeSalary;

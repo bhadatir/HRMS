@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.dto.TravelPlanResponse;
 import com.example.HRMS.Backend.model.TravelDoc;
 import com.example.HRMS.Backend.model.TravelPlan;
+import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,4 +21,6 @@ public interface TravelPlanService {
     void saveDoc(Long travelPlanId, MultipartFile file, Long docTypeId) throws IOException;
 
     List<TravelDocResponse> findAllTravelDoc() throws IOException;
+
+    void updateTravelPlan(@Valid TravelPlan travelPlan);
 }

@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 public class SecurityConfig implements WebMvcConfigurer {
 
-    private static final String[] COMMON_ROLES = { "HR", "MANAGER", "EMPLOYEE", "ADMIN" };
+    private static final String[] COMMON_ROLES = { "ROLE_HR", "ROLE_MANAGER", "ROLE_EMPLOYEE", "ROLE_ADMIN" };
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,16 +38,18 @@ public class SecurityConfig implements WebMvcConfigurer {
             .authorizeHttpRequests(auth ->
              auth.requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/swagger-ui/**").permitAll()
+            .requestMatchers("/uploads/**").permitAll()
             .requestMatchers("/api/hr/job/**").permitAll()
             .requestMatchers("/v3/api-docs/**").permitAll()
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/admin/**").permitAll()
+//                     .hasAnyAuthority("ROLE_ADMIN")
             .requestMatchers("/api/hr/**").permitAll()
-//                     .hasAnyRole("HR", "ADMIN")
-            .requestMatchers("/ api/org-chart/**", "/api/gameType/**", "/api/travel/**",
+//                     .hasAnyAuthority("ROLE_HR", "ROLE_ADMIN")
+            .requestMatchers("/api/org-chart/**", "/api/gameType/**", "/api/travel/**",
                     "/api/game/**", "/api/job/**", "/api/post/**" , "/api/user/**").permitAll()
-//            .hasAnyRole(COMMON_ROLES)
-            .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
-            .requestMatchers("/api/employee/**").hasAnyRole("EMPLOYEE", "ADMIN")
+//            .hasAnyAuthority(COMMON_ROLES)
+            .requestMatchers("/api/manager/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
+            .requestMatchers("/api/employee/**").hasAnyAuthority("ROLE_EMPLOYEE", "ROLE_ADMIN")
             .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

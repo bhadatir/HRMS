@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +43,9 @@ public class JobServiceImpl implements JobService {
     @Value("${img.path}")
     private String folderPath;
 
+    @Value("${URL.path}")
+    private String URL;
+
     @Override
     public void saveJob(@Valid JobRequest jobRequest, MultipartFile file) throws IOException {
         Job job = new Job();
@@ -51,13 +55,15 @@ public class JobServiceImpl implements JobService {
 
         String time = Instant.now().toString().replace(":","-");
 
-        String filePath = folderPath + "job_description/" + jobRequest.getFkJobTypeId()+ " " + jobRequest.getFkJobOwnerEmployeeId()+ " " + time + "_" + file.getOriginalFilename();
-        file.transferTo(new File(System.getProperty("user.dir") + "/" + filePath));
+        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+        String filePath = "job_description/" + jobRequest.getFkJobTypeId() +"_" + jobRequest.getFkJobOwnerEmployeeId() + "_" + time + "_" + originalFilePath;
+        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+
 
         job.setJobCreatedAt(Instant.now());
         job.setJobSalary(jobRequest.getJobSalary());
         job.setJobTitle(jobRequest.getJobTitle());
-        job.setJobDescriptionUrl(filePath);
+        job.setJobDescriptionUrl(URL + filePath);
         job.setFkJobType(jobType);
         job.setFkJobOwnerEmployee(employee);
         jobRepository.save(job);
@@ -104,15 +110,17 @@ public class JobServiceImpl implements JobService {
 
         String time = Instant.now().toString().replace(":","-");
 
-        String filePath = folderPath + "refer_friend_cv/" + fkReferFriendEmployeeId + " " + time + "_" + file.getOriginalFilename();
-        file.transferTo(new File(System.getProperty("user.dir") + "/" + filePath));
+        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+        String filePath = "refer_friend_cv/" + fkReferFriendEmployeeId +"_" + time + "_" + originalFilePath;
+
+        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
 
         CvStatusType cvStatusType = cvStatusTypeRepository.findById(
                 referFriendRequest.getFkCvStatusTypeId()
         ).orElseThrow(() -> new RuntimeException("cv status type not found"));
 
         referFriend.setReferFriendShortNote(referFriendRequest.getReferFriendShortNote());
-        referFriend.setReferFriendCvUrl(filePath);
+        referFriend.setReferFriendCvUrl(URL + filePath);
         referFriend.setFkCvStatusType(cvStatusType);
 
         Employee employee = employeeRepository.findEmployeeById(referFriendRequest.getFkReferFriendEmployeeId());

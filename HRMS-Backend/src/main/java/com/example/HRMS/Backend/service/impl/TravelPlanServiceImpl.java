@@ -9,6 +9,7 @@ import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,6 +27,7 @@ import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hibernate.type.descriptor.java.CoercionHelper.toLong;
 
@@ -108,8 +110,16 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         return travelPlanResponses;
     }
 
+    @Override
+    public void updateTravelPlan(@Valid TravelPlan travelPlan){
+        travelPlanRepository.save(travelPlan);
+    }
+
     @Value("${img.path}")
     private String folderPath;
+
+    @Value("${URL.path}")
+    private String URL;
 
     @Override
     public void saveDoc(Long travelPlanId, MultipartFile file, Long docTypeId) throws IOException {
@@ -121,8 +131,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         Long empId = employee.getId();
 
-        String filePath = folderPath + travelPlanId + docTypeId + empId + "_" + file.getOriginalFilename();
-        file.transferTo(new File(System.getProperty("user.dir") + "/" + filePath));
+        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+        String filePath = "travel_doc/" + travelPlanId +"_" + docTypeId + "_" + empId  + "_" + originalFilePath;
+
+        file.transferTo(new File(System.getProperty("user.dir") + "/" +folderPath + filePath));
 
         TravelDoc travelDoc = new TravelDoc();
         travelDoc.setFkEmployee(employeeRepository.findEmployeeById(empId));
@@ -134,7 +146,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         }else{
             travelDoc.setFkEmployeeTravelPlan(employeeTravelPlan);
         }
-        travelDoc.setTravelDocUrl(filePath);
+        travelDoc.setTravelDocUrl(URL + filePath);
         travelDoc.setTravelDocUploadedAt(Instant.now());
         travelDoc.setFkTravelDocsType(travelDocsTypeRepository.findTravelDocsTypeById(docTypeId));
 

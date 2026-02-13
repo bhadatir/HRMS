@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.ExpenseService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -54,12 +56,16 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Value("${img.path}")
     private String folderPath;
 
+    @Value("${URL.path}")
+    private String URL;
+
     @Override
     public void saveExpenseProof(Long proofTypeId, Long expenseId, MultipartFile file) throws IOException {
         ExpenseProof expenseProof = new ExpenseProof();
 
-        String filePath = folderPath + proofTypeId+" " + expenseId + "_" + file.getOriginalFilename();
-        file.transferTo(new File(System.getProperty("user.dir") + "/" + filePath));
+        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+        String filePath = "expanse_proof/" + proofTypeId +"_" + expenseId + "_" + originalFilePath;
+        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
 
         expenseProof.setFkExpense(expenseRepository.findExpensesById(expenseId));
         expenseProof.setFkExpenseProofType(expenseProofTypeRepository.findExpenseProofTypeById(proofTypeId));
@@ -68,4 +74,44 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         expenseProofRepository.save(expenseProof);
     }
+
+    @Override
+    public void saveExpenseWithProof(@Valid ExpenseRequest expenseRequest, List<MultipartFile> files, List<Long> proofTypeId) throws IOException {
+        Instant time = Instant.now();
+        Expense expense = new Expense();
+        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
+        TravelPlanStatus travelPlanStatus = travelPlanStatusRepository.findTravelPlanStatusById(expenseRequest.getFkExpenseTravelPlanStatusId());
+        expense.setExpenseAmount(expenseRequest.getExpenseAmount());
+        expense.setExpenseDate(expenseRequest.getExpenseDate());
+        expense.setExpenseRemark(expenseRequest.getExpenseRemark());
+        expense.setFkEmployeeTravelPlan(employeeTravelPlan);
+        expense.setExpenseUploadedAt(time);
+        expense.setFkExpenseTravelPlanStatus(travelPlanStatus);
+        expenseRepository.save(expense);
+
+        String timeInString = Instant.now().toString().replace(":","-");
+
+        for (int i = 0; i < files.size(); i++) {
+            MultipartFile file = files.get(i);
+            Long id = proofTypeId.get(i);
+
+            ExpenseProof expenseProof = new ExpenseProof();
+
+            String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+            String filePath = "expanse_proof/" + id +"_" + timeInString + "_" + originalFilePath;
+            file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+
+            expenseProof.setFkExpense(expense);
+            expenseProof.setFkExpenseProofType(expenseProofTypeRepository.findExpenseProofTypeById(id));
+            expenseProof.setExpenseProofUploadedAt(Instant.now());
+            expenseProof.setExpenseProofUrl(URL + filePath);
+
+            expenseProofRepository.save(expenseProof);
+
+        }
+
+
+    }
+
+
 }

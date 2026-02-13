@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.dto;
 
 import com.example.HRMS.Backend.model.Employee;
+import com.example.HRMS.Backend.model.PostVisibility;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -27,4 +28,8 @@ public class PostResponse {
     private Boolean postIsDeleted;
 
     private Long employeeId;
+
+    private Long postVisibilityId;
+
+    private String postVisibilityName;
 }

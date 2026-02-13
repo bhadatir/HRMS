@@ -21,8 +21,9 @@ public class RegisterRequest {
     private LocalDate dob;
     @NotBlank
     private String gender;
+
+    private String employeeProfileUrl;
     @NotNull
-    @PastOrPresent
     private LocalDate hireDate;
     @NotNull
     @Min(0)

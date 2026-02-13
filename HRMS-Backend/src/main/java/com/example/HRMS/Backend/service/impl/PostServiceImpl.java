@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +32,13 @@ public class PostServiceImpl implements PostService {
     private final ModelMapper modelMapper;
     private final EmployeeRepository employeeRepository;
     private final EmailService emailService;
+    private final PostVisibilityRepository postVisibilityRepository;
 
     @Value("${img.path}")
     private String folderPath;
+
+    @Value("${URL.path}")
+    private String URL;
 
     @Override
     public void savePost(PostRequest postRequest, MultipartFile file) throws IOException {
@@ -41,13 +46,16 @@ public class PostServiceImpl implements PostService {
 
         String time = Instant.now().toString().replace(":","-");
 
-        String filePath = folderPath + time + postRequest.getFkPostEmployeeId() + "_" + file.getOriginalFilename();
-        file.transferTo(new File(System.getProperty("user.dir") + "/" + filePath));
+        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+        String filePath = "post_content/" + time +"_" + postRequest.getFkPostEmployeeId() + "_" + originalFilePath;
+
+        file.transferTo(new File(System.getProperty("user.dir") + "/" +folderPath + filePath));
 
         post.setFkPostEmployee(employeeRepository.findEmployeeById(postRequest.getFkPostEmployeeId()));
         post.setPostContent(postRequest.getPostContent());
         post.setPostTitle(postRequest.getPostTitle());
-        post.setPostContentUrl(filePath);
+        post.setPostContentUrl(URL + filePath);
+        post.setFkPostVisibility(postVisibilityRepository.findPostVisibilitiesById(postRequest.getFkPostVisibilityId()));
 
         postRepository.save(post);
     }

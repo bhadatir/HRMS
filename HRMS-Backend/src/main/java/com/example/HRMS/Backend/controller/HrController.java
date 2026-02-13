@@ -6,6 +6,7 @@ import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.model.GameType;
 import com.example.HRMS.Backend.model.Job;
 import com.example.HRMS.Backend.model.TravelDoc;
+import com.example.HRMS.Backend.model.TravelPlan;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.repository.GameTypeRepository;
 import com.example.HRMS.Backend.repository.JobRepository;
@@ -25,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/hr")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173",allowCredentials = "true")
 public class HrController {
 
     private final TravelPlanService travelPlanService;
@@ -54,6 +54,12 @@ public class HrController {
     @GetMapping("/travelDoc/{id}")
     public ResponseEntity<List<TravelDoc>> showTravelDocByEmpId(@PathVariable Long id) {
         return ResponseEntity.ok(travelDocRepository.findTravelDocByFkEmployee_Id(id));
+    }
+
+    @PutMapping("/travelPlan")
+    public ResponseEntity<String> updateTravelPLan(@Valid @RequestBody TravelPlan travelPlan){
+        travelPlanService.updateTravelPlan(travelPlan);
+        return ResponseEntity.ok("Travel Plan Update successfully");
     }
 
     @PostMapping("/game")

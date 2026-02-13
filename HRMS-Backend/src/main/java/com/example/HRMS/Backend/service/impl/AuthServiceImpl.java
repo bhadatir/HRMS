@@ -2,6 +2,7 @@ package com.example.HRMS.Backend.service.impl;
 
 import com.example.HRMS.Backend.dto.AuthRequest;
 import com.example.HRMS.Backend.dto.AuthResponse;
+import com.example.HRMS.Backend.dto.EmployeeResponse;
 import com.example.HRMS.Backend.dto.RegisterRequest;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.DepartmentRepository;
@@ -11,7 +12,10 @@ import com.example.HRMS.Backend.repository.RoleRepository;
 import com.example.HRMS.Backend.service.AuthService;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,18 +23,28 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
 
     private final EmployeeRepository employeeRepository;
+
+    private final ModelMapper modelMapper;
 
     private final RoleRepository roleRepository;
 
@@ -42,19 +56,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtUtil jwtUtil;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
-    @Autowired
-    public AuthServiceImpl(AuthenticationManager authenticationManager, EmployeeRepository employeeRepository, RoleRepository roleRepository, DepartmentRepository departmentRepository, PositionRepository positionRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-        this.authenticationManager = authenticationManager;
-        this.employeeRepository = employeeRepository;
-        this.roleRepository = roleRepository;
-        this.departmentRepository = departmentRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.positionRepository = positionRepository;
-        this.jwtUtil = jwtUtil;
-    }
 
     @Override
     public AuthResponse login(AuthRequest authRequest) {
@@ -127,6 +130,55 @@ public class AuthServiceImpl implements AuthService {
 
         employee.setEmployeePassword(passwordEncoder.encode(newPassword));
         employee.setResetToken(null);
+        employeeRepository.save(employee);
+    }
+
+    @Override
+    public EmployeeResponse getEmployeeByEmail(String email) throws IOException {
+        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
+                .orElseThrow( () -> new RuntimeException("employee not found"));
+
+        EmployeeResponse employeeResponse = new EmployeeResponse();
+
+        employeeResponse.setEmployeeDob(employee.getEmployeeDob());
+        employeeResponse.setEmployeeGender(employee.getEmployeeGender());
+        employeeResponse.setEmployeeEmail(employee.getEmployeeEmail());
+        employeeResponse.setEmployeeSalary(employee.getEmployeeSalary());
+        employeeResponse.setEmployeeIsActive(employee.getEmployeeIsActive());
+        employeeResponse.setId(employee.getId());
+        employeeResponse.setEmployeeFirstName(employee.getEmployeeFirstName());
+        employeeResponse.setEmployeeLastName(employee.getEmployeeLastName());
+        employeeResponse.setEmployeeHireDate(employee.getEmployeeHireDate());
+        employeeResponse.setDepartmentId(employee.getFkDepartment().getId());
+        employeeResponse.setDepartmentName(employee.getFkDepartment().getDepartmentName());
+        employeeResponse.setPositionId(employee.getFkPosition().getId());
+        employeeResponse.setPositionName(employee.getFkPosition().getPositionName());
+        employeeResponse.setRoleId(employee.getFkRole().getId());
+        employeeResponse.setRoleName(employee.getFkRole().getRoleName());
+        employeeResponse.setManagerEmployeeEmail(employee.getFkManagerEmployee().getEmployeeEmail());
+        employeeResponse.setManagerEmployeeId(employee.getFkManagerEmployee().getId());
+        employeeResponse.setEmployeeProfileUrl("http://localhost:8080/uploads/"+ employee.getEmployeeProfileUrl());
+
+
+        return employeeResponse;
+    }
+
+    @Value("${img.path}")
+    private String folderPath;
+
+    @Value("${URL.path}")
+    private String URL;
+
+    @Override
+    public void addProfileImage(Long empId, MultipartFile file) throws IOException {
+        Employee employee = employeeRepository.findEmployeeById(empId);
+
+        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+        String filePath = "Profile_Image/" + empId + originalFilePath;
+        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+
+        employee.setEmployeeProfileUrl(URL + filePath);
+
         employeeRepository.save(employee);
     }
 }

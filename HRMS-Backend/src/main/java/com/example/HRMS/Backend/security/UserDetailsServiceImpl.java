@@ -33,6 +33,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(
                 "ROLE_" + employee.getFkRole().getRoleName().toUpperCase());
 
+        System.out.println(authority);
+
         return new User(
                 employee.getEmployeeEmail(),
                 employee.getEmployeePassword(),

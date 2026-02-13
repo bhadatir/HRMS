@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.TravelDoc;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.repository.TravelDocRepository;
+import com.example.HRMS.Backend.service.AuthService;
 import com.example.HRMS.Backend.service.PostService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +22,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173",allowCredentials = "true")
 public class UserController {
 
-    private final EmployeeRepository employeeRepository;
-    private final ModelMapper modelMapper;
+    private final AuthService authService;
 
     @GetMapping("/email")
-    public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) {
-        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
-                .orElseThrow( () -> new RuntimeException("employee not found"));
-        EmployeeResponse employeeResponse = modelMapper.map(employee,EmployeeResponse.class);
-        return ResponseEntity.ok(employeeResponse);
+    public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) throws IOException {
+        return ResponseEntity.ok(authService.getEmployeeByEmail(email));
+    }
+
+    @PatchMapping("/profileImage/{empId}")
+    public ResponseEntity<String> addProfileImage(@PathVariable Long empId,
+                                                  @RequestBody MultipartFile file) throws IOException {
+        authService.addProfileImage(empId,file);
+        return ResponseEntity.ok("Profile Image set successfully");
     }
 }
