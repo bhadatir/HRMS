@@ -60,7 +60,6 @@ public class TravelPlan {
     @NotNull(message = "HR Employee id is required who create this travel plan")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_travel_plan_HR_employee_id", nullable = false)
-    @JsonIgnore
     private Employee fkTravelPlanHREmployee;
 
 }

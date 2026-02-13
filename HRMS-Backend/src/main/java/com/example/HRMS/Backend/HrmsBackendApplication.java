@@ -6,6 +6,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import static org.springframework.http.CacheControl.maxAge;
+
 @SpringBootApplication
 @EnableScheduling
 public class HrmsBackendApplication implements WebMvcConfigurer {
@@ -21,7 +23,8 @@ public class HrmsBackendApplication implements WebMvcConfigurer {
 				.allowedOrigins("http://localhost:5173")
 				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 				.allowedHeaders("*")
-				.allowCredentials(true);
+				.allowCredentials(true)
+				.maxAge(3600);
 	}
 
 	//show image properly is pending

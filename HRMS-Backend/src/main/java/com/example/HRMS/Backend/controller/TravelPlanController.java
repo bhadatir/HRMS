@@ -3,6 +3,7 @@ package com.example.HRMS.Backend.controller;
 import com.example.HRMS.Backend.dto.ExpenseRequest;
 import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
+import com.example.HRMS.Backend.dto.TravelPlanResponse;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.repository.GameTypeRepository;
@@ -36,7 +37,7 @@ public class TravelPlanController {
     private final ExpenseService expenseService;
 
     @GetMapping("/allTravelPlans")
-    public ResponseEntity<List<TravelPlan>> showAllGames() {
+    public ResponseEntity<List<TravelPlanResponse>> showAllGames() {
         return ResponseEntity.ok(travelPlanService.showAllTravelPlan());
     }
 

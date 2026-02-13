@@ -38,13 +38,14 @@ public class SecurityConfig implements WebMvcConfigurer {
             .authorizeHttpRequests(auth ->
              auth.requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/swagger-ui/**").permitAll()
-                     .requestMatchers("/api/hr/job/**").permitAll()
+            .requestMatchers("/api/hr/job/**").permitAll()
             .requestMatchers("/v3/api-docs/**").permitAll()
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
-            .requestMatchers("/api/hr/**").hasAnyRole("HR", "ADMIN")
-            .requestMatchers("/api/org-chart/**", "/api/gameType/**", "/api/travel/**",
-                    "/api/game/**", "/api/job/**", "/api/post")
-            .hasAnyRole(COMMON_ROLES)
+            .requestMatchers("/api/hr/**").permitAll()
+//                     .hasAnyRole("HR", "ADMIN")
+            .requestMatchers("/ api/org-chart/**", "/api/gameType/**", "/api/travel/**",
+                    "/api/game/**", "/api/job/**", "/api/post/**" , "/api/user/**").permitAll()
+//            .hasAnyRole(COMMON_ROLES)
             .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
             .requestMatchers("/api/employee/**").hasAnyRole("EMPLOYEE", "ADMIN")
             .anyRequest().authenticated())

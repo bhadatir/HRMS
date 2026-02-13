@@ -2,6 +2,7 @@ package com.example.HRMS.Backend.service;
 
 import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
+import com.example.HRMS.Backend.dto.TravelPlanResponse;
 import com.example.HRMS.Backend.model.TravelDoc;
 import com.example.HRMS.Backend.model.TravelPlan;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +15,7 @@ public interface TravelPlanService {
 
     void addTravelPlan(TravelPlanRequest travelPlanRequest);
 
-    List<TravelPlan> showAllTravelPlan();
+    List<TravelPlanResponse> showAllTravelPlan();
 
     void saveDoc(Long travelPlanId, MultipartFile file, Long docTypeId) throws IOException;
 

@@ -1,7 +1,9 @@
 package com.example.HRMS.Backend.service.impl;
 
+import com.example.HRMS.Backend.dto.EmployeeTravelPlanResponse;
 import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
+import com.example.HRMS.Backend.dto.TravelPlanResponse;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
@@ -88,8 +90,22 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     }
 
     @Override
-    public List<TravelPlan> showAllTravelPlan(){
-        return travelPlanRepository.findAll();
+    public List<TravelPlanResponse> showAllTravelPlan(){
+        List<TravelPlanResponse> travelPlanResponses = new ArrayList<>();
+        for(TravelPlan travelPlan:travelPlanRepository.findAll()){
+            TravelPlanResponse travelPlanResponse = modelMapper.map(travelPlan,TravelPlanResponse.class);
+
+            List<EmployeeTravelPlanResponse> employeeTravelPlanResponses = new ArrayList<>();
+            for(EmployeeTravelPlan employeeTravelPlan:employeeTravelPlanRepository.findEmployeeTravelPlanByFkTravelPlan_Id(travelPlan.getId()))
+            {
+                EmployeeTravelPlanResponse employeeTravelPlanResponse = modelMapper.map(employeeTravelPlan, EmployeeTravelPlanResponse.class);
+                employeeTravelPlanResponses.add(employeeTravelPlanResponse);
+            }
+            travelPlanResponse.setEmployeeTravelPlanResponses(employeeTravelPlanResponses);
+
+            travelPlanResponses.add(travelPlanResponse);
+        }
+        return travelPlanResponses;
     }
 
     @Value("${img.path}")
