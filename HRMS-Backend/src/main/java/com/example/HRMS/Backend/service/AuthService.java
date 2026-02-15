@@ -1,13 +1,11 @@
 package com.example.HRMS.Backend.service;
 
 
-import com.example.HRMS.Backend.dto.AuthRequest;
-import com.example.HRMS.Backend.dto.AuthResponse;
-import com.example.HRMS.Backend.dto.EmployeeResponse;
-import com.example.HRMS.Backend.dto.RegisterRequest;
+import com.example.HRMS.Backend.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface AuthService {
     AuthResponse login(AuthRequest authRequest);
@@ -21,4 +19,6 @@ public interface AuthService {
     EmployeeResponse getEmployeeByEmail(String email) throws IOException;
 
     void addProfileImage(Long empId, MultipartFile file) throws IOException;
+
+    List<EmployeeSearch> getEmployeeByName(String query);
 }

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CvStatusTypeRepository extends JpaRepository<CvStatusType,Long> {
+     CvStatusType findCvStatusTypeById(Long id);
 }

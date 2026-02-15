@@ -46,6 +46,12 @@ public class TravelPlanController {
         return ResponseEntity.ok("Expense add successfully");
     }
 
+    @GetMapping("/employeeTravelPlan/{empId}/{travelId}")
+    public ResponseEntity<Long> findEmployeeTravelPlanId(@PathVariable Long empId,
+                                                         @PathVariable Long travelId) {
+        return ResponseEntity.ok(travelPlanService.findEmployeeTravelPlanId(empId,travelId));
+    }
+
     @PostMapping("/expenseProof/{proofTypeId}/{expenseId}")
     public ResponseEntity<String> addExpenseProof(@PathVariable Long proofTypeId,
                                                   @PathVariable Long expenseId,

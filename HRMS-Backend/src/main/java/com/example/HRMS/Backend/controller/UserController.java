@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.EmployeeResponse;
+import com.example.HRMS.Backend.dto.EmployeeSearch;
 import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.TravelDoc;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
@@ -29,6 +30,11 @@ public class UserController {
     @GetMapping("/email")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) throws IOException {
         return ResponseEntity.ok(authService.getEmployeeByEmail(email));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<EmployeeSearch>> getEmployee(@RequestParam String query) throws IOException {
+        return ResponseEntity.ok(authService.getEmployeeByName(query));
     }
 
     @PatchMapping("/profileImage/{empId}")

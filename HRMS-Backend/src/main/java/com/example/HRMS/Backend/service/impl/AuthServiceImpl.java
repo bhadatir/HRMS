@@ -1,9 +1,6 @@
 package com.example.HRMS.Backend.service.impl;
 
-import com.example.HRMS.Backend.dto.AuthRequest;
-import com.example.HRMS.Backend.dto.AuthResponse;
-import com.example.HRMS.Backend.dto.EmployeeResponse;
-import com.example.HRMS.Backend.dto.RegisterRequest;
+import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.DepartmentRepository;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
@@ -137,9 +134,7 @@ public class AuthServiceImpl implements AuthService {
     public EmployeeResponse getEmployeeByEmail(String email) throws IOException {
         Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
                 .orElseThrow( () -> new RuntimeException("employee not found"));
-
         EmployeeResponse employeeResponse = new EmployeeResponse();
-
         employeeResponse.setEmployeeDob(employee.getEmployeeDob());
         employeeResponse.setEmployeeGender(employee.getEmployeeGender());
         employeeResponse.setEmployeeEmail(employee.getEmployeeEmail());
@@ -155,10 +150,12 @@ public class AuthServiceImpl implements AuthService {
         employeeResponse.setPositionName(employee.getFkPosition().getPositionName());
         employeeResponse.setRoleId(employee.getFkRole().getId());
         employeeResponse.setRoleName(employee.getFkRole().getRoleName());
-        employeeResponse.setManagerEmployeeEmail(employee.getFkManagerEmployee().getEmployeeEmail());
-        employeeResponse.setManagerEmployeeId(employee.getFkManagerEmployee().getId());
-        employeeResponse.setEmployeeProfileUrl("http://localhost:8080/uploads/"+ employee.getEmployeeProfileUrl());
 
+        if(employee.getFkManagerEmployee() != null) {
+            employeeResponse.setManagerEmployeeEmail(employee.getFkManagerEmployee().getEmployeeEmail());
+            employeeResponse.setManagerEmployeeId(employee.getFkManagerEmployee().getId());
+        }
+        employeeResponse.setEmployeeProfileUrl(employee.getEmployeeProfileUrl());
 
         return employeeResponse;
     }
@@ -180,5 +177,10 @@ public class AuthServiceImpl implements AuthService {
         employee.setEmployeeProfileUrl(URL + filePath);
 
         employeeRepository.save(employee);
+    }
+
+    @Override
+    public List<EmployeeSearch> getEmployeeByName(String query){
+        return employeeRepository.searchEmployeeByName(query);
     }
 }

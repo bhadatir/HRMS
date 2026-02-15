@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 //import com.example.HRMS.Backend.dto.ManagerChain;
+import com.example.HRMS.Backend.dto.EmployeeResponse;
+import com.example.HRMS.Backend.dto.EmployeeSearch;
 import com.example.HRMS.Backend.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,4 +34,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     //for pass reset
     Optional<Employee> findByResetToken(String resetToken);
+
+    @Query(value = "SELECT NEW com.example.HRMS.Backend.dto.EmployeeSearch(e.id, e.employeeFirstName, e.employeeLastName) " +
+            "FROM Employee e " +
+            "WHERE lower(e.employeeFirstName) like lower(concat(:query,'%')) " +
+            "or lower(e.employeeLastName) like lower(concat(:query,'%')) ")
+    List<EmployeeSearch> searchEmployeeByName(@Param("query") String query);
 }

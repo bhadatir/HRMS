@@ -193,4 +193,11 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         return Files.readAllBytes(new File(System.getProperty("user.dir") + "/" + path).toPath());
     }
 
+    @Override
+    public Long findEmployeeTravelPlanId(Long empId, Long travelId){
+        Employee employee = employeeRepository.findEmployeeById(empId);
+        TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelId);
+        return travelPlanRepository.findEmployeeTravelPlanId(employee,travelPlan);
+    }
+
 }

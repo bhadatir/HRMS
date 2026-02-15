@@ -23,4 +23,6 @@ public interface TravelPlanService {
     List<TravelDocResponse> findAllTravelDoc() throws IOException;
 
     void updateTravelPlan(@Valid TravelPlan travelPlan);
+
+    Long findEmployeeTravelPlanId(Long empId, Long travelId);
 }

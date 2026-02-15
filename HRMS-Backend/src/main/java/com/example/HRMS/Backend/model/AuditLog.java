@@ -28,14 +28,11 @@ public class AuditLog {
     @Column(name = "audit_log_action", nullable = false)
     private String action;
 
-    @Column(name = "audit_log_old_status")
-    private String oldStatus = "pendding";
-
     @Column(name = "audit_log_new_status")
-    private String newStatus = "pendding";
+    private String newStatus = "NA";
 
     @Column(name = "audit_log_performed_by")
-    private String performedBy = "xyz";
+    private String performedBy;
 
     @Column(name = "audit_log_timestamp", nullable = false)
     private Instant timestamp = Instant.now();
