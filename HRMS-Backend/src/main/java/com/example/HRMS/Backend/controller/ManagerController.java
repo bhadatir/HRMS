@@ -22,11 +22,6 @@ public class ManagerController {
     private final EmployeeRepository employeeRepository;
     private final PostService postService;
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<List<TravelDoc>> showTravelDocByEmpIdByManager(@PathVariable Long id) {
-//
-//    }
-
     @GetMapping("/travelDoc/{id}")
     public ResponseEntity<List<TravelDoc>> showTravelDocByEmpId(@PathVariable Long id) {
         return ResponseEntity.ok(travelDocRepository.findTravelDocByFkEmployee_Id(id));

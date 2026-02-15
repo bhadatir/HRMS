@@ -81,6 +81,12 @@ public class HrController {
         return ResponseEntity.ok("Cv Reviewer add successfully");
     }
 
+    @PatchMapping("/referCV/{referId}")
+    public ResponseEntity<String > updateReferCvStatus(@PathVariable Long referId, @RequestParam Long ststusid)
+    {   jobService.updateStatus(referId, ststusid);
+        return ResponseEntity.ok("status update successful");
+    }
+
     @PatchMapping("/comment/{commentId}")
     public ResponseEntity<String> removeComment(@PathVariable Long commentId) {
         postService.removeCommentByHr(commentId);

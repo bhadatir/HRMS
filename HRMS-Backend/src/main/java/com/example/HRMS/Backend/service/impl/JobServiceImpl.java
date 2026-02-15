@@ -8,6 +8,7 @@ import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.JobService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -123,7 +124,7 @@ public class JobServiceImpl implements JobService {
         referFriend.setReferFriendCvUrl(URL + filePath);
         referFriend.setFkCvStatusType(cvStatusType);
 
-        Employee employee = employeeRepository.findEmployeeById(referFriendRequest.getFkReferFriendEmployeeId());
+        Employee employee = employeeRepository.findEmployeeById(fkReferFriendEmployeeId);
         referFriend.setFkReferFriendEmployee(employee);
         referFriend.setReferFriendEmail(referFriendRequest.getReferFriendEmail());
 
@@ -148,14 +149,22 @@ public class JobServiceImpl implements JobService {
 
         referFriendRepositort.save(referFriend);
 
+        String absolutePath = new File(folderPath + filePath).getAbsolutePath();
         //it's not working
-        emailService.sendEmailWithAttachement(emails,
-                job.getId() +" "+ job.getJobTitle(),
-                "refer friend details : " + "\n"
-                + "email : " + referFriendRequest.getReferFriendEmail()
-                + "name : " + referFriendRequest.getReferFriendName()
-                + "employee detail : " + employee.getId() + " " + employee.getEmployeeEmail()
-                ,filePath);
+
+        File savedFile = new File(System.getProperty("user.dir") + "/" + folderPath + filePath);
+        if(savedFile.exists() && savedFile.canRead()) {
+            emailService.sendEmailWithAttachement(emails,
+                    job.getId() + " " + job.getJobTitle(),
+                    "refer friend details : " + "\n"
+                            + "email : " + referFriendRequest.getReferFriendEmail()
+                            + "name : " + referFriendRequest.getReferFriendName()
+                            + "employee detail : " + employee.getId() + " " + employee.getEmployeeEmail()
+                    , absolutePath);
+        }
+        else {
+            throw new IOException("file not found at : "+savedFile.getAbsolutePath());
+        }
     }
 
     @Override
@@ -175,6 +184,18 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobResponse showJobByJobId(Long jobId){
         return modelMapper.map(jobRepository.findJobById(jobId),JobResponse.class);
+    }
+
+    @Transactional
+    @Override
+    public void updateStatus(Long referId, Long statusId){
+        ReferFriend referFriend = referFriendRepositort.findById(referId).orElseThrow(
+                () -> new RuntimeException("refer friend not found")
+        );
+        referFriend.setFkCvStatusType(cvStatusTypeRepository.findById(statusId).orElseThrow(
+                () -> new RuntimeException("cv status type not found")
+        ));
+        referFriendRepositort.save(referFriend);
     }
 
 }

@@ -25,4 +25,6 @@ public interface JobService {
 
     JobResponse showJobByJobId(Long jobId);
 
+    void updateStatus(Long referId, Long ststusId);
+
 }

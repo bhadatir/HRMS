@@ -1,0 +1,546 @@
+2026-02-15T12:45:48.669+05:30  INFO 6356 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 6356 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T12:45:48.672+05:30  INFO 6356 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T12:45:49.540+05:30  INFO 6356 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T12:45:49.667+05:30  INFO 6356 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 110 ms. Found 33 JPA repository interfaces.
+2026-02-15T12:45:50.235+05:30  INFO 6356 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T12:45:50.244+05:30  INFO 6356 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T12:45:50.245+05:30  INFO 6356 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T12:45:50.305+05:30  INFO 6356 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T12:45:50.306+05:30  INFO 6356 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1589 ms
+2026-02-15T12:45:50.549+05:30  INFO 6356 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T12:45:50.593+05:30  INFO 6356 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T12:45:50.623+05:30  INFO 6356 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T12:45:50.860+05:30  INFO 6356 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T12:45:50.883+05:30  INFO 6356 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T12:45:51.335+05:30  INFO 6356 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 2200e64a-fa2a-42f9-86df-1dcb9ad8348d
+2026-02-15T12:45:51.338+05:30  INFO 6356 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T12:45:51.405+05:30  WARN 6356 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T12:45:51.427+05:30  INFO 6356 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T12:45:52.688+05:30  INFO 6356 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T12:45:53.171+05:30 DEBUG 6356 --- [HRMS-Backend] [main] org.hibernate.SQL                        : create table audit_log (pk_audit_log_id bigint identity not null, audit_log_action varchar(255) not null, audit_log_entity_id bigint not null, audit_log_entity_name varchar(255) not null, audit_log_new_status varchar(255) not null, audit_log_old_status varchar(255) not null, audit_log_performed_by varchar(255) not null, audit_log_timestamp datetimeoffset(6) not null, primary key (pk_audit_log_id))
+2026-02-15T12:45:53.746+05:30  INFO 6356 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T12:45:53.935+05:30  INFO 6356 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T12:45:54.069+05:30  INFO 6356 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T12:45:54.938+05:30  WARN 6356 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T12:45:55.472+05:30  INFO 6356 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T12:45:55.486+05:30  INFO 6356 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 7.251 seconds (process running for 7.787)
+2026-02-15T12:46:17.950+05:30  INFO 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T12:46:17.950+05:30  INFO 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T12:46:17.953+05:30  INFO 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-02-15T12:46:18.240+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] org.hibernate.SQL                        : select cst1_0.pk_cv_status_type_id,cst1_0.cv_status_type_name from cv_status_type cst1_0 where cst1_0.pk_cv_status_type_id=?
+2026-02-15T12:46:18.341+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] org.hibernate.SQL                        : select e1_0.pk_employee_id,e1_0.employee_dob,e1_0.employee_email,e1_0.employee_first_name,e1_0.employee_gender,e1_0.employee_hire_date,e1_0.employee_is_active,e1_0.employee_last_name,e1_0.employee_password,e1_0.employee_profile,e1_0.employee_salary,e1_0.fk_department_id,e1_0.fk_manager_employee_id,e1_0.fk_position_id,e1_0.fk_role_id,e1_0.employee_pass_reset_token,e1_0.employee_reset_token_expiry from employee e1_0 where e1_0.pk_employee_id=?
+2026-02-15T12:46:18.358+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] org.hibernate.SQL                        : select j1_0.pk_job_id,j1_0.fk_job_owner_employee_id,j1_0.fk_job_type_id,j1_0.job_created_at,j1_0.job_description_url,j1_0.job_is_active,j1_0.job_salary,j1_0.job_title from jobs j1_0 where j1_0.pk_job_id=?
+2026-02-15T12:46:18.374+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] org.hibernate.SQL                        : select cr1_0.pk_cv_reviewer_id,cr1_0.cv_reviewer_created_at,cr1_0.fk_cv_reviewer_employee_id,cr1_0.fk_job_id from cv_reviewer cr1_0 join jobs fj1_0 on fj1_0.pk_job_id=cr1_0.fk_job_id where fj1_0.pk_job_id=?
+2026-02-15T12:46:18.374+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] org.hibernate.SQL                        : select e1_0.pk_employee_id,e1_0.employee_dob,e1_0.employee_email,e1_0.employee_first_name,e1_0.employee_gender,e1_0.employee_hire_date,e1_0.employee_is_active,e1_0.employee_last_name,e1_0.employee_password,e1_0.employee_profile,e1_0.employee_salary,e1_0.fk_department_id,e1_0.fk_manager_employee_id,e1_0.fk_position_id,e1_0.fk_role_id,e1_0.employee_pass_reset_token,e1_0.employee_reset_token_expiry from employee e1_0 where e1_0.pk_employee_id=?
+2026-02-15T12:46:18.408+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] org.hibernate.SQL                        : insert into refer_friend (fk_cv_status_type_id,fk_job_id,fk_refer_friend_employee_id,refer_friend_cv_url,refer_friend_email,refer_friend_name,refer_friend_review_status_changed_at,refer_friend_short_note) values (?,?,?,?,?,?,?,?)
+2026-02-15T12:46:18.524+05:30  INFO 6356 --- [HRMS-Backend] [http-nio-8080-exec-1] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T12:46:18.524701200
+2026-02-15T12:46:59.553+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-4] org.hibernate.SQL                        : select cst1_0.pk_cv_status_type_id,cst1_0.cv_status_type_name from cv_status_type cst1_0 where cst1_0.pk_cv_status_type_id=?
+2026-02-15T12:46:59.558+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-4] org.hibernate.SQL                        : select e1_0.pk_employee_id,e1_0.employee_dob,e1_0.employee_email,e1_0.employee_first_name,e1_0.employee_gender,e1_0.employee_hire_date,e1_0.employee_is_active,e1_0.employee_last_name,e1_0.employee_password,e1_0.employee_profile,e1_0.employee_salary,e1_0.fk_department_id,e1_0.fk_manager_employee_id,e1_0.fk_position_id,e1_0.fk_role_id,e1_0.employee_pass_reset_token,e1_0.employee_reset_token_expiry from employee e1_0 where e1_0.pk_employee_id=?
+2026-02-15T12:46:59.558+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-4] org.hibernate.SQL                        : select j1_0.pk_job_id,j1_0.fk_job_owner_employee_id,j1_0.fk_job_type_id,j1_0.job_created_at,j1_0.job_description_url,j1_0.job_is_active,j1_0.job_salary,j1_0.job_title from jobs j1_0 where j1_0.pk_job_id=?
+2026-02-15T12:46:59.570+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-4] org.hibernate.SQL                        : select cr1_0.pk_cv_reviewer_id,cr1_0.cv_reviewer_created_at,cr1_0.fk_cv_reviewer_employee_id,cr1_0.fk_job_id from cv_reviewer cr1_0 join jobs fj1_0 on fj1_0.pk_job_id=cr1_0.fk_job_id where fj1_0.pk_job_id=?
+2026-02-15T12:46:59.574+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-4] org.hibernate.SQL                        : select e1_0.pk_employee_id,e1_0.employee_dob,e1_0.employee_email,e1_0.employee_first_name,e1_0.employee_gender,e1_0.employee_hire_date,e1_0.employee_is_active,e1_0.employee_last_name,e1_0.employee_password,e1_0.employee_profile,e1_0.employee_salary,e1_0.fk_department_id,e1_0.fk_manager_employee_id,e1_0.fk_position_id,e1_0.fk_role_id,e1_0.employee_pass_reset_token,e1_0.employee_reset_token_expiry from employee e1_0 where e1_0.pk_employee_id=?
+2026-02-15T12:46:59.578+05:30 DEBUG 6356 --- [HRMS-Backend] [http-nio-8080-exec-4] org.hibernate.SQL                        : insert into refer_friend (fk_cv_status_type_id,fk_job_id,fk_refer_friend_employee_id,refer_friend_cv_url,refer_friend_email,refer_friend_name,refer_friend_review_status_changed_at,refer_friend_short_note) values (?,?,?,?,?,?,?,?)
+2026-02-15T12:46:59.590+05:30  INFO 6356 --- [HRMS-Backend] [http-nio-8080-exec-4] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T12:46:59.590765
+2026-02-15T12:52:29.105+05:30  INFO 6356 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T12:52:29.157+05:30  INFO 6356 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T12:52:29.170+05:30  INFO 6356 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T12:52:29.174+05:30  INFO 6356 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T12:52:29.182+05:30  INFO 6356 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T12:52:35.151+05:30  INFO 10408 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 10408 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T12:52:35.155+05:30  INFO 10408 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T12:52:36.008+05:30  INFO 10408 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T12:52:36.147+05:30  INFO 10408 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 130 ms. Found 33 JPA repository interfaces.
+2026-02-15T12:52:36.680+05:30  INFO 10408 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T12:52:36.689+05:30  INFO 10408 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T12:52:36.689+05:30  INFO 10408 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T12:52:36.740+05:30  INFO 10408 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T12:52:36.741+05:30  INFO 10408 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1521 ms
+2026-02-15T12:52:36.998+05:30  INFO 10408 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T12:52:37.045+05:30  INFO 10408 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T12:52:37.077+05:30  INFO 10408 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T12:52:37.320+05:30  INFO 10408 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T12:52:37.351+05:30  INFO 10408 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T12:52:37.808+05:30  INFO 10408 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 4eca6715-980e-4acb-a421-298bce981adb
+2026-02-15T12:52:37.810+05:30  INFO 10408 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T12:52:37.893+05:30  WARN 10408 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T12:52:37.917+05:30  INFO 10408 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T12:52:39.264+05:30  INFO 10408 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T12:52:40.434+05:30  INFO 10408 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T12:52:40.663+05:30  INFO 10408 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T12:52:40.829+05:30  INFO 10408 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T12:52:41.875+05:30  WARN 10408 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T12:52:42.449+05:30  INFO 10408 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T12:52:42.462+05:30  INFO 10408 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 7.828 seconds (process running for 8.354)
+2026-02-15T12:52:45.726+05:30  INFO 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T12:52:45.726+05:30  INFO 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T12:52:45.726+05:30  INFO 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-02-15T12:52:46.116+05:30 DEBUG 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] org.hibernate.SQL                        : select cst1_0.pk_cv_status_type_id,cst1_0.cv_status_type_name from cv_status_type cst1_0 where cst1_0.pk_cv_status_type_id=?
+2026-02-15T12:52:46.265+05:30 DEBUG 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] org.hibernate.SQL                        : select e1_0.pk_employee_id,e1_0.employee_dob,e1_0.employee_email,e1_0.employee_first_name,e1_0.employee_gender,e1_0.employee_hire_date,e1_0.employee_is_active,e1_0.employee_last_name,e1_0.employee_password,e1_0.employee_profile,e1_0.employee_salary,e1_0.fk_department_id,e1_0.fk_manager_employee_id,e1_0.fk_position_id,e1_0.fk_role_id,e1_0.employee_pass_reset_token,e1_0.employee_reset_token_expiry from employee e1_0 where e1_0.pk_employee_id=?
+2026-02-15T12:52:46.276+05:30 DEBUG 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] org.hibernate.SQL                        : select j1_0.pk_job_id,j1_0.fk_job_owner_employee_id,j1_0.fk_job_type_id,j1_0.job_created_at,j1_0.job_description_url,j1_0.job_is_active,j1_0.job_salary,j1_0.job_title from jobs j1_0 where j1_0.pk_job_id=?
+2026-02-15T12:52:46.287+05:30 DEBUG 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] org.hibernate.SQL                        : select cr1_0.pk_cv_reviewer_id,cr1_0.cv_reviewer_created_at,cr1_0.fk_cv_reviewer_employee_id,cr1_0.fk_job_id from cv_reviewer cr1_0 join jobs fj1_0 on fj1_0.pk_job_id=cr1_0.fk_job_id where fj1_0.pk_job_id=?
+2026-02-15T12:52:46.292+05:30 DEBUG 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] org.hibernate.SQL                        : select e1_0.pk_employee_id,e1_0.employee_dob,e1_0.employee_email,e1_0.employee_first_name,e1_0.employee_gender,e1_0.employee_hire_date,e1_0.employee_is_active,e1_0.employee_last_name,e1_0.employee_password,e1_0.employee_profile,e1_0.employee_salary,e1_0.fk_department_id,e1_0.fk_manager_employee_id,e1_0.fk_position_id,e1_0.fk_role_id,e1_0.employee_pass_reset_token,e1_0.employee_reset_token_expiry from employee e1_0 where e1_0.pk_employee_id=?
+2026-02-15T12:52:46.330+05:30 DEBUG 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] org.hibernate.SQL                        : insert into refer_friend (fk_cv_status_type_id,fk_job_id,fk_refer_friend_employee_id,refer_friend_cv_url,refer_friend_email,refer_friend_name,refer_friend_review_status_changed_at,refer_friend_short_note) values (?,?,?,?,?,?,?,?)
+2026-02-15T12:52:46.442+05:30  INFO 10408 --- [HRMS-Backend] [http-nio-8080-exec-2] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T12:52:46.442461500
+2026-02-15T13:01:57.342+05:30  INFO 10408 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:01:57.384+05:30  INFO 10408 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:01:57.393+05:30  INFO 10408 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:01:57.396+05:30  INFO 10408 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:01:57.401+05:30  INFO 10408 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:02:03.197+05:30  INFO 18308 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 18308 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:02:03.200+05:30  INFO 18308 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:02:04.041+05:30  INFO 18308 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:02:04.166+05:30  INFO 18308 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 114 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:02:04.696+05:30  INFO 18308 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:02:04.704+05:30  INFO 18308 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:02:04.705+05:30  INFO 18308 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:02:04.758+05:30  INFO 18308 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:02:04.759+05:30  INFO 18308 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1516 ms
+2026-02-15T13:02:05.005+05:30  INFO 18308 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:02:05.050+05:30  INFO 18308 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:02:05.079+05:30  INFO 18308 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:02:05.327+05:30  INFO 18308 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:02:05.359+05:30  INFO 18308 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:02:05.859+05:30  INFO 18308 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: e471c248-de92-47bc-bf3f-53561afdadf3
+2026-02-15T13:02:05.861+05:30  INFO 18308 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:02:05.948+05:30  WARN 18308 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:02:05.973+05:30  INFO 18308 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:02:07.333+05:30  INFO 18308 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:02:08.405+05:30  INFO 18308 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:02:08.603+05:30  INFO 18308 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:02:08.732+05:30  INFO 18308 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:02:09.589+05:30  WARN 18308 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:02:10.142+05:30  INFO 18308 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:02:10.155+05:30  INFO 18308 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 7.401 seconds (process running for 7.915)
+2026-02-15T13:02:20.910+05:30  INFO 18308 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T13:02:20.910+05:30  INFO 18308 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T13:02:20.910+05:30  INFO 18308 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-02-15T13:02:21.582+05:30  INFO 18308 --- [HRMS-Backend] [http-nio-8080-exec-1] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:02:21.582388200
+2026-02-15T13:07:59.059+05:30  INFO 18308 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:07:59.113+05:30  INFO 18308 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:07:59.123+05:30  INFO 18308 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:07:59.126+05:30  INFO 18308 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:07:59.132+05:30  INFO 18308 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:08:05.446+05:30  INFO 12376 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 12376 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:08:05.449+05:30  INFO 12376 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:08:06.280+05:30  INFO 12376 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:08:06.422+05:30  INFO 12376 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 132 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:08:06.962+05:30  INFO 12376 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:08:06.972+05:30  INFO 12376 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:08:06.973+05:30  INFO 12376 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:08:07.021+05:30  INFO 12376 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:08:07.022+05:30  INFO 12376 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1531 ms
+2026-02-15T13:08:07.257+05:30  INFO 12376 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:08:07.300+05:30  INFO 12376 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:08:07.344+05:30  INFO 12376 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:08:07.599+05:30  INFO 12376 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:08:07.624+05:30  INFO 12376 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:08:08.023+05:30  INFO 12376 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: ac4d5c3e-d411-4577-b590-9f00009cc77d
+2026-02-15T13:08:08.026+05:30  INFO 12376 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:08:08.109+05:30  WARN 12376 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:08:08.137+05:30  INFO 12376 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:08:09.430+05:30  INFO 12376 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:08:10.468+05:30  INFO 12376 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:08:10.648+05:30  INFO 12376 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:08:10.784+05:30  INFO 12376 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:08:11.624+05:30  WARN 12376 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:08:12.157+05:30  INFO 12376 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:08:12.171+05:30  INFO 12376 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 7.147 seconds (process running for 7.671)
+2026-02-15T13:08:32.653+05:30  INFO 12376 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T13:08:32.653+05:30  INFO 12376 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T13:08:32.653+05:30  INFO 12376 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-02-15T13:08:33.320+05:30  INFO 12376 --- [HRMS-Backend] [http-nio-8080-exec-1] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:08:33.320401900
+2026-02-15T13:10:49.706+05:30  INFO 12376 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:10:49.737+05:30  INFO 12376 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:10:49.745+05:30  INFO 12376 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:10:49.748+05:30  INFO 12376 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:10:49.752+05:30  INFO 12376 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:10:54.215+05:30  INFO 24144 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 24144 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:10:54.217+05:30  INFO 24144 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:10:54.868+05:30  INFO 24144 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:10:54.969+05:30  INFO 24144 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 87 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:10:55.377+05:30  INFO 24144 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:10:55.384+05:30  INFO 24144 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:10:55.384+05:30  INFO 24144 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:10:55.419+05:30  INFO 24144 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:10:55.419+05:30  INFO 24144 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1167 ms
+2026-02-15T13:10:55.616+05:30  INFO 24144 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:10:55.660+05:30  INFO 24144 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:10:55.684+05:30  INFO 24144 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:10:55.872+05:30  INFO 24144 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:10:55.891+05:30  INFO 24144 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:10:56.247+05:30  INFO 24144 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: f807f8b4-5837-4d0e-b382-b968a35b0133
+2026-02-15T13:10:56.248+05:30  INFO 24144 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:10:56.274+05:30  WARN 24144 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:10:56.290+05:30  INFO 24144 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:10:57.169+05:30  INFO 24144 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:10:57.438+05:30  INFO 24144 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:10:57.600+05:30  INFO 24144 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:10:57.715+05:30  INFO 24144 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:10:58.395+05:30  WARN 24144 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:10:58.854+05:30  INFO 24144 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:10:58.863+05:30  INFO 24144 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.011 seconds (process running for 5.453)
+2026-02-15T13:11:06.884+05:30  INFO 24144 --- [HRMS-Backend] [http-nio-8080-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T13:11:06.884+05:30  INFO 24144 --- [HRMS-Backend] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T13:11:06.893+05:30  INFO 24144 --- [HRMS-Backend] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 9 ms
+2026-02-15T13:11:07.431+05:30  INFO 24144 --- [HRMS-Backend] [http-nio-8080-exec-3] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:11:07.431083300
+2026-02-15T13:14:02.680+05:30  INFO 24144 --- [HRMS-Backend] [http-nio-8080-exec-5] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:14:02.680079500
+2026-02-15T13:21:40.758+05:30  INFO 24144 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:21:40.786+05:30  INFO 24144 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:21:40.791+05:30  INFO 24144 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:21:40.793+05:30  INFO 24144 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:21:40.795+05:30  INFO 24144 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:21:47.575+05:30  INFO 28852 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 28852 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:21:47.578+05:30  INFO 28852 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:21:48.212+05:30  INFO 28852 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:21:48.319+05:30  INFO 28852 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 100 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:21:48.712+05:30  INFO 28852 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:21:48.720+05:30  INFO 28852 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:21:48.721+05:30  INFO 28852 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:21:48.769+05:30  INFO 28852 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:21:48.769+05:30  INFO 28852 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1157 ms
+2026-02-15T13:21:48.975+05:30  INFO 28852 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:21:49.009+05:30  INFO 28852 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:21:49.035+05:30  INFO 28852 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:21:49.213+05:30  INFO 28852 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:21:49.233+05:30  INFO 28852 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:21:49.586+05:30  INFO 28852 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 862095f4-4b8f-41cb-8ffd-aca3bf6e243a
+2026-02-15T13:21:49.588+05:30  INFO 28852 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:21:49.652+05:30  WARN 28852 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:21:49.667+05:30  INFO 28852 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:21:50.868+05:30  INFO 28852 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:21:51.960+05:30  INFO 28852 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:21:52.116+05:30  INFO 28852 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:21:52.230+05:30  INFO 28852 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:21:52.946+05:30  WARN 28852 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:21:53.885+05:30  INFO 28852 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:21:53.909+05:30  INFO 28852 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 6.664 seconds (process running for 7.073)
+2026-02-15T13:21:56.313+05:30  INFO 28852 --- [HRMS-Backend] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T13:21:56.314+05:30  INFO 28852 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T13:21:56.315+05:30  INFO 28852 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-02-15T13:21:56.840+05:30  INFO 28852 --- [HRMS-Backend] [http-nio-8080-exec-2] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:21:56.840820500
+2026-02-15T13:22:16.674+05:30  INFO 28852 --- [HRMS-Backend] [http-nio-8080-exec-4] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:22:16.674346400
+2026-02-15T13:22:18.626+05:30  INFO 28852 --- [HRMS-Backend] [http-nio-8080-exec-6] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:22:18.626528600
+2026-02-15T13:29:44.047+05:30  INFO 28852 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:29:44.076+05:30  INFO 28852 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:29:44.082+05:30  INFO 28852 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:29:44.083+05:30  INFO 28852 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:29:44.087+05:30  INFO 28852 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:29:47.372+05:30  INFO 23364 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 23364 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:29:47.374+05:30  INFO 23364 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:29:47.945+05:30  INFO 23364 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:29:48.040+05:30  INFO 23364 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 89 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:29:48.430+05:30  INFO 23364 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:29:48.438+05:30  INFO 23364 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:29:48.438+05:30  INFO 23364 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:29:48.473+05:30  INFO 23364 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:29:48.473+05:30  INFO 23364 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1067 ms
+2026-02-15T13:29:48.643+05:30  INFO 23364 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:29:48.675+05:30  INFO 23364 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:29:48.702+05:30  INFO 23364 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:29:48.868+05:30  INFO 23364 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:29:48.888+05:30  INFO 23364 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:29:49.217+05:30  INFO 23364 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: bae24b28-f4e9-4806-a27b-46e6e35241ca
+2026-02-15T13:29:49.219+05:30  INFO 23364 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:29:49.277+05:30  WARN 23364 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:29:49.299+05:30  INFO 23364 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:29:50.081+05:30  INFO 23364 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:29:51.019+05:30  INFO 23364 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:29:51.180+05:30  INFO 23364 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:29:51.287+05:30  INFO 23364 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:29:51.923+05:30  WARN 23364 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:29:52.347+05:30  INFO 23364 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:29:52.359+05:30  INFO 23364 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.321 seconds (process running for 5.718)
+2026-02-15T13:29:56.966+05:30  INFO 23364 --- [HRMS-Backend] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T13:29:56.969+05:30  INFO 23364 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T13:29:56.969+05:30  INFO 23364 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-02-15T13:29:57.490+05:30  INFO 23364 --- [HRMS-Backend] [http-nio-8080-exec-2] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:29:57.490647900
+2026-02-15T13:29:57.506+05:30  WARN 23364 --- [HRMS-Backend] [http-nio-8080-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 515, SQLState: 23000
+2026-02-15T13:29:57.506+05:30 ERROR 23364 --- [HRMS-Backend] [http-nio-8080-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : Cannot insert the value NULL into column 'audit_log_new_status', table 'HRMS_DataBase.dbo.audit_log'; column does not allow nulls. INSERT fails.
+2026-02-15T13:30:47.201+05:30  INFO 23364 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:30:47.230+05:30  INFO 23364 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:30:47.237+05:30  INFO 23364 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:30:47.239+05:30  INFO 23364 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:30:47.241+05:30  INFO 23364 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:30:53.254+05:30  INFO 25412 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 25412 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:30:53.256+05:30  INFO 25412 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:30:53.834+05:30  INFO 25412 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:30:53.923+05:30  INFO 25412 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 84 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:30:54.323+05:30  INFO 25412 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:30:54.329+05:30  INFO 25412 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:30:54.330+05:30  INFO 25412 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:30:54.363+05:30  INFO 25412 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:30:54.363+05:30  INFO 25412 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1074 ms
+2026-02-15T13:30:54.527+05:30  INFO 25412 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:30:54.576+05:30  INFO 25412 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:30:54.602+05:30  INFO 25412 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:30:54.795+05:30  INFO 25412 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:30:54.816+05:30  INFO 25412 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:30:55.140+05:30  INFO 25412 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: e5c4cc9c-8d21-4962-a8aa-3e8a0df8a134
+2026-02-15T13:30:55.142+05:30  INFO 25412 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:30:55.201+05:30  WARN 25412 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:30:55.216+05:30  INFO 25412 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:30:56.079+05:30  INFO 25412 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:30:57.045+05:30  INFO 25412 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:30:57.200+05:30  INFO 25412 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:30:57.318+05:30  INFO 25412 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:30:57.927+05:30  WARN 25412 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:30:58.339+05:30  INFO 25412 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:30:58.348+05:30  INFO 25412 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.43 seconds (process running for 5.821)
+2026-02-15T13:31:04.596+05:30  INFO 25412 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:31:04.625+05:30  INFO 25412 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:31:04.630+05:30  INFO 25412 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:31:04.633+05:30  INFO 25412 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:31:04.636+05:30  INFO 25412 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:31:28.445+05:30  INFO 20064 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 20064 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:31:28.448+05:30  INFO 20064 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:31:29.408+05:30  INFO 20064 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:31:29.611+05:30  INFO 20064 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 181 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:31:30.436+05:30  INFO 20064 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:31:30.450+05:30  INFO 20064 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:31:30.450+05:30  INFO 20064 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:31:30.508+05:30  INFO 20064 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:31:30.509+05:30  INFO 20064 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2021 ms
+2026-02-15T13:31:30.809+05:30  INFO 20064 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:31:30.867+05:30  INFO 20064 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:31:30.919+05:30  INFO 20064 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:31:31.252+05:30  INFO 20064 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:31:31.286+05:30  INFO 20064 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:31:31.790+05:30  INFO 20064 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 02ad6326-7c63-4100-9e97-c76f385e2b21
+2026-02-15T13:31:31.792+05:30  INFO 20064 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:31:31.890+05:30  WARN 20064 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:31:31.921+05:30  INFO 20064 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:31:33.398+05:30  INFO 20064 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:31:34.450+05:30  INFO 20064 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:31:34.590+05:30  INFO 20064 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:31:34.696+05:30  INFO 20064 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:31:35.374+05:30  WARN 20064 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:31:35.823+05:30  INFO 20064 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:31:35.833+05:30  INFO 20064 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 7.967 seconds (process running for 8.566)
+2026-02-15T13:33:46.415+05:30  INFO 20064 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:33:46.443+05:30  INFO 20064 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:33:46.451+05:30  INFO 20064 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:33:46.453+05:30  INFO 20064 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:33:46.458+05:30  INFO 20064 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:33:48.302+05:30  INFO 12672 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 12672 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:33:48.306+05:30  INFO 12672 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:33:48.876+05:30  INFO 12672 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:33:48.971+05:30  INFO 12672 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 87 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:33:49.381+05:30  INFO 12672 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:33:49.393+05:30  INFO 12672 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:33:49.394+05:30  INFO 12672 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:33:49.428+05:30  INFO 12672 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:33:49.428+05:30  INFO 12672 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1088 ms
+2026-02-15T13:33:49.613+05:30  INFO 12672 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:33:49.658+05:30  INFO 12672 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:33:49.682+05:30  INFO 12672 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:33:49.883+05:30  INFO 12672 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:33:49.903+05:30  INFO 12672 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:33:50.242+05:30  INFO 12672 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: e8441df0-a7df-4acd-900c-a71e7f2928ff
+2026-02-15T13:33:50.243+05:30  INFO 12672 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:33:50.296+05:30  WARN 12672 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:33:50.312+05:30  INFO 12672 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:33:51.116+05:30  INFO 12672 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:33:51.948+05:30  INFO 12672 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:33:52.088+05:30  INFO 12672 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:33:52.192+05:30  INFO 12672 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:33:52.791+05:30  WARN 12672 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:33:53.239+05:30  INFO 12672 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:33:53.248+05:30  INFO 12672 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.313 seconds (process running for 5.842)
+2026-02-15T13:33:57.587+05:30  INFO 12672 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T13:33:57.587+05:30  INFO 12672 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T13:33:57.587+05:30  INFO 12672 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-02-15T13:33:58.055+05:30  INFO 12672 --- [HRMS-Backend] [http-nio-8080-exec-1] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:33:58.055911
+2026-02-15T13:33:58.072+05:30  WARN 12672 --- [HRMS-Backend] [http-nio-8080-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 515, SQLState: 23000
+2026-02-15T13:33:58.072+05:30 ERROR 12672 --- [HRMS-Backend] [http-nio-8080-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : Cannot insert the value NULL into column 'audit_log_new_status', table 'HRMS_DataBase.dbo.audit_log'; column does not allow nulls. INSERT fails.
+2026-02-15T13:34:57.872+05:30  INFO 12672 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:34:57.908+05:30  INFO 12672 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:34:57.914+05:30  INFO 12672 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:34:57.916+05:30  INFO 12672 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:34:57.920+05:30  INFO 12672 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:35:01.319+05:30  INFO 2344 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 2344 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:35:01.321+05:30  INFO 2344 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:35:01.961+05:30  INFO 2344 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:35:02.049+05:30  INFO 2344 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 81 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:35:02.508+05:30  INFO 2344 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:35:02.518+05:30  INFO 2344 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:35:02.519+05:30  INFO 2344 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:35:02.559+05:30  INFO 2344 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:35:02.559+05:30  INFO 2344 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1206 ms
+2026-02-15T13:35:02.784+05:30  INFO 2344 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:35:02.828+05:30  INFO 2344 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:35:02.852+05:30  INFO 2344 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:35:03.052+05:30  INFO 2344 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:35:03.072+05:30  INFO 2344 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:35:03.412+05:30  INFO 2344 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 811f051d-45ed-4b54-9d6a-297609dde84d
+2026-02-15T13:35:03.414+05:30  INFO 2344 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:35:03.482+05:30  WARN 2344 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:35:03.499+05:30  INFO 2344 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:35:04.318+05:30  INFO 2344 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:35:05.290+05:30  INFO 2344 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:35:05.442+05:30  INFO 2344 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:35:05.554+05:30  INFO 2344 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:35:06.189+05:30  WARN 2344 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:35:06.613+05:30  INFO 2344 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:35:06.622+05:30  INFO 2344 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.657 seconds (process running for 6.091)
+2026-02-15T13:35:09.454+05:30  INFO 2344 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T13:35:09.455+05:30  INFO 2344 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T13:35:09.457+05:30  INFO 2344 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-15T13:35:10.009+05:30  INFO 2344 --- [HRMS-Backend] [http-nio-8080-exec-1] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:35:10.009133
+2026-02-15T13:35:28.969+05:30  INFO 2344 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:35:29.003+05:30  INFO 2344 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:35:29.010+05:30  INFO 2344 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:35:29.012+05:30  INFO 2344 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:35:29.015+05:30  INFO 2344 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:35:32.998+05:30  INFO 28400 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 28400 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:35:33.000+05:30  INFO 28400 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:35:33.593+05:30  INFO 28400 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:35:33.676+05:30  INFO 28400 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 77 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:35:34.067+05:30  INFO 28400 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:35:34.074+05:30  INFO 28400 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:35:34.074+05:30  INFO 28400 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:35:34.108+05:30  INFO 28400 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:35:34.108+05:30  INFO 28400 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1076 ms
+2026-02-15T13:35:34.274+05:30  INFO 28400 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:35:34.322+05:30  INFO 28400 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:35:34.350+05:30  INFO 28400 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:35:34.546+05:30  INFO 28400 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:35:34.567+05:30  INFO 28400 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:35:34.903+05:30  INFO 28400 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: a65c7661-aa72-407d-bc59-96da49fd87ad
+2026-02-15T13:35:34.904+05:30  INFO 28400 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:35:34.963+05:30  WARN 28400 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:35:34.980+05:30  INFO 28400 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:35:35.866+05:30  INFO 28400 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:35:36.803+05:30  INFO 28400 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:35:36.948+05:30  INFO 28400 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:35:37.058+05:30  INFO 28400 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:35:37.774+05:30  WARN 28400 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:35:38.207+05:30  INFO 28400 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:35:38.217+05:30  INFO 28400 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.579 seconds (process running for 5.978)
+2026-02-15T13:35:41.215+05:30  INFO 28400 --- [HRMS-Backend] [http-nio-8080-exec-5] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T13:35:41.215+05:30  INFO 28400 --- [HRMS-Backend] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T13:35:41.229+05:30  INFO 28400 --- [HRMS-Backend] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed initialization in 14 ms
+2026-02-15T13:35:41.830+05:30  INFO 28400 --- [HRMS-Backend] [http-nio-8080-exec-5] c.e.H.Backend.config.AuditLoggingAspect  : AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: 2026-02-15T13:35:41.830885300
+2026-02-15T13:44:07.970+05:30  INFO 28400 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-15T13:44:08.000+05:30  INFO 28400 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-15T13:44:08.007+05:30  INFO 28400 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:44:08.008+05:30  INFO 28400 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-15T13:44:08.012+05:30  INFO 28400 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-15T13:44:25.348+05:30  INFO 4804 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 4804 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-15T13:44:25.351+05:30  INFO 4804 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-15T13:44:25.951+05:30  INFO 4804 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-15T13:44:26.042+05:30  INFO 4804 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 83 ms. Found 33 JPA repository interfaces.
+2026-02-15T13:44:26.450+05:30  INFO 4804 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-15T13:44:26.458+05:30  INFO 4804 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-15T13:44:26.458+05:30  INFO 4804 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-15T13:44:26.496+05:30  INFO 4804 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-15T13:44:26.497+05:30  INFO 4804 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1111 ms
+2026-02-15T13:44:26.667+05:30  INFO 4804 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-15T13:44:26.714+05:30  INFO 4804 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-15T13:44:26.738+05:30  INFO 4804 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-15T13:44:26.915+05:30  INFO 4804 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-15T13:44:26.937+05:30  INFO 4804 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-15T13:44:27.257+05:30  INFO 4804 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 5c6d8ddd-1615-44d9-b0b3-dd92543be941
+2026-02-15T13:44:27.258+05:30  INFO 4804 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-15T13:44:27.329+05:30  WARN 4804 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-15T13:44:27.344+05:30  INFO 4804 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-15T13:44:28.163+05:30  INFO 4804 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-15T13:44:29.062+05:30  INFO 4804 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-15T13:44:29.205+05:30  INFO 4804 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-15T13:44:29.320+05:30  INFO 4804 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-15T13:44:29.958+05:30  WARN 4804 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-15T13:44:30.374+05:30  INFO 4804 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-15T13:44:30.385+05:30  INFO 4804 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.368 seconds (process running for 5.795)
+2026-02-15T13:44:33.309+05:30  INFO 4804 --- [HRMS-Backend] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-15T13:44:33.310+05:30  INFO 4804 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-15T13:44:33.312+05:30  INFO 4804 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
