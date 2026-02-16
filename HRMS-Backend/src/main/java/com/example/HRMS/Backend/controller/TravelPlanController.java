@@ -1,8 +1,6 @@
 package com.example.HRMS.Backend.controller;
 
-import com.example.HRMS.Backend.dto.EmployeeSearch;
-import com.example.HRMS.Backend.dto.ExpenseRequest;
-import com.example.HRMS.Backend.dto.TravelPlanResponse;
+import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.service.ExpenseService;
 import com.example.HRMS.Backend.service.TravelPlanService;
@@ -24,11 +22,16 @@ public class TravelPlanController {
     private final ExpenseService expenseService;
 
     @GetMapping("/allTravelPlans")
-    public ResponseEntity<List<TravelPlanResponse>> showAllGames() {
+    public ResponseEntity<List<TravelPlanResponse>> showAllTravelPlans() {
         return ResponseEntity.ok(travelPlanService.showAllTravelPlan());
     }
 
-    @GetMapping("/{hrEmpId}")
+    @GetMapping("/travelPlanId/{id}")
+    public ResponseEntity<TravelPlanResponse> showTravelPlanById(@PathVariable Long id) {
+        return ResponseEntity.ok(travelPlanService.showTravelPlanById(id));
+    }
+
+    @GetMapping("/hrId/{hrEmpId}")
     public ResponseEntity<TravelPlan> findTravelPlanByHrEmployeeId(@PathVariable Long hrEmpId){
         return ResponseEntity.ok(travelPlanService.findTravelPlanByHREmployeeId(hrEmpId));
     }
@@ -37,6 +40,17 @@ public class TravelPlanController {
     public ResponseEntity<String> addExpense(@Valid @RequestBody ExpenseRequest expenseRequest) {
         expenseService.saveExpense(expenseRequest);
         return ResponseEntity.ok("Expense add successfully");
+    }
+
+    @GetMapping("/expense/{employeeId}/{travelPlanId}")
+    public ResponseEntity<List<ExpenseResponse>> getExpenseById(@PathVariable Long travelPlanId
+                                                                , @PathVariable Long employeeId) {
+        return ResponseEntity.ok(expenseService.getExpenseById(employeeId, travelPlanId));
+    }
+
+    @GetMapping("/expenseProof/{expenseId}")
+    public ResponseEntity<List<ExpenseProofResponse>> getExpenseProofById(@PathVariable Long expenseId) {
+        return ResponseEntity.ok(expenseService.getExpenseProofById(expenseId));
     }
 
     @PostMapping(value = "/expenseWithProof", consumes = {"multipart/form-data"})

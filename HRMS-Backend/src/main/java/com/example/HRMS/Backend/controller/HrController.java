@@ -11,6 +11,7 @@ import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.repository.GameTypeRepository;
 import com.example.HRMS.Backend.repository.JobRepository;
 import com.example.HRMS.Backend.repository.TravelDocRepository;
+import com.example.HRMS.Backend.service.ExpenseService;
 import com.example.HRMS.Backend.service.JobService;
 import com.example.HRMS.Backend.service.PostService;
 import com.example.HRMS.Backend.service.TravelPlanService;
@@ -33,11 +34,18 @@ public class HrController {
     private final GameTypeRepository gameTypeRepository;
     private final JobService jobService;
     private final PostService postService;
+    private final ExpenseService expenseService;
 
     @PostMapping("/travelPlan")
     public ResponseEntity<String > addNewTravelPlan(@Valid @RequestBody TravelPlanRequest travelPlanRequest) {
         travelPlanService.addTravelPlan(travelPlanRequest);
         return ResponseEntity.ok("Travel plan add successfully");
+    }
+
+    @PutMapping("/travelPlan/{travelPlanId}")
+    public ResponseEntity<String> updateTravelPLan(@Valid @RequestBody TravelPlanRequest travelPlanRequest, @PathVariable Long travelPlanId){
+        travelPlanService.updateTravelPlan(travelPlanRequest,travelPlanId);
+        return ResponseEntity.ok("Travel Plan Update successfully");
     }
 
     @PostMapping("/travelPlanDoc/{employeeId}/{travelPlanId}/{docTypeId}")
@@ -52,15 +60,16 @@ public class HrController {
         return ResponseEntity.ok(travelPlanService.findAllTravelDoc());
     }
 
-    @GetMapping("/travelDoc/{id}")
-    public ResponseEntity<List<TravelDoc>> showTravelDocByEmpId(@PathVariable Long id) {
-        return ResponseEntity.ok(travelDocRepository.findTravelDocByFkEmployee_Id(id));
+    @GetMapping("/travelDoc/{empId}/{travelPlanId}")
+    public ResponseEntity<List<TravelDocResponse>> showTravelDocByEmpId(@PathVariable Long empId,
+                                                                        @PathVariable Long travelPlanId) {
+        return ResponseEntity.ok(travelPlanService.findTravelDocByFkEmployeeId(empId,travelPlanId));
     }
 
-    @PutMapping("/travelPlan")
-    public ResponseEntity<String> updateTravelPLan(@Valid @RequestBody TravelPlan travelPlan){
-        travelPlanService.updateTravelPlan(travelPlan);
-        return ResponseEntity.ok("Travel Plan Update successfully");
+    @PatchMapping("/expense/{expId}/{statusId}")
+    public ResponseEntity<String > updateExpenseStatus(@PathVariable Long expId, @PathVariable Long statusId)
+    {   expenseService.updateExpenseStatus(expId, statusId);
+        return ResponseEntity.ok("status update successful");
     }
 
     @PostMapping("/game")

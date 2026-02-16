@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sidebar"
 
 export function AppSidebar() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const items = [
     { title: "Home", icon: Home, url: "/dashboard" },
@@ -36,6 +36,11 @@ export function AppSidebar() {
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
+        <div className="p-4 mt-auto">
+          <p className="text-sm text-gray-500 uppercase">{user?.employeeEmail}</p>
+          <p className="text-sm text-gray-500">{user?.roleName}</p>
+          <p className="text-sm text-gray-500">{user?.departmentName}</p>
+        </div>
       </SidebarContent>
       <SidebarFooter className="p-4 border-t">
         <SidebarMenuButton onClick={logout} className="text-red-500 hover:text-red-600">

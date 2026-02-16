@@ -93,6 +93,62 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     }
 
     @Override
+    public void updateTravelPlan(@Valid TravelPlanRequest travelPlanRequest, Long travelPlanId){
+
+        TravelPlan travelPlan = modelMapper.map(travelPlanRequest, TravelPlan.class);
+
+        travelPlan.setId(travelPlanId);
+
+        TravelPlan savedTravelplan = travelPlanRepository.save(travelPlan);
+
+        TravelPlanStatus travelPlanStatus = travelPlanStatusRepository.findById(1L).orElseThrow(
+                () -> new RuntimeException("Status not found")
+        );
+
+        List<Long> empId = travelPlanRequest.getEmployeesInTravelPlanId();
+
+        List<String> emails = new ArrayList<>();
+
+        for(Long id : empId){
+
+            Long empTravelId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(id,travelPlanId);
+
+            if(empTravelId == null) {
+                Employee employee = employeeRepository.findById(id).orElseThrow(
+                        () -> new RuntimeException("Employee not found"));
+
+                EmployeeTravelPlan employeeTravelPlan = new EmployeeTravelPlan();
+                employeeTravelPlan.setFkEmployee(employee);
+                employeeTravelPlan.setEmployeeTravelPlanCreatedAt(Instant.now());
+                employeeTravelPlan.setFkTravelPlan(savedTravelplan);
+                employeeTravelPlan.setFkTravelPlanStatus(travelPlanStatus);
+                employeeTravelPlanRepository.save(employeeTravelPlan);
+
+                emails.add(employee.getEmployeeEmail());
+            }
+        }
+
+        if(!emails.isEmpty()){
+        emailService.sendEmail(emails,"Travel Plan",travelPlanRequest.getTravelPlanDetails());}
+    }
+
+    @Override
+    public TravelPlanResponse showTravelPlanById(Long travelplanId){
+        TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelplanId);
+        TravelPlanResponse travelPlanResponse = modelMapper.map(travelPlan,TravelPlanResponse.class);
+
+        List<EmployeeTravelPlanResponse> employeeTravelPlanResponses = new ArrayList<>();
+        for(EmployeeTravelPlan employeeTravelPlan:employeeTravelPlanRepository.findEmployeeTravelPlanByFkTravelPlan_Id(travelPlan.getId()))
+        {
+            EmployeeTravelPlanResponse employeeTravelPlanResponse = modelMapper.map(employeeTravelPlan, EmployeeTravelPlanResponse.class);
+            employeeTravelPlanResponses.add(employeeTravelPlanResponse);
+        }
+        travelPlanResponse.setEmployeeTravelPlanResponses(employeeTravelPlanResponses);
+
+        return travelPlanResponse;
+    }
+
+    @Override
     public List<TravelPlanResponse> showAllTravelPlan(){
         List<TravelPlanResponse> travelPlanResponses = new ArrayList<>();
         for(TravelPlan travelPlan:travelPlanRepository.findAll()){
@@ -109,11 +165,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             travelPlanResponses.add(travelPlanResponse);
         }
         return travelPlanResponses;
-    }
-
-    @Override
-    public void updateTravelPlan(@Valid TravelPlan travelPlan){
-        travelPlanRepository.save(travelPlan);
     }
 
     @Value("${img.path}")
@@ -189,40 +240,37 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         List<TravelDoc> travelDocs = travelDocRepository.findAll();
         List<TravelDocResponse> travelDocResponses = new ArrayList<>();
-        TravelDocResponse travelDocResponse = new TravelDocResponse();
-        for(TravelDoc travelDoc : travelDocs) {
-
-            travelDocResponse.setTravelDocUploadedAt(travelDoc.getTravelDocUploadedAt());
-            travelDocResponse.setTravelDocUrl(travelDoc.getTravelDocUrl());
-
-            travelDocResponse.setTravelDocsTypeId(travelDoc.getFkTravelDocsType().getId());
-
-            Long employeeTravelPlanId = null;
-
-            if (travelDoc != null && travelDoc.getFkEmployeeTravelPlan() != null) {
-                employeeTravelPlanId = travelDoc.getFkEmployeeTravelPlan().getId();
-                travelDocResponse.setEmployeeTravelPlanId(employeeTravelPlanId);
-            }
-
-            travelDocResponse.setTravelPlanId(travelDoc.getFkTravelPlan().getId());
-            travelDocResponse.setEmployeeId(travelDoc.getFkEmployee().getId());
-
-            travelDocResponse.setTravelDocsTypeName(travelDoc.getFkTravelDocsType().getTravelDocsTypeName());
-            travelDocResponse.setTravelPlanName(travelDoc.getFkTravelPlan().getTravelPlanName());
-            travelDocResponse.setEmployeeEmail(travelDoc.getFkEmployee().getEmployeeEmail());
-
-            travelDocResponse.setTravelDocImg(getTravelDocImg(travelDoc.getId(),
-                    travelDoc.getTravelDocUrl()));
+        for(TravelDoc travelDoc : travelDocs)
+        {
+            TravelDocResponse travelDocResponse = modelMapper.map(travelDoc,TravelDocResponse.class);
             travelDocResponses.add(travelDocResponse);
         }
-        return  travelDocResponses;
+
+        return travelDocResponses;
 
     }
 
-    @Cacheable(value = "TravelDoc", key = "#id")
-    public byte[] getTravelDocImg(Long id, String path) throws IOException {
-        return Files.readAllBytes(new File(System.getProperty("user.dir") + "/" + path).toPath());
+    @Override
+    public List<TravelDocResponse> findTravelDocByFkEmployeeId(Long empId, Long travelPlanId){
+
+        Employee employee = employeeRepository.findEmployeeById(empId);
+        TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
+        List<TravelDoc> travelDocs = travelDocRepository.findByFkEmployeeAndFkTravelPlan(employee ,travelPlan);
+        List<TravelDocResponse> travelDocResponses = new ArrayList<>();
+        for(TravelDoc travelDoc : travelDocs)
+        {
+            TravelDocResponse travelDocResponse = modelMapper.map(travelDoc,TravelDocResponse.class);
+            travelDocResponses.add(travelDocResponse);
+        }
+
+        return travelDocResponses;
     }
+
+
+//    @Cacheable(value = "TravelDoc", key = "#id")
+//    public byte[] getTravelDocImg(Long id, String path) throws IOException {
+//        return Files.readAllBytes(new File(System.getProperty("user.dir") + "/" + path).toPath());
+//    }
 
     @Override
     public Long findEmployeeTravelPlanId(Long empId, Long travelId){
@@ -235,5 +283,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     public List<Long> getTravelPlan(String query){
         return travelPlanRepository.findTravelPlan(query);
     }
+
 
 }

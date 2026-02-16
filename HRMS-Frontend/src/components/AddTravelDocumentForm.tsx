@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMutation } from "@tanstack/react-query";
-import { apiService } from "../api/apiService";
+import { travelService } from "../api/travelService";
 import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
 
   const { data: employeeTravelPlan, isLoading, isError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
-    queryFn: () => apiService.findEmployeeTravelPlans(1, 1, token || ""),
+    queryFn: () => travelService.findEmployeeTravelPlans(1, 1, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
@@ -28,12 +28,12 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
       formData.append("file", docFile);
 
       if(user?.roleName === "HR"  ) {
-          return apiService.addTravelPlanDocByHr(user?.id || 0, travelPlanId, docType, formData, token || "");
+          return travelService.addTravelPlanDocByHr(user?.id || 0, travelPlanId, docType, formData, token || "");
       } else if(user?.roleName === "EMPLOYEE") {
             if (!employeeTravelPlan) {
                 throw new Error("Employee travel plan not found");
             }
-          return apiService.addTravelPlanDocByEmployee(user?.id || 0, employeeTravelPlan, docType, formData, token || "");
+          return travelService.addTravelPlanDocByEmployee(user?.id || 0, employeeTravelPlan, docType, formData, token || "");
       }
     },
     onSuccess: () => {
@@ -69,6 +69,7 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
               </select>
         </div>
         
+        <div className="border-2 border-dashed rounded-lg p-6 text-center space-y-2 border-slate-200">
         <Button 
           className="w-full text-black" 
           onClick={() => expenseMutation.mutate()} 
@@ -76,6 +77,7 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
         >
           {expenseMutation.isPending ? "Uploading..." : "Submit Document"}
         </Button>
+        </div>
       </CardContent>
     </Card>
   );

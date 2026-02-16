@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMutation } from "@tanstack/react-query";
-import { apiService } from "../api/apiService";
+import { travelService } from "../api/travelService";
 import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -14,7 +14,7 @@ export default function AddExpenseForm({ travelPlanId, startDate, endDate, onSuc
 
   const { data: employeeTravelPlan, isLoading, isError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
-    queryFn: () => apiService.findEmployeeTravelPlans(1, 1, token || ""),
+    queryFn: () => travelService.findEmployeeTravelPlans(1, 1, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
@@ -50,7 +50,7 @@ export default function AddExpenseForm({ travelPlanId, startDate, endDate, onSuc
       const idsBlob = new Blob([JSON.stringify(idsArray)], { type: "application/json" });
       formData.append("proofTypes", idsBlob);
   
-      return apiService.addExpenseWithProof(formData, token || "");
+      return travelService.addExpenseWithProof(formData, token || "");
     },
     onSuccess: () => {
       alert("Expense submitted!");

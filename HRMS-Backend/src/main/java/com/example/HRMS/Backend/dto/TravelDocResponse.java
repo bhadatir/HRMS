@@ -11,9 +11,9 @@ import java.time.Instant;
 @Data
 public class TravelDocResponse {
 
-    private String travelDocUrl;
+    private Long id;
 
-    private byte[] travelDocImg;
+    private String travelDocUrl;
 
     private Instant travelDocUploadedAt;
 

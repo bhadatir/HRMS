@@ -1,12 +1,16 @@
 package com.example.HRMS.Backend.service.impl;
 
+import com.example.HRMS.Backend.dto.ExpenseProofResponse;
 import com.example.HRMS.Backend.dto.ExpenseRequest;
+import com.example.HRMS.Backend.dto.ExpenseResponse;
+import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.ExpenseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +32,8 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ExpenseProofTypeRepository expenseProofTypeRepository;
     private final ExpenseProofRepository expenseProofRepository;
     private final EmailService emailService;
+    private final ModelMapper modelMapper;
+    private final TravelDocRepository travelDocRepository;
 
     @Override
     public void saveExpense(ExpenseRequest expenseRequest){
@@ -53,6 +59,56 @@ public class ExpenseServiceImpl implements ExpenseService {
                 + travelPlan.getTravelPlanTo() + " - " + travelPlan.getTravelPlanFrom());
     }
 
+    @Override
+    public List<ExpenseResponse> getExpenseById(Long employeeId, Long travelPlanId){
+        Long employeeTravelPlanId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(employeeId,travelPlanId);
+
+        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
+        List<Expense> expenses = expenseRepository.findExpenseByFkEmployeeTravelPlan(employeeTravelPlan);
+
+        List<ExpenseResponse> expenseResponses= new ArrayList<>();
+        for(Expense expense: expenses){
+            ExpenseResponse expenseResponse = new ExpenseResponse();
+
+            expenseResponse.setExpenseDate(expense.getExpenseDate());
+            expenseResponse.setExpenseAmount(expense.getExpenseAmount());
+            expenseResponse.setExpenseRemark(expense.getExpenseRemark());
+            expenseResponse.setExpenseUploadedAt(expense.getExpenseUploadedAt());
+
+            //it is correct??
+            expenseResponse.setId(expense.getId());
+
+            expenseResponse.setEmployeeTravelPlanId(expense.getFkEmployeeTravelPlan().getId());
+
+            expenseResponse.setExpenseTravelPlanStatusId(expense.getFkExpenseTravelPlanStatus().getId());
+            expenseResponse.setExpenseTravelPlanStatusName(expense.getFkExpenseTravelPlanStatus().getTravelPlanStatusName());
+
+            List<ExpenseProof> expenseProofs = expenseProofRepository.findExpenseProofByFkExpense_Id(expense.getId());
+            List<ExpenseProofResponse> expenseProofResponses = new ArrayList<>();
+            for(ExpenseProof expenseProof : expenseProofs){
+                ExpenseProofResponse expenseProofResponse = modelMapper.map(expenseProof,ExpenseProofResponse.class);
+                expenseProofResponses.add(expenseProofResponse);
+            }
+
+            expenseResponse.setExpenseProofResponses(expenseProofResponses);
+
+            expenseResponses.add(expenseResponse);
+        }
+
+        return expenseResponses;
+    }
+
+    @Override
+    public List<ExpenseProofResponse> getExpenseProofById(Long expenseId){
+        List<ExpenseProof> expenseProofs = expenseProofRepository.findExpenseProofByFkExpense_Id(expenseId);
+        List<ExpenseProofResponse> expenseProofResponses = new ArrayList<>();
+        for(ExpenseProof expenseProof : expenseProofs){
+            ExpenseProofResponse expenseProofResponse = modelMapper.map(expenseProof,ExpenseProofResponse.class);
+            expenseProofResponses.add(expenseProofResponse);
+        }
+        return expenseProofResponses;
+    }
+
     @Value("${img.path}")
     private String folderPath;
 
@@ -73,6 +129,13 @@ public class ExpenseServiceImpl implements ExpenseService {
         expenseProof.setExpenseProofUrl(filePath);
 
         expenseProofRepository.save(expenseProof);
+    }
+
+    @Override
+    public void updateExpenseStatus(Long expId, Long statusId){
+        Expense expense = expenseRepository.findExpensesById(expId);
+        expense.setFkExpenseTravelPlanStatus(travelPlanStatusRepository.findTravelPlanStatusById(statusId));
+        expenseRepository.save(expense);
     }
 
     @Override
@@ -109,9 +172,6 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseProofRepository.save(expenseProof);
 
         }
-
-
     }
-
 
 }

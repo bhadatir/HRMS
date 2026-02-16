@@ -1,8 +1,11 @@
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Calendar, DollarSign, Building } from "lucide-react";
+import { Mail, Calendar, DollarSign, Building, X, Bell } from "lucide-react";
+import Notifications from "../components/Notifications.tsx";
+import { Button } from "@/components/ui/button";
 import {
   SidebarInset,
   SidebarProvider,
@@ -11,6 +14,7 @@ import {
 import { AppSidebar } from "@/components/app-sidebar"
 export default function Dashboard() {
   const { user } = useAuth();
+  const [showNotification, setShowNotification] = useState(false);
 
   if (!user) {
     return (
@@ -24,12 +28,28 @@ export default function Dashboard() {
     <SidebarProvider>
        <AppSidebar />
        <SidebarInset className="bg-slate-50">
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-6 bg-white">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 bg-white">
           <SidebarTrigger className="-ml-1" />
+
           <h3 className="text-lg font-bold">My Dashboard</h3>
+
+          <Bell onClick={() => setShowNotification(true)} className="gap-2 text-gray-600 cursor-pointer"/>
+
         </header>
         <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto animate-in fade-in duration-500 w-250">
           
+            {/* Notifications */}
+            {showNotification && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
+                  <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                    setShowNotification(false);
+                  }}><X /></Button>
+                  <Notifications />
+                </div>
+              </div>
+            )}
+
           <div className="relative rounded p-8 text-black shadow-xl">
             <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
               <Avatar className="h-16 w-16">

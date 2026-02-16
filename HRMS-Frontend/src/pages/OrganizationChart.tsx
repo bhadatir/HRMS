@@ -12,13 +12,15 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronDown } from "lucide-react";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Search, User } from "lucide-react";
+import { Search, User, Bell, X } from "lucide-react";
+import Notifications from "../components/Notifications.tsx";
 
 export default function OrganizationChart() {
   const { token } = useAuth(); 
   const [selectedId, setSelectedId] = useState(2);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);  
+  const [showNotification, setShowNotification] = useState(false);
 
   const { data: suggestions } = useQuery({
     queryKey: ["employeeSearch", searchTerm],
@@ -83,6 +85,9 @@ export default function OrganizationChart() {
               </div>
             )}
           </div>
+
+          <Bell onClick={() => setShowNotification(true)} className="gap-2 text-gray-600 cursor-pointer"/>
+
         </header>
 
         <div className="p-6 max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500 w-250">
@@ -92,6 +97,18 @@ export default function OrganizationChart() {
             <div className="p-10 text-center text-red-500 font-medium">Employee data could not be retrieved.</div>
           ) : (
             <>
+
+              {/* Notifications */}
+              {showNotification && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                  <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
+                    <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                      setShowNotification(false);
+                    }}><X /></Button>
+                    <Notifications />
+                  </div>
+                </div>
+              )}
               <section className="bg-white p-4 rounded-lg border shadow-sm">
                 <Breadcrumb>
                   <BreadcrumbList>
