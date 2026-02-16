@@ -9,7 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
-export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlanId: number; onSuccess: () => void }) {
+export default function AddExpenseForm({ travelPlanId, startDate, endDate, onSuccess }: { travelPlanId: number, startDate: string, endDate: string, onSuccess: () => void }) {
   const { token, user } = useAuth();
 
   const { data: employeeTravelPlan, isLoading, isError } = useQuery({
@@ -72,6 +72,8 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
           <div className="space-y-2 flex">
             <label className="text-sm font-medium text-gray-500 w-30 mt-2">Hire Date :</label>
             <Input type="date" placeholder="Select expense Date"
+            min={startDate}
+            max={endDate}
             onChange={(e) => setForm({...form, expenseDate: e.target.value})} />
           </div>
         </div>

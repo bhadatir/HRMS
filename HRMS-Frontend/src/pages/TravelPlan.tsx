@@ -17,6 +17,8 @@ export default function TravelPlan() {
   const { token, user } = useAuth(); 
   const [showForm, setShowForm] = useState(false);
   const [activeExpenseId, setActiveExpenseId] = useState<number | null>(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const { data: allPlans, isLoading } = useQuery({
     queryKey: ["allTravelPlans"],
@@ -61,8 +63,16 @@ export default function TravelPlan() {
           {activeExpenseId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-xl max-w-lg w-full relative">
-                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => setActiveExpenseId(null)}><X /></Button>
-                <AddExpenseForm travelPlanId={activeExpenseId} onSuccess={() => setActiveExpenseId(null)} />
+                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                  setActiveExpenseId(null);
+                  setStartDate("");
+                  setEndDate("");
+                }}><X /></Button>
+                <AddExpenseForm travelPlanId={activeExpenseId} startDate={startDate} endDate={endDate} onSuccess={() => {
+                  setActiveExpenseId(null);
+                  setStartDate("");
+                  setEndDate("");
+                }} />
               </div>
             </div>
           )}
@@ -103,12 +113,37 @@ export default function TravelPlan() {
                     </div>
 
                     {user?.roleName === "EMPLOYEE" && (
-                      <Button 
-                        onClick={() => setActiveExpenseId(plan.id)}
-                        className="w-full text-gray-600 mt-2"
-                      >
-                        Claim Expense
-                      </Button>
+                      <div className="mt-2">
+                        {(() => {
+                          const now = new Date().getTime();
+                          const planEndDate = new Date(plan.travelPlanEndDate).getTime();
+                          const planStartDate = new Date(plan.travelPlanStartDate).getTime();
+                          const tenDays = 10 * 24 * 60 * 60 * 1000;
+                          const expiryDate = planEndDate + tenDays;
+                          const canClaim = now >= planStartDate && now <= expiryDate;
+                          return canClaim ? (  
+                            <Button 
+                              onClick={() => {
+                                setActiveExpenseId(plan.id);
+                                setStartDate(plan.travelPlanStartDate);
+                                setEndDate(plan.travelPlanEndDate);
+                              }}
+                              className="w-full text-gray-600 mt-2"
+                            >
+                              Claim Expense
+                            </Button>
+                            ) : 
+                          new Date(plan.travelPlanStartDate) > new Date() ? (
+                          <Button disabled className="w-full text-gray-400 mt-2 cursor-not-allowed">
+                            Claim Expense Not Available Yet
+                          </Button>
+                        ) : (
+                          <Button disabled className="w-full text-gray-400 mt-2 cursor-not-allowed">
+                            Claim Expense Expire
+                          </Button>
+                        );
+                        })()}
+                      </div>
                     )}
                   </CardContent>
                 </Card>
