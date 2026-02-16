@@ -28,7 +28,12 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
   });
 
   const docResults = useQueries({
-    queries: (plan?.employeeTravelPlanResponses || []).map((exp: any) => ({
+    queries: (plan?.employeeTravelPlanResponses || []).filter((exp: any) => {
+      if(user?.roleName === "HR") return true;
+      if(user?.roleName === "EMPLOYEE") return exp.employeeId === user.id;
+      if(user?.roleName === "MANAGER") return exp.employeeFkManagerEmployeeId === user.id;
+      return false;
+    }).map((exp: any) => ({
       queryKey: ["travelPlanDocs", exp.employeeId, travelPlan],
       queryFn: () => travelService.findTravelDocByEmpId(exp.employeeId, travelPlan!, token || ""),
       enabled: !!token && !!exp.employeeId && !!travelPlan && viewMode === "DOCUMENTS",
@@ -159,7 +164,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                           {exp.expenseTravelPlanStatusName}
                         </Badge>
                       </TableCell>
-                      {user?.roleName !== "EMPLOYEE" && (
+                      {user?.roleName === "HR" && (
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             {exp.expenseTravelPlanStatusName === "PENDDING" ? (
@@ -197,7 +202,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                   allDocs.map((doc: any) => (
                     <TableRow key={doc.id}>
                       <TableCell className="font-medium">{doc.travelDocsTypeName}</TableCell>
-                      <TableCell>{doc.employeeEmail || "System"}</TableCell>
+                      <TableCell>{doc.employeeEmail} ({doc.fkRoleRoleName})</TableCell>
                       <TableCell >{doc.travelDocUploadedAt}</TableCell>
                       <TableCell className="text-right">
                         <a href = {doc.travelDocUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline flex items-center gap-1 justify-end">
@@ -219,7 +224,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                   </TableCell>
                 </TableRow>
               )}
-              {viewMode === "EXPENSES" && allDocs.length === 0 && (
+              {viewMode === "EXPENSES" && allExpenses.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-10">
                     <div className="flex flex-col items-center gap-2">

@@ -28,7 +28,7 @@ export default function Dashboard() {
     <SidebarProvider>
        <AppSidebar />
        <SidebarInset className="bg-slate-50">
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-6 bg-white">
+        <header className="flex h-16 items-center justify-between gap-2 border-b px-6 bg-white">
           <SidebarTrigger className="-ml-1" />
 
           <h3 className="text-lg font-bold">My Dashboard</h3>
@@ -50,8 +50,8 @@ export default function Dashboard() {
               </div>
             )}
 
-          <div className="relative rounded p-8 text-black shadow-xl">
-            <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+          <div className="rounded p-8 text-black">
+            <div className="flex flex-col md:flex-row items-center gap-6">
               <Avatar className="h-16 w-16">
                 <AvatarImage src={user.employeeProfileUrl} />
                 <AvatarFallback className="bg-blue-600 text-white">
