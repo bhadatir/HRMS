@@ -40,9 +40,10 @@ public class HrController {
         return ResponseEntity.ok("Travel plan add successfully");
     }
 
-    @PostMapping("/travelPlanDoc/{travelPlanId}/{docTypeId}")
-    public ResponseEntity<String > addTravelPlanDocByHR(@PathVariable Long travelPlanId, @RequestParam("file") MultipartFile file, @PathVariable Long docTypeId ) throws IOException {
-        travelPlanService.saveDoc(travelPlanId, file, docTypeId);
+    @PostMapping("/travelPlanDoc/{employeeId}/{travelPlanId}/{docTypeId}")
+    public ResponseEntity<String > addTravelPlanDocByHR(@PathVariable Long travelPlanId, @PathVariable Long employeeId,
+                                                        @RequestParam("file") MultipartFile file, @PathVariable Long docTypeId ) throws IOException {
+        travelPlanService.saveDocByHr(travelPlanId, file, docTypeId,employeeId);
         return ResponseEntity.ok("travel plan doc add successfully");
     }
 

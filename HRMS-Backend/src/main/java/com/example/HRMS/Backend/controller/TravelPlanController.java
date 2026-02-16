@@ -1,5 +1,6 @@
 package com.example.HRMS.Backend.controller;
 
+import com.example.HRMS.Backend.dto.EmployeeSearch;
 import com.example.HRMS.Backend.dto.ExpenseRequest;
 import com.example.HRMS.Backend.dto.TravelPlanResponse;
 import com.example.HRMS.Backend.model.*;
@@ -58,6 +59,11 @@ public class TravelPlanController {
                                                   @RequestParam("file") MultipartFile file) throws IOException {
         expenseService.saveExpenseProof(proofTypeId, expenseId, file);
         return ResponseEntity.ok("Expense Proof add successfully");
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Long>> getTravelplan(@RequestParam String query) throws IOException {
+        return ResponseEntity.ok(travelPlanService.getTravelPlan(query));
     }
 
 }

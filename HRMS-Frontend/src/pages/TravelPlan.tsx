@@ -11,14 +11,18 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, X, MapPin, Calendar } from "lucide-react";
 import TravelPlanForm from "../components/TravelPlanForm";
 import AddExpenseForm from "../components/AddExpenseForm";
-import { DropdownMenu } from "radix-ui";
+import AddTravelDocumentForm from "../components/AddTravelDocumentForm";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 export default function TravelPlan() {
   const { token, user } = useAuth(); 
   const [showForm, setShowForm] = useState(false);
   const [activeExpenseId, setActiveExpenseId] = useState<number | null>(null);
+  const [selectedTravelId, setSelectedTravelId] = useState<number | null>(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [searchTerm, setSearchTerm] = useState("fun");
 
   const { data: allPlans, isLoading } = useQuery({
     queryKey: ["allTravelPlans"],
@@ -26,15 +30,25 @@ export default function TravelPlan() {
     enabled: !!token,
   });
 
+  const { data: searchFilter, isLoading: isSearchLoading } = useQuery({
+    queryKey: ["travelPlanSearch", searchTerm],
+    queryFn: () => apiService.searchTravelPlan(searchTerm, token || ""),
+    enabled: searchTerm.length >= 1,
+  });
+
   const filteredPlans = useMemo(() => {
     if (!allPlans || !user) return [];
-    if (user.roleName === "EMPLOYEE") {
+    if (!searchFilter) return allPlans;
+    if (user.roleName === "EMPLOYEE" && !isSearchLoading) {
       return allPlans.filter((plan: any) =>
-        plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeEmail === user.employeeEmail)
+        plan.employeeTravelPlanResponses.some((resp: any) => {
+          return ( resp.employeeEmail === user.employeeEmail 
+          && searchFilter.includes(resp.travelPlanId))
+        })
       );
     }
-    return allPlans;
-  }, [allPlans, user]);
+    return allPlans.filter((plan: any) => searchFilter.includes(plan.id));
+  }, [allPlans, user, searchFilter, isSearchLoading]);
 
   return (
     <SidebarProvider>
@@ -44,7 +58,24 @@ export default function TravelPlan() {
           <div className="flex items-center gap-2">
             <SidebarTrigger />
             <h3 className="text-lg font-bold text-slate-800">Travel Management</h3>
+            {searchFilter && searchFilter.length > 0 ?(
+              <Badge variant="outline">{searchFilter.length} results</Badge>
+            ) : (<Badge variant="outline">No filter applied</Badge>)
+            }
           </div>
+
+          <div className="relative max-w-sm w-full">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+            <Input 
+              placeholder="Search Travel Plans (e.g. 'ti')..." 
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+              }}
+            />
+          </div>
+
           {user?.roleName === "HR" && (
             <Button onClick={() => setShowForm(!showForm)} className="gap-2 text-gray-600">
               {showForm ? <X size={18} /> : <Plus size={18} />}
@@ -54,12 +85,20 @@ export default function TravelPlan() {
         </header>
 
         <main className="p-6 max-w-7xl mx-auto space-y-6 w-250">
+          
+          {/* Create or edit travel plan form */}
           {showForm && (
-            <div className="animate-in slide-in-from-top duration-300">
-              <TravelPlanForm onSuccess={() => setShowForm(false)} />
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl max-w-lg w-full relative">
+                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                  setShowForm(false);
+                }}><X /></Button>
+                <TravelPlanForm onSuccess={() => setShowForm(false)} />
+              </div>
             </div>
           )}
 
+          {/*Add travel expense by employee */}
           {activeExpenseId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-xl max-w-lg w-full relative">
@@ -70,6 +109,24 @@ export default function TravelPlan() {
                 }}><X /></Button>
                 <AddExpenseForm travelPlanId={activeExpenseId} startDate={startDate} endDate={endDate} onSuccess={() => {
                   setActiveExpenseId(null);
+                  setStartDate("");
+                  setEndDate("");
+                }} />
+              </div>
+            </div>
+          )}
+
+          {/* Add travel doc by employee or HR */}
+          {selectedTravelId && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl max-w-lg w-full relative">
+                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                  setSelectedTravelId(null);
+                  setStartDate("");
+                  setEndDate("");
+                }}><X /></Button>
+                <AddTravelDocumentForm travelPlanId={selectedTravelId}  onSuccess={() => {
+                  setSelectedTravelId(null);
                   setStartDate("");
                   setEndDate("");
                 }} />
@@ -145,6 +202,19 @@ export default function TravelPlan() {
                         })()}
                       </div>
                     )}
+
+                    {user?.roleName === "HR" || user?.roleName === "EMPLOYEE" ? (
+                      <div className="mt-2">
+                        <Button 
+                          onClick={() => {
+                            setSelectedTravelId(plan.id);
+                          }}
+                          className="w-full text-gray-600 mt-2"
+                        >
+                          Add Travel Docs
+                        </Button>
+                      </div>
+                    ) : null}
                   </CardContent>
                 </Card>
               ))

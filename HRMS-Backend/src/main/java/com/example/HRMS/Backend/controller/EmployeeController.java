@@ -26,9 +26,10 @@ public class EmployeeController {
     private final EmployeeRepository employeeRepository;
     private final PostService postService;
 
-    @PostMapping("/travelPlanDoc/{employeeTravelPlanId}")
-    public ResponseEntity<String> addTravelPlanDocByEmployee(@PathVariable Long employeeTravelPlanId, @RequestParam("file") MultipartFile file, @RequestParam("docType") Long docTypeId ) throws IOException {
-        travelPlanService.saveDoc(employeeTravelPlanId, file, docTypeId);
+    @PostMapping("/travelPlanDoc/{employeeId}/{employeeTravelPlanId}/{docType}")
+    public ResponseEntity<String> addTravelPlanDocByEmployee(@PathVariable Long employeeTravelPlanId, @PathVariable Long employeeId
+                                                            , @RequestParam("file") MultipartFile file, @PathVariable("docType") Long docTypeId ) throws IOException {
+        travelPlanService.saveDocByEmployee(employeeTravelPlanId, file, docTypeId, employeeId);
         return ResponseEntity.ok("Travel plan doc add successfully");
     }
 

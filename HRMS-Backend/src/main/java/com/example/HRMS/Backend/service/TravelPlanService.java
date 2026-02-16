@@ -18,11 +18,15 @@ public interface TravelPlanService {
 
     List<TravelPlanResponse> showAllTravelPlan();
 
-    void saveDoc(Long travelPlanId, MultipartFile file, Long docTypeId) throws IOException;
+    void saveDocByEmployee(Long employeeTravelPlanId, MultipartFile file, Long docTypeId, Long employeeId) throws IOException;
+
+    void saveDocByHr(Long travelPlanId, MultipartFile file, Long docTypeId, Long employeeId) throws IOException;
 
     List<TravelDocResponse> findAllTravelDoc() throws IOException;
 
     void updateTravelPlan(@Valid TravelPlan travelPlan);
 
     Long findEmployeeTravelPlanId(Long empId, Long travelId);
+
+    List<Long> getTravelPlan(String query);
 }

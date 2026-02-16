@@ -73,7 +73,31 @@ export const apiService = {
   findEmployeeTravelPlans: async (empId: number, travelId: number, token: string) => {
     const res = await api.get(`/travel/employeeTravelPlan/${empId}/${travelId}`, authHeader(token));
     return res.data;
+  },
+
+  searchTravelPlan : async (query: string, token: string) => {
+    const res = await api.get(`/travel/search?query=${query}`, authHeader(token));
+    return res.data;
+  },
+
+  addTravelPlanDocByHr: async (employeeId: number, travelPlanId: number, docTypeId: number, formData: FormData, token: string) => {
+    const res = await api.post(`/hr/travelPlanDoc/${employeeId}/${travelPlanId}/${docTypeId}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    return res.data;
+  },
+
+  addTravelPlanDocByEmployee: async (employeeId: number, employeeTravelPlanId: number, docTypeId: number, formData: FormData, token: string) => {
+    const res = await api.post(`/employee/travelPlanDoc/${employeeId}/${employeeTravelPlanId}/${docTypeId}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    return res.data;
   }
+
 };
 
 

@@ -18,4 +18,8 @@ public class EmployeeTravelPlanResponse {
 
     private String employeeEmail;
 
+    private Long travelPlanId;
+
+    private String travelPlanName;
+
 }

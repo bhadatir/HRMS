@@ -33,7 +33,7 @@ export default function TravelPlanForm({ onSuccess }: { onSuccess: () => void })
   });
 
   return (
-    <Card className="w-full border-2 border-blue-100 shadow-lg">
+    <Card className="border-none shadow-none">
       <CardHeader><CardTitle>Create New Trip</CardTitle></CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
         

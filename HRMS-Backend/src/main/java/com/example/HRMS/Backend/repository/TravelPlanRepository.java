@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TravelPlanRepository extends JpaRepository<TravelPlan, Long> {
 
@@ -20,5 +22,12 @@ public interface TravelPlanRepository extends JpaRepository<TravelPlan, Long> {
             "where e.fkEmployee = :empId " +
             "and e.fkTravelPlan = :travelId")
     Long findEmployeeTravelPlanId(@Param("empId") Employee empId, @Param("travelId") TravelPlan travelId);
+
+    @Query(value = "SELECT t.id " +
+            "FROM TravelPlan t " +
+            "WHERE lower(t.travelPlanName) like lower(concat(:query,'%')) " +
+            "or lower(t.travelPlanFrom) like lower(concat(:query,'%')) " +
+            "or lower(t.travelPlanTo) like lower(concat(:query,'%')) ")
+    List<Long> findTravelPlan(String query);
 }
 

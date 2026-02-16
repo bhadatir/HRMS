@@ -49,8 +49,10 @@ public class SecurityConfig implements WebMvcConfigurer {
                     "/api/game/**", "/api/job/**", "/api/post/**" , "/api/user/**",
                     "/api/notification/**").permitAll()
 //            .hasAnyAuthority(COMMON_ROLES)
-            .requestMatchers("/api/manager/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
-            .requestMatchers("/api/employee/**").hasAnyAuthority("ROLE_EMPLOYEE", "ROLE_ADMIN")
+            .requestMatchers("/api/manager/**").permitAll()
+//                     .hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
+            .requestMatchers("/api/employee/**").permitAll()
+//                     .hasAnyAuthority("ROLE_EMPLOYEE", "ROLE_ADMIN")
             .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.rmi.RemoteException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,13 +123,47 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     private String URL;
 
     @Override
-    public void saveDoc(Long travelPlanId, MultipartFile file, Long docTypeId) throws IOException {
+    public void saveDocByEmployee(Long employeeTravelPlanId, MultipartFile file, Long docTypeId, Long employeeId) throws IOException {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = authentication.getName();
+//        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
+//                .orElseThrow(() -> new RuntimeException("Employee not found"));
 
+        Employee employee = employeeRepository.findEmployeeById(employeeId);
+        Long empId = employee.getId();
+
+        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+        String filePath = "travel_doc/" + employeeTravelPlanId +"_" + docTypeId + "_" + empId  + "_" + originalFilePath;
+
+        file.transferTo(new File(System.getProperty("user.dir") + "/" +folderPath + filePath));
+
+        TravelDoc travelDoc = new TravelDoc();
+        travelDoc.setFkEmployee(employeeRepository.findEmployeeById(empId));
+
+        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
+
+        if(employeeTravelPlan == null){
+            throw new RemoteException("employeeTravelPlan not found");
+        }
+
+        travelDoc.setFkEmployeeTravelPlan(employeeTravelPlan);
+        travelDoc.setTravelDocUrl(URL + filePath);
+        travelDoc.setTravelDocUploadedAt(Instant.now());
+        travelDoc.setFkTravelDocsType(travelDocsTypeRepository.findTravelDocsTypeById(docTypeId));
+
+        travelDocRepository.save(travelDoc);
+    }
+
+    @Override
+    public void saveDocByHr(Long travelPlanId, MultipartFile file, Long docTypeId, Long employeeId) throws IOException {
+
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = authentication.getName();
+//        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
+//                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        Employee employee = employeeRepository.findEmployeeById(employeeId);
         Long empId = employee.getId();
 
         String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
@@ -138,14 +173,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         TravelDoc travelDoc = new TravelDoc();
         travelDoc.setFkEmployee(employeeRepository.findEmployeeById(empId));
-
-        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(travelPlanId);
-
-        if(employeeTravelPlan == null){
-            travelDoc.setFkTravelPlan(travelPlanRepository.findTravelPlanById(travelPlanId));
-        }else{
-            travelDoc.setFkEmployeeTravelPlan(employeeTravelPlan);
+        if(travelPlanRepository.findTravelPlanById(travelPlanId) == null){
+            throw new RemoteException("travel plan not found");
         }
+        travelDoc.setFkTravelPlan(travelPlanRepository.findTravelPlanById(travelPlanId));
         travelDoc.setTravelDocUrl(URL + filePath);
         travelDoc.setTravelDocUploadedAt(Instant.now());
         travelDoc.setFkTravelDocsType(travelDocsTypeRepository.findTravelDocsTypeById(docTypeId));
@@ -198,6 +229,11 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         Employee employee = employeeRepository.findEmployeeById(empId);
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelId);
         return travelPlanRepository.findEmployeeTravelPlanId(employee,travelPlan);
+    }
+
+    @Override
+    public List<Long> getTravelPlan(String query){
+        return travelPlanRepository.findTravelPlan(query);
     }
 
 }
