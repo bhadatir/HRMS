@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.JobRequest;
+import com.example.HRMS.Backend.dto.ReferFriendResponse;
 import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.model.GameType;
@@ -60,12 +61,6 @@ public class HrController {
         return ResponseEntity.ok(travelPlanService.findAllTravelDoc());
     }
 
-    @GetMapping("/travelDoc/{empId}/{travelPlanId}")
-    public ResponseEntity<List<TravelDocResponse>> showTravelDocByEmpId(@PathVariable Long empId,
-                                                                        @PathVariable Long travelPlanId) {
-        return ResponseEntity.ok(travelPlanService.findTravelDocByFkEmployeeId(empId,travelPlanId));
-    }
-
     @PatchMapping("/expense/{expId}/{statusId}")
     public ResponseEntity<String > updateExpenseStatus(@PathVariable Long expId, @PathVariable Long statusId)
     {   expenseService.updateExpenseStatus(expId, statusId);
@@ -85,16 +80,29 @@ public class HrController {
         return ResponseEntity.ok("Job add successfully");
     }
 
+    @PutMapping(value = "/job/{jobId}", consumes = {"multipart/form-data"})
+    public ResponseEntity<String> updateJob(@PathVariable Long jobId,
+                                         @Valid @RequestPart JobRequest jobRequest,
+                                         @RequestPart(value = "file",required = false) MultipartFile file) throws IOException {
+        jobService.updateJob(jobId,jobRequest,file);
+        return ResponseEntity.ok("Job update successfully");
+    }
+
     @PostMapping("/cvReviewer/{jobId}/{empCvReviewerId}")
     public ResponseEntity<String> addCvReviewer(@PathVariable Long jobId, @PathVariable Long empCvReviewerId) {
         jobService.saveCvReviewer(jobId,empCvReviewerId);
         return ResponseEntity.ok("Cv Reviewer add successfully");
     }
 
-    @PatchMapping("/referCV/{referId}")
-    public ResponseEntity<String > updateReferCvStatus(@PathVariable Long referId, @RequestParam Long ststusid)
-    {   jobService.updateStatus(referId, ststusid);
+    @PatchMapping("/referCV/{referId}/{statusId}")
+    public ResponseEntity<String > updateReferCvStatus(@PathVariable Long referId, @PathVariable Long statusId)
+    {   jobService.updateStatus(referId, statusId);
         return ResponseEntity.ok("status update successful");
+    }
+
+    @GetMapping("/referData/{jobId}")
+    public ResponseEntity<List<ReferFriendResponse> > getReferDataByJobId(@PathVariable Long jobId){
+        return ResponseEntity.ok(jobService.getReferDataByJobId(jobId));
     }
 
     @PatchMapping("/comment/{commentId}")

@@ -34,6 +34,5 @@ public class HrmsBackendApplication implements WebMvcConfigurer {
 		registry.addResourceHandler("/uploads/**")
 				.addResourceLocations("file:src/main/resources/static/uploads/");
 	}
-	//show image properly is pending
 
 }

@@ -33,4 +33,6 @@ public interface TravelPlanService {
     TravelPlanResponse showTravelPlanById(Long id);
 
     List<TravelDocResponse> findTravelDocByFkEmployeeId(Long empId,Long travelPlanId);
+
+    List<TravelDocResponse> findAllTravelPlanDocByTravelPlan(Long travelPlanId);
 }

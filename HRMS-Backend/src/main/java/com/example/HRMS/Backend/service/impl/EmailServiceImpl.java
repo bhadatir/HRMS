@@ -26,6 +26,12 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.username}")
     private String sender;
 
+    @Value("${URL.path}")
+    private String URL;
+
+    @Value("${img.path}")
+    private String folderPath;
+
     @Override
     public void sendEmail(List<String> email, String sub, String content){
 
@@ -52,10 +58,13 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(subject);
             helper.setText(text);
 
-            ClassPathResource image = new ClassPathResource(path.substring(19));
+//          ClassPathResource image = new ClassPathResource("static/"+path.substring(22));
 
+            String relativePath = path.replace(URL, "");
+            String fullPath = System.getProperty("user.dir") +"/"+ folderPath + relativePath;
+            FileSystemResource image = new FileSystemResource(fullPath);
             if (!image.exists()) {
-                throw new IOException("Image not found at " + path);
+                throw new IOException("Image not found at " + image.getPath());
             }
 
             helper.addAttachment("data.png", image);

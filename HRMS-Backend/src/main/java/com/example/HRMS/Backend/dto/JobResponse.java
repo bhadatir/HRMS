@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 public class JobResponse {
@@ -27,5 +28,7 @@ public class JobResponse {
     private Long jobTypeId;
 
     private Long employeeId;
+
+    private List<CvReviewerResponse> cvReviewerResponses;
 
 }

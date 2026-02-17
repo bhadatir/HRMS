@@ -42,15 +42,22 @@ export default function TravelPlan() {
 
   const filteredPlans = useMemo(() => {
     if (!allPlans || !user) return [];
-    if (!searchFilter) return allPlans;
-    if (user.roleName === "EMPLOYEE" && !isSearchLoading) {
+    if (user.roleName === "EMPLOYEE" && !isSearchLoading && searchFilter) {
       return allPlans.filter((plan: any) =>
         plan.employeeTravelPlanResponses.some((resp: any) => {
           return ( resp.employeeEmail === user.employeeEmail 
-          && searchFilter.includes(resp.travelPlanId))
+          && searchFilter?.includes(resp.travelPlanId))
         })
       );
     }
+    if (user.roleName === "EMPLOYEE" && !isSearchLoading && !searchFilter) {
+      return allPlans.filter((plan: any) =>
+        plan.employeeTravelPlanResponses.some((resp: any) => {
+          return ( resp.employeeEmail === user.employeeEmail)
+        })
+      );
+    }
+    if (!searchFilter) return allPlans;
     return allPlans.filter((plan: any) => searchFilter.includes(plan.id));
   }, [allPlans, user, searchFilter, isSearchLoading]);
 
@@ -81,7 +88,8 @@ export default function TravelPlan() {
           </div>
 
           {user?.roleName === "HR" && (
-            <Button onClick={() => setShowForm(true)} className="gap-2 text-gray-600">
+            <Button title="Create New Travel Plan"
+              onClick={() => setShowForm(true)} className="gap-2 text-gray-600">
               <Plus size={18} />
               New Plan
             </Button>
@@ -97,7 +105,8 @@ export default function TravelPlan() {
           {showNotification && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
-                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                  onClick={() => {
                   setShowNotification(false);
                 }}><X /></Button>
                 <Notifications />
@@ -109,7 +118,7 @@ export default function TravelPlan() {
           {showForm && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-xl max-w-lg w-full relative">
-                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                <Button title="Close Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setShowForm(false);
                   setEditTravelPlanId(null);
                 }}><X /></Button>
@@ -122,7 +131,7 @@ export default function TravelPlan() {
           {activeExpenseId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-xl max-w-lg w-full relative">
-                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                <Button title="Close Expense Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setActiveExpenseId(null);
                   setStartDate("");
                   setEndDate("");
@@ -140,7 +149,7 @@ export default function TravelPlan() {
           {selectedTravelId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-xl max-w-lg w-full relative">
-                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                <Button title="Close Document Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setSelectedTravelId(null);
                   setEditTravelPlanId(null);
                   setStartDate("");
@@ -160,7 +169,7 @@ export default function TravelPlan() {
           {fullTravelDetails && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-xl max-w-2xl w-full relative p-6 h-150 overflow-y-auto">
-                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                <Button title="Close Travel Details" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setFullTravelDetails(null);
                 }}><X /></Button>
                 <FullTravelDetail travelPlan={fullTravelDetails} onSuccess={() => {
@@ -210,6 +219,7 @@ export default function TravelPlan() {
                     {user?.roleName === "HR" || user?.roleName === "EMPLOYEE" ? (
                       <div className="mt-2 flex justify-between gap-2">
                         <Button 
+                          title="Add Travel Document"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedTravelId(plan.id);
@@ -228,6 +238,7 @@ export default function TravelPlan() {
                           const canClaim = now >= planStartDate && now <= expiryDate;
                           return canClaim && user?.roleName === "EMPLOYEE" &&(  
                             <Button 
+                              title="Claim Travel Expense"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setActiveExpenseId(plan.id);
@@ -253,6 +264,7 @@ export default function TravelPlan() {
 
                         {user?.roleName === "HR" && (
                           <Button 
+                            title="Edit Travel Plan"
                             onClick={(e) => {
                               e.stopPropagation();
                               setShowForm(true);

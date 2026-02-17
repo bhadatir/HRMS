@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import ResetPassword from "./pages/ResetPassword";
 import OrganizationChart from "./pages/OrganizationChart";
 import TravelPlan from "./pages/TravelPlan";
+import JobManagement from "./pages/JobManagement";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/organization-chart" element={<OrganizationChart />} />
             <Route path="/travel-plan" element={<TravelPlan />} />
+            <Route path="/job-management" element={<JobManagement />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" />} />

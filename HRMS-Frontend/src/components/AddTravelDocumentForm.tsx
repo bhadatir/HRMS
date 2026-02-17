@@ -7,17 +7,18 @@ import { useMutation } from "@tanstack/react-query";
 import { travelService } from "../api/travelService";
 import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { travelPlanId: number, onSuccess: () => void }) {
   const { token, user } = useAuth();
+  const queryClient = useQueryClient();
 
   const [docFile, setDocFile] = useState<File>(null as any);
-  const [docType, setDocType] = useState<number>(0);
+  const [docType, setDocType] = useState<number>(1);
 
   const { data: employeeTravelPlan, isLoading, isError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
-    queryFn: () => travelService.findEmployeeTravelPlans(1, 1, token || ""),
+    queryFn: () => travelService.findEmployeeTravelPlans(user?.id, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
@@ -36,7 +37,9 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
           return travelService.addTravelPlanDocByEmployee(user?.id || 0, employeeTravelPlan, docType, formData, token || "");
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
+      await queryClient.invalidateQueries({ queryKey: ["travelPlanDocs", travelPlanId] });
       alert("Travel document submitted!");
       onSuccess();
     },

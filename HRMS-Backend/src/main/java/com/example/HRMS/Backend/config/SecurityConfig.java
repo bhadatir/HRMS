@@ -5,9 +5,11 @@ import org.apache.tomcat.util.bcel.Const;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,26 +36,28 @@ public class SecurityConfig implements WebMvcConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter)
             throws Exception {
 
-        http.csrf(csrf -> csrf.disable())
+        http.cors(Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth ->
              auth.requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/swagger-ui/**").permitAll()
             .requestMatchers("/uploads/**").permitAll()
-            .requestMatchers("/api/hr/job/**").permitAll()
             .requestMatchers("/v3/api-docs/**").permitAll()
-            .requestMatchers("/api/admin/**").permitAll()
-//                     .hasAnyAuthority("ROLE_ADMIN")
-            .requestMatchers("/api/hr/**").permitAll()
-//                     .hasAnyAuthority("ROLE_HR", "ROLE_ADMIN")
+            .requestMatchers("/api/admin/**")
+                     .hasAnyAuthority("ROLE_ADMIN")
+            .requestMatchers("/api/hr/**")
+                     .hasAnyAuthority("ROLE_HR", "ROLE_ADMIN")
             .requestMatchers("/api/org-chart/**", "/api/gameType/**", "/api/travel/**",
                     "/api/game/**", "/api/job/**", "/api/post/**" , "/api/user/**",
-                    "/api/notification/**").permitAll()
-//            .hasAnyAuthority(COMMON_ROLES)
-            .requestMatchers("/api/manager/**").permitAll()
-//                     .hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
-            .requestMatchers("/api/employee/**").permitAll()
-//                     .hasAnyAuthority("ROLE_EMPLOYEE", "ROLE_ADMIN")
+                    "/api/notification/**")
+            .hasAnyAuthority(COMMON_ROLES)
+            .requestMatchers("/api/manager/**")
+                     .hasAnyAuthority("ROLE_MANAGER", "ROLE_ADMIN")
+            .requestMatchers("/api/employee/**")
+                     .hasAnyAuthority("ROLE_EMPLOYEE", "ROLE_ADMIN")
             .anyRequest().authenticated())
+            .sessionManagement(session -> session.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

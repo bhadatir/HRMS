@@ -1,4 +1,4 @@
-import { Home, Users, Settings, LogOut } from "lucide-react"
+import { Home, Plane, LogOut, Network, Briefcase, Mail, Building, ShieldCheck, Building2 } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import {
   Sidebar,
@@ -15,8 +15,9 @@ export function AppSidebar() {
 
   const items = [
     { title: "Home", icon: Home, url: "/dashboard" },
-    { title: "Organization Chart", icon: Users, url: "/organization-chart" },
-    { title: "Travel Plan", icon: Users, url: "/travel-plan" },
+    { title: "Organization Chart", icon: Network, url: "/organization-chart" },
+    { title: "Travel Plan", icon: Plane, url: "/travel-plan" },
+    { title: "Job Management", icon: Briefcase, url: "/job-management" },
   ]
 
   return (
@@ -37,9 +38,9 @@ export function AppSidebar() {
           ))}
         </SidebarMenu>
         <div className="p-4 mt-auto">
-          <p className="text-sm text-gray-500 uppercase">{user?.employeeEmail}</p>
-          <p className="text-sm text-gray-500">{user?.roleName}</p>
-          <p className="text-sm text-gray-500">{user?.departmentName}</p>
+          <p className="text-sm text-blue-500 flex gap-2"><Mail size={14} className="mt-1"/>{user?.employeeEmail}</p>
+          <p className="text-sm text-blue-500 flex gap-2"><ShieldCheck size={14} className="mt-1"/>{user?.roleName}</p>
+          <p className="text-sm text-blue-500 flex gap-2"><Building2 size={14} className="mt-1"/>{user?.departmentName}</p>
         </div>
       </SidebarContent>
       <SidebarFooter className="p-4 border-t">

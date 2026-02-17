@@ -27,22 +27,21 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
     }))
   });
 
-  const docResults = useQueries({
-    queries: (plan?.employeeTravelPlanResponses || []).filter((exp: any) => {
-      if(user?.roleName === "HR") return true;
-      if(user?.roleName === "EMPLOYEE") return exp.employeeId === user.id;
-      if(user?.roleName === "MANAGER") return exp.employeeFkManagerEmployeeId === user.id;
-      return false;
-    }).map((exp: any) => ({
-      queryKey: ["travelPlanDocs", exp.employeeId, travelPlan],
-      queryFn: () => travelService.findTravelDocByEmpId(exp.employeeId, travelPlan!, token || ""),
-      enabled: !!token && !!exp.employeeId && !!travelPlan && viewMode === "DOCUMENTS",
-    }))
+  const {data: allDocs = [], isLoading: docsLoading} = useQuery({
+    queryKey: ["travelPlanDocs", travelPlan],
+    queryFn: () => travelService.findTravelDocByHr(travelPlan!, token || ""),
+    enabled: !!token && !!travelPlan && viewMode === "DOCUMENTS",
+    select: (data) => {
+      if(user?.roleName === "HR" || user?.roleName === "EMPLOYEE") return data;
+      if(user?.roleName === "MANAGER") {
+        return data.filter((doc: any) => doc.employeeFkManagerEmployeeId === user.id);
+      }
+      return [];
+    }
   });
 
   const allExpenses = expenseResults.flatMap((result) => result.data || []);
-  const allDocs = docResults.flatMap((result) => result.data || []);
-  const isLoadingData = planLoading || (viewMode === "EXPENSES" ? expenseResults.some(r => r.isLoading) : docResults.some(r => r.isLoading));
+  const isLoadingData = planLoading || (viewMode === "EXPENSES" ? expenseResults.some(r => r.isLoading) : docsLoading);
 
   const approveMutation = useMutation({
     mutationFn: ({ expenseId, statusId }: { expenseId: number; statusId: number }) =>
@@ -92,7 +91,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                 <Plane className="text-blue-500" />
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase">Created At</p>
-                  <p className="font-semibold">{plan?.travelPlanCreatedAt}</p>
+                  <p className="font-semibold">{plan?.travelPlanCreatedAt.split("T")[0]}</p>
                 </div>
               </div>
             </CardContent>
@@ -138,7 +137,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                 <TableBody>
                   { viewMode === "EXPENSES" ? allExpenses.map((exp: any) => (
                     <TableRow key={exp.id}>
-                      <TableCell>{exp.expenseDate}</TableCell>
+                      <TableCell>{exp.expenseDate.split("T")[0]}</TableCell>
                       <TableCell>
                         <p className="font-medium">{exp.expenseRemark}</p>
                         <p className="text-[10px] text-slate-400">ID: {exp.id}</p>
@@ -160,14 +159,15 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={exp.expenseTravelPlanStatusName === "APPROVED" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
+                        <Badge className={exp.expenseTravelPlanStatusName === "APPROVED" ? "bg-green-100 text-green-700" 
+                                            : exp.expenseTravelPlanStatusName === "REJECTED" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}>
                           {exp.expenseTravelPlanStatusName}
                         </Badge>
                       </TableCell>
                       {user?.roleName === "HR" && (
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            {exp.expenseTravelPlanStatusName === "PENDDING" ? (
+                            {exp.expenseTravelPlanStatusName === "PENDING" ? (
                             <>
                               <Button 
                                 size="sm" 
@@ -203,7 +203,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                     <TableRow key={doc.id}>
                       <TableCell className="font-medium">{doc.travelDocsTypeName}</TableCell>
                       <TableCell>{doc.employeeEmail} ({doc.fkRoleRoleName})</TableCell>
-                      <TableCell >{doc.travelDocUploadedAt}</TableCell>
+                      <TableCell >{doc.travelDocUploadedAt.split("T")[0]}</TableCell>
                       <TableCell className="text-right">
                         <a href = {doc.travelDocUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline flex items-center gap-1 justify-end">
                         <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50">

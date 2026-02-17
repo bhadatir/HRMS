@@ -14,7 +14,7 @@ export default function AddExpenseForm({ travelPlanId, startDate, endDate, onSuc
 
   const { data: employeeTravelPlan, isLoading, isError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
-    queryFn: () => travelService.findEmployeeTravelPlans(1, 1, token || ""),
+    queryFn: () => travelService.findEmployeeTravelPlans(user?.id, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
@@ -70,7 +70,7 @@ export default function AddExpenseForm({ travelPlanId, startDate, endDate, onSuc
           <Input type="number" placeholder="Amount ($)" onChange={(e) => setForm({...form, expenseAmount: Number(e.target.value)})} />
           
           <div className="space-y-2 flex">
-            <label className="text-sm font-medium text-gray-500 w-30 mt-2">Hire Date :</label>
+            <label className="text-sm font-medium text-gray-500 w-30 mt-2">Expense Date :</label>
             <Input type="date" placeholder="Select expense Date"
             min={startDate}
             max={endDate}
@@ -88,6 +88,7 @@ export default function AddExpenseForm({ travelPlanId, startDate, endDate, onSuc
         <Input placeholder="Proof Type IDs (e.g. 1, 2)" value={proofTypeIds} onChange={(e) => setProofTypeIds(e.target.value)} />
         
         <Button 
+          title="Submit Claim"
           className="w-full text-black" 
           onClick={() => expenseMutation.mutate()} 
           disabled={expenseMutation.isPending || proofFiles.length === 0}

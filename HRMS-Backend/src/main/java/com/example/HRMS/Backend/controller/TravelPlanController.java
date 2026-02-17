@@ -80,4 +80,15 @@ public class TravelPlanController {
         return ResponseEntity.ok(travelPlanService.getTravelPlan(query));
     }
 
+    @GetMapping("/travelDoc/{empId}/{travelPlanId}")
+    public ResponseEntity<List<TravelDocResponse>> showTravelDocByEmpId(@PathVariable Long empId,
+                                                                        @PathVariable Long travelPlanId) {
+        return ResponseEntity.ok(travelPlanService.findTravelDocByFkEmployeeId(empId,travelPlanId));
+    }
+
+    @GetMapping("/travelDoc/{travelPlanId}")
+    public ResponseEntity<List<TravelDocResponse>> showAllTravelPlanDocByTravelPlan(@PathVariable Long travelPlanId) throws IOException {
+        return ResponseEntity.ok(travelPlanService.findAllTravelPlanDocByTravelPlan(travelPlanId));
+    }
+
 }

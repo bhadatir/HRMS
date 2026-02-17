@@ -16,4 +16,8 @@ public interface TravelDocRepository extends JpaRepository<TravelDoc, Long> {
 
 
     List<TravelDoc> findByFkEmployeeAndFkTravelPlan(Employee fkEmployee, TravelPlan fkTravelPlan);
+
+    List<TravelDoc> findTravelDocsByFkEmployeeTravelPlan_Id(Long employeeTravelPlanId);
+
+    List<TravelDoc> findByFkTravelPlan(TravelPlan fkTravelPlan);
 }

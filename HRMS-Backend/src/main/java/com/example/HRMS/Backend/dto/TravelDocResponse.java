@@ -31,5 +31,7 @@ public class TravelDocResponse {
 
     private String employeeEmail;
 
+    private Long employeeFkManagerEmployeeId;
+
     private String fkRoleRoleName;
 }

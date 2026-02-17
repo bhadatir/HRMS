@@ -102,7 +102,7 @@ export default function OrganizationChart() {
               {showNotification && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                   <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
-                    <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                    <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                       setShowNotification(false);
                     }}><X /></Button>
                     <Notifications />
@@ -116,6 +116,7 @@ export default function OrganizationChart() {
                       <div key={manager.employeeId} className="flex items-center">
                         <BreadcrumbItem>
                           <button 
+                            title = {`View ${manager.firstName} ${manager.lastName}'s profile`}
                             onClick={() => setSelectedId(manager.employeeId)}
                             className="text-sm font-semibold text-slate-600 hover:text-blue-600"
                           >

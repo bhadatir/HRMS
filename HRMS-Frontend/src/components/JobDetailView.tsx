@@ -1,0 +1,196 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { jobService } from "../api/jobService";
+import { useAuth } from "../context/AuthContext";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { 
+  Briefcase, 
+  Users, 
+  FileText, 
+  CheckCircle, 
+  XCircle, 
+  ExternalLink, 
+  UserPlus, 
+  UserCheck 
+} from "lucide-react";
+
+export default function JobDetailView({ jobId, onSuccess }: { jobId: number | null; onSuccess: () => void }) {
+  const { token, user } = useAuth();
+  const queryClient = useQueryClient();
+  const [viewMode, setViewMode] = useState<"REFERRALS" | "REVIEWERS">("REFERRALS");
+  const [newReviewerId, setNewReviewerId] = useState<string>("");
+
+  const { data: job, isLoading: jobLoading } = useQuery({
+    queryKey: ["jobDetail", jobId],
+    queryFn: () => jobService.getJobById(jobId!, token || ""),
+    enabled: !!jobId && !!token,
+  });
+
+  const { data: referrals = [], isLoading: referralsLoading } = useQuery({
+    queryKey: ["jobReferrals", jobId],
+    queryFn: () => jobService.getReferDataByJobId(jobId!, token || ""),
+    enabled: !!jobId && !!token && viewMode === "REFERRALS",
+  });
+
+  const updateCvStatusMutation = useMutation({
+    mutationFn: ({ referId, statusId }: { referId: number; statusId: number }) =>
+      jobService.updateReferCvStatus(referId, statusId, token || ""),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobReferrals", jobId] });
+      alert("CV Status updated successfully");
+    },
+    onError: (err: any) => alert(err.message)
+  });
+
+  const addReviewerMutation = useMutation({
+    mutationFn: () => jobService.addCvReviewer(jobId!, Number(newReviewerId), token || ""),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobDetail", jobId] });
+      setNewReviewerId("");
+      alert("Reviewer added successfully");
+    },
+    onError: (err: any) => alert(err.message)
+  });
+
+  const isLoadingData = jobLoading || (viewMode === "REFERRALS" && referralsLoading);
+
+  if (isLoadingData) return <div className="p-10 text-center text-slate-500">Loading Job Data...</div>;
+
+  return (
+    <div>
+      <Card className="border-none shadow-none">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <div>
+            <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <Briefcase className="text-blue-600" /> {job?.jobTitle}
+            </CardTitle>
+            <CardDescription className="mt-1">Salary: ${job?.jobSalary} | Category ID: {job?.jobTypeId}</CardDescription>
+          </div>
+          <Badge variant="outline" className="bg-white">Owner ID: {job?.employeeId}</Badge>
+        </CardHeader>
+      </Card>
+
+      <Card className="border-none shadow-none">
+        <CardHeader className="flex flex-row items-center justify-between">
+            <Button className={viewMode === "REFERRALS" ? "rounded-md border text-gray-700" : "rounded-md text-gray-400"}
+                size="sm"
+                onClick={()=>setViewMode("REFERRALS")}><Users size={18} /> Referrals</Button>
+            <Button className={viewMode === "REVIEWERS" ? "rounded-md border text-gray-700" : "rounded-md text-gray-400"}
+                size="sm"
+                onClick={()=>setViewMode("REVIEWERS")}><UserCheck size={18} /> Reviewers</Button>
+        </CardHeader>
+
+        <CardContent>
+          {viewMode === "REFERRALS" ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Candidate</TableHead>
+                  <TableHead>Referred By</TableHead>
+                  <TableHead>CV</TableHead>
+                  <TableHead>Status</TableHead>
+                  {user?.roleName === "HR" && <TableHead>Actions</TableHead>}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {referrals.map((ref: any) => (
+                  <TableRow key={ref.id}>
+                    <TableCell>
+                      <p className="font-bold">{ref.referFriendName}</p>
+                      <p className="text-xs text-slate-500 max-w-[120px] truncate" title={ref.referFriendEmail}>{ref.referFriendEmail}</p>
+                    </TableCell>
+                    <TableCell className="text-xs max-w-[120px] truncate" title={ref.employeeEmail}>{ref.employeeEmail}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <a href={ref.referFriendCvUrl} target="_blank" rel="noreferrer" className="text-blue-600 flex items-center gap-1 text-xs">
+                          <ExternalLink size={12} /> CV
+                        </a>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={ref.cvStatusTypeName === "APPROVED" ? "bg-green-100 text-green-700" 
+                                            : ref.cvStatusTypeName === "REJECTED" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}>
+                        {ref.cvStatusTypeName}
+                      </Badge>
+                    </TableCell>
+                    {user?.roleName === "HR" && (
+                      <TableCell className="text-right space-x-2">
+                        {ref.cvStatusTypeName === "PENDING" &&
+                        <>
+                            <Button 
+                            size="sm" variant="outline" className="text-green-600 border-green-200"
+                            onClick={() => updateCvStatusMutation.mutate({ referId: ref.id, statusId: 5 })}
+                            >
+                            <CheckCircle size={14} />
+                            </Button>
+                            <Button 
+                            size="sm" variant="outline" className="text-red-600 border-red-200"
+                            onClick={() => updateCvStatusMutation.mutate({ referId: ref.id, statusId: 6 })}
+                            >
+                            <XCircle size={14} />
+                            </Button>
+                        </>
+                        }
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+                {referrals.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={user?.roleName === "HR" ? 5 : 4} className="text-center py-10">
+                    <div className="flex flex-col items-center gap-2">
+                      <FileText size={32} className="text-slate-400" />
+                      <p className="text-sm text-slate-400">No referrals added yet.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="space-y-6">
+              <div className="flex gap-2 items-end max-w-sm">
+                <div className="flex-1 space-y-1">
+                  <label className="text-xs font-bold text-slate-500">ADD REVIEWER (ID)</label>
+                  <Input 
+                    placeholder="Enter Employee ID" 
+                    value={newReviewerId} 
+                    onChange={(e) => setNewReviewerId(e.target.value)}
+                  />
+                </div>
+                <Button onClick={() => addReviewerMutation.mutate()} disabled={!newReviewerId} className="text-gray-700">
+                  <UserPlus size={16} className="mr-2" /> Add
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                  <UserCheck size={16} className="text-blue-600" /> Assigned Reviewers
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">                   
+                  {job?.cvReviewerResponses?.map((rev: any) => (
+                  <Card key={rev.id} className="border-slate-200 flex items-start gap-4 p-4">
+                    <div className="flex flex-col gap-1">
+                        <p className="text-sm font-semibold truncate max-w-[120px]" title={rev.employeeEmail}>
+                            {rev.employeeEmail}
+                        </p>
+                        <Badge className="bg-blue-100 text-blue-700">ID: {rev.employeeId}</Badge>
+                    </div>                    
+                  </Card>
+                  ))}
+                  {(!job?.cvReviewerResponses || job.cvReviewerResponses.length === 0) && (
+                    <p className="text-xs text-slate-400 italic">No reviewers assigned yet.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

@@ -61,7 +61,7 @@ public class AuditLoggingAspect {
         log.info("AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: {}",
                 LocalDateTime.now());
 
-        if(args.length>0 && args[0] instanceof ReferFriendRequest){
+        if(args.length>0){
             ReferFriendRequest referFriendRequest = (ReferFriendRequest) args[0];
             AuditLog log = new AuditLog();
             log.setEntityName("Referral");

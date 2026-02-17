@@ -19,4 +19,5 @@ public interface EmployeeTravelPlanRepository extends JpaRepository<EmployeeTrav
             "where e.fkEmployee.id = :empId " +
             "and e.fkTravelPlan.id = :travelPlanId ")
     Long findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(@Param("empId") Long empId, @Param("travelPlanId") Long travelPlanId);
+
 }

@@ -1,9 +1,6 @@
 package com.example.HRMS.Backend.service.impl;
 
-import com.example.HRMS.Backend.dto.JobRequest;
-import com.example.HRMS.Backend.dto.JobResponse;
-import com.example.HRMS.Backend.dto.JobShareRequest;
-import com.example.HRMS.Backend.dto.ReferFriendRequest;
+import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
@@ -36,7 +33,7 @@ public class JobServiceImpl implements JobService {
     private final CvReviewerRepository cvReviewerRepository;
     private final JobShareRepository jobShareRepository;
     private final JobShareToRepository jobShareToRepository;
-    private final ReferFriendRepositort referFriendRepositort;
+    private final ReferFriendRepository referFriendRepository;
     private final CvStatusTypeRepository cvStatusTypeRepository;
     private final ModelMapper modelMapper;
     private final EmailService emailService;
@@ -57,9 +54,9 @@ public class JobServiceImpl implements JobService {
         String time = Instant.now().toString().replace(":","-");
 
         String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
-        String filePath = "job_description/" + jobRequest.getFkJobTypeId() +"_" + jobRequest.getFkJobOwnerEmployeeId() + "_" + time + "_" + originalFilePath;
+        String filePath = "job_description/" + jobRequest.getFkJobTypeId() +"_"
+                + jobRequest.getFkJobOwnerEmployeeId() + "_" + time + "_" + originalFilePath;
         file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
-
 
         job.setJobCreatedAt(Instant.now());
         job.setJobSalary(jobRequest.getJobSalary());
@@ -67,6 +64,30 @@ public class JobServiceImpl implements JobService {
         job.setJobDescriptionUrl(URL + filePath);
         job.setFkJobType(jobType);
         job.setFkJobOwnerEmployee(employee);
+        jobRepository.save(job);
+    }
+
+    @Override
+    public void updateJob(Long jobId, @Valid JobRequest jobRequest, MultipartFile file) throws IOException {
+        Job job = jobRepository.findJobById(jobId);
+        JobType jobType = jobTypeRepository.findJobTypesById(jobRequest.getFkJobTypeId());
+        Employee employee = employeeRepository.findEmployeeById(jobRequest.getFkJobOwnerEmployeeId());
+
+        if(file != null && !file.isEmpty()){
+            String time = Instant.now().toString().replace(":","-");
+
+            String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+            String filePath = "job_description/" + jobRequest.getFkJobTypeId() +"_"
+                    + jobRequest.getFkJobOwnerEmployeeId() + "_" + time + "_" + originalFilePath;
+            file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+            job.setJobDescriptionUrl(URL + filePath);
+        }
+
+        job.setJobSalary(jobRequest.getJobSalary());
+        job.setJobTitle(jobRequest.getJobTitle());
+        job.setFkJobType(jobType);
+        job.setFkJobOwnerEmployee(employee);
+
         jobRepository.save(job);
     }
 
@@ -147,9 +168,8 @@ public class JobServiceImpl implements JobService {
         }
 
 
-        referFriendRepositort.save(referFriend);
+        referFriendRepository.save(referFriend);
 
-        String absolutePath = new File(folderPath + filePath).getAbsolutePath();
         //it's not working
 
         File savedFile = new File(System.getProperty("user.dir") + "/" + folderPath + filePath);
@@ -160,7 +180,7 @@ public class JobServiceImpl implements JobService {
                             + "email : " + referFriendRequest.getReferFriendEmail()
                             + "name : " + referFriendRequest.getReferFriendName()
                             + "employee detail : " + employee.getId() + " " + employee.getEmployeeEmail()
-                    , absolutePath);
+                    , URL + filePath);
         }
         else {
             throw new IOException("file not found at : "+savedFile.getAbsolutePath());
@@ -183,19 +203,49 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobResponse showJobByJobId(Long jobId){
-        return modelMapper.map(jobRepository.findJobById(jobId),JobResponse.class);
+        JobResponse jobResponse = modelMapper.map(jobRepository.findJobById(jobId),JobResponse.class);
+        List<CvReviewerResponse> cvReviewerResponses = new ArrayList<>();
+        List<CvReviewer> cvReviewers = cvReviewerRepository.findCvReviewerByFkJob_Id(jobId);
+
+        for(CvReviewer cvReviewer : cvReviewers)
+        {
+            CvReviewerResponse cvReviewerResponse = new CvReviewerResponse();
+            cvReviewerResponse.setJobId(jobId);
+            cvReviewerResponse.setId(cvReviewer.getId());
+            cvReviewerResponse.setCvReviewerCreatedAt(cvReviewer.getCvReviewerCreatedAt());
+            cvReviewerResponse.setEmployeeId(cvReviewer.getFkCvReviewerEmployee().getId());
+            cvReviewerResponse.setEmployeeEmail(cvReviewer.getFkCvReviewerEmployee().getEmployeeEmail());
+            cvReviewerResponses.add(cvReviewerResponse);
+        }
+
+        jobResponse.setCvReviewerResponses(cvReviewerResponses);
+        return jobResponse;
     }
 
     @Transactional
     @Override
     public void updateStatus(Long referId, Long statusId){
-        ReferFriend referFriend = referFriendRepositort.findById(referId).orElseThrow(
+        ReferFriend referFriend = referFriendRepository.findById(referId).orElseThrow(
                 () -> new RuntimeException("refer friend not found")
         );
         referFriend.setFkCvStatusType(cvStatusTypeRepository.findById(statusId).orElseThrow(
                 () -> new RuntimeException("cv status type not found")
         ));
-        referFriendRepositort.save(referFriend);
+        referFriendRepository.save(referFriend);
+    }
+
+    @Override
+    public List<ReferFriendResponse> getReferDataByJobId(Long jobId){
+        List<ReferFriendResponse> referFriendResponses = new ArrayList<>();
+        List<ReferFriend> referFriends = referFriendRepository.findReferFriendByFkJob_Id(jobId);
+
+        for(ReferFriend referFriend : referFriends)
+        {
+            ReferFriendResponse referFriendResponse = modelMapper.map(referFriend,ReferFriendResponse.class);
+            referFriendResponses.add(referFriendResponse);
+        }
+
+        return referFriendResponses;
     }
 
 }

@@ -26,9 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.hibernate.type.descriptor.java.CoercionHelper.toLong;
 
@@ -256,6 +254,42 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         Employee employee = employeeRepository.findEmployeeById(empId);
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
         List<TravelDoc> travelDocs = travelDocRepository.findByFkEmployeeAndFkTravelPlan(employee ,travelPlan);
+
+        Long employeeTravelPlanId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(empId, travelPlanId);
+        List<TravelDoc> travelDocsEmp = travelDocRepository.findTravelDocsByFkEmployeeTravelPlan_Id(employeeTravelPlanId);
+        travelDocs.addAll(travelDocsEmp);
+
+        List<TravelDocResponse> travelDocResponses = new ArrayList<>();
+        for(TravelDoc travelDoc : travelDocs)
+        {
+            TravelDocResponse travelDocResponse = modelMapper.map(travelDoc,TravelDocResponse.class);
+            travelDocResponses.add(travelDocResponse);
+        }
+
+        return travelDocResponses;
+    }
+
+    @Override
+    public List<TravelDocResponse> findAllTravelPlanDocByTravelPlan(Long travelPlanId) {
+        TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
+        List<TravelDoc> travelDocsHr = travelDocRepository.findByFkTravelPlan(travelPlan);
+
+        System.out.println(travelDocsHr);
+
+        List<EmployeeTravelPlan> employeeTravelPlan = employeeTravelPlanRepository.
+                findEmployeeTravelPlanByFkTravelPlan_Id(travelPlanId);
+
+        Set<TravelDoc> travelDocsSet = new LinkedHashSet<>(travelDocsHr);
+
+        for (EmployeeTravelPlan etp : employeeTravelPlan)
+        {
+            List<TravelDoc> travelDocsEmp = travelDocRepository.
+                    findTravelDocsByFkEmployeeTravelPlan_Id(etp.getId());
+            System.out.println(travelDocsEmp);
+            travelDocsSet.addAll(travelDocsEmp);
+        }
+
+        List<TravelDoc> travelDocs = new ArrayList<>(travelDocsSet);
         List<TravelDocResponse> travelDocResponses = new ArrayList<>();
         for(TravelDoc travelDoc : travelDocs)
         {

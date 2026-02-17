@@ -54,12 +54,8 @@ export const travelService = {
     return res.data;
   },
 
-  updateExpenseStatus: async (expenseId: number, statusId: number, token:String) => {
-    const res = await api.patch(`/hr/expense/${expenseId}/${statusId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  updateExpenseStatus: async (expenseId: number, statusId: number, token: string) => {
+    const res = await api.patch(`/hr/expense/${expenseId}/${statusId}`,null, authHeader(token));
     return res.data;
   },
 
@@ -91,8 +87,8 @@ export const travelService = {
     return res.data;
   },
 
-  findTravelDocByEmpId: async (empId: number, travelPlanId: number, token: string) => {
-    const res = await api.get(`/hr/travelDoc/${empId}/${travelPlanId}`, authHeader(token));
+  findTravelDocByHr: async (travelPlanId: number, token: string) => {
+    const res = await api.get(`/travel/travelDoc/${travelPlanId}`, authHeader(token));
     return res.data;
   }
 

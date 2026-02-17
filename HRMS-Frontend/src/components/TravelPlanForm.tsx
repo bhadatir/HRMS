@@ -165,7 +165,7 @@ export default function TravelPlanForm( { editTravelPlanId, onSuccess }: { editT
         <Button 
           className="md:col-span-2 text-black" 
           onClick={() => editTravelPlanId ? updateMutation.mutate() : createMutation.mutate()} 
-          disabled={createMutation.isPending || updateMutation.isPending}
+          disabled={createMutation.isPending || updateMutation.isPending || !form.travelPlanName || !form.travelPlanFrom || !form.travelPlanTo || !form.travelPlanStartDate || !form.travelPlanEndDate}
         >
           {createMutation.isPending ? "Saving..." : updateMutation.isPending ? "Updating..." : editTravelPlanId ? "Update Travel Plan" : "Deploy Travel Plan"}
         </Button>
