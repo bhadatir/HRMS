@@ -8,6 +8,7 @@ import ResetPassword from "./pages/ResetPassword";
 import OrganizationChart from "./pages/OrganizationChart";
 import TravelPlan from "./pages/TravelPlan";
 import JobManagement from "./pages/JobManagement";
+import PostManagement from "./pages/PostManagement";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/organization-chart" element={<OrganizationChart />} />
             <Route path="/travel-plan" element={<TravelPlan />} />
             <Route path="/job-management" element={<JobManagement />} />
+            <Route path="/post-management" element={<PostManagement />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" />} />

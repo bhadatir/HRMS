@@ -7,6 +7,7 @@ import com.example.HRMS.Backend.dto.TravelPlanResponse;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
+import com.example.HRMS.Backend.service.NotificationService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -27,6 +28,8 @@ import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static org.hibernate.type.descriptor.java.CoercionHelper.toLong;
 
@@ -49,6 +52,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     private final TravelDocsTypeRepository travelDocsTypeRepository;
 
     private final EmailService emailService;
+
+    private final NotificationService notificationService;
+
+    private final NotificationRepository notificationRepository;
 
     @Override
     public TravelPlan findTravelPlanByHREmployeeId(Long hrEmployeeId){
@@ -85,13 +92,18 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             employeeTravelPlanRepository.save(employeeTravelPlan);
 
             emails.add(employee.getEmployeeEmail());
+            notificationService.createNotification(id,"you are added in Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+
         }
 
         emailService.sendEmail(emails,"Travel Plan",travelPlanRequest.getTravelPlanDetails());
     }
 
+    @Transactional
     @Override
     public void updateTravelPlan(@Valid TravelPlanRequest travelPlanRequest, Long travelPlanId){
+
+        List<Long> employeesId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlanId);
 
         TravelPlan travelPlan = modelMapper.map(travelPlanRequest, TravelPlan.class);
 
@@ -108,27 +120,126 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         List<String> emails = new ArrayList<>();
 
         for(Long id : empId){
+            Employee employee = employeeRepository.findEmployeeById(id);
 
-            Long empTravelId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(id,travelPlanId);
+            if(!employeesId.contains(id)) {
+                Long employeeTravelPlanId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(id,travelPlanId);
+                EmployeeTravelPlan employeeTravelPlan1 = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
 
-            if(empTravelId == null) {
-                Employee employee = employeeRepository.findById(id).orElseThrow(
-                        () -> new RuntimeException("Employee not found"));
+                if(Boolean.TRUE.equals(employeeTravelPlan1.getEmployeeIsDeletedFromTravel())){
+                    employeeTravelPlan1.setEmployeeIsDeletedFromTravel(false);
 
-                EmployeeTravelPlan employeeTravelPlan = new EmployeeTravelPlan();
-                employeeTravelPlan.setFkEmployee(employee);
-                employeeTravelPlan.setEmployeeTravelPlanCreatedAt(Instant.now());
-                employeeTravelPlan.setFkTravelPlan(savedTravelplan);
-                employeeTravelPlan.setFkTravelPlanStatus(travelPlanStatus);
-                employeeTravelPlanRepository.save(employeeTravelPlan);
+                    employeeTravelPlanRepository.save(employeeTravelPlan1);
 
-                emails.add(employee.getEmployeeEmail());
+                    List<TravelDoc> travelDocByHr = travelDocRepository.findByFkEmployeeAndFkTravelPlan(employee, travelPlan);
+                    for(TravelDoc travelDoc:travelDocByHr){
+                        travelDoc.setDocIsDeletedFromTravel(false);
+                        travelDocRepository.save(travelDoc);
+                    }
+                    List<TravelDoc> travelDocByEmp = travelDocRepository.findByFkEmployeeAndFkEmployeeTravelPlan(employee, employeeTravelPlan1);
+                    for(TravelDoc travelDoc:travelDocByEmp){
+                        travelDoc.setDocIsDeletedFromTravel(false);
+                        travelDocRepository.save(travelDoc);
+                    }
+
+                    List<String> emails1 = new ArrayList<>();
+                    emails1.add(employee.getEmployeeEmail());
+                    emailService.sendEmail(emails1,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+                    notificationService.createNotification(id,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+
+                }else {
+
+                    EmployeeTravelPlan employeeTravelPlan = new EmployeeTravelPlan();
+                    employeeTravelPlan.setFkEmployee(employee);
+                    employeeTravelPlan.setEmployeeTravelPlanCreatedAt(Instant.now());
+                    employeeTravelPlan.setFkTravelPlan(savedTravelplan);
+                    employeeTravelPlan.setFkTravelPlanStatus(travelPlanStatus);
+                    employeeTravelPlanRepository.save(employeeTravelPlan);
+
+                    emails.add(employee.getEmployeeEmail());
+                    notificationService.createNotification(id,"New added in Travel Plan by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+
+                }
             }
+
+        }
+
+        for(Long id : employeesId){
+
+            if(!empId.contains(id)) {
+
+                markEmployeeTravelPlanAsDelete(id,travelPlanId);
+                Employee employee = employeeRepository.findEmployeeById(id);
+                List<String> emails1 = new ArrayList<>();
+                emails1.add(employee.getEmployeeEmail());
+                emailService.sendEmail(emails1,"Removed from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+                notificationService.createNotification(id,"Removed from Travel Plan by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+
+            }
+
         }
 
         if(!emails.isEmpty()){
-        emailService.sendEmail(emails,"Travel Plan",travelPlanRequest.getTravelPlanDetails());}
+            emailService.sendEmail(emails,"Travel Plan",travelPlanRequest.getTravelPlanDetails());
+        }
     }
+
+    @Transactional
+    @Override
+    public void markEmployeeTravelPlanAsDelete(Long empId, Long travelPlanId){
+
+        Employee employee = employeeRepository.findEmployeeById(empId);
+        TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
+
+        Long employeeTravelPlanId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(empId,travelPlanId);
+
+        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
+
+        employeeTravelPlan.setEmployeeIsDeletedFromTravel(true);
+
+        employeeTravelPlanRepository.save(employeeTravelPlan);
+
+        List<TravelDoc> travelDocByHr = travelDocRepository.findByFkEmployeeAndFkTravelPlan(employee, travelPlan);
+        for(TravelDoc travelDoc:travelDocByHr){
+            travelDoc.setDocIsDeletedFromTravel(true);
+            travelDocRepository.save(travelDoc);
+        }
+        List<TravelDoc> travelDocByEmp = travelDocRepository.findByFkEmployeeAndFkEmployeeTravelPlan(employee, employeeTravelPlan);
+        for(TravelDoc travelDoc:travelDocByEmp){
+            travelDoc.setDocIsDeletedFromTravel(true);
+            travelDocRepository.save(travelDoc);
+        }
+
+    }
+
+    @Transactional
+    @Override
+    public void markAsDeleted(Long travelPlanId){
+        TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
+        travelPlan.setTravelPlanIsDeleted(true);
+        travelPlanRepository.save(travelPlan);
+        Long hrId = travelPlan.getFkTravelPlanHREmployee().getId();
+        markEmployeeTravelPlanAsDelete(hrId, travelPlanId);
+
+        Employee employee = employeeRepository.findEmployeeById(hrId);
+        List<String> emails = new ArrayList<>();
+        emails.add(employee.getEmployeeEmail());
+
+        List<Long> empIds = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlanId);
+
+        for(Long empId: empIds) {
+            markEmployeeTravelPlanAsDelete(empId, travelPlanId);
+            Employee employee1 = employeeRepository.findEmployeeById(empId);
+            List<String> emails1 = new ArrayList<>();
+            emails1.add(employee1.getEmployeeEmail());
+            emailService.sendEmail(emails1,"Travel Plan id deleted by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+            notificationService.createNotification(empId,"Travel Plan id deleted by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+        }
+
+        emailService.sendEmail(emails,"Travel Plan id deleted by You at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+        notificationService.createNotification(hrId,"Travel Plan id deleted by You at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+    }
+
 
     @Override
     public TravelPlanResponse showTravelPlanById(Long travelplanId){

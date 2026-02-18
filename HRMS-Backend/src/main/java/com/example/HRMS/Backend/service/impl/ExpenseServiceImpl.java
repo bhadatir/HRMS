@@ -8,6 +8,7 @@ import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.ExpenseService;
+import com.example.HRMS.Backend.service.NotificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +36,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final EmailService emailService;
     private final ModelMapper modelMapper;
     private final TravelDocRepository travelDocRepository;
+    private final NotificationService notificationService;
 
     @Override
     public void saveExpense(ExpenseRequest expenseRequest){
@@ -136,6 +139,14 @@ public class ExpenseServiceImpl implements ExpenseService {
         Expense expense = expenseRepository.findExpensesById(expId);
         expense.setFkExpenseTravelPlanStatus(travelPlanStatusRepository.findTravelPlanStatusById(statusId));
         expenseRepository.save(expense);
+
+        notificationService.createNotification(expense.getFkEmployeeTravelPlan().getFkEmployee().getId()
+                ,"Expense Status Upgraded"
+                , "Status : " + travelPlanStatusRepository.findTravelPlanStatusById(statusId).getTravelPlanStatusName()
+                   + " at :" + LocalDateTime.now() + " by "
+                   + expense.getFkEmployeeTravelPlan().getFkTravelPlan().getFkTravelPlanHREmployee().getEmployeeEmail() + " for "
+                   + expense.getFkEmployeeTravelPlan().getFkTravelPlan().getTravelPlanName() + " travel plan"
+        );
     }
 
     @Override
@@ -172,6 +183,13 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseProofRepository.save(expenseProof);
 
         }
+        notificationService.createNotification(employeeTravelPlan.getFkTravelPlan().getFkTravelPlanHREmployee().getId()
+                ,"Expense Added"
+                , "at :" + LocalDateTime.now() + " by "
+                + employeeTravelPlan.getFkEmployee().getEmployeeEmail() + " for "
+                + employeeTravelPlan.getFkTravelPlan().getTravelPlanName() + " travel plan"
+        );
+
     }
 
 }

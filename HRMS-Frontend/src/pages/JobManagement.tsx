@@ -10,13 +10,15 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ReferFriend from "../components/ReferFriend.tsx";
 import ShareJob from "../components/ShareJob.tsx";
-import { Plus, X, Briefcase, MapPin, Calendar, Search, Users, DollarSign, Share, UserPlus, Edit } from "lucide-react";
+import { Plus, X, Briefcase, MapPin, Calendar, Search, Users, DollarSign, Share, UserPlus, Edit, Bell } from "lucide-react";
 import JobForm from "../components/JobForm.tsx";
 import JobDetailView from "@/components/JobDetailView.tsx";
+import Notifications from "@/components/Notifications.tsx";
 
 export default function JobManagement() {
-  const { token, user } = useAuth();
+  const { token, user, unreadNotifications } = useAuth();
   const [showForm, setShowForm] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");  
   const [shareJobId, setShareJobId] = useState<number | null>(null);
   const [editJobId, setEditJobId] = useState<number | null>(null);
@@ -62,9 +64,35 @@ export default function JobManagement() {
               Post New Job
             </Button>
           )}
+
+          <div className="relative inline-block">
+            <Bell 
+              size={25} 
+              onClick={() => setShowNotification(true)} 
+              className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+            />
+            {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                {unreadNotifications}
+              </span>
+            )}
+          </div>
         </header>
 
         <main className="p-6 max-w-7xl mx-auto space-y-6 w-250">
+          
+          {/* Notifications */}
+          {showNotification && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
+                <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                  onClick={() => {
+                  setShowNotification(false);
+                }}><X /></Button>
+                <Notifications />
+              </div>
+            </div>
+          )}
 
           {/* job details with reviewer and referral management */}
           {selectedJobId && (
@@ -182,6 +210,7 @@ export default function JobManagement() {
                     <a 
                         key={job.id} 
                         href={job.jobDescriptionUrl}
+                        onClick={(e) => e.stopPropagation()}
                         target="_blank" 
                         rel="noreferrer"
                         className="text-blue-600 hover:underline flex items-center gap-1 text-xs"

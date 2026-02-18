@@ -16,7 +16,7 @@ import { Search, User, Bell, X } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
 
 export default function OrganizationChart() {
-  const { token } = useAuth(); 
+  const { token, unreadNotifications } = useAuth(); 
   const [selectedId, setSelectedId] = useState(2);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);  
@@ -85,9 +85,18 @@ export default function OrganizationChart() {
               </div>
             )}
           </div>
-
-          <Bell onClick={() => setShowNotification(true)} className="gap-2 text-gray-600 cursor-pointer"/>
-
+          <div className="relative inline-block">
+            <Bell 
+              size={25} 
+              onClick={() => setShowNotification(true)} 
+              className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+            />
+            {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                {unreadNotifications}
+              </span>
+            )}
+          </div>
         </header>
 
         <div className="p-6 max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500 w-250">

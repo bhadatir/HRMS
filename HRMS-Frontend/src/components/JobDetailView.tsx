@@ -36,6 +36,8 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
     enabled: !!jobId && !!token && viewMode === "REFERRALS",
   });
 
+  console.log(referrals);
+
   const updateCvStatusMutation = useMutation({
     mutationFn: ({ referId, statusId }: { referId: number; statusId: number }) =>
       jobService.updateReferCvStatus(referId, statusId, token || ""),
@@ -153,6 +155,7 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
             </Table>
           ) : (
             <div className="space-y-6">
+              {user?.roleName === "HR" && (
               <div className="flex gap-2 items-end max-w-sm">
                 <div className="flex-1 space-y-1">
                   <label className="text-xs font-bold text-slate-500">ADD REVIEWER (ID)</label>
@@ -166,6 +169,7 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
                   <UserPlus size={16} className="mr-2" /> Add
                 </Button>
               </div>
+              )}
 
               <div className="space-y-2">
                 <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">

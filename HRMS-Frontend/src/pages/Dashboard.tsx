@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, unreadNotifications } = useAuth();
   const [showNotification, setShowNotification] = useState(false);
 
   if (!user) {
@@ -28,15 +28,26 @@ export default function Dashboard() {
     <SidebarProvider>
        <AppSidebar />
        <SidebarInset className="bg-slate-50">
-        <header className="flex h-16 items-center justify-between gap-2 border-b px-6 bg-white">
-          <SidebarTrigger className="-ml-1" />
-
-          <h3 className="text-lg font-bold">My Dashboard</h3>
-
-          <Bell onClick={() => setShowNotification(true)} className="gap-2 text-gray-600 cursor-pointer"/>
-
+        <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
+          
+          <div className="flex items-center gap-2">
+            <SidebarTrigger />
+            <h3 className="text-lg font-bold text-slate-800">My Dashboard</h3>
+          </div>
+          <div className="relative inline-block">
+            <Bell 
+              size={25} 
+              onClick={() => setShowNotification(true)} 
+              className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+            />
+            {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                {unreadNotifications}
+              </span>
+            )}
+          </div>
         </header>
-        <div className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto animate-in fade-in duration-500 w-250">
+        <main className="p-6 max-w-7xl mx-auto space-y-6 w-250">
           
             {/* Notifications */}
             {showNotification && (
@@ -146,7 +157,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-        </div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

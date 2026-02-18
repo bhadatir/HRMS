@@ -1,9 +1,6 @@
 package com.example.HRMS.Backend.controller;
 
-import com.example.HRMS.Backend.dto.JobRequest;
-import com.example.HRMS.Backend.dto.JobResponse;
-import com.example.HRMS.Backend.dto.JobShareRequest;
-import com.example.HRMS.Backend.dto.ReferFriendRequest;
+import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.repository.JobRepository;
 import com.example.HRMS.Backend.service.JobService;
 import jakarta.validation.Valid;
@@ -33,6 +30,11 @@ public class JobController {
                                               @RequestPart("file") MultipartFile file) throws IOException {
         jobService.referFriend(referFriendRequest,file);
         return ResponseEntity.ok("refer friend successfully");
+    }
+
+    @GetMapping("/referData/{jobId}")
+    public ResponseEntity<List<ReferFriendResponse> > getReferDataByJobId(@PathVariable Long jobId){
+        return ResponseEntity.ok(jobService.getReferDataByJobId(jobId));
     }
 
     @GetMapping("/")

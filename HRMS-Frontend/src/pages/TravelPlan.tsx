@@ -1,6 +1,6 @@
 
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { travelService } from "../api/travelService";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/app-sidebar"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, MapPin, Calendar, Edit, ImagePlus, Bell, Search } from "lucide-react";
+import { Plus, X, MapPin, Calendar, Edit, ImagePlus, Bell, Search, Trash2 } from "lucide-react";
 import TravelPlanForm from "../components/TravelPlanForm";
 import AddExpenseForm from "../components/AddExpenseForm";
 import AddTravelDocumentForm from "../components/AddTravelDocumentForm";
@@ -17,7 +17,8 @@ import { Input } from "@/components/ui/input";
 import Notifications from "../components/Notifications.tsx";
 
 export default function TravelPlan() {
-  const { token, user } = useAuth(); 
+  const { token, user, unreadNotifications } = useAuth(); 
+  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [fullTravelDetails, setFullTravelDetails] = useState<number | null>(null);
@@ -40,12 +41,21 @@ export default function TravelPlan() {
     enabled: searchTerm.length >= 1,
   });
 
+  const deleteTravelPlanMutation = useMutation({
+    mutationFn: (travelPlanId: number) => travelService.deleteTravelPlan(travelPlanId, token || ""),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
+      alert("Travel plan deleted successfully");
+    },
+    onError: (err: any) => alert("Error: " + err.message)
+  });
+
   const filteredPlans = useMemo(() => {
     if (!allPlans || !user) return [];
     if (user.roleName === "EMPLOYEE" && !isSearchLoading && searchFilter) {
       return allPlans.filter((plan: any) =>
         plan.employeeTravelPlanResponses.some((resp: any) => {
-          return ( resp.employeeEmail === user.employeeEmail 
+          return ( resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false
           && searchFilter?.includes(resp.travelPlanId))
         })
       );
@@ -53,10 +63,24 @@ export default function TravelPlan() {
     if (user.roleName === "EMPLOYEE" && !isSearchLoading && !searchFilter) {
       return allPlans.filter((plan: any) =>
         plan.employeeTravelPlanResponses.some((resp: any) => {
-          return ( resp.employeeEmail === user.employeeEmail)
+          return ( resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false)
         })
       );
     }
+  
+    if(user?.roleName === "MANAGER" && !isSearchLoading && searchFilter) {
+      return allPlans.filter((plan: any) => 
+        plan.employeeFkManagerEmployeeId === user.id 
+        || (plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false))
+        && searchFilter.includes(plan.id));
+    }
+
+    if(user?.roleName === "MANAGER" && !isSearchLoading && !searchFilter) {
+      return allPlans.filter((plan: any) => plan.employeeFkManagerEmployeeId === user.id
+      || (plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false)));
+    }
+
+    // if role hr so hr add exp only on that in which hr is going in travel is remaining
     if (!searchFilter) return allPlans;
     return allPlans.filter((plan: any) => searchFilter.includes(plan.id));
   }, [allPlans, user, searchFilter, isSearchLoading]);
@@ -95,7 +119,18 @@ export default function TravelPlan() {
             </Button>
           )}
 
-          <Bell onClick={() => setShowNotification(true)} className="gap-2 text-gray-600 cursor-pointer"/>
+          <div className="relative inline-block">
+            <Bell 
+              size={25} 
+              onClick={() => setShowNotification(true)} 
+              className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+            />
+            {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                {unreadNotifications}
+              </span>
+            )}
+          </div>
 
         </header>
 
@@ -183,7 +218,7 @@ export default function TravelPlan() {
             {isLoading ? (
                <p>Loading plans...</p>
             ) : filteredPlans.length > 0 ? (
-              filteredPlans.map((plan: any) => (
+              filteredPlans.sort((a: any, b: any) => new Date(b.travelPlanStartDate).getTime() - new Date(a.travelPlanStartDate).getTime()).map((plan: any) => (
                 <Card key={plan.id} 
                   onClick={() => setFullTravelDetails(plan.id)}
                   className="hover:shadow-md transition-shadow border-slate-200 cursor-pointer">
@@ -209,15 +244,21 @@ export default function TravelPlan() {
                       <p className="text-xs font-bold text-slate-400 uppercase">Team Members</p>
                       <div className="flex flex-wrap gap-1">
                         {plan.employeeTravelPlanResponses.map((m: any) => (
-                          <Badge key={m.employeeEmail} variant="secondary" className="text-[10px]">
-                            {m.employeeEmail.split('@')[0]}
-                          </Badge>
+                          !m.employeeIsDeletedFromTravel ? (
+                            <Badge key={m.employeeEmail} variant="secondary" className="text-[10px]">
+                              {m.employeeEmail.split('@')[0]}
+                            </Badge>
+                        ): null
                         ))}
                       </div>
                     </div>
 
-                    {user?.roleName === "HR" || user?.roleName === "EMPLOYEE" ? (
+                    {/* manager also add doc so update thia */}
+
+                    
+                    {user?.roleName === "HR" || user?.roleName === "EMPLOYEE" || (user?.roleName === "MANAGER" && plan.employeeFkManagerEmployeeId !== user.id) ? (
                       <div className="mt-2 flex justify-between gap-2">
+                        { new Date(plan.travelPlanStartDate) > new Date() ? (
                         <Button 
                           title="Add Travel Document"
                           onClick={(e) => {
@@ -228,15 +269,15 @@ export default function TravelPlan() {
                         >
                           <ImagePlus size={14} /> Doc
                         </Button>
+                        ):(<></>)}
 
                         {(() => {
                           const now = new Date().getTime();
                           const planEndDate = new Date(plan.travelPlanEndDate).getTime();
-                          const planStartDate = new Date(plan.travelPlanStartDate).getTime();
                           const tenDays = 10 * 24 * 60 * 60 * 1000;
                           const expiryDate = planEndDate + tenDays;
-                          const canClaim = now >= planStartDate && now <= expiryDate;
-                          return canClaim && user?.roleName === "EMPLOYEE" &&(  
+                          const canClaim = now >= planEndDate && now <= expiryDate;
+                          return canClaim && (  
                             <Button 
                               title="Claim Travel Expense"
                               onClick={(e) => {
@@ -262,7 +303,8 @@ export default function TravelPlan() {
                         // );
                         })()}
 
-                        {user?.roleName === "HR" && (
+                        {user?.roleName === "HR" && new Date(plan.travelPlanStartDate) > new Date() ? (
+                          <>
                           <Button 
                             title="Edit Travel Plan"
                             onClick={(e) => {
@@ -273,8 +315,19 @@ export default function TravelPlan() {
                             className="text-gray-600 mt-2"
                           >
                           <Edit size={14} />
-                        </Button>
-                        )}
+                          </Button>
+                          <Button 
+                            title="Delete Travel Plan"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteTravelPlanMutation.mutate(plan.id);
+                            }}
+                            className="text-red-500 hover:text-red-700 right-0 mt-2"
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </>
+                        ):(<></>)}
                       </div>
                     ) : null}
                   </CardContent>

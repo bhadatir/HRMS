@@ -35,6 +35,11 @@ export const travelService = {
     return res.data;
   },
 
+  deleteTravelPlan: async (travelPlanId: number, token: string) => {
+    const res = await api.patch(`/hr/deleteTravel/${travelPlanId}`, authHeader(token));
+    return res.data;
+  },
+
   addExpenseWithProof: async (formData: FormData, token: string) => {
     const res = await api.post("/travel/expenseWithProof", formData, {
       headers: {

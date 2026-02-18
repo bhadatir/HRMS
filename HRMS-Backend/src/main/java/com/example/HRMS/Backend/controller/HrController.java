@@ -43,6 +43,12 @@ public class HrController {
         return ResponseEntity.ok("Travel plan add successfully");
     }
 
+    @PatchMapping("/deleteTravel/{travelPlanId}")
+    public ResponseEntity<String> softDeleteUser(@PathVariable Long travelPlanId) {
+        travelPlanService.markAsDeleted(travelPlanId);
+        return ResponseEntity.ok("Travel plan delete successfully");
+    }
+
     @PutMapping("/travelPlan/{travelPlanId}")
     public ResponseEntity<String> updateTravelPLan(@Valid @RequestBody TravelPlanRequest travelPlanRequest, @PathVariable Long travelPlanId){
         travelPlanService.updateTravelPlan(travelPlanRequest,travelPlanId);
@@ -98,11 +104,6 @@ public class HrController {
     public ResponseEntity<String > updateReferCvStatus(@PathVariable Long referId, @PathVariable Long statusId)
     {   jobService.updateStatus(referId, statusId);
         return ResponseEntity.ok("status update successful");
-    }
-
-    @GetMapping("/referData/{jobId}")
-    public ResponseEntity<List<ReferFriendResponse> > getReferDataByJobId(@PathVariable Long jobId){
-        return ResponseEntity.ok(jobService.getReferDataByJobId(jobId));
     }
 
     @PatchMapping("/comment/{commentId}")

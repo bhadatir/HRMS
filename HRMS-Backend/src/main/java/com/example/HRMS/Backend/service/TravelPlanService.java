@@ -35,4 +35,8 @@ public interface TravelPlanService {
     List<TravelDocResponse> findTravelDocByFkEmployeeId(Long empId,Long travelPlanId);
 
     List<TravelDocResponse> findAllTravelPlanDocByTravelPlan(Long travelPlanId);
+
+    void markAsDeleted(Long travelPlanId);
+
+    void markEmployeeTravelPlanAsDelete(Long empId, Long travelPlanId);
 }

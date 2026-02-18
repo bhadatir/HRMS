@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface JobService {
+
     void saveJob(@Valid JobRequest job, MultipartFile file) throws IOException;
 
     void saveCvReviewer(Long jobId, Long empCvReviewerId);

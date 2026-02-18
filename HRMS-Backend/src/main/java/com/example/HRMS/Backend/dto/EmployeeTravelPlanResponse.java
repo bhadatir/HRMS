@@ -24,4 +24,6 @@ public class EmployeeTravelPlanResponse {
 
     private String travelPlanName;
 
+    private Boolean employeeIsDeletedFromTravel;
+
 }

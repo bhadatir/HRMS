@@ -1,6 +1,6 @@
 import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
 import { travelService } from "../api/travelService";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +42,16 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
 
   const allExpenses = expenseResults.flatMap((result) => result.data || []);
   const isLoadingData = planLoading || (viewMode === "EXPENSES" ? expenseResults.some(r => r.isLoading) : docsLoading);
+
+  const totalExpenseAmount = useMemo(() => {
+    return allExpenses.reduce((total, exp:any) => total + exp.expenseAmount, 0);
+  }, [allExpenses]);
+
+  const approvedTotal = useMemo(() => {
+    return allExpenses
+      .filter((exp:any) => exp.expenseTravelPlanStatusName === "APPROVED")
+      .reduce((total, exp:any) => total + exp.expenseAmount, 0);
+  }, [allExpenses]);
 
   const approveMutation = useMutation({
     mutationFn: ({ expenseId, statusId }: { expenseId: number; statusId: number }) =>
@@ -101,6 +111,18 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 <FileText className="text-blue-600" /> {viewMode === "EXPENSES" ? "Expenses" : "Travel Documents"}
+
+                {viewMode === "EXPENSES" && 
+                  <div className="ml-4 flex-col">
+                    <p className="text-sm font-medium text-slate-500">
+                    Total: ${totalExpenseAmount.toLocaleString()}
+                    </p>
+                    <p className="text-sm font-medium text-slate-500">
+                    Approved: ${approvedTotal.toLocaleString()}
+                    </p>
+                  </div>
+                }
+              
                 <div className="flex bg-gray-100 p-1 rounded-lg w-max right-10 absolute">
                   <Button className={viewMode === "EXPENSES" ? "rounded-md border text-gray-700" : "rounded-md text-gray-400"}
                     size="sm"
@@ -200,6 +222,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                   )
                 ):(
                   allDocs.map((doc: any) => (
+                    !doc.docIsDeletedFromTravel ? (
                     <TableRow key={doc.id}>
                       <TableCell className="font-medium">{doc.travelDocsTypeName}</TableCell>
                       <TableCell>{doc.employeeEmail} ({doc.fkRoleRoleName})</TableCell>
@@ -212,6 +235,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                         </a>
                       </TableCell>
                     </TableRow>
+                    ) : null
                 ))
               )}
               {viewMode === "DOCUMENTS" && allDocs.length === 0 && (

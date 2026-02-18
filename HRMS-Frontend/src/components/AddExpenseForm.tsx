@@ -72,7 +72,6 @@ export default function AddExpenseForm({ travelPlanId, startDate, endDate, onSuc
           <div className="space-y-2 flex">
             <label className="text-sm font-medium text-gray-500 w-30 mt-2">Expense Date :</label>
             <Input type="date" placeholder="Select expense Date"
-            min={startDate}
             max={endDate}
             onChange={(e) => setForm({...form, expenseDate: e.target.value})} />
           </div>

@@ -1,24 +1,39 @@
-
-import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { jobService } from "../api/jobService";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Send, X } from "lucide-react";
+import { Send } from "lucide-react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+
+type ShareJobFormInputs = {
+    fkJobShareEmployeeId: number;
+    fkJobId: number;
+    emails: string;
+}
+
+
 
 export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSuccess: () => void }) {
   const { token, user } = useAuth();
-  const [emails, setEmails] = useState<string>("");
+  
+  const {register, handleSubmit, watch, formState: { errors }} = useForm<ShareJobFormInputs>({
+    defaultValues: {
+      fkJobShareEmployeeId: user?.id || 0,
+      fkJobId: jobId,
+      emails: ""
+    }
+  });
 
   const shareMutation = useMutation({
-    mutationFn: () => {
+    mutationFn: (data: ShareJobFormInputs) => {
       const payload = {
-        fkJobShareEmployeeId: user?.id || 0,
-        fkJobId: jobId,
-        emails: emails.split(",").map(email => email.trim()).filter(email => email !== "")
+        fkJobShareEmployeeId: data.fkJobShareEmployeeId,
+        fkJobId: data.fkJobId,
+        emails: data.emails.split(",").map(email => email.trim()).filter(email => email !== "")
       };
+
       return jobService.shareJob(payload, token || "");
     },
     onSuccess: () => {
@@ -36,22 +51,30 @@ export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSucces
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <form onSubmit={handleSubmit(data => shareMutation.mutate(data))} className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-500">Recipient Emails (Comma separated)</label>
           <Input 
-            placeholder="e.g. friend1@gmail.com, friend2@gmail.com" 
-            value={emails}
-            onChange={(e) => setEmails(e.target.value)}
+            placeholder="e.g. friend1@gmail.com, friend2@gmail.com"
+              {...register("emails", {
+                required: "Emails are required"
+                ,
+                pattern: {
+                  value: /^\s*[\w.-]+@[\w.-]+\.[a-z]{2,}(\s*,\s*[\w.-]+@[\w.-]+\.[a-z]{2,})*\s*$/i,
+                  message: "Please enter valid email addresses separated by commas"
+                }
+              })}
           />
+          {errors.emails && <p className="text-red-500 text-xs">{errors.emails.message}</p>}
         </div>
         <Button 
           title="Send Job Details"
           className="w-full text-black" 
-          onClick={() => shareMutation.mutate()}
-          disabled={shareMutation.isPending || !emails}
+          disabled={shareMutation.isPending || !watch("emails")}
         >
           {shareMutation.isPending ? "Sharing..." : "Send Job Details"}
         </Button>
+        </form>
       </CardContent>
     </Card>
   );

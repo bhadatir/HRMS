@@ -46,6 +46,9 @@ public class TravelPlan {
     @Column(name = "travel_plan_is_return")
     private Boolean travelPlanIsReturn = true;
 
+    @Column(name = "travel_plan_is_deleted")
+    private Boolean travelPlanIsDeleted = false;
+
     @NotNull(message = "travel plan starting date is required")
     @Column(name = "travel_plan_start_date", nullable = false)
     private LocalDate travelPlanStartDate;

@@ -36,7 +36,7 @@ export const jobService = {
   },
 
   getReferDataByJobId: async (jobId: number, token: string) => {
-    const res = await api.get(`/hr/referData/${jobId}`, authHeader(token));
+    const res = await api.get(`/job/referData/${jobId}`, authHeader(token));
     return res.data;
   },
 

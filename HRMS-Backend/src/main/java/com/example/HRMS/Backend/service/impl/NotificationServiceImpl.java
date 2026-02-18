@@ -8,6 +8,7 @@ import com.example.HRMS.Backend.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepo;
     private final EmployeeRepository employeeRepository;
     private final ModelMapper modelMapper;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     @Transactional
@@ -41,6 +43,8 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setMessage(msg);
         notification.setRead(false);
         notificationRepo.save(notification);
+
+        messagingTemplate.convertAndSend("/topic/user/" + empId + "/notifications", "NEW_NOTIFICATION");
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.service;
 
 import com.example.HRMS.Backend.dto.*;
+import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,4 +35,10 @@ public interface PostService {
     void removeComment(Long commentId);
 
     void removePost(Long postId);
+
+    void updatePost(Long postId, @Valid PostRequest postRequest, MultipartFile file) throws IOException;
+
+    void removeLikeByCommentId(Long commentId,Long employeeId);
+
+    void removeLikeByPostId(Long postId,Long employeeId);
 }

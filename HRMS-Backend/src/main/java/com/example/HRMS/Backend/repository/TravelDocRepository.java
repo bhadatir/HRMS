@@ -1,9 +1,11 @@
 package com.example.HRMS.Backend.repository;
 
 import com.example.HRMS.Backend.model.Employee;
+import com.example.HRMS.Backend.model.EmployeeTravelPlan;
 import com.example.HRMS.Backend.model.TravelDoc;
 import com.example.HRMS.Backend.model.TravelPlan;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,4 +22,7 @@ public interface TravelDocRepository extends JpaRepository<TravelDoc, Long> {
     List<TravelDoc> findTravelDocsByFkEmployeeTravelPlan_Id(Long employeeTravelPlanId);
 
     List<TravelDoc> findByFkTravelPlan(TravelPlan fkTravelPlan);
+
+    List<TravelDoc> findByFkEmployeeAndFkEmployeeTravelPlan(Employee fkEmployee, EmployeeTravelPlan fkEmployeeTravelPlan);
+
 }

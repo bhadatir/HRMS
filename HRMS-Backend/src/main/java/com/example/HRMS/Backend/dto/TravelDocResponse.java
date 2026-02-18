@@ -34,4 +34,6 @@ public class TravelDocResponse {
     private Long employeeFkManagerEmployeeId;
 
     private String fkRoleRoleName;
+
+    private Boolean docIsDeletedFromTravel;
 }

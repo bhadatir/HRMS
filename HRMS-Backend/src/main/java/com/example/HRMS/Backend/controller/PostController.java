@@ -27,13 +27,21 @@ public class PostController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<PostResponse>> allJob() {
+    public ResponseEntity<List<PostResponse>> allPost() {
         return ResponseEntity.ok(postService.showAllPosts());
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponse> jobByJobId(@PathVariable Long postId) {
+    public ResponseEntity<PostResponse> postByPostId(@PathVariable Long postId) {
         return ResponseEntity.ok(postService.showPostByPostId(postId));
+    }
+
+    @PutMapping(value = "/{postId}", consumes = {"multipart/form-data"})
+    public ResponseEntity<String> updatePost(@PathVariable Long postId,
+                                            @Valid @RequestPart PostRequest postRequest,
+                                            @RequestPart(value = "file",required = false) MultipartFile file) throws IOException {
+        postService.updatePost(postId, postRequest, file);
+        return ResponseEntity.ok("Post update successfully");
     }
 
     @PostMapping("/tag/{postId}/{tagTypeId}")
@@ -72,5 +80,19 @@ public class PostController {
     @GetMapping("/likeByCommentId/{commentId}")
     public ResponseEntity<List<LikeResponse>> getLikeByCommentId(@PathVariable Long commentId) {
         return ResponseEntity.ok(postService.getLikeByCommentId(commentId));
+    }
+
+    @DeleteMapping("/commentLike/{commentId}/{employeeId}")
+    public ResponseEntity<String> removeLikeByCommentId(@PathVariable Long commentId
+                                                        ,@PathVariable Long employeeId) {
+        postService.removeLikeByCommentId(commentId, employeeId);
+        return ResponseEntity.ok("remove like successfully");
+    }
+
+    @DeleteMapping("/postLike/{postId}/{employeeId}")
+    public ResponseEntity<String> removeLikeByPostId(@PathVariable Long postId
+                                                    ,@PathVariable Long employeeId) {
+        postService.removeLikeByPostId(postId, employeeId);
+        return ResponseEntity.ok("remove like successfully");
     }
 }

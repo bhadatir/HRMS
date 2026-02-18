@@ -6,25 +6,35 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { jobService } from "../api/jobService";
 import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+
+type JobFormInputs ={
+    jobTitle: string;
+    jobSalary: number;
+    fkJobTypeId: number;
+    fkJobOwnerEmployeeId: number;
+    file?: File[];
+}
 
 export default function JobForm({ editJobId, onSuccess }: { editJobId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
-
-  const [docFile, setDocFile] = useState<File | null>(null);
   const [createdAt, setCreatedAt] = useState("");
-  const [form, setForm] = useState({
-    jobTitle: "",
-    jobSalary: 0,
-    fkJobTypeId: 1,
-    fkJobOwnerEmployeeId: user?.id || 0
+
+  const {register, handleSubmit, reset, watch, formState: { errors }} = useForm<JobFormInputs>({
+    defaultValues: {
+      jobTitle: "",
+      jobSalary: 0,
+      fkJobTypeId: 1,
+      fkJobOwnerEmployeeId: user?.id || 0
+    }
   });
 
   const getJobMutation = useMutation({
     mutationFn: () => jobService.getJobById(editJobId!, token || ""),
     onSuccess: (data) => {
       setCreatedAt(data.jobCreatedAt?.split("T")[0] || "");
-      setForm({
+      reset({
         jobTitle: data.jobTitle,
         jobSalary: data.jobSalary,
         fkJobTypeId: data.jobTypeId,
@@ -41,13 +51,13 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
   }, [editJobId]);
 
   const jobMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (data: JobFormInputs) => {
       const formData = new FormData();
-      const jsonBlob = new Blob([JSON.stringify(form)], { type: "application/json" });
+      const jsonBlob = new Blob([JSON.stringify(data)], { type: "application/json" });
       formData.append("jobRequest", jsonBlob);
       
-      if (docFile) {
-        formData.append("file", docFile);
+      if (data.file) {
+        formData.append("file", data.file[0]);
       }
 
       if (editJobId) {
@@ -72,32 +82,32 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <form onSubmit={handleSubmit(data => jobMutation.mutate(data))} className="space-y-4">
         <div className="space-y-1">
           <label className="text-xs font-bold text-slate-500 uppercase">Job Title</label>
           <Input 
             type="text" 
-            value={form.jobTitle} 
+            {...register("jobTitle", { required: "Job title is required" })}
             placeholder="e.g. Senior Java Developer" 
-            onChange={(e) => setForm({ ...form, jobTitle: e.target.value })} 
           />
+          {errors.jobTitle && <p className="text-red-500 text-xs">{errors.jobTitle.message}</p>}
         </div>
 
         <div className="space-y-1">
           <label className="text-xs font-bold text-slate-500 uppercase">Salary ($)</label>
           <Input 
             type="number" 
-            value={form.jobSalary} 
+            {...register("jobSalary", { required: "Job salary is required" })}
             placeholder="Annual Salary" 
-            onChange={(e) => setForm({ ...form, jobSalary: Number(e.target.value) })} 
           />
+          {errors.jobSalary && <p className="text-red-500 text-xs">{errors.jobSalary.message}</p>}
         </div>
 
         <div className="space-y-1">
           <label className="text-xs font-bold text-slate-500 uppercase">Job Category</label>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-            value={form.fkJobTypeId}
-            onChange={(e) => setForm({ ...form, fkJobTypeId: Number(e.target.value) })}
+            {...register("fkJobTypeId", { required: "Job category is required" })}
           >
             <option value="1">Software Developer</option>
             <option value="2">Data Analyst</option>
@@ -106,6 +116,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
             <option value="5">Backend Developer</option>
             <option value="6">Other</option>
           </select>
+          {errors.fkJobTypeId && <p className="text-red-500 text-xs">{errors.fkJobTypeId.message}</p>}
         </div>
 
         <div className="border-2 border-dashed rounded-lg p-6 text-center space-y-2 border-slate-200">
@@ -113,22 +124,24 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
           <Input
             type="file"
             className="cursor-pointer"
-            onChange={(e) => e.target.files && setDocFile(e.target.files[0])}
+            accept=".pdf,.doc,.docx"
+              {...register("file", {required: !editJobId && "Job description is required for new jobs"})}
           />
+          {errors.file && <p className="text-red-500 text-xs">{errors.file.message}</p>}
           <p className="text-xs text-slate-400">
             {editJobId ? "Upload new JD to replace existing file (Optional)" : "Upload job description (Required)"}
           </p>
-          {docFile && <p className="text-xs text-blue-600 font-medium">{docFile.name}</p>}
+          {watch("file") && <p className="text-xs text-blue-600 font-medium">{watch("file")?.[0]?.name}</p>}
         </div>
 
         <Button
           title={editJobId ? "Update Job Posting" : "Create Job Posting"}
           className="w-full text-black mt-4"
-          onClick={() => jobMutation.mutate()}
-          disabled={jobMutation.isPending || (!editJobId && !docFile)}
+          disabled={jobMutation.isPending || (!editJobId && !watch("file")) || !watch("jobTitle") || !watch("jobSalary") || !watch("fkJobTypeId") }
         >
           {jobMutation.isPending ? "Processing..." : editJobId ? "Update Job Posting" : "Create Job Posting"}
         </Button>
+        </form>
       </CardContent>
     </Card>
   );

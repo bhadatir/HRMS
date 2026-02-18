@@ -6,6 +6,11 @@ import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.PostService;
+import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -102,6 +107,27 @@ public class PostServiceImpl implements PostService {
         }
 
         return postTagResponses;
+    }
+
+    @Override
+    public void updatePost(Long postId, @Valid PostRequest postRequest, MultipartFile file) throws IOException {
+        Post post = postRepository.findPostsById(postId);
+
+        if(file != null && !file.isEmpty()){
+            String time = Instant.now().toString().replace(":","-");
+
+            String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+            String filePath = "post_content/" + postRequest.getFkPostEmployeeId()
+                                + "_" + time + "_" + originalFilePath;
+            file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+            post.setPostContentUrl(URL + filePath);
+        }
+
+        post.setPostTitle(postRequest.getPostTitle());
+        post.setPostContent(postRequest.getPostContent());
+        post.setFkPostVisibility(postVisibilityRepository.findPostVisibilitiesById(postRequest.getFkPostVisibilityId()));
+
+        postRepository.save(post);
     }
 
     @Override
@@ -218,6 +244,22 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findPostsById(postId);
         post.setPostIsDeleted(true);
         postRepository.save(post);
+    }
+
+    @Override
+    @Transactional
+    public void removeLikeByCommentId(Long commentId, Long employeeId){
+        Comment comment = commentsRepository.findCommentById(commentId);
+        Employee employee = employeeRepository.findEmployeeById(employeeId);
+        likesRepository.removeLikeByFkCommentAndFkLikeEmployee(comment,employee);
+    }
+
+    @Override
+    @Transactional
+    public void removeLikeByPostId(Long postId, Long employeeId){
+        Post post = postRepository.findPostsById(postId);
+        Employee employee = employeeRepository.findEmployeeById(employeeId);
+        likesRepository.removeLikeByFkPostAndFkLikeEmployee(post,employee);
     }
 
 }

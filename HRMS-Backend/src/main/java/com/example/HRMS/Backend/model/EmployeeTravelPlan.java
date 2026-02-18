@@ -24,6 +24,9 @@ public class EmployeeTravelPlan {
     @Column(name = "employee_travel_plan_created_at")
     private Instant employeeTravelPlanCreatedAt;
 
+    @Column(name = "employee_is_deleted_from_travel")
+    private Boolean employeeIsDeletedFromTravel = false;
+
     @NotNull(message = "Travel plan status is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_travel_plan_status_id", nullable = false)

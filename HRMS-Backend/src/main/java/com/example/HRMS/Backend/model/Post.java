@@ -44,7 +44,7 @@ public class Post {
     @JoinColumn(name = "fk_post_employee_id")
     private Employee fkPostEmployee;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "fk_post_visibility_id")
     private PostVisibility fkPostVisibility;
 }

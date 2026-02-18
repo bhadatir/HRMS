@@ -5,8 +5,10 @@ import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.JobService;
+import com.example.HRMS.Backend.service.NotificationService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +40,7 @@ public class JobServiceImpl implements JobService {
     private final CvStatusTypeRepository cvStatusTypeRepository;
     private final ModelMapper modelMapper;
     private final EmailService emailService;
+    private final NotificationService notificationService;
 
     @Value("${img.path}")
     private String folderPath;
@@ -170,7 +174,13 @@ public class JobServiceImpl implements JobService {
 
         referFriendRepository.save(referFriend);
 
-        //it's not working
+        notificationService.createNotification(job.getFkJobOwnerEmployee().getId()
+                ,"Refer Friend For Job"
+                , "by "
+                        + employee.getEmployeeEmail() + " for Job : "
+                        + job.getJobTitle()
+                        + " at :" + LocalDateTime.now()
+        );
 
         File savedFile = new File(System.getProperty("user.dir") + "/" + folderPath + filePath);
         if(savedFile.exists() && savedFile.canRead()) {
@@ -232,6 +242,13 @@ public class JobServiceImpl implements JobService {
                 () -> new RuntimeException("cv status type not found")
         ));
         referFriendRepository.save(referFriend);
+        notificationService.createNotification(referFriend.getFkReferFriendEmployee().getId()
+                ,"Status upgraded of your Refer Friend CV"
+                ,  "Status : " + cvStatusTypeRepository.findCvStatusTypeById(statusId).getCvStatusTypeName() + " by "
+                        + referFriend.getFkJob().getFkJobOwnerEmployee().getEmployeeEmail() + " for Job : "
+                        + referFriend.getFkJob().getJobTitle()
+                        + " at :" + LocalDateTime.now()
+        );
     }
 
     @Override

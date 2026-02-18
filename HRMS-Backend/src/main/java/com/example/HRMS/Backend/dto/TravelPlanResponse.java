@@ -39,5 +39,9 @@ public class TravelPlanResponse {
 
     private String employeeEmail;
 
+    private Long employeeFkManagerEmployeeId;
+
+    private Boolean travelPlanIsDeleted;
+
     private List<EmployeeTravelPlanResponse> employeeTravelPlanResponses;
 }

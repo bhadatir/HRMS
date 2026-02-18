@@ -18,6 +18,7 @@ export function AppSidebar() {
     { title: "Organization Chart", icon: Network, url: "/organization-chart" },
     { title: "Travel Plan", icon: Plane, url: "/travel-plan" },
     { title: "Job Management", icon: Briefcase, url: "/job-management" },
+    { title: "Post Management", icon: Mail, url: "/post-management" },
   ]
 
   return (

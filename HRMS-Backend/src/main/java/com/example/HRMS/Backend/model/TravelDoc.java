@@ -27,6 +27,9 @@ public class TravelDoc {
     @Column(name = "travel_doc_url", nullable = false)
     private String travelDocUrl;
 
+    @Column(name = "doc_is_deleted_from_travel")
+    private Boolean docIsDeletedFromTravel = false;
+
     @Column(name = "travel_doc_uploaded_at")
     private Instant travelDocUploadedAt = Instant.now();
 
