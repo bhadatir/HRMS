@@ -9,17 +9,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "travel_plan_status")
-public class TravelPlanStatus {
+@Table(name = "expense_status")
+public class ExpenseStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "pk_travel_plan_status_id", nullable = false)
+    @Column(name = "pk_expense_status_id", nullable = false)
     private Long id;
 
     @Size(max = 20)
-    @NotNull(message = "travel plan status id is required")
-    @Column(name = "travel_plan_status_name", nullable = false, length = 20)
-    private String travelPlanStatusName;
+    @NotNull(message = "expense status id is required")
+    @Column(name = "expense_status_name", nullable = false, length = 20)
+    private String expenseStatusName;
 
 
 }

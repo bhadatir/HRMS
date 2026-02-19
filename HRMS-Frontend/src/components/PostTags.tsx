@@ -64,6 +64,7 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
                 className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
                 onChange={(e) => addTagMutation.mutate(Number(e.target.value))}
               >
+                <option value="">Select tag to add</option>
                 {allTagTypes.map((tagType: any) => ( tagType.id !== 1 && !tags.find((tag: any) => tag.tagTypeId === tagType.id) && (
                   <option key={tagType.id} value={tagType.id}>{tagType.tagTypeName}</option>
                 )))}

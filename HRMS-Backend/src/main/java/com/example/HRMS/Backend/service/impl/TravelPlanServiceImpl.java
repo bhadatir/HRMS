@@ -11,25 +11,17 @@ import com.example.HRMS.Backend.service.NotificationService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import static org.hibernate.type.descriptor.java.CoercionHelper.toLong;
 
@@ -43,7 +35,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
     private final TravelDocRepository travelDocRepository;
 
-    private final TravelPlanStatusRepository travelPlanStatusRepository;
+    private final ExpenseStatusRepository expenseStatusRepository;
 
     private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
 
@@ -72,10 +64,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         TravelPlan savedTravelplan = travelPlanRepository.save(travelPlan);
 
-        TravelPlanStatus travelPlanStatus = travelPlanStatusRepository.findById(1L).orElseThrow(
-                () -> new RuntimeException("Status not found")
-        );
-
         List<Long> empId = travelPlanRequest.getEmployeesInTravelPlanId();
 
         List<String> emails = new ArrayList<>();
@@ -88,7 +76,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             employeeTravelPlan.setFkEmployee(employee);
             employeeTravelPlan.setEmployeeTravelPlanCreatedAt(Instant.now());
             employeeTravelPlan.setFkTravelPlan(savedTravelplan);
-            employeeTravelPlan.setFkTravelPlanStatus(travelPlanStatus);
             employeeTravelPlanRepository.save(employeeTravelPlan);
 
             emails.add(employee.getEmployeeEmail());
@@ -103,7 +90,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     @Override
     public void updateTravelPlan(@Valid TravelPlanRequest travelPlanRequest, Long travelPlanId){
 
-        List<Long> employeesId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlanId);
+        List<Long> existingEmployeesId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlanId);
 
         TravelPlan travelPlan = modelMapper.map(travelPlanRequest, TravelPlan.class);
 
@@ -111,49 +98,38 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         TravelPlan savedTravelplan = travelPlanRepository.save(travelPlan);
 
-        TravelPlanStatus travelPlanStatus = travelPlanStatusRepository.findById(1L).orElseThrow(
-                () -> new RuntimeException("Status not found")
-        );
-
-        List<Long> empId = travelPlanRequest.getEmployeesInTravelPlanId();
+        List<Long> newEmpId = travelPlanRequest.getEmployeesInTravelPlanId();
 
         List<String> emails = new ArrayList<>();
 
-        for(Long id : empId){
+        for(Long id : newEmpId){
             Employee employee = employeeRepository.findEmployeeById(id);
 
-            if(!employeesId.contains(id)) {
+            if(!existingEmployeesId.contains(id)) {
                 Long employeeTravelPlanId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(id,travelPlanId);
-                EmployeeTravelPlan employeeTravelPlan1 = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
 
-                if(Boolean.TRUE.equals(employeeTravelPlan1.getEmployeeIsDeletedFromTravel())){
+                if(employeeTravelPlanId != null){
+                    EmployeeTravelPlan employeeTravelPlan1 = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
+
                     employeeTravelPlan1.setEmployeeIsDeletedFromTravel(false);
 
                     employeeTravelPlanRepository.save(employeeTravelPlan1);
 
-                    List<TravelDoc> travelDocByHr = travelDocRepository.findByFkEmployeeAndFkTravelPlan(employee, travelPlan);
-                    for(TravelDoc travelDoc:travelDocByHr){
-                        travelDoc.setDocIsDeletedFromTravel(false);
-                        travelDocRepository.save(travelDoc);
-                    }
-                    List<TravelDoc> travelDocByEmp = travelDocRepository.findByFkEmployeeAndFkEmployeeTravelPlan(employee, employeeTravelPlan1);
-                    for(TravelDoc travelDoc:travelDocByEmp){
-                        travelDoc.setDocIsDeletedFromTravel(false);
-                        travelDocRepository.save(travelDoc);
-                    }
+                    travelDocRepository.findByFkEmployeeAndFkTravelPlanAndRemoveIt(employee, travelPlan);
+
+                    travelDocRepository.findByFkEmployeeAndFkEmployeeTravelPlanAndRemoveIt(employee, employeeTravelPlan1);
 
                     List<String> emails1 = new ArrayList<>();
                     emails1.add(employee.getEmployeeEmail());
                     emailService.sendEmail(emails1,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
                     notificationService.createNotification(id,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
 
-                }else {
+                } else {
 
                     EmployeeTravelPlan employeeTravelPlan = new EmployeeTravelPlan();
                     employeeTravelPlan.setFkEmployee(employee);
                     employeeTravelPlan.setEmployeeTravelPlanCreatedAt(Instant.now());
                     employeeTravelPlan.setFkTravelPlan(savedTravelplan);
-                    employeeTravelPlan.setFkTravelPlanStatus(travelPlanStatus);
                     employeeTravelPlanRepository.save(employeeTravelPlan);
 
                     emails.add(employee.getEmployeeEmail());
@@ -164,9 +140,9 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         }
 
-        for(Long id : employeesId){
+        for(Long id : existingEmployeesId){
 
-            if(!empId.contains(id)) {
+            if(!newEmpId.contains(id)) {
 
                 markEmployeeTravelPlanAsDelete(id,travelPlanId);
                 Employee employee = employeeRepository.findEmployeeById(id);
@@ -176,7 +152,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 notificationService.createNotification(id,"Removed from Travel Plan by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
 
             }
-
         }
 
         if(!emails.isEmpty()){
@@ -189,7 +164,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     public void markEmployeeTravelPlanAsDelete(Long empId, Long travelPlanId){
 
         Employee employee = employeeRepository.findEmployeeById(empId);
-        TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
 
         Long employeeTravelPlanId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(empId,travelPlanId);
 
@@ -199,16 +173,8 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         employeeTravelPlanRepository.save(employeeTravelPlan);
 
-        List<TravelDoc> travelDocByHr = travelDocRepository.findByFkEmployeeAndFkTravelPlan(employee, travelPlan);
-        for(TravelDoc travelDoc:travelDocByHr){
-            travelDoc.setDocIsDeletedFromTravel(true);
-            travelDocRepository.save(travelDoc);
-        }
-        List<TravelDoc> travelDocByEmp = travelDocRepository.findByFkEmployeeAndFkEmployeeTravelPlan(employee, employeeTravelPlan);
-        for(TravelDoc travelDoc:travelDocByEmp){
-            travelDoc.setDocIsDeletedFromTravel(true);
-            travelDocRepository.save(travelDoc);
-        }
+        travelDocRepository.findByFkEmployeeAndFkEmployeeTravelPlanAndRemoveIt(employee, employeeTravelPlan);
+
 
     }
 
@@ -218,8 +184,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
         travelPlan.setTravelPlanIsDeleted(true);
         travelPlanRepository.save(travelPlan);
+
         Long hrId = travelPlan.getFkTravelPlanHREmployee().getId();
-        markEmployeeTravelPlanAsDelete(hrId, travelPlanId);
+        Employee hrEmployee = employeeRepository.findEmployeeById(hrId);
+        travelDocRepository.findByFkEmployeeAndFkTravelPlanAndRemoveIt(hrEmployee, travelPlan);
 
         Employee employee = employeeRepository.findEmployeeById(hrId);
         List<String> emails = new ArrayList<>();
@@ -383,26 +351,25 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     @Override
     public List<TravelDocResponse> findAllTravelPlanDocByTravelPlan(Long travelPlanId) {
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
-        List<TravelDoc> travelDocsHr = travelDocRepository.findByFkTravelPlan(travelPlan);
+        List<TravelDoc> travelDocs = travelDocRepository.findTravelDocsByFkTravelPlan(travelPlan);
 
-        System.out.println(travelDocsHr);
+        System.out.println(travelDocs);
 
         List<EmployeeTravelPlan> employeeTravelPlan = employeeTravelPlanRepository.
                 findEmployeeTravelPlanByFkTravelPlan_Id(travelPlanId);
 
-        Set<TravelDoc> travelDocsSet = new LinkedHashSet<>(travelDocsHr);
+        Set<TravelDoc> travelDocsSet = new LinkedHashSet<>(travelDocs);
 
         for (EmployeeTravelPlan etp : employeeTravelPlan)
         {
             List<TravelDoc> travelDocsEmp = travelDocRepository.
                     findTravelDocsByFkEmployeeTravelPlan_Id(etp.getId());
-            System.out.println(travelDocsEmp);
             travelDocsSet.addAll(travelDocsEmp);
         }
 
-        List<TravelDoc> travelDocs = new ArrayList<>(travelDocsSet);
+        List<TravelDoc> allTravelDocs = new ArrayList<>(travelDocsSet);
         List<TravelDocResponse> travelDocResponses = new ArrayList<>();
-        for(TravelDoc travelDoc : travelDocs)
+        for(TravelDoc travelDoc : allTravelDocs)
         {
             TravelDocResponse travelDocResponse = modelMapper.map(travelDoc,TravelDocResponse.class);
             travelDocResponses.add(travelDocResponse);
@@ -410,12 +377,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         return travelDocResponses;
     }
-
-
-//    @Cacheable(value = "TravelDoc", key = "#id")
-//    public byte[] getTravelDocImg(Long id, String path) throws IOException {
-//        return Files.readAllBytes(new File(System.getProperty("user.dir") + "/" + path).toPath());
-//    }
 
     @Override
     public Long findEmployeeTravelPlanId(Long empId, Long travelId){
@@ -427,6 +388,11 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     @Override
     public List<Long> getTravelPlan(String query){
         return travelPlanRepository.findTravelPlan(query);
+    }
+
+    @Override
+    public List<TravelDocsType> getAllDocTypes(){
+        return travelDocsTypeRepository.findAll();
     }
 
 

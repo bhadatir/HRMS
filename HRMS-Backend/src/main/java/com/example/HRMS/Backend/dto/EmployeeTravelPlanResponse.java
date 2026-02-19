@@ -10,10 +10,6 @@ public class EmployeeTravelPlanResponse {
 
     private Instant employeeTravelPlanCreatedAt;
 
-    private Long travelPlanStatusId;
-
-    private String travelPlanStatusName;
-
     private Long employeeId;
 
     private Long employeeFkManagerEmployeeId;

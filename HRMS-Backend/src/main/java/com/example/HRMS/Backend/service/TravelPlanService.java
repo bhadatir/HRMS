@@ -4,6 +4,7 @@ import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.dto.TravelPlanResponse;
 import com.example.HRMS.Backend.model.TravelDoc;
+import com.example.HRMS.Backend.model.TravelDocsType;
 import com.example.HRMS.Backend.model.TravelPlan;
 import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,4 +40,6 @@ public interface TravelPlanService {
     void markAsDeleted(Long travelPlanId);
 
     void markEmployeeTravelPlanAsDelete(Long empId, Long travelPlanId);
+
+    List<TravelDocsType> getAllDocTypes();
 }

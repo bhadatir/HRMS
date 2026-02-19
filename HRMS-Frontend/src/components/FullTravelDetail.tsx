@@ -29,12 +29,12 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
 
   const {data: allDocs = [], isLoading: docsLoading} = useQuery({
     queryKey: ["travelPlanDocs", travelPlan],
-    queryFn: () => travelService.findTravelDocByHr(travelPlan!, token || ""),
+    queryFn: () => travelService.findTravelDocByPlanId(travelPlan!, token || ""),
     enabled: !!token && !!travelPlan && viewMode === "DOCUMENTS",
     select: (data) => {
       if(user?.roleName === "HR" || user?.roleName === "EMPLOYEE") return data;
       if(user?.roleName === "MANAGER") {
-        return data.filter((doc: any) => doc.employeeFkManagerEmployeeId === user.id);
+        return data.filter((doc: any) => doc.employeeFkManagerEmployeeId === user.id || doc.employeeId === user.id);
       }
       return [];
     }
@@ -49,7 +49,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
 
   const approvedTotal = useMemo(() => {
     return allExpenses
-      .filter((exp:any) => exp.expenseTravelPlanStatusName === "APPROVED")
+      .filter((exp:any) => exp.expenseExpenseStatusName === "APPROVED")
       .reduce((total, exp:any) => total + exp.expenseAmount, 0);
   }, [allExpenses]);
 
@@ -181,15 +181,15 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={exp.expenseTravelPlanStatusName === "APPROVED" ? "bg-green-100 text-green-700" 
-                                            : exp.expenseTravelPlanStatusName === "REJECTED" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}>
-                          {exp.expenseTravelPlanStatusName}
+                        <Badge className={exp.expenseExpenseStatusName === "APPROVED" ? "bg-green-100 text-green-700" 
+                                            : exp.expenseExpenseStatusName === "REJECTED" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}>
+                          {exp.expenseExpenseStatusName}
                         </Badge>
                       </TableCell>
                       {user?.roleName === "HR" && (
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            {exp.expenseTravelPlanStatusName === "PENDING" ? (
+                            {exp.expenseExpenseStatusName === "PENDING" ? (
                             <>
                               <Button 
                                 size="sm" 

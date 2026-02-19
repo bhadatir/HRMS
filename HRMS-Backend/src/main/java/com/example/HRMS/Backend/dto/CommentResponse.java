@@ -12,7 +12,11 @@ public class CommentResponse {
 
     private Long employeeId;
 
+    private String employeeEmail;
+
     private Long parentCommentId;
+
+    private String parentCommentEmployeeEmail;
 
     private String commentContent;
 

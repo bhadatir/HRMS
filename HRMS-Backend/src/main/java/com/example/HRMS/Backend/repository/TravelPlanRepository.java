@@ -2,7 +2,6 @@ package com.example.HRMS.Backend.repository;
 
 import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.TravelPlan;
-import com.example.HRMS.Backend.model.TravelPlanStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

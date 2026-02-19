@@ -167,6 +167,11 @@ public class PostServiceImpl implements PostService {
         for(Comment comment: comments)
         {
             CommentResponse commentResponse = modelMapper.map(comment, CommentResponse.class);
+            if(comment.getParentComment() != null) {
+                Comment comment1 = comment.getParentComment();
+                Employee employee = comment1.getFkCommentEmployee();
+                commentResponse.setParentCommentEmployeeEmail(employee.getEmployeeEmail());
+            }
             commentResponses.add(commentResponse);
         }
 

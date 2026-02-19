@@ -22,7 +22,7 @@ public class TravelPlanRequest {
     @NotNull(message = "travel plan ending location is required")
     private String travelPlanTo;
 
-    private Boolean travelPlanIsReturn = true;
+    private Boolean travelPlanIsReturn;
 
     @NotNull(message = "travel plan starting date is required")
     private LocalDate travelPlanStartDate;

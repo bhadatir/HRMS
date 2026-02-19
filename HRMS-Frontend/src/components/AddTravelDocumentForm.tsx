@@ -16,10 +16,16 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
   const [docFile, setDocFile] = useState<File>(null as any);
   const [docType, setDocType] = useState<number>(1);
 
-  const { data: employeeTravelPlan, isLoading, isError } = useQuery({
+  const { data: employeeTravelPlan} = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
     queryFn: () => travelService.findEmployeeTravelPlans(user?.id, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
+  });
+
+  const { data: allTagTypes = [] } = useQuery({
+    queryKey: ["allTravelDocTypes"],
+    queryFn: () => travelService.getAllTravelDocTypes(token || ""),
+    enabled: !!token,
   });
 
   const expenseMutation = useMutation({
@@ -60,15 +66,13 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
         <div className="space-y-2">
               <label className="text-sm font-medium">Document Type</label>
               <select 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                className="flex h-10 w-full rounded-md border px-3 py-2 text-sm text-gray-500"
                 onChange={e => setDocType(Number(e.target.value))}
               >
-                <option value="1">Rules</option>
-                <option value="2">Visa</option>
-                <option value="3">Ticket</option>
-                <option value="4">Passport</option>
-                <option value="5">Hotel Booking</option>
-                <option value="6">Other</option>
+                <option value="">Select document type</option> 
+                {allTagTypes.map((type: any) => (
+                  <option key={type.id} value={type.id}>{type.travelDocsTypeName}</option>
+                ))}
               </select>
         </div>
         

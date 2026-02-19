@@ -87,8 +87,13 @@ public class TravelPlanController {
     }
 
     @GetMapping("/travelDoc/{travelPlanId}")
-    public ResponseEntity<List<TravelDocResponse>> showAllTravelPlanDocByTravelPlan(@PathVariable Long travelPlanId) throws IOException {
+    public ResponseEntity<List<TravelDocResponse>> showAllTravelPlanDocByTravelPlan(@PathVariable Long travelPlanId) {
         return ResponseEntity.ok(travelPlanService.findAllTravelPlanDocByTravelPlan(travelPlanId));
+    }
+
+    @GetMapping("/docTypes")
+    public ResponseEntity<List<TravelDocsType>> getAllDocTypes() {
+        return ResponseEntity.ok(travelPlanService.getAllDocTypes());
     }
 
 }

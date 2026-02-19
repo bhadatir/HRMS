@@ -3,7 +3,6 @@ package com.example.HRMS.Backend.service.impl;
 import com.example.HRMS.Backend.dto.ExpenseProofResponse;
 import com.example.HRMS.Backend.dto.ExpenseRequest;
 import com.example.HRMS.Backend.dto.ExpenseResponse;
-import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
@@ -29,7 +28,7 @@ import java.util.Objects;
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
-    private final TravelPlanStatusRepository travelPlanStatusRepository;
+    private final ExpenseStatusRepository expenseStatusRepository;
     private final ExpenseRepository expenseRepository;
     private final ExpenseProofTypeRepository expenseProofTypeRepository;
     private final ExpenseProofRepository expenseProofRepository;
@@ -42,12 +41,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     public void saveExpense(ExpenseRequest expenseRequest){
         Expense expense = new Expense();
         EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
-        TravelPlanStatus travelPlanStatus = travelPlanStatusRepository.findTravelPlanStatusById(expenseRequest.getFkExpenseTravelPlanStatusId());
+        ExpenseStatus expenseStatus = expenseStatusRepository.findExpenseStatusById(1L);
         expense.setExpenseAmount(expenseRequest.getExpenseAmount());
         expense.setExpenseDate(expenseRequest.getExpenseDate());
         expense.setExpenseRemark(expenseRequest.getExpenseRemark());
         expense.setFkEmployeeTravelPlan(employeeTravelPlan);
-        expense.setFkExpenseTravelPlanStatus(travelPlanStatus);
+        expense.setFkExpenseExpenseStatus(expenseStatus);
         expenseRepository.save(expense);
 
         List<String> emails = new ArrayList<>();
@@ -83,8 +82,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 
             expenseResponse.setEmployeeTravelPlanId(expense.getFkEmployeeTravelPlan().getId());
 
-            expenseResponse.setExpenseTravelPlanStatusId(expense.getFkExpenseTravelPlanStatus().getId());
-            expenseResponse.setExpenseTravelPlanStatusName(expense.getFkExpenseTravelPlanStatus().getTravelPlanStatusName());
+            expenseResponse.setExpenseExpenseStatusId(expense.getFkExpenseExpenseStatus().getId());
+            expenseResponse.setExpenseExpenseStatusName(expense.getFkExpenseExpenseStatus().getExpenseStatusName());
 
             List<ExpenseProof> expenseProofs = expenseProofRepository.findExpenseProofByFkExpense_Id(expense.getId());
             List<ExpenseProofResponse> expenseProofResponses = new ArrayList<>();
@@ -137,12 +136,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public void updateExpenseStatus(Long expId, Long statusId){
         Expense expense = expenseRepository.findExpensesById(expId);
-        expense.setFkExpenseTravelPlanStatus(travelPlanStatusRepository.findTravelPlanStatusById(statusId));
+        expense.setFkExpenseExpenseStatus(expenseStatusRepository.findExpenseStatusById(statusId));
         expenseRepository.save(expense);
 
         notificationService.createNotification(expense.getFkEmployeeTravelPlan().getFkEmployee().getId()
                 ,"Expense Status Upgraded"
-                , "Status : " + travelPlanStatusRepository.findTravelPlanStatusById(statusId).getTravelPlanStatusName()
+                , "Status : " + expenseStatusRepository.findExpenseStatusById(statusId).getExpenseStatusName()
                    + " at :" + LocalDateTime.now() + " by "
                    + expense.getFkEmployeeTravelPlan().getFkTravelPlan().getFkTravelPlanHREmployee().getEmployeeEmail() + " for "
                    + expense.getFkEmployeeTravelPlan().getFkTravelPlan().getTravelPlanName() + " travel plan"
@@ -154,13 +153,13 @@ public class ExpenseServiceImpl implements ExpenseService {
         Instant time = Instant.now();
         Expense expense = new Expense();
         EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
-        TravelPlanStatus travelPlanStatus = travelPlanStatusRepository.findTravelPlanStatusById(expenseRequest.getFkExpenseTravelPlanStatusId());
+        ExpenseStatus expenseStatus = expenseStatusRepository.findExpenseStatusById(expenseRequest.getFkExpenseExpenseStatusId());
         expense.setExpenseAmount(expenseRequest.getExpenseAmount());
         expense.setExpenseDate(expenseRequest.getExpenseDate());
         expense.setExpenseRemark(expenseRequest.getExpenseRemark());
         expense.setFkEmployeeTravelPlan(employeeTravelPlan);
         expense.setExpenseUploadedAt(time);
-        expense.setFkExpenseTravelPlanStatus(travelPlanStatus);
+        expense.setFkExpenseExpenseStatus(expenseStatus);
         expenseRepository.save(expense);
 
         String timeInString = Instant.now().toString().replace(":","-");

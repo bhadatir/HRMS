@@ -81,6 +81,8 @@ export default function TravelPlan() {
     }
 
     // if role hr so hr add exp only on that in which hr is going in travel is remaining
+
+
     if (!searchFilter) return allPlans;
     return allPlans.filter((plan: any) => searchFilter.includes(plan.id));
   }, [allPlans, user, searchFilter, isSearchLoading]);
@@ -218,7 +220,11 @@ export default function TravelPlan() {
             {isLoading ? (
                <p>Loading plans...</p>
             ) : filteredPlans.length > 0 ? (
-              filteredPlans.sort((a: any, b: any) => new Date(b.travelPlanStartDate).getTime() - new Date(a.travelPlanStartDate).getTime()).map((plan: any) => (
+              filteredPlans.sort((a: any, b: any) => new Date(b.travelPlanStartDate).getTime() 
+                                                      - new Date(a.travelPlanStartDate).getTime())
+              .map((plan: any) => (
+                plan.travelPlanIsDeleted === false ? 
+                (
                 <Card key={plan.id} 
                   onClick={() => setFullTravelDetails(plan.id)}
                   className="hover:shadow-md transition-shadow border-slate-200 cursor-pointer">
@@ -271,7 +277,7 @@ export default function TravelPlan() {
                         </Button>
                         ):(<></>)}
 
-                        {(() => {
+                        {user?.roleName !== "HR" || (user?.roleName === "HR" && user?.id !== plan.employeeId ) ? ((() => {
                           const now = new Date().getTime();
                           const planEndDate = new Date(plan.travelPlanEndDate).getTime();
                           const tenDays = 10 * 24 * 60 * 60 * 1000;
@@ -301,7 +307,7 @@ export default function TravelPlan() {
                         //     Claim Expense Expire
                         //   </Button>
                         // );
-                        })()}
+                        }))():null}
 
                         {user?.roleName === "HR" && new Date(plan.travelPlanStartDate) > new Date() ? (
                           <>
@@ -326,12 +332,16 @@ export default function TravelPlan() {
                           >
                             <Trash2 size={14} />
                           </Button>
+                          {deleteTravelPlanMutation.isPending && (
+                            <span className="text-[10px] text-red-600">Deleting...</span>
+                          )}
                         </>
                         ):(<></>)}
                       </div>
                     ) : null}
                   </CardContent>
                 </Card>
+                ) : null
               ))
             ) : (
               <div className="col-span-full py-20 text-center text-slate-400">No travel plans found.</div>

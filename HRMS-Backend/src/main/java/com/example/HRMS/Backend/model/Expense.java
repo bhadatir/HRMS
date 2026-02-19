@@ -1,15 +1,11 @@
 package com.example.HRMS.Backend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,8 +38,8 @@ public class Expense {
 
     @NotNull(message = "expense status is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "fk_expense_travel_plan_status_id", nullable = false)
-    private TravelPlanStatus fkExpenseTravelPlanStatus;
+    @JoinColumn(name = "fk_expense_expense_status_id", nullable = false)
+    private ExpenseStatus fkExpenseExpenseStatus;
 
     @NotNull(message = "Employee travel plan id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -19,8 +19,8 @@ public class ExpenseResponse {
 
     private Instant expenseUploadedAt;
 
-    private Long expenseTravelPlanStatusId;
-    private String expenseTravelPlanStatusName;
+    private Long expenseExpenseStatusId;
+    private String expenseExpenseStatusName;
 
     private long employeeTravelPlanId;
 

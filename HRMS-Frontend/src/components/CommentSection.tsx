@@ -61,10 +61,10 @@ export default function CommentSection({ postId }: { postId: number }) {
                                             : "bg-white border"}`}>
             <div className="flex justify-between items-start">
               <div className="text-xs">
-                <span className="font-bold text-blue-600">User {comment.employeeId} </span>
+                <span className="font-bold text-blue-600"> {comment.employeeEmail} </span>
 
                 {comment.parentCommentId && (
-                      <span className="text-[10px] text-slate-400">replied to #{comment.parentCommentId}</span>
+                      <span className="text-[10px] text-slate-400">replied to #{comment.parentCommentEmployeeEmail}</span>
                     )}
                 <p className="text-slate-700 mt-1">{comment.commentContent}</p>
 

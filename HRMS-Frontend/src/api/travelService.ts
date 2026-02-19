@@ -20,6 +20,11 @@ export const travelService = {
     return res.data;
   },
 
+  getAllTravelDocTypes: async (token: string) => {
+    const res = await api.get("/travel/docTypes", authHeader(token));
+    return res.data;
+  },
+
   getTravelPlanById: async (travelPlanId: number, token: string) => {
     const res = await api.get(`/travel/travelPlanId/${travelPlanId}`, authHeader(token));
     return res.data;
@@ -36,7 +41,7 @@ export const travelService = {
   },
 
   deleteTravelPlan: async (travelPlanId: number, token: string) => {
-    const res = await api.patch(`/hr/deleteTravel/${travelPlanId}`, authHeader(token));
+    const res = await api.patch(`/hr/deleteTravel/${travelPlanId}`,null ,authHeader(token));
     return res.data;
   },
 
@@ -92,7 +97,7 @@ export const travelService = {
     return res.data;
   },
 
-  findTravelDocByHr: async (travelPlanId: number, token: string) => {
+  findTravelDocByPlanId: async (travelPlanId: number, token: string) => {
     const res = await api.get(`/travel/travelDoc/${travelPlanId}`, authHeader(token));
     return res.data;
   }

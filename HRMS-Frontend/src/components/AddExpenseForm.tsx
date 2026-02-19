@@ -22,7 +22,7 @@ export default function AddExpenseForm({ travelPlanId, startDate, endDate, onSuc
     expenseAmount: 0,
     expenseDate: "",
     expenseRemark: "",
-    fkExpenseTravelPlanStatusId: 1,
+    fkExpenseExpenseStatusId: 1,
     fkEmployeeTravelPlanId: employeeTravelPlan,
   });
 
