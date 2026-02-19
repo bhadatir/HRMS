@@ -44,8 +44,13 @@ export const postService = {
     return res.data;
   },
 
-  removePost: async (postId: number, token: string) => {
-    const res = await api.delete(`/post/${postId}`, authHeader(token));
+  removePostByHr: async (postId: number, token: string) => {
+    const res = await api.patch(`/hr/rmPost/${postId}`, null, authHeader(token));
+    return res.data;
+  },
+
+  removePostByEmp: async (postId: number, token: string) => {
+    const res = await api.patch(`/post/rmPost/${postId}`, null, authHeader(token));
     return res.data;
   },
 
@@ -84,8 +89,13 @@ export const postService = {
     return res.data;
   },
 
-  removeComment: async (commentId: number, token: string) => {
-    const res = await api.delete(`/post/comment/${commentId}`, authHeader(token));
+  removeCommentByHr: async (commentId: number, token: string) => {
+    const res = await api.patch(`/hr/comment/${commentId}`, null, authHeader(token));
+    return res.data;
+  },
+
+  removeCommentByOwner: async (commentId: number, token: string) => {
+    const res = await api.patch(`/post/comment/${commentId}`, null, authHeader(token));
     return res.data;
   },
 

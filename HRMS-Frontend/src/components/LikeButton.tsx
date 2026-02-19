@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { postService } from "../api/postService";
 import { useAuth } from "../context/AuthContext";
-import { Heart, ThumbsUp } from "lucide-react";
+import { Heart } from "lucide-react";
 
 export default function LikeButton({ postId, commentId }: { postId: number, commentId?: number }) {
   const { token, user } = useAuth();
@@ -22,11 +22,19 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
         return commentId ? postService.removeLikeByComment(commentId, user?.id || 0, token || "") 
                             : postService.removeLikeByPost(postId, user?.id || 0, token || "");
       }
-      const payload = {
+      var payload
+      if(commentId) {
+      payload = {
+        fkPostId: null,
+        fkLikeEmployeeId: user?.id || 0,
+        fkCommentId: commentId
+      };} else {
+      payload = {
         fkPostId: postId,
         fkLikeEmployeeId: user?.id || 0,
-        fkCommentId: commentId || null
+        fkCommentId: null
       };
+      }
       return postService.addLike(payload, token || "");
     },
     onSuccess: () => {

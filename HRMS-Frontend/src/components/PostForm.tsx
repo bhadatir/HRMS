@@ -127,6 +127,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
             </label>
             <Input 
               type="file" 
+              accept=".jpg,.jpeg,.png"
               {...register("file", {required: !editPostId && "File is required for new posts"})}
               className="cursor-pointer text-xs" 
             />

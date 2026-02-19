@@ -53,7 +53,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     const stompClient = Stomp.over(socket);
 
     stompClient.connect({Authorization: `Bearer ${token}`}, () => {
-      stompClient.subscribe(`/topic/notifications/user_${userData.id}/notifications`, (message) => {
+      stompClient.subscribe(`/topic/notifications/user_${userData.id}/notifications`, () => {
         queryClient.invalidateQueries({ queryKey: ["notifications"] });
       });
     });

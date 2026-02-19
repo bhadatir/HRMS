@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
+import com.example.HRMS.Backend.service.NotificationService;
 import com.example.HRMS.Backend.service.PostService;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +40,7 @@ public class PostServiceImpl implements PostService {
     private final EmployeeRepository employeeRepository;
     private final EmailService emailService;
     private final PostVisibilityRepository postVisibilityRepository;
+    private final NotificationService notificationService;
 
     @Value("${img.path}")
     private String folderPath;
@@ -165,11 +168,14 @@ public class PostServiceImpl implements PostService {
     public void addLike(LikeRequest likeRequest){
         Like like =new Like();
 
-        like.setFkPost(postRepository.findPostsById(likeRequest.getFkPostId()));
         like.setFkLikeEmployee(employeeRepository.findEmployeeById(likeRequest.getFkLikeEmployeeId()));
 
         if (likeRequest.getFkCommentId() != null) {
             like.setFkComment(commentsRepository.findCommentById(likeRequest.getFkCommentId()));
+        }
+
+        if (likeRequest.getFkPostId() != null) {
+            like.setFkPost(postRepository.findPostsById(likeRequest.getFkPostId()));
         }
 
         likesRepository.save(like);
@@ -208,21 +214,34 @@ public class PostServiceImpl implements PostService {
     @Override
     public void removeCommentByHr(Long commentId){
         Comment comment = commentsRepository.findCommentById(commentId);
-
-        comment.setCommentIsDeleted(true);
+        commentsRepository.makeCommentIdDeleted(commentId);
+        likesRepository.removeLikesForDeletedComment(commentId);
 
         String email = comment.getFkCommentEmployee().getEmployeeEmail();
         List<String> emails = new ArrayList<>();
         emails.add(email);
         emailService.sendEmail(emails, "Warning mail", "Do not share this type of content second time :" + comment.getCommentContent());
-
-        commentsRepository.save(comment);
+        notificationService.createNotification(comment.getFkCommentEmployee().getId()
+                ,"WARNING : comment is deleted by hr"
+                , " at :" + LocalDateTime.now() + " comment content : "
+                        + comment.getCommentContent()
+        );
     }
 
     @Override
+    @Transactional
     public void removePostByHr(Long postId){
         Post post = postRepository.findPostsById(postId);
         post.setPostIsDeleted(true);
+        List<Comment> comments = commentsRepository.findCommentByFkPost_Id(postId);
+
+        for(Comment comment : comments)
+        {
+            commentsRepository.makeCommentIdDeleted(comment.getId());
+            likesRepository.removeLikesForDeletedComment(comment.getId());
+        }
+
+        likesRepository.removeLikesByFkPost(post);
 
         String email = post.getFkPostEmployee().getEmployeeEmail();
         List<String> emails = new ArrayList<>();
@@ -230,25 +249,40 @@ public class PostServiceImpl implements PostService {
         emailService.sendEmail(emails, "Warning mail", "Do not share this type of content second time :" + post.getPostContent());
 
         postRepository.save(post);
+
+        notificationService.createNotification(post.getFkPostEmployee().getId()
+                ,"WARNING : post is deleted by hr"
+                , " at :" + LocalDateTime.now() + " post title : "
+                        + post.getPostTitle() + " post content : "
+                        + post.getPostContent()
+        );
     }
 
     @Override
     public void removeComment(Long commentId){
-        Comment comment = commentsRepository.findCommentById(commentId);
-        comment.setCommentIsDeleted(true);
-        commentsRepository.save(comment);
-    }
-
-    @Override
-    public void removePost(Long postId){
-        Post post = postRepository.findPostsById(postId);
-        post.setPostIsDeleted(true);
-        postRepository.save(post);
+        commentsRepository.makeCommentIdDeleted(commentId);
+        likesRepository.removeLikesForDeletedComment(commentId);
     }
 
     @Override
     @Transactional
-    public void removeLikeByCommentId(Long commentId, Long employeeId){
+    public void removePost(Long postId){
+        Post post = postRepository.findPostsById(postId);
+        post.setPostIsDeleted(true);
+        postRepository.save(post);
+        List<Comment> comments = commentsRepository.findCommentByFkPost_Id(postId);
+
+        for(Comment comment : comments)
+        {
+            commentsRepository.makeCommentIdDeleted(comment.getId());
+            likesRepository.removeLikesForDeletedComment(comment.getId());
+        }
+        likesRepository.removeLikesByFkPost(post);
+    }
+
+    @Override
+    @Transactional
+        public void removeLikeByCommentId(Long commentId, Long employeeId){
         Comment comment = commentsRepository.findCommentById(commentId);
         Employee employee = employeeRepository.findEmployeeById(employeeId);
         likesRepository.removeLikeByFkCommentAndFkLikeEmployee(comment,employee);

@@ -4,14 +4,8 @@ import com.example.HRMS.Backend.dto.JobRequest;
 import com.example.HRMS.Backend.dto.ReferFriendResponse;
 import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
-import com.example.HRMS.Backend.model.GameType;
-import com.example.HRMS.Backend.model.Job;
-import com.example.HRMS.Backend.model.TravelDoc;
-import com.example.HRMS.Backend.model.TravelPlan;
-import com.example.HRMS.Backend.repository.EmployeeRepository;
-import com.example.HRMS.Backend.repository.GameTypeRepository;
-import com.example.HRMS.Backend.repository.JobRepository;
-import com.example.HRMS.Backend.repository.TravelDocRepository;
+import com.example.HRMS.Backend.model.*;
+import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.ExpenseService;
 import com.example.HRMS.Backend.service.JobService;
 import com.example.HRMS.Backend.service.PostService;
@@ -32,6 +26,7 @@ public class HrController {
 
     private final TravelPlanService travelPlanService;
     private final TravelDocRepository travelDocRepository;
+    private final CommentsRepository commentsRepository;
     private final GameTypeRepository gameTypeRepository;
     private final JobService jobService;
     private final PostService postService;
@@ -112,7 +107,7 @@ public class HrController {
         return ResponseEntity.ok("comment remove successfully");
     }
 
-    @PatchMapping("/post/{postId}")
+    @PatchMapping("/rmPost/{postId}")
     public ResponseEntity<String> removePost(@PathVariable Long postId) {
         postService.removePostByHr(postId);
         return ResponseEntity.ok("post remove successfully");

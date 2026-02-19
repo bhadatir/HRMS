@@ -4,6 +4,7 @@ import com.example.HRMS.Backend.model.Comment;
 import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.Like;
 import com.example.HRMS.Backend.model.Post;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,10 +21,19 @@ public interface LikesRepository extends JpaRepository<Like,Long> {
 
     void removeLikeByFkCommentAndFkLikeEmployee(Comment fkComment, Employee fkLikeEmployee);
 
-    @Modifying
-    @Query(value = "DELETE FROM Like l " +
-            "WHERE l.fkComment = NULL " +
-            "and l.fkPost = :fkPost and l.fkLikeEmployee = :fkLikeEmployee ")
-    void removeLikeByFkPostAndFkLikeEmployee(@Param("fkPost") Post fkPost, @Param("fkLikeEmployee") Employee fkLikeEmployee);
+    void removeLikeByFkPostAndFkLikeEmployee(Post fkPost, Employee fkLikeEmployee);
 
+    @Modifying
+    @Transactional
+    @Query(value = "WITH CommentChain AS (" +
+            "SELECT pk_comment_id from comments where pk_comment_id = :commentId " +
+            "UNION ALL " +
+            "SELECT c.pk_comment_id from comments c " +
+            "inner join comments cc on c.parent_comment_id = cc.pk_comment_id " +
+            ") " +
+            "DELETE FROM likes " +
+            "WHERE fk_comment_id IN (select pk_comment_id from CommentChain ) ", nativeQuery = true)
+    void removeLikesForDeletedComment(Long commentId);
+
+    void removeLikesByFkPost(Post fkPost);
 }

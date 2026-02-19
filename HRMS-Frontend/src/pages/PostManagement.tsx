@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { postService } from "../api/postService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,11 +21,23 @@ export default function PostManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editPostId, setEditPostId] = useState<number>(0);
   const [showComments, setShowComments] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: allPosts, isLoading } = useQuery({
     queryKey: ["allPosts"],
     queryFn: () => postService.showAllPosts(token || ""),
     enabled: !!token,
+  });
+
+  const removePost = useMutation({
+    mutationFn: (postId: number) => {
+      if (user?.roleName === "HR") {
+        return postService.removePostByHr(postId, token || "");
+      } else {
+        return postService.removePostByEmp(postId, token || "");
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allPosts"] })
   });
 
   const filteredPosts = useMemo(() => {
@@ -138,10 +150,10 @@ export default function PostManagement() {
                         {(user?.roleName === "HR" || user?.id === post.employeeId) && (  
                           <Button variant="ghost" size="sm" className="ml-2" onClick={(e) => {
                             e.stopPropagation();
-                            setEditPostId(post.id);
-                            setShowForm(true);
+                            removePost.mutate(post.id);
                           }}>
                           <Delete size={16} className="text-blue-600" />
+                          {removePost.isPending && <span className="text-[10px] text-red-600">Deleting...</span>}
                           </Button>
                         )}
                       </div>

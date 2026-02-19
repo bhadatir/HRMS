@@ -27,16 +27,5 @@ public class ManagerController {
         return ResponseEntity.ok(travelDocRepository.findTravelDocByFkEmployee_Id(id));
     }
 
-    @PatchMapping("/comment/{commentId}")
-    public ResponseEntity<String> removeComment(@PathVariable Long commentId) {
-        postService.removeComment(commentId);
-        return ResponseEntity.ok("comment remove successfully");
-    }
-
-    @PatchMapping("/post/{postId}")
-    public ResponseEntity<String> removePost(@PathVariable Long postId) {
-        postService.removePost(postId);
-        return ResponseEntity.ok("post remove successfully");
-    }
 
 }

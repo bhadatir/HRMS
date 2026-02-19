@@ -1,6 +1,8 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.*;
+import com.example.HRMS.Backend.model.Comment;
+import com.example.HRMS.Backend.repository.CommentsRepository;
 import com.example.HRMS.Backend.service.PostService;
 import com.example.HRMS.Backend.service.impl.OrgChartServiceImpl;
 import jakarta.validation.Valid;
@@ -18,6 +20,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final CommentsRepository commentsRepository;
 
     @PostMapping(value = "/", consumes = {"multipart/form-data"})
         public ResponseEntity<String> addPost(@Valid @RequestPart("postRequest") PostRequest postRequest,
@@ -94,5 +97,18 @@ public class PostController {
                                                     ,@PathVariable Long employeeId) {
         postService.removeLikeByPostId(postId, employeeId);
         return ResponseEntity.ok("remove like successfully");
+    }
+
+
+    @PatchMapping("/comment/{commentId}")
+    public ResponseEntity<String> removeComment(@PathVariable Long commentId) {
+        postService.removeComment(commentId);
+        return ResponseEntity.ok("comment remove successfully");
+    }
+
+    @PatchMapping("/rmPost/{postId}")
+    public ResponseEntity<String> removePost(@PathVariable Long postId) {
+        postService.removePost(postId);
+        return ResponseEntity.ok("post remove successfully");
     }
 }

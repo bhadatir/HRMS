@@ -29,8 +29,8 @@ return (
     <main className="p-4 w-full">
       <div className="space-y-4">
         <h3 className="font-bold text-lg">Notifications</h3>
-        {notifications?.length > 0 ? (
-          notifications.map((notif: any) => (
+        {notifications?.length > 0 && notifications.filter((n: any) => !n.read).length > 0 ? (
+          notifications.map((notif: any) => ( !notif.read && (
             <Card key={notif.id} className={`shadow-none border ${!notif.read ? 'bg-blue-50/30' : ''}`}>
               <CardContent className="p-4 flex items-start gap-4">
                 <div className="flex-1 space-y-1">
@@ -51,7 +51,7 @@ return (
                   )}
                 </div>
               </CardContent>
-            </Card>
+            </Card>)
           ))
         ) : (
           <div className="text-center py-10 text-gray-400 italic">No notifications.</div>
