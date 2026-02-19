@@ -19,6 +19,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.beans.Visibility;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
@@ -77,6 +78,14 @@ public class PostServiceImpl implements PostService {
         for(Post post:posts){
             PostResponse postResponse = modelMapper.map(post,PostResponse.class);
             postResponses.add(postResponse);
+
+            List<PostTag> postTags = postTagRepository.findPostTagsByFkPost_Id(post.getId());
+            List<PostTagResponse> postTagResponses = new ArrayList<>();
+            for(PostTag postTag : postTags) {
+                PostTagResponse postTagResponse = modelMapper.map(postTag, PostTagResponse.class);
+                postTagResponses.add(postTagResponse);
+            }
+            postResponse.setPostTagResponses(postTagResponses);
         }
 
         return postResponses;
@@ -296,4 +305,21 @@ public class PostServiceImpl implements PostService {
         likesRepository.removeLikeByFkPostAndFkLikeEmployee(post,employee);
     }
 
+    @Override
+    public List<TagType> getPostTagTypes(){
+        return tagTypesRepository.findAll();
+    }
+
+    @Override
+    public List<PostVisibility> getAllVisibilities(){
+        return postVisibilityRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void removePostTagFromPost(Long postId, Long tagTypeId){
+        Post post = postRepository.findPostsById(postId);
+        TagType tagType = tagTypesRepository.findTagTypeById(tagTypeId);
+        postTagRepository.removePostTagByFkPostAndFkTagType(post, tagType);
+    }
 }

@@ -75,7 +75,7 @@ export default function Dashboard() {
                   <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-none">
                     ID: {user.id}
                   </Badge>
-                  <Badge variant="outline" className="text-slate-300 border-slate-700">
+                  <Badge variant="outline" className="text-slate-500 border-slate-700">
                     {user.roleName || "Employee"}
                   </Badge>
                 </div>

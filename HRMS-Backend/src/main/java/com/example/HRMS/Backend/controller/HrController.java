@@ -81,6 +81,11 @@ public class HrController {
         return ResponseEntity.ok("Job add successfully");
     }
 
+    @GetMapping("/jobTypes")
+    public ResponseEntity<List<JobType>> getAllJobTypes() {
+        return ResponseEntity.ok(jobService.getAllJobTypes());
+    }
+
     @PutMapping(value = "/job/{jobId}", consumes = {"multipart/form-data"})
     public ResponseEntity<String> updateJob(@PathVariable Long jobId,
                                          @Valid @RequestPart JobRequest jobRequest,
@@ -111,5 +116,11 @@ public class HrController {
     public ResponseEntity<String> removePost(@PathVariable Long postId) {
         postService.removePostByHr(postId);
         return ResponseEntity.ok("post remove successfully");
+    }
+
+    @PatchMapping("/jobStatus/{jobId}")
+    public ResponseEntity<String > changeJobStatus(@PathVariable Long jobId)
+    {   jobService.changeJobStatus(jobId);
+        return ResponseEntity.ok("job status update successful");
     }
 }

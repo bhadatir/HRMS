@@ -15,4 +15,6 @@ public class EmployeeSearch {
     private String employeeFirstName;
 
     private String employeeLastName;
+
+    private String roleName;
 }

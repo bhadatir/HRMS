@@ -110,8 +110,17 @@ export const postService = {
   },
 
   removePostTagFromPost: async (postId: number, tagId: number, token: string) => {
-    const res = await api.delete(`/post/tag/${postId}/${tagId}`, authHeader(token));
+    const res = await api.delete(`/post/rmTag/${postId}/${tagId}`, authHeader(token));
     return res.data;  
   },
 
+  getAllTagTypes: async (token: string) => {
+    const res = await api.get(`/post/postTagTypes`, authHeader(token));
+    return res.data;
+  },
+
+  getAllVisibilities: async (token: string) => {
+    const res = await api.get(`/post/visibilities`, authHeader(token));
+    return res.data;
+  },
 };

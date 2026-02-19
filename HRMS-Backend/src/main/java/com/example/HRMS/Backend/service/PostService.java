@@ -1,9 +1,13 @@
 package com.example.HRMS.Backend.service;
 
 import com.example.HRMS.Backend.dto.*;
+import com.example.HRMS.Backend.model.JobType;
+import com.example.HRMS.Backend.model.PostVisibility;
+import com.example.HRMS.Backend.model.TagType;
 import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.beans.Visibility;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,4 +45,11 @@ public interface PostService {
     void removeLikeByCommentId(Long commentId,Long employeeId);
 
     void removeLikeByPostId(Long postId,Long employeeId);
+
+    List<TagType> getPostTagTypes();
+
+    List<PostVisibility> getAllVisibilities();
+
+    void removePostTagFromPost(Long postId, Long tagTypeId);
+
 }

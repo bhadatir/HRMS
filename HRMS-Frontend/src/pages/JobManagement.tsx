@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { jobService } from "../api/jobService";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ReferFriend from "../components/ReferFriend.tsx";
 import ShareJob from "../components/ShareJob.tsx";
-import { Plus, X, Briefcase, MapPin, Calendar, Search, Users, DollarSign, Share, UserPlus, Edit, Bell } from "lucide-react";
+import { Plus, X, Calendar, Search, DollarSign, Share, UserPlus, Edit, Bell } from "lucide-react";
 import JobForm from "../components/JobForm.tsx";
 import JobDetailView from "@/components/JobDetailView.tsx";
 import Notifications from "@/components/Notifications.tsx";
@@ -24,6 +24,7 @@ export default function JobManagement() {
   const [editJobId, setEditJobId] = useState<number | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [referJobId, setReferJobId] = useState<number | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: allJobs, isLoading } = useQuery({
     queryKey: ["allJobs"],
@@ -37,6 +38,14 @@ export default function JobManagement() {
       job.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
     )
   }, [allJobs, searchTerm]);
+
+  const jobStatusmutation = useMutation({
+    mutationFn: (jobId: number) => jobService.updateJobStatus(jobId, token || ""),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allJobs"] });
+      queryClient.invalidateQueries({ queryKey: ["jobDetail"] });
+    }
+   });
 
   return (
     <SidebarProvider>
@@ -167,7 +176,7 @@ export default function JobManagement() {
             {isLoading ? (
               <p>Loading jobs...</p>
             ) : filteredJobs.length > 0 ? (
-              filteredJobs.map((job: any) => (
+              filteredJobs.map((job: any) => ((job.jobIsActive || user?.roleName === "HR") && (
                 <Card 
                   key={job.id} 
                   className="border-slate-200 cursor-pointer group"
@@ -175,10 +184,16 @@ export default function JobManagement() {
                 >
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <Badge variant="outline" className={job.jobIsActive ? "border-green-500 text-green-500" : "border-red-500 text-red-500"} >
+                      <Badge variant="outline" 
+                        onClick={(e) => {
+                          if (user?.roleName !== "HR") return;
+                          e.stopPropagation();
+                          jobStatusmutation.mutate(job.id);
+                        }}
+                        className={job.jobIsActive ? "border-green-500 text-green-500" : "border-red-500 text-red-500"} >
                         {job.jobIsActive ? "Open" : "Closed"}
                       </Badge>
-
+                      
                       {user?.roleName === "HR" && 
                         <Button 
                           title="Edit job"
@@ -242,7 +257,7 @@ export default function JobManagement() {
 
                   </CardContent>
                 </Card>
-              ))
+              )))
             ) : (
               <div className="col-span-full py-20 text-center text-slate-400 italic">
                 No jobs matching your criteria.

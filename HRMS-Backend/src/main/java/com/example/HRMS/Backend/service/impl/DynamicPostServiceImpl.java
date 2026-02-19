@@ -4,10 +4,7 @@ import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.GameType;
 import com.example.HRMS.Backend.model.Post;
 import com.example.HRMS.Backend.model.PostTag;
-import com.example.HRMS.Backend.repository.EmployeeRepository;
-import com.example.HRMS.Backend.repository.PostRepository;
-import com.example.HRMS.Backend.repository.PostTagRepository;
-import com.example.HRMS.Backend.repository.TagTypesRepository;
+import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.DynamicPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,6 +23,7 @@ public class DynamicPostServiceImpl implements DynamicPostService {
     private final PostRepository postRepository;
     private final PostTagRepository postTagRepository;
     private final TagTypesRepository tagTypesRepository;
+    private final PostVisibilityRepository postVisibilityRepository;
 
     @Override
     @Scheduled(cron = "0 0 4 * * *")
@@ -43,6 +41,7 @@ public class DynamicPostServiceImpl implements DynamicPostService {
                 post.setPostContentUrl("dummy url");
                 post.setPostTitle("Happy BirthDay");
                 post.setPostContent("Wish you Happy BirthDay " + employee.getEmployeeFirstName());
+                post.setFkPostVisibility(postVisibilityRepository.findPostVisibilitiesById(1L));
 
                 postRepository.save(post);
 
@@ -65,6 +64,7 @@ public class DynamicPostServiceImpl implements DynamicPostService {
                 post.setPostContentUrl("dummy url");
                 post.setPostTitle("Happy Working Anniversary");
                 post.setPostContent("Happy Working Anniversary " + employee.getEmployeeFirstName());
+                post.setFkPostVisibility(postVisibilityRepository.findPostVisibilitiesById(1L));
 
                 postRepository.save(post);
 

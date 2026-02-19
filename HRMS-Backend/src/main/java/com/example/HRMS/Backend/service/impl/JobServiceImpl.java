@@ -265,4 +265,16 @@ public class JobServiceImpl implements JobService {
         return referFriendResponses;
     }
 
+    @Override
+    public List<JobType> getAllJobTypes(){
+        return jobTypeRepository.findAll();
+    }
+
+    @Override
+    public void changeJobStatus(Long jobId){
+        Job job = jobRepository.findJobById(jobId);
+        job.setJobIsActive(!job.getJobIsActive());
+        jobRepository.save(job);
+    }
+
 }

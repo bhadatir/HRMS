@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { jobService } from "../api/jobService";
 import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 type JobFormInputs ={
     jobTitle: string;
@@ -20,6 +20,12 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [createdAt, setCreatedAt] = useState("");
+
+  const { data: allJobTypes = [] } = useQuery({
+    queryKey: ["allJobTypes"],
+    queryFn: () => jobService.getAllJobTypes(token || ""),
+    enabled: !!token,
+  });
 
   const {register, handleSubmit, reset, watch, formState: { errors }} = useForm<JobFormInputs>({
     defaultValues: {
@@ -109,12 +115,9 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
             {...register("fkJobTypeId", { required: "Job category is required" })}
           >
-            <option value="1">Software Developer</option>
-            <option value="2">Data Analyst</option>
-            <option value="3">Data Science</option>
-            <option value="4">Frontend Developer</option>
-            <option value="5">Backend Developer</option>
-            <option value="6">Other</option>
+            {allJobTypes.map((type: any) => (
+              <option key={type.id} value={type.id}>{type.jobTypeName}</option>
+            ))}
           </select>
           {errors.fkJobTypeId && <p className="text-red-500 text-xs">{errors.fkJobTypeId.message}</p>}
         </div>

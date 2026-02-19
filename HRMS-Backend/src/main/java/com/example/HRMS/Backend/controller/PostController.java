@@ -2,6 +2,8 @@ package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.Comment;
+import com.example.HRMS.Backend.model.PostVisibility;
+import com.example.HRMS.Backend.model.TagType;
 import com.example.HRMS.Backend.repository.CommentsRepository;
 import com.example.HRMS.Backend.service.PostService;
 import com.example.HRMS.Backend.service.impl.OrgChartServiceImpl;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.beans.Visibility;
 import java.io.IOException;
 import java.util.List;
 
@@ -53,6 +56,12 @@ public class PostController {
         return ResponseEntity.ok("tag add on post successfully");
     }
 
+    @DeleteMapping("/rmTag/{postId}/{tagTypeId}")
+    public ResponseEntity<String> removePostTagFromPost(@PathVariable Long postId, @PathVariable Long tagTypeId) {
+        postService.removePostTagFromPost(postId,tagTypeId);
+        return ResponseEntity.ok("tag remove from post successfully");
+    }
+
     @GetMapping("/postTag/{postId}")
     public ResponseEntity<List<PostTagResponse>> getPostTagsById(@PathVariable Long postId) {
         return ResponseEntity.ok(postService.getPostTagsById(postId));
@@ -63,6 +72,12 @@ public class PostController {
         postService.addComment(commentRequest);
         return ResponseEntity.ok("comment add successfully");
     }
+
+    @GetMapping("/postTagTypes")
+    public ResponseEntity<List<TagType>> getPostTagTypes() {
+        return ResponseEntity.ok(postService.getPostTagTypes());
+    }
+
 
     @GetMapping("/comment/{postId}")
     public ResponseEntity<List<CommentResponse>> getCommentsById(@PathVariable Long postId) {
@@ -111,4 +126,10 @@ public class PostController {
         postService.removePost(postId);
         return ResponseEntity.ok("post remove successfully");
     }
+
+    @GetMapping("/visibilities")
+    public ResponseEntity<List<PostVisibility>> getAllVisibilities() {
+        return ResponseEntity.ok(postService.getAllVisibilities());
+    }
+
 }

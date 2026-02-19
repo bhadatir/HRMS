@@ -1,7 +1,9 @@
 package com.example.HRMS.Backend.dto;
 
 import com.example.HRMS.Backend.model.Employee;
+import com.example.HRMS.Backend.model.PostTag;
 import com.example.HRMS.Backend.model.PostVisibility;
+import com.example.HRMS.Backend.model.TagType;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -11,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 public class PostResponse {
@@ -29,7 +32,13 @@ public class PostResponse {
 
     private Long employeeId;
 
+    private String employeeEmail;
+
+    private String employeeFirstName;
+
     private Long postVisibilityId;
 
     private String postVisibilityName;
+
+    private List<PostTagResponse> postTagResponses;
 }

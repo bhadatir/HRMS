@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { postService } from "../api/postService.ts";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +19,13 @@ type PostFormInputs ={
 export default function PostForm({ editPostId, onSuccess }: { editPostId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
-
+  
+  const { data: allVisibilities = [] } = useQuery({
+    queryKey: ["allVisibilities"],
+    queryFn: () => postService.getAllVisibilities(token || ""),
+    enabled: !!token,
+  });
+  
   const {register, handleSubmit, reset, watch, formState: { errors }} = useForm<PostFormInputs>({
     defaultValues: {
       postTitle: "",
@@ -113,10 +119,9 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
               className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
               {...register("fkPostVisibilityId", { required: "Visibility is required" })}
             >
-              <option value="1">Everyone</option>
-              <option value="2">Managers</option>
-              <option value="3">It dep</option>
-              <option value="4">Interns</option>
+              {allVisibilities.map((vis: any) => (
+                <option key={vis.id} value={vis.id}>{vis.postVisibilityName}</option>
+              ))}
             </select>
             {errors.fkPostVisibilityId && <p className="text-red-500 text-xs">{errors.fkPostVisibilityId.message}</p>}
           </div>

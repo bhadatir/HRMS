@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { postService } from "../api/postService";
 import { useAuth } from "../context/AuthContext";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Tag as TagIcon } from "lucide-react";
+import { Delete, Plus, Tag as TagIcon } from "lucide-react";
 
 export default function PostTags({ postId, isOwner }: { postId: number; isOwner: boolean }) {
   const { token } = useAuth();
@@ -17,12 +17,24 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
     enabled: !!postId,
   });
 
+  const { data: allTagTypes = [] } = useQuery({
+    queryKey: ["allTagTypes"],
+    queryFn: () => postService.getAllTagTypes(token || ""),
+    enabled: !!token,
+  });
+
   const addTagMutation = useMutation({
     mutationFn: (tagTypeId: number) => postService.addPostTagOnPost(postId, tagTypeId, token || ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["postTags", postId] });
+      queryClient.invalidateQueries({ queryKey: ["allPosts"] });
       setShowTagInput(false);
     }
+  });
+
+  const removeTagMutation = useMutation({
+    mutationFn: (tagId: number) => postService.removePostTagFromPost(postId, tagId, token || ""),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["postTags", postId] })
   });
 
   return (
@@ -31,23 +43,31 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
       {tags.map((tag: any) => (
         <Badge key={tag.id} variant="secondary" className="text-[10px] bg-slate-100">
           {tag.tagTypeName}
+          {isOwner && (
+            <div className="ml-1 cursor-pointer" onClick={() => removeTagMutation.mutate(tag.id)}>
+            <Delete size={12} className="text-slate-500" />
+            </div>
+          )}
         </Badge>
       ))}
       
       {isOwner && (
         <div className="relative">
-          <button 
-            onClick={() => setShowTagInput(!showTagInput)}
-            className="text-blue-600 hover:bg-blue-50 rounded-full p-1"
-          >
-            <Plus size={14} />
-          </button>
+          <div className="cursor-pointer" onClick={() => setShowTagInput(!showTagInput)} hidden={showTagInput}>
+             <Plus size={20}  
+            className="text-slate-400" />
+          </div>
           
           {showTagInput && (
-            <div className="absolute top-8 left-0 z-20 bg-white border shadow-xl rounded-lg p-2 flex flex-col gap-1 w-32">
-              <button onClick={() => addTagMutation.mutate(1)} className="text-[10px] hover:bg-slate-100 p-1 text-left">Urgent</button>
-              <button onClick={() => addTagMutation.mutate(2)} className="text-[10px] hover:bg-slate-100 p-1 text-left">Announcement</button>
-              <button onClick={() => addTagMutation.mutate(3)} className="text-[10px] hover:bg-slate-100 p-1 text-left">Event</button>
+            <div className="space-y-2">
+              <select 
+                className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => addTagMutation.mutate(Number(e.target.value))}
+              >
+                {allTagTypes.map((tagType: any) => ( tagType.id !== 1 && !tags.find((tag: any) => tag.tagTypeId === tagType.id) && (
+                  <option key={tagType.id} value={tagType.id}>{tagType.tagTypeName}</option>
+                )))}
+              </select> 
             </div>
           )}
         </div>

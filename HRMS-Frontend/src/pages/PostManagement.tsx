@@ -13,6 +13,7 @@ import PostForm from "../components/PostForm";
 import LikeButton from "@/components/LikeButton";
 import CommentSection from "@/components/CommentSection";
 import Notifications from "@/components/Notifications";
+import PostTags from "@/components/PostTags";
 
 export default function PostManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -22,6 +23,13 @@ export default function PostManagement() {
   const [editPostId, setEditPostId] = useState<number>(0);
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
+
+  const postVisibilityOptions = {
+    [user?.roleName as string]: true,
+    "EVERYONE": true,
+    [user?.positionName as string]: true,
+    [user?.departmentName as string]: true
+  };
 
   const { data: allPosts, isLoading } = useQuery({
     queryKey: ["allPosts"],
@@ -45,7 +53,14 @@ export default function PostManagement() {
     return allPosts
       .filter((post: any) => !post.postIsDeleted && 
         (post.postTitle.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         post.postContent.toLowerCase().includes(searchTerm.toLowerCase())))
+         post.postTags?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         post.employeeFirstName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         post.employeeEmail.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         post.postTagResponses?.map((tag: any) => ` ${tag.tagTypeName}`).join("")?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         post.postTagResponses?.map((tag: any) => tag.tagTypeName.toLowerCase()).includes(searchTerm.toLowerCase()) || 
+         post.postCreatedAt.split("T")[0].includes(searchTerm.toLowerCase()) ||
+         post.postContent.toLowerCase().includes(searchTerm.toLowerCase())) && 
+        (post.postVisibilityName in postVisibilityOptions))
       .sort((a: any, b: any) => new Date(b.postCreatedAt).getTime() - new Date(a.postCreatedAt).getTime());
   }, [allPosts, searchTerm]);
 
@@ -121,71 +136,76 @@ export default function PostManagement() {
           <div className="space-y-6">
             {isLoading ? (
               <p className="text-center text-slate-400">Loading feed...</p>
-            ) : filteredPosts.length > 0 ? (
+            ) : filteredPosts.length > 0  ? (
               filteredPosts.map((post: any) => (
-                <Card key={post.id} className="hover:shadow-md transition-shadow border-slate-200">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div className="flex justify-between w-full">
-                        <CardTitle className="text-xl font-bold text-slate-900">{post.postTitle}</CardTitle>
-                        <div className="flex gap-2 items-center mt-1">
-                          <Badge variant="secondary" className="text-[10px] bg-blue-50 text-blue-700">
-                            <Eye size={10} className="mr-1" /> {post.postVisibilityName}
-                          </Badge>
-                          <span className="text-[10px] text-slate-400">{post.postCreatedAt?.split("T")[0]}</span>
+                ( (post.postVisibilityName in postVisibilityOptions) ? (
+                  <Card key={post.id} className="hover:shadow-md transition-shadow border-slate-200">
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div className="flex justify-between w-full">
+                          <CardTitle className="text-xl font-bold text-slate-900">{post.postTitle}</CardTitle>
+                          <div className="flex gap-2 items-center mt-1">
+                            <Badge variant="secondary" className="text-[10px] bg-blue-50 text-blue-700">
+                              <Eye size={10} className="mr-1" /> {post.postVisibilityName}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          {(user?.id === post.employeeId) && (
+                            <div className="ml-5 flex gap-2">
+                              <Button variant="ghost" size="sm" onClick={(e) => {
+                                e.stopPropagation();
+                                setEditPostId(post.id);
+                                setShowForm(true);
+                              }}>
+                              <Edit size={16} className="text-blue-600" />
+                              </Button>
+                            </div>
+                          )}
+                          {(user?.roleName === "HR" || user?.id === post.employeeId) && (  
+                            <Button variant="ghost" size="sm" className="ml-2" onClick={(e) => {
+                              e.stopPropagation();
+                              removePost.mutate(post.id);
+                            }}>
+                            <Delete size={16} className="text-blue-600" />
+                            {removePost.isPending && <span className="text-[10px] text-red-600">Deleting...</span>}
+                            </Button>
+                          )}
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        {(user?.id === post.employeeId) && (
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="sm" onClick={(e) => {
-                              e.stopPropagation();
-                              setEditPostId(post.id);
-                              setShowForm(true);
-                            }}>
-                            <Edit size={16} className="text-blue-600" />
-                            </Button>
-                          </div>
-                        )}
-                        {(user?.roleName === "HR" || user?.id === post.employeeId) && (  
-                          <Button variant="ghost" size="sm" className="ml-2" onClick={(e) => {
-                            e.stopPropagation();
-                            removePost.mutate(post.id);
-                          }}>
-                          <Delete size={16} className="text-blue-600" />
-                          {removePost.isPending && <span className="text-[10px] text-red-600">Deleting...</span>}
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-slate-600 whitespace-pre-wrap">{post.postContent}</p>
+                    </CardHeader>
                     
-                    {post.postContentUrl && (
-                      <div className="rounded-lg overflow-hidden border">
-                        <img 
-                          src={post.postContentUrl} 
-                          alt="Post Content" 
-                          className="w-full object-cover max-h-96"
-                        />
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm text-slate-600 whitespace-pre-wrap">{post.postContent}</p>              
+                        <span className="text-[10px] text-slate-400">{post.postCreatedAt?.split("T")[0]}</span>                          
                       </div>
-                    )}
-
-                    <div className="flex items-center gap-6 pt-4 border-t">
-                      <div className="flex items-center gap-1 text-slate-500 cursor-pointer transition-colors">
-                        <LikeButton postId={post.id} />
+                      {post.postContentUrl && (
+                        <div className="rounded-lg overflow-hidden border">
+                          <img 
+                            src={post.postContentUrl} 
+                            alt="Post Content" 
+                            className="w-full object-cover max-h-96"
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between pt-4 border-t">
+                        <div className="flex items-center gap-6">
+                          <div className="flex items-center gap-1 text-slate-500 cursor-pointer transition-colors">
+                            <LikeButton postId={post.id} />
+                          </div>
+                          <div className="flex items-center gap-1 text-slate-500 cursor-pointer transition-colors"
+                            onClick={() => setShowComments(!showComments)}>
+                            <MessageSquare size={18} />
+                            <span className="text-xs font-bold">Comments</span>
+                          </div>
+                        </div>                      
+                        <PostTags postId={post.id} isOwner={user?.id === post.employeeId} />
                       </div>
-                      <div className="flex items-center gap-1 text-slate-500 cursor-pointer transition-colors"
-                        onClick={() => setShowComments(!showComments)}>
-                        <MessageSquare size={18} />
-                        <span className="text-xs font-bold">Comments</span>
-                      </div>
-                    </div>
-                    {showComments && <CommentSection postId={post.id}/>}
-                  </CardContent>
-                </Card>
+                      {showComments && <CommentSection postId={post.id}/>}
+                    </CardContent>
+                  </Card>
+                ) : null)
               ))
             ) : (
               <div className="text-center py-20 text-slate-400">No posts found.</div>

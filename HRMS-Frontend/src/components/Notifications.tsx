@@ -43,7 +43,7 @@ return (
                   {!notif.read && (
                     <Button 
                       variant="link" 
-                      className="h-auto p-0 text-xs text-blue-600"
+                      className="text-xs text-blue-600"
                       onClick={() => markReadMutation.mutate(notif.id)}
                     >
                       Mark as read

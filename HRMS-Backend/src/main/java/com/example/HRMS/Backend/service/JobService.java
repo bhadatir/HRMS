@@ -2,6 +2,7 @@ package com.example.HRMS.Backend.service;
 
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.Job;
+import com.example.HRMS.Backend.model.JobType;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,4 +29,8 @@ public interface JobService {
     void updateJob(Long jobId, @Valid JobRequest jobRequest, MultipartFile file) throws IOException;
 
     List<ReferFriendResponse> getReferDataByJobId(Long jobId);
+
+    List<JobType> getAllJobTypes();
+
+    void changeJobStatus(Long jobId);
 }

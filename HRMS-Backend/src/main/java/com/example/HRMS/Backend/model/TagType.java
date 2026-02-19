@@ -20,6 +20,4 @@ public class TagType {
     @NotNull(message = "tag type name is required")
     @Column(name = "tag_type_name", nullable = false)
     private String tagTypeName;
-
-
 }

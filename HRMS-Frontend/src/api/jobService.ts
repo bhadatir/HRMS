@@ -30,6 +30,11 @@ export const jobService = {
     return res.data;
   },
 
+  getAllJobTypes: async (token: string) => {
+    const res = await api.get("/hr/jobTypes", authHeader(token));
+    return res.data;
+  },
+
   getJobById: async (jobId: number, token: string) => {
     const res = await api.get(`/job/${jobId}`, authHeader(token));
     return res.data;
@@ -71,5 +76,11 @@ export const jobService = {
       },
     });
     return res.data;
+  },
+
+  updateJobStatus: async (jobId: number, token: string) => {
+    const res = await api.patch(`/hr/jobStatus/${jobId}`, null, authHeader(token));
+    return res.data;
   }
+
 };

@@ -35,7 +35,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     //for pass reset
     Optional<Employee> findByResetToken(String resetToken);
 
-    @Query(value = "SELECT NEW com.example.HRMS.Backend.dto.EmployeeSearch(e.id, e.employeeFirstName, e.employeeLastName) " +
+    @Query(value = "SELECT NEW com.example.HRMS.Backend.dto.EmployeeSearch(e.id, e.employeeFirstName, e.employeeLastName, e.fkRole.roleName) " +
             "FROM Employee e " +
             "WHERE lower(e.employeeFirstName) like lower(concat(:query,'%')) " +
             "or lower(e.employeeLastName) like lower(concat(:query,'%')) ")
