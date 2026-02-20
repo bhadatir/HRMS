@@ -43,5 +43,7 @@ public class TravelPlanResponse {
 
     private Boolean travelPlanIsDeleted;
 
+    private String reasonForDeleteTravelPlan;
+
     private List<EmployeeTravelPlanResponse> employeeTravelPlanResponses;
 }

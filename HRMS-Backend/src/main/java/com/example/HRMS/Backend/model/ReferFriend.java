@@ -50,6 +50,9 @@ public class ReferFriend {
     @JoinColumn(name = "fk_cv_status_type_id", nullable = false)
     private CvStatusType fkCvStatusType;
 
+    @Column(name = "reason_for_delete_travel_plan")
+    private String reasonForCvStatusChange;
+
     @NotNull(message = "who refer this?(employee id) is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_refer_friend_employee_id", nullable = false)

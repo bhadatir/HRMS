@@ -46,5 +46,8 @@ public class Comment {
     @Column(name = "comment_is_deleted")
     private Boolean commentIsDeleted = false;
 
+    @Column(name = "reason_for_delete_comment")
+    private String reasonForDeleteComment;
+
 
 }

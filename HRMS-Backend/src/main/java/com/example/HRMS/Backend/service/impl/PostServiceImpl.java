@@ -226,9 +226,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void removeCommentByHr(Long commentId){
+    public void removeCommentByHr(Long commentId, String reason){
         Comment comment = commentsRepository.findCommentById(commentId);
         commentsRepository.makeCommentIdDeleted(commentId);
+        commentsRepository.addReasonForDeletion(commentId, reason);
         likesRepository.removeLikesForDeletedComment(commentId);
 
         String email = comment.getFkCommentEmployee().getEmployeeEmail();
@@ -244,9 +245,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void removePostByHr(Long postId){
+    public void removePostByHr(Long postId, String reason){
         Post post = postRepository.findPostsById(postId);
         post.setPostIsDeleted(true);
+        post.setReasonForDeletePost(reason);
         List<Comment> comments = commentsRepository.findCommentByFkPost_Id(postId);
 
         for(Comment comment : comments)
@@ -273,16 +275,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void removeComment(Long commentId){
+    public void removeComment(Long commentId, String reason){
         commentsRepository.makeCommentIdDeleted(commentId);
+        commentsRepository.addReasonForDeletion(commentId, reason);
         likesRepository.removeLikesForDeletedComment(commentId);
     }
 
     @Override
     @Transactional
-    public void removePost(Long postId){
+    public void removePost(Long postId, String reason){
         Post post = postRepository.findPostsById(postId);
         post.setPostIsDeleted(true);
+        post.setReasonForDeletePost(reason);
         postRepository.save(post);
         List<Comment> comments = commentsRepository.findCommentByFkPost_Id(postId);
 

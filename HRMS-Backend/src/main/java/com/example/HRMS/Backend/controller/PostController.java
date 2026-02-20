@@ -116,14 +116,14 @@ public class PostController {
 
 
     @PatchMapping("/comment/{commentId}")
-    public ResponseEntity<String> removeComment(@PathVariable Long commentId) {
-        postService.removeComment(commentId);
+    public ResponseEntity<String> removeComment(@PathVariable Long commentId, @RequestParam String reason) {
+        postService.removeComment(commentId, reason);
         return ResponseEntity.ok("comment remove successfully");
     }
 
     @PatchMapping("/rmPost/{postId}")
-    public ResponseEntity<String> removePost(@PathVariable Long postId) {
-        postService.removePost(postId);
+    public ResponseEntity<String> removePost(@PathVariable Long postId, @RequestParam String reason) {
+        postService.removePost(postId, reason);
         return ResponseEntity.ok("post remove successfully");
     }
 

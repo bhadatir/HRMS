@@ -32,13 +32,13 @@ public interface PostService {
 
     List<LikeResponse> getLikeByCommentId(Long commentId);
 
-    void removeCommentByHr(Long commentId);
+    void removeCommentByHr(Long commentId, String reason);
 
-    void removePostByHr(Long postId);
+    void removePostByHr(Long postId, String reason);
 
-    void removeComment(Long commentId);
+    void removeComment(Long commentId, String reason);
 
-    void removePost(Long postId);
+    void removePost(Long postId, String reason);
 
     void updatePost(Long postId, @Valid PostRequest postRequest, MultipartFile file) throws IOException;
 

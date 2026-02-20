@@ -24,7 +24,7 @@ public class DynamicCycleServiceImpl implements DynamicCycleService {
     //run every day to check cycle complete or not
     //if cycle complete so reset isPlayed flag
     @Override
-    @Scheduled(cron = "59 59 23 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void checkAndResetCycles() {
         List<GameType> allGames = gameTypeRepo.findAll();
         LocalDateTime now = LocalDateTime.now();
@@ -62,7 +62,7 @@ public class DynamicCycleServiceImpl implements DynamicCycleService {
         List<EmployeeGameInterest> employeeGameInterests = employeeGameInterestRepository.getEmployeeGameInterestByFkGameType_Id(gameTypeId);
 
         for(EmployeeGameInterest employeeGameInterest : employeeGameInterests){
-//            employeeGameInterest.setPlayedInCurrentCycle(false);
+            employeeGameInterest.setPlayedInCurrentCycle(0);
         }
     }
 }

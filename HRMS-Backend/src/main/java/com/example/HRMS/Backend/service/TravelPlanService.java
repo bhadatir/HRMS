@@ -37,7 +37,7 @@ public interface TravelPlanService {
 
     List<TravelDocResponse> findAllTravelPlanDocByTravelPlan(Long travelPlanId);
 
-    void markAsDeleted(Long travelPlanId);
+    void markAsDeleted(Long travelPlanId, String reason);
 
     void markEmployeeTravelPlanAsDelete(Long empId, Long travelPlanId);
 

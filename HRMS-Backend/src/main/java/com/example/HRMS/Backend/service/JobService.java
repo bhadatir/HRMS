@@ -24,7 +24,7 @@ public interface JobService {
 
     JobResponse showJobByJobId(Long jobId);
 
-    void updateStatus(Long referId, Long ststusId);
+    void updateStatus(Long referId, Long statusId, String reason);
 
     void updateJob(Long jobId, @Valid JobRequest jobRequest, MultipartFile file) throws IOException;
 
@@ -32,5 +32,5 @@ public interface JobService {
 
     List<JobType> getAllJobTypes();
 
-    void changeJobStatus(Long jobId);
+    void changeJobStatus(Long jobId, String reason);
 }

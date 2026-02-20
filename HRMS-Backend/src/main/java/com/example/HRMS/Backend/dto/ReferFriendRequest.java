@@ -23,6 +23,8 @@ public class ReferFriendRequest {
     @NotNull(message = "cv status type is required")
     private Long fkCvStatusTypeId;
 
+    private String reasonForCvStatusChange;
+
     @NotNull(message = "who refer this?(employee id) is required")
     private Long fkReferFriendEmployeeId;
 

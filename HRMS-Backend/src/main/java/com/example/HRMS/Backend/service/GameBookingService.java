@@ -4,6 +4,7 @@ import com.example.HRMS.Backend.dto.GameBookingRequest;
 import com.example.HRMS.Backend.dto.GameBookingResponse;
 import com.example.HRMS.Backend.model.BookingParticipant;
 import com.example.HRMS.Backend.model.GameBooking;
+import com.example.HRMS.Backend.model.GameType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,9 +15,11 @@ public interface GameBookingService {
 
     List<GameBookingResponse> findAllGameBooking();
 
-    void addToWaitlist(Long empId, Long gameId, LocalDateTime slot, boolean isSecond, List<BookingParticipant> bookingParticipants);
+    void addToWaitlist(Long empId, Long gameId, LocalDateTime slot, Boolean isFirstGame, List<BookingParticipant> bookingParticipants);
 
-    GameBooking updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId);
+    void updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId);
+
+    void updateWaitingList(GameType gameType, LocalDateTime targetedSloatTime);
 
     GameBookingResponse findBookingByEmpId(Long empId);
 }

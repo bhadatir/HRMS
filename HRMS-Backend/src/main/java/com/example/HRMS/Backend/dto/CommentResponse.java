@@ -24,4 +24,6 @@ public class CommentResponse {
 
     private Boolean commentIsDeleted;
 
+    private String reasonForDeleteComment;
+
 }

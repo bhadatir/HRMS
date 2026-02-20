@@ -49,6 +49,9 @@ public class TravelPlan {
     @Column(name = "travel_plan_is_deleted")
     private Boolean travelPlanIsDeleted = false;
 
+    @Column(name = "reason_for_delete_travel_plan")
+    private String reasonForDeleteTravelPlan;
+
     @NotNull(message = "travel plan starting date is required")
     @Column(name = "travel_plan_start_date", nullable = false)
     private LocalDate travelPlanStartDate;

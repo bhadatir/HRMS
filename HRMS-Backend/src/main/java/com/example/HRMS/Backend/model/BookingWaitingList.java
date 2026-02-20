@@ -24,8 +24,8 @@ public class BookingWaitingList {
     @Column(name = "target_slot_datetime")
     private LocalDateTime targetSlotDatetime;
 
-    @Column(name = "is_second_time_attempt")
-    private Boolean isSecondTimeAttempt = false;
+    @Column(name = "is_first_game")
+    private Boolean isFirstGame = true;
 
     @Column(name = "waiting_status_is_active", nullable = false)
     private Boolean waitingStatusIsActive = true;

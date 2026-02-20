@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class OrgChart {
     private Long employeeId;
+    private String employeeEmail;
     private String firstName;
     private String lastName;
     private String positionName;

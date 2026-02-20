@@ -28,4 +28,6 @@ public class CommentRequest {
     @NotNull(message = "Comment content is required")
     private String commentContent;
 
+    private String reasonForDeleteComment;
+
 }

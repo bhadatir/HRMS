@@ -32,4 +32,10 @@ public interface CommentsRepository extends JpaRepository<Comment,Long> {
             "where pk_comment_id in (select pk_comment_id from CommentChain ) ", nativeQuery = true)
     void makeCommentIdDeleted(Long commentId);
 
+    @Modifying
+    @Transactional
+    @Query(value = "update Comment c " +
+            "set c.reasonForDeleteComment = :reason " +
+            "where c.id = :commentId ")
+    void addReasonForDeletion(Long commentId, String reason);
 }

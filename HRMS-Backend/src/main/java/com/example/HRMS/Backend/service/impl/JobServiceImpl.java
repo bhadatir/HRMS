@@ -234,13 +234,14 @@ public class JobServiceImpl implements JobService {
 
     @Transactional
     @Override
-    public void updateStatus(Long referId, Long statusId){
+    public void updateStatus(Long referId, Long statusId, String reason){
         ReferFriend referFriend = referFriendRepository.findById(referId).orElseThrow(
                 () -> new RuntimeException("refer friend not found")
         );
         referFriend.setFkCvStatusType(cvStatusTypeRepository.findById(statusId).orElseThrow(
                 () -> new RuntimeException("cv status type not found")
         ));
+        referFriend.setReasonForCvStatusChange(reason);
         referFriendRepository.save(referFriend);
         notificationService.createNotification(referFriend.getFkReferFriendEmployee().getId()
                 ,"Status upgraded of your Refer Friend CV"
@@ -271,9 +272,10 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void changeJobStatus(Long jobId){
+    public void changeJobStatus(Long jobId, String reason){
         Job job = jobRepository.findJobById(jobId);
         job.setJobIsActive(!job.getJobIsActive());
+        job.setReasonForDeActiveJob(reason);
         jobRepository.save(job);
     }
 

@@ -34,8 +34,14 @@ public class GameBookingController {
     }
 
     @PutMapping("/status")
-        public ResponseEntity<GameBooking> changeGameBookingStatus(@RequestParam Long gameBookingId,@RequestParam Long statusId){
-        return ResponseEntity.ok(gameBookingService.updateGameBookingStatus(gameBookingId,statusId));
+    public ResponseEntity<String> changeGameBookingStatus(@RequestParam Long gameBookingId,@RequestParam Long statusId){
+        gameBookingService.updateGameBookingStatus(gameBookingId,statusId);
+        return ResponseEntity.ok("update status successfully");
+    }
+
+    @PostMapping("/gameInterest")
+    public ResponseEntity<String> addGameInterest(@RequestParam Long gameBookingId,@RequestParam Long statusId){
+        return ResponseEntity.ok("game interest added successful");
     }
 
 }

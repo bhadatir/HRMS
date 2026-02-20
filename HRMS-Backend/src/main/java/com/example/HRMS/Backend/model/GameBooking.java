@@ -33,9 +33,6 @@ public class GameBooking {
     @Column(name = "game_booking_end_time", nullable = false)
     private LocalDateTime gameBookingEndTime;
 
-    @Column(name = "is_second_time_play")
-    private Boolean isSecondTimePlay = false;
-
     @NotNull(message = "game booking status id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_game_booking_status_id", nullable = false)

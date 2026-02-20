@@ -39,8 +39,8 @@ public class HrController {
     }
 
     @PatchMapping("/deleteTravel/{travelPlanId}")
-    public ResponseEntity<String> softDeleteUser(@PathVariable Long travelPlanId) {
-        travelPlanService.markAsDeleted(travelPlanId);
+    public ResponseEntity<String> softDeleteUser(@PathVariable Long travelPlanId,@RequestParam String reason) {
+        travelPlanService.markAsDeleted(travelPlanId, reason);
         return ResponseEntity.ok("Travel plan delete successfully");
     }
 
@@ -101,26 +101,26 @@ public class HrController {
     }
 
     @PatchMapping("/referCV/{referId}/{statusId}")
-    public ResponseEntity<String > updateReferCvStatus(@PathVariable Long referId, @PathVariable Long statusId)
-    {   jobService.updateStatus(referId, statusId);
+    public ResponseEntity<String > updateReferCvStatus(@PathVariable Long referId, @PathVariable Long statusId,@RequestParam String reason)
+    {   jobService.updateStatus(referId, statusId, reason);
         return ResponseEntity.ok("status update successful");
     }
 
     @PatchMapping("/comment/{commentId}")
-    public ResponseEntity<String> removeComment(@PathVariable Long commentId) {
-        postService.removeCommentByHr(commentId);
+    public ResponseEntity<String> removeComment(@PathVariable Long commentId, @RequestParam String reason) {
+        postService.removeCommentByHr(commentId, reason);
         return ResponseEntity.ok("comment remove successfully");
     }
 
     @PatchMapping("/rmPost/{postId}")
-    public ResponseEntity<String> removePost(@PathVariable Long postId) {
-        postService.removePostByHr(postId);
+    public ResponseEntity<String> removePost(@PathVariable Long postId, @RequestParam String reason) {
+        postService.removePostByHr(postId, reason);
         return ResponseEntity.ok("post remove successfully");
     }
 
     @PatchMapping("/jobStatus/{jobId}")
-    public ResponseEntity<String > changeJobStatus(@PathVariable Long jobId)
-    {   jobService.changeJobStatus(jobId);
+    public ResponseEntity<String > changeJobStatus(@PathVariable Long jobId,@RequestParam String reason)
+    {   jobService.changeJobStatus(jobId,reason);
         return ResponseEntity.ok("job status update successful");
     }
 }

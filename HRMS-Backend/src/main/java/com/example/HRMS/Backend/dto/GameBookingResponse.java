@@ -17,13 +17,15 @@ public class GameBookingResponse {
 
     private LocalDateTime gameBookingEndTime;
 
-    private Boolean isSecondTimePlay;
-
     private Long gameBookingStatusId;
 
     private Long gameTypeId;
 
+    private String gameTypeName;
+
     private Long employeeId;
+
+    private String employeeEmail;
 
     private Instant gameBookingCreatedAt;
 

@@ -40,5 +40,7 @@ public class PostResponse {
 
     private String postVisibilityName;
 
+    private String reasonForDeletePost;
+
     private List<PostTagResponse> postTagResponses;
 }

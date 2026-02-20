@@ -2,6 +2,7 @@ package com.example.HRMS.Backend.dto;
 
 import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.TravelDoc;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.time.LocalDate;
@@ -23,6 +24,8 @@ public class TravelPlanRequest {
     private String travelPlanTo;
 
     private Boolean travelPlanIsReturn;
+
+    private String reasonForDeleteTravelPlan;
 
     @NotNull(message = "travel plan starting date is required")
     private LocalDate travelPlanStartDate;

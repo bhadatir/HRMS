@@ -25,7 +25,7 @@ public class EmployeeGameInterest {
     @JoinColumn(name = "fk_game_type_id", nullable = false)
     private GameType fkGameType;
 
-//    @Column(name = "played_in_current_cycle")
-//    private Boolean playedInCurrentCycle = false;
+    @Column(name = "played_in_current_cycle")
+    private Integer playedInCurrentCycle = 0;
 
 }

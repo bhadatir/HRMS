@@ -27,4 +27,6 @@ public class JobRequest {
         @NotNull(message = "job owner(HR) id is required")
         private Long fkJobOwnerEmployeeId;
 
+        private String reasonForDeActiveJob;
+
 }

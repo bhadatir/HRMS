@@ -27,6 +27,10 @@ public class JobResponse {
 
     private Long jobTypeId;
 
+    private String jobTypeName;
+
+    private String reasonForDeActiveJob;
+
     private Long employeeId;
 
     private List<CvReviewerResponse> cvReviewerResponses;

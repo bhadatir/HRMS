@@ -27,4 +27,10 @@ public class GameTypeController {
     public ResponseEntity<GameType> findGameById(@PathVariable Long id){
         return ResponseEntity.ok(gameTypeRepository.findGameTypeById(id));
     }
+
+    @PostMapping("/")
+    public ResponseEntity<String> addGame(@RequestBody GameType gameType){
+        gameTypeRepository.save(gameType);
+        return ResponseEntity.ok("game type added successfully");
+    }
 }

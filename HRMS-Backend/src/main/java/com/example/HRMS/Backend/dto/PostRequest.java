@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.dto;
 
 import com.example.HRMS.Backend.model.PostVisibility;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -18,4 +19,6 @@ public class PostRequest {
     private Long fkPostEmployeeId;
 
     private Long fkPostVisibilityId = 1L;
+
+    private String reasonForDeletePost;
 }

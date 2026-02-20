@@ -30,4 +30,6 @@ public class ReferFriendResponse {
 
     private String jobTitle;
 
+    private String reasonForCvStatusChange;
+
 }

@@ -180,9 +180,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
     @Transactional
     @Override
-    public void markAsDeleted(Long travelPlanId){
+    public void markAsDeleted(Long travelPlanId, String reason){
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
         travelPlan.setTravelPlanIsDeleted(true);
+        travelPlan.setReasonForDeleteTravelPlan(reason);
         travelPlanRepository.save(travelPlan);
 
         Long hrId = travelPlan.getFkTravelPlanHREmployee().getId();
