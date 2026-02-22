@@ -16,7 +16,8 @@ import {
   ExternalLink, 
   UserPlus, 
   UserCheck, 
-  User
+  User,
+  IndianRupee
 } from "lucide-react";
 import { apiService } from "@/api/apiService";
 
@@ -46,11 +47,9 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
     enabled: !!jobId && !!token && viewMode === "REFERRALS",
   });
 
-  console.log(referrals);
-
   const updateCvStatusMutation = useMutation({
-    mutationFn: ({ referId, statusId }: { referId: number; statusId: number }) =>
-      jobService.updateReferCvStatus(referId, statusId, token || ""),
+    mutationFn: ({ referId, statusId, reason }: { referId: number; statusId: number; reason: string }) =>
+      jobService.updateReferCvStatus(referId, statusId, reason, token || ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["jobReferrals", jobId] });
       alert("CV Status updated successfully");
@@ -76,6 +75,13 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
     addReviewerMutation.mutate();
   };
 
+  const handleUpdateCvStatus = (referId: number, statusId: number) => {
+    const reason = window.prompt("Please enter reason for updating CV status:", "")?.trim();
+    if (reason) {
+      updateCvStatusMutation.mutate({ referId, statusId, reason });
+    }
+  };
+
   const isLoadingData = jobLoading || (viewMode === "REFERRALS" && referralsLoading);
 
   if (isLoadingData) return <div className="p-10 text-center text-slate-500">Loading Job Data...</div>;
@@ -88,9 +94,16 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
             <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
               <Briefcase className="text-blue-600" /> {job?.jobTitle}
             </CardTitle>
-            <CardDescription className="mt-1">Salary: ${job?.jobSalary} | Category ID: {job?.jobTypeId}</CardDescription>
+            <CardDescription className="mt-1 flex">
+              <div>
+                <div className="flex">
+                Salary: <IndianRupee size={14} className="mt-1"/> {job?.jobSalary} 
+                </div>
+                Category ID: {job?.jobTypeName}
+              </div>
+            </CardDescription>
           </div>
-          <Badge variant="outline" className="bg-white">Owner ID: {job?.employeeId}</Badge>
+          {job?.employeeId != user?.id && <Badge title="Owner Email" variant="outline" className="bg-white">{job?.employeeEmail}</Badge>}
         </CardHeader>
       </Card>
 
@@ -143,13 +156,13 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
                         <>
                             <Button 
                             size="sm" variant="outline" className="text-green-600 border-green-200"
-                            onClick={() => updateCvStatusMutation.mutate({ referId: ref.id, statusId: 5 })}
+                            onClick={() => handleUpdateCvStatus(ref.id, 5)}
                             >
                             <CheckCircle size={14} />
                             </Button>
                             <Button 
                             size="sm" variant="outline" className="text-red-600 border-red-200"
-                            onClick={() => updateCvStatusMutation.mutate({ referId: ref.id, statusId: 6 })}
+                            onClick={() => handleUpdateCvStatus(ref.id, 6)}
                             >
                             <XCircle size={14} />
                             </Button>
@@ -205,7 +218,6 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-slate-900">{emp.employeeFirstName} {emp.employeeLastName}</p>
-                            <p className="text-[10px] text-slate-500 uppercase">ID: {emp.id}</p>
                           </div>
                         </button>
                       )))}
@@ -225,7 +237,6 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
                         <p className="text-sm font-semibold truncate max-w-[120px]" title={rev.employeeEmail}>
                             {rev.employeeEmail}
                         </p>
-                        <Badge className="bg-blue-100 text-blue-700">ID: {rev.employeeId}</Badge>
                     </div>                    
                   </Card>
                   ))}

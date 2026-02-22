@@ -78,7 +78,6 @@ export default function OrganizationChart() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-slate-900">{emp.employeeFirstName} {emp.employeeLastName}</p>
-                      <p className="text-[10px] text-slate-500 uppercase">ID: {emp.id}</p>
                     </div>
                   </button>
                 ))}
@@ -156,7 +155,7 @@ export default function OrganizationChart() {
                   <CardContent className="bg-slate-50/50 border-t p-4 flex justify-between items-center">
                     <p className="text-xs font-medium text-slate-500">Department: <span className="text-slate-900">{orgData.departmentName}</span></p>
                     
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-700">ID: {orgData.employeeId}</Badge>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-700">{orgData.employeeEmail}</Badge>
                   </CardContent>
                 </Card>
               </section>

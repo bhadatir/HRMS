@@ -15,6 +15,8 @@ public class EmployeeTravelPlanResponse {
     private Long employeeFkManagerEmployeeId;
 
     private String employeeEmail;
+    private String employeeFirstName;
+    private String employeeLastName;
 
     private Long travelPlanId;
 

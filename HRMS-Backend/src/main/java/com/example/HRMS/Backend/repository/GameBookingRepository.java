@@ -25,4 +25,5 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
     boolean hasPlayedInCycle(@Param("empId") Long empId,
                              @Param("gameTypeId") Long gameTypeId);
 
+    boolean existsByFkGameType_IdAndGameBookingStartTimeAndFkGameBookingStatus_Id(Long id, LocalDateTime targetSlot, int i);
 }

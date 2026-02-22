@@ -11,6 +11,7 @@ import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.Temporal;
 
 @Getter
@@ -52,7 +53,10 @@ public class GameType {
 
     @PostPersist
     public void afterInsert() {
-        long minutes = Duration.between((Temporal)operatingStart, (Temporal) operatingEnd).toMinutes();
+        LocalTime start = operatingStart.toLocalTime();
+        LocalTime end = operatingEnd.toLocalTime();
+
+        long minutes = Duration.between(start,end).toMinutes();
         totalSlotsPerDay = (int) minutes / gameSlotDuration ;
     }
 }

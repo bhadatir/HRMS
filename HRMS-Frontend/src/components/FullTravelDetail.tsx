@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plane, Calendar, MapPin, FileText, CheckCircle, XCircle, ExternalLink } from "lucide-react";
+import { Plane, Calendar, MapPin, FileText, CheckCircle, XCircle, ExternalLink, IndianRupee } from "lucide-react";
 
 export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan: number| null; onSuccess: () => void }) {
   const { token, user } = useAuth();
@@ -114,11 +114,11 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
 
                 {viewMode === "EXPENSES" && 
                   <div className="ml-4 flex-col">
-                    <p className="text-sm font-medium text-slate-500">
-                    Total: ${totalExpenseAmount.toLocaleString()}
+                    <p className="text-sm flex font-medium text-slate-500">
+                    Total: <IndianRupee size={14} className="mt-1"/>{totalExpenseAmount.toLocaleString()}
                     </p>
-                    <p className="text-sm font-medium text-slate-500">
-                    Approved: ${approvedTotal.toLocaleString()}
+                    <p className="text-sm flex font-medium text-slate-500">
+                    Approved: <IndianRupee size={14} className="mt-1"/>{approvedTotal.toLocaleString()}
                     </p>
                   </div>
                 }
@@ -164,7 +164,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                         <p className="font-medium">{exp.expenseRemark}</p>
                         <p className="text-[10px] text-slate-400">ID: {exp.id}</p>
                       </TableCell>
-                      <TableCell className="font-bold text-slate-900">${exp.expenseAmount}</TableCell>
+                      <TableCell className="font-bold flex text-slate-900"><IndianRupee className="mt-1" size={14} />{exp.expenseAmount}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           {exp.expenseProofResponses?.map((proof: any, idx: number) => (

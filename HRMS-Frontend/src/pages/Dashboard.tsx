@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Calendar, DollarSign, Building, X, Bell } from "lucide-react";
+import { Mail, Calendar, DollarSign, Building, X, Bell, IndianRupee } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
 import { Button } from "@/components/ui/button";
 import {
@@ -119,13 +119,13 @@ export default function Dashboard() {
 
             <Card className="shadow-sm border-slate-200">
               <CardHeader className="flex flex-row items-center space-x-2 pb-2">
-                <DollarSign className="w-4 h-4 text-green-600" />
+                <IndianRupee className="w-4 h-4 text-green-600" />
                 <CardTitle className="text-sm font-medium">Salary Overview</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-500">Annual Gross</p>
                 <p className="text-xl font-bold text-slate-900">
-                  ${user.employeeSalary?.toLocaleString()}
+                  {user.employeeSalary?.toLocaleString()}
                 </p>
               </CardContent>
             </Card>

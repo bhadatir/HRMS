@@ -44,13 +44,13 @@ export const postService = {
     return res.data;
   },
 
-  removePostByHr: async (postId: number, token: string) => {
-    const res = await api.patch(`/hr/rmPost/${postId}`, null, authHeader(token));
+  removePostByHr: async (postId: number, reason: string, token: string) => {
+    const res = await api.patch(`/hr/rmPost/${postId}?reason=${reason}`, null, authHeader(token));
     return res.data;
   },
 
-  removePostByEmp: async (postId: number, token: string) => {
-    const res = await api.patch(`/post/rmPost/${postId}`, null, authHeader(token));
+  removePostByEmp: async (postId: number, reason: string, token: string) => {
+    const res = await api.patch(`/post/rmPost/${postId}?reason=${reason}`, null, authHeader(token));
     return res.data;
   },
 
@@ -89,13 +89,13 @@ export const postService = {
     return res.data;
   },
 
-  removeCommentByHr: async (commentId: number, token: string) => {
-    const res = await api.patch(`/hr/comment/${commentId}`, null, authHeader(token));
+  removeCommentByHr: async (commentId: number, reason: string, token: string) => {
+    const res = await api.patch(`/hr/comment/${commentId}?reason=${reason}`, null, authHeader(token));
     return res.data;
   },
 
-  removeCommentByOwner: async (commentId: number, token: string) => {
-    const res = await api.patch(`/post/comment/${commentId}`, null, authHeader(token));
+  removeCommentByOwner: async (commentId: number, reason: string, token: string) => {
+    const res = await api.patch(`/post/comment/${commentId}?reason=${reason}`, null, authHeader(token));
     return res.data;
   },
 

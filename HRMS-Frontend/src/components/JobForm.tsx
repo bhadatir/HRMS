@@ -100,7 +100,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-500 uppercase">Salary ($)</label>
+          <label className="text-xs font-bold text-slate-500 uppercase">Salary</label>
           <Input 
             type="number" 
             {...register("jobSalary", { required: "Job salary is required" })}

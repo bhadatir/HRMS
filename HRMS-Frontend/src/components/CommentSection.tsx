@@ -38,11 +38,11 @@ export default function CommentSection({ postId }: { postId: number }) {
   });
 
   const removeCommentMutation = useMutation({
-    mutationFn: (commentId: number) => {
+    mutationFn: ({ commentId, reason }: { commentId: number; reason: string }) => {
       if (user?.roleName === "HR" && comments.find((c: any) => c.id === commentId)?.employeeId !== user.id) {
-        return postService.removeCommentByHr(commentId, token || "");
+        return postService.removeCommentByHr(commentId, reason, token || "");
       } else {
-        return postService.removeCommentByOwner(commentId, token || "");
+        return postService.removeCommentByOwner(commentId, reason, token || "");
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["postComments", postId] })
@@ -52,7 +52,15 @@ export default function CommentSection({ postId }: { postId: number }) {
     setReplyTo({ id: comment.id, name: `User ${comment.employeeId}` });
     commentref.current?.focus();
   }
-    return (
+
+    const handleDelete = (commentId: number) => {
+    const reason = window.prompt("Please enter reason for deleting this comment:", "")?.trim();
+    if (reason) {
+      removeCommentMutation.mutate({ commentId, reason });
+    }
+  };
+
+  return (
     <div className="mt-4 space-y-4 pt-4 border-t">
       <div className="space-y-3">
         {comments.filter((c: any) => !c.commentIsDeleted).map((comment: any) => (
@@ -82,7 +90,7 @@ export default function CommentSection({ postId }: { postId: number }) {
                 </button>
                 {(user?.roleName === "HR" || user?.id === comment.employeeId) && (
                     <button
-                    onClick={() => removeCommentMutation.mutate(comment.id)}
+                    onClick={() => handleDelete(comment.id)}
                           className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
                   >
                     <Trash2 size={12} />

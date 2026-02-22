@@ -74,7 +74,7 @@ export default function Signup() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Date of Birth</label>
-              <Input required type="date" onChange={e => setForm({...form, dob: e.target.value})} />
+              <Input required type="date" max={new Date().toISOString().split("T")[0]} onChange={e => setForm({...form, dob: e.target.value})} />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Hire Date</label>

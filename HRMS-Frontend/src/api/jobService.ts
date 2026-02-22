@@ -50,8 +50,8 @@ export const jobService = {
     return res.data;
   },
 
-  updateReferCvStatus: async (referId: number, statusId: number, token: string) => {
-    const res = await api.patch(`/hr/referCV/${referId}/${statusId}`, null, authHeader(token));
+  updateReferCvStatus: async (referId: number, statusId: number, reason: string, token: string) => {
+    const res = await api.patch(`/hr/referCV/${referId}/${statusId}?reason=${encodeURIComponent(reason)}`, null, authHeader(token));
     return res.data;
   },
 
@@ -78,8 +78,8 @@ export const jobService = {
     return res.data;
   },
 
-  updateJobStatus: async (jobId: number, token: string) => {
-    const res = await api.patch(`/hr/jobStatus/${jobId}`, null, authHeader(token));
+  updateJobStatus: async (jobId: number, reason: string, token: string) => {
+    const res = await api.patch(`/hr/jobStatus/${jobId}?reason=${encodeURIComponent(reason)}`, null, authHeader(token));
     return res.data;
   }
 

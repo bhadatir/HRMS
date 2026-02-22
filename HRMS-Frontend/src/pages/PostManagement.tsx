@@ -8,7 +8,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Plus, X, MessageSquare, Search, Eye, Edit, Delete, Bell } from "lucide-react";
+import { Plus, X, MessageSquare, Search, Eye, Edit, Delete, Bell, Trash } from "lucide-react";
 import PostForm from "../components/PostForm";
 import LikeButton from "@/components/LikeButton";
 import CommentSection from "@/components/CommentSection";
@@ -38,11 +38,11 @@ export default function PostManagement() {
   });
 
   const removePost = useMutation({
-    mutationFn: (postId: number) => {
+    mutationFn: ({ postId, reason }: { postId: number; reason: string }) => {
       if (user?.roleName === "HR") {
-        return postService.removePostByHr(postId, token || "");
+        return postService.removePostByHr(postId, reason, token || "");
       } else {
-        return postService.removePostByEmp(postId, token || "");
+        return postService.removePostByEmp(postId, reason, token || "");
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allPosts"] })
@@ -63,6 +63,13 @@ export default function PostManagement() {
         (post.postVisibilityName in postVisibilityOptions))
       .sort((a: any, b: any) => new Date(b.postCreatedAt).getTime() - new Date(a.postCreatedAt).getTime());
   }, [allPosts, searchTerm]);
+
+  const handleDelete = (postId: number) => {
+    const reason = window.prompt("Please enter reason for deleting this post:", "")?.trim();
+    if (reason) {
+      removePost.mutate({ postId, reason });
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -165,9 +172,9 @@ export default function PostManagement() {
                           {(user?.roleName === "HR" || user?.id === post.employeeId) && (  
                             <Button variant="ghost" size="sm" className="ml-2" onClick={(e) => {
                               e.stopPropagation();
-                              removePost.mutate(post.id);
+                              handleDelete(post.id);
                             }}>
-                            <Delete size={16} className="text-blue-600" />
+                            <Trash size={16} className="text-red-600" />
                             {removePost.isPending && <span className="text-[10px] text-red-600">Deleting...</span>}
                             </Button>
                           )}

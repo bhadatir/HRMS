@@ -9,6 +9,7 @@ import OrganizationChart from "./pages/OrganizationChart";
 import TravelPlan from "./pages/TravelPlan";
 import JobManagement from "./pages/JobManagement";
 import PostManagement from "./pages/PostManagement";
+import GameManagement from "./pages/GameManagement";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
             <Route path="/travel-plan" element={<TravelPlan />} />
             <Route path="/job-management" element={<JobManagement />} />
             <Route path="/post-management" element={<PostManagement />} />
+            <Route path="/game-management" element={<GameManagement />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" />} />

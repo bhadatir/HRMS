@@ -1,8 +1,10 @@
 package com.example.HRMS.Backend.controller;
 
+import com.example.HRMS.Backend.dto.EmployeeGameInterestResponse;
 import com.example.HRMS.Backend.dto.GameBookingRequest;
 import com.example.HRMS.Backend.dto.GameBookingResponse;
 import com.example.HRMS.Backend.model.GameBooking;
+import com.example.HRMS.Backend.model.GameType;
 import com.example.HRMS.Backend.service.GameBookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,15 +35,33 @@ public class GameBookingController {
         return ResponseEntity.ok(gameBookingService.findBookingByEmpId(empId));
     }
 
-    @PutMapping("/status")
+    @PatchMapping("/status")
     public ResponseEntity<String> changeGameBookingStatus(@RequestParam Long gameBookingId,@RequestParam Long statusId){
         gameBookingService.updateGameBookingStatus(gameBookingId,statusId);
         return ResponseEntity.ok("update status successfully");
     }
 
-    @PostMapping("/gameInterest")
-    public ResponseEntity<String> addGameInterest(@RequestParam Long gameBookingId,@RequestParam Long statusId){
-        return ResponseEntity.ok("game interest added successful");
+    @PutMapping("/booking/{bookingId}")
+    public ResponseEntity<String> updateGameBooking(@PathVariable Long bookingId,@RequestBody GameBookingRequest gameBookingRequest){
+        gameBookingService.updateGameBooking(bookingId, gameBookingRequest);
+        return ResponseEntity.ok("update booking successfully");
+    }
+
+    @PostMapping("/interest/{empId}/{gameTypeId}")
+    public ResponseEntity<String> addGameInterest(@PathVariable Long empId, @PathVariable Long gameTypeId){
+        gameBookingService.addGameInterest(empId, gameTypeId);
+        return ResponseEntity.ok("game interest added successfully");
+    }
+
+    @DeleteMapping("/interest/{gameInterestId}")
+    public ResponseEntity<String> removeGameInterest(@PathVariable Long gameInterestId){
+        gameBookingService.removeGameInterest(gameInterestId);
+        return ResponseEntity.ok("game interest removed successfully");
+    }
+
+    @GetMapping("/interest/{empId}")
+    public ResponseEntity<List<EmployeeGameInterestResponse>> findGameInterestByEmp(@PathVariable Long empId){
+        return ResponseEntity.ok(gameBookingService.findGameInterestByEmp(empId));
     }
 
 }

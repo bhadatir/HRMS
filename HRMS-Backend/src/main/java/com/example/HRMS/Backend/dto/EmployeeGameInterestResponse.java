@@ -10,7 +10,7 @@ public class EmployeeGameInterestResponse {
 
     private String employeeEmail;
 
-    private Long gameType;
+    private Long gameTypeId;
 
     private String gameTypeName;
 }

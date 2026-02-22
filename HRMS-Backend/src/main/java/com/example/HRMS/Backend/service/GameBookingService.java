@@ -1,5 +1,6 @@
 package com.example.HRMS.Backend.service;
 
+import com.example.HRMS.Backend.dto.EmployeeGameInterestResponse;
 import com.example.HRMS.Backend.dto.GameBookingRequest;
 import com.example.HRMS.Backend.dto.GameBookingResponse;
 import com.example.HRMS.Backend.model.BookingParticipant;
@@ -15,11 +16,21 @@ public interface GameBookingService {
 
     List<GameBookingResponse> findAllGameBooking();
 
-    void addToWaitlist(Long empId, Long gameId, LocalDateTime slot, Boolean isFirstGame, List<BookingParticipant> bookingParticipants);
+    void addToWaitlist(Long empId, Long gameId, LocalDateTime slot, Boolean isFirstGame, List<Long> bookingParticipantsEmpId);
 
     void updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId);
 
     void updateWaitingList(GameType gameType, LocalDateTime targetedSloatTime);
 
     GameBookingResponse findBookingByEmpId(Long empId);
+
+    void updateGameBooking(Long bookingId, GameBookingRequest gameBookingRequest);
+
+    void updateGame(Long gameTypeId, GameType gameType);
+
+    void addGameInterest(Long empId, Long gameTypeId);
+
+    void removeGameInterest(Long gameInterestId);
+
+    List<EmployeeGameInterestResponse> findGameInterestByEmp(Long empId);
 }

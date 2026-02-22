@@ -67,7 +67,7 @@ export default function AddExpenseForm({ travelPlanId, startDate, endDate, onSuc
       <CardHeader><CardTitle className="text-xl">Submit Expense Claim</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <Input type="number" placeholder="Amount ($)" onChange={(e) => setForm({...form, expenseAmount: Number(e.target.value)})} />
+          <Input type="number" placeholder="Amount" onChange={(e) => setForm({...form, expenseAmount: Number(e.target.value)})} />
           
           <div className="space-y-2 flex">
             <label className="text-sm font-medium text-gray-500 w-30 mt-2">Expense Date :</label>

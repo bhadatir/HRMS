@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class GameBookingResponse {
@@ -28,5 +29,7 @@ public class GameBookingResponse {
     private String employeeEmail;
 
     private Instant gameBookingCreatedAt;
+
+    private List<BookingParticipantResponse> bookingParticipantResponses;
 
 }

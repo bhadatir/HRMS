@@ -6,10 +6,7 @@ import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
-import com.example.HRMS.Backend.service.ExpenseService;
-import com.example.HRMS.Backend.service.JobService;
-import com.example.HRMS.Backend.service.PostService;
-import com.example.HRMS.Backend.service.TravelPlanService;
+import com.example.HRMS.Backend.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +28,7 @@ public class HrController {
     private final JobService jobService;
     private final PostService postService;
     private final ExpenseService expenseService;
+    private final GameBookingService gameBookingService;
 
     @PostMapping("/travelPlan")
     public ResponseEntity<String > addNewTravelPlan(@Valid @RequestBody TravelPlanRequest travelPlanRequest) {
@@ -72,6 +70,18 @@ public class HrController {
     public ResponseEntity<String> addNewGameType(@Valid @RequestBody GameType gameType) {
         gameTypeRepository.save(gameType);
         return ResponseEntity.ok("Game add successfully");
+    }
+
+    @PostMapping("/gameType")
+    public ResponseEntity<String> addGame(@RequestBody GameType gameType){
+        gameTypeRepository.save(gameType);
+        return ResponseEntity.ok("game type added successfully");
+    }
+
+    @PutMapping("/gameType/{gameTypeId}")
+    public ResponseEntity<String> updateGame(@PathVariable Long gameTypeId, @RequestBody GameType gameType){
+        gameBookingService.updateGame(gameTypeId, gameType);
+        return ResponseEntity.ok("game type updated successfully");
     }
 
     @PostMapping(value = "/job", consumes = {"multipart/form-data"})

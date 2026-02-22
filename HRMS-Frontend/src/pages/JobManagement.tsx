@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ReferFriend from "../components/ReferFriend.tsx";
 import ShareJob from "../components/ShareJob.tsx";
-import { Plus, X, Calendar, Search, DollarSign, Share, UserPlus, Edit, Bell } from "lucide-react";
+import { Plus, X, Calendar, Search, DollarSign, Share, UserPlus, Edit, Bell, IndianRupee } from "lucide-react";
 import JobForm from "../components/JobForm.tsx";
 import JobDetailView from "@/components/JobDetailView.tsx";
 import Notifications from "@/components/Notifications.tsx";
@@ -40,12 +40,19 @@ export default function JobManagement() {
   }, [allJobs, searchTerm]);
 
   const jobStatusmutation = useMutation({
-    mutationFn: (jobId: number) => jobService.updateJobStatus(jobId, token || ""),
+    mutationFn: ({ jobId, reason }: { jobId: number; reason: string }) => jobService.updateJobStatus(jobId, reason, token || ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allJobs"] });
       queryClient.invalidateQueries({ queryKey: ["jobDetail"] });
     }
    });
+
+  const handleDelete = (id: number) => {
+    const reason = window.prompt("Please enter reason for change this job status:", "")?.trim();
+    if (reason) {
+      jobStatusmutation.mutate({ jobId: id, reason });
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -113,8 +120,7 @@ export default function JobManagement() {
                 </Button>
                 <JobDetailView jobId={selectedJobId} onSuccess={() => setSelectedJobId(null)} />
               </div>
-            </div>
-            
+            </div>            
           )}
 
           {/* Job Post Form Modal */}
@@ -188,7 +194,7 @@ export default function JobManagement() {
                         onClick={(e) => {
                           if (user?.roleName !== "HR") return;
                           e.stopPropagation();
-                          jobStatusmutation.mutate(job.id);
+                          handleDelete(job.id);
                         }}
                         className={job.jobIsActive ? "border-green-500 text-green-500" : "border-red-500 text-red-500"} >
                         {job.jobIsActive ? "Open" : "Closed"}
@@ -213,7 +219,7 @@ export default function JobManagement() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
                       <div className="flex items-center gap-2">
-                        <DollarSign size={14} className="text-slate-400" />
+                        <IndianRupee size={14} className="text-slate-400" />
                         {job.jobSalary}
                       </div>
                       <div className="flex items-center gap-2">

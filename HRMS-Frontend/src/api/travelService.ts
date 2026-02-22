@@ -40,8 +40,8 @@ export const travelService = {
     return res.data;
   },
 
-  deleteTravelPlan: async (travelPlanId: number, token: string) => {
-    const res = await api.patch(`/hr/deleteTravel/${travelPlanId}`,null ,authHeader(token));
+  deleteTravelPlan: async (travelPlanId: number, reason: string, token: string) => {
+    const res = await api.patch(`/hr/deleteTravel/${travelPlanId}?reason=${encodeURIComponent(reason)}`, null, authHeader(token));
     return res.data;
   },
 

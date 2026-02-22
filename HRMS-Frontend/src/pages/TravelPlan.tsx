@@ -42,7 +42,7 @@ export default function TravelPlan() {
   });
 
   const deleteTravelPlanMutation = useMutation({
-    mutationFn: (travelPlanId: number) => travelService.deleteTravelPlan(travelPlanId, token || ""),
+    mutationFn: ({ travelPlanId, reason }: { travelPlanId: number; reason: string }) => travelService.deleteTravelPlan(travelPlanId, reason, token || ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
       alert("Travel plan deleted successfully");
@@ -86,6 +86,15 @@ export default function TravelPlan() {
     if (!searchFilter) return allPlans;
     return allPlans.filter((plan: any) => searchFilter.includes(plan.id));
   }, [allPlans, user, searchFilter, isSearchLoading]);
+
+  const handleDelete = (travelPlanId: number) => {
+    const reason = window.prompt("Please enter reason for deleting this travel plan:", "")?.trim();
+    if (reason) {
+      deleteTravelPlanMutation.mutate({ travelPlanId, reason });
+    }else{
+      alert("Deletion reason is required");
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -326,15 +335,16 @@ export default function TravelPlan() {
                             title="Delete Travel Plan"
                             onClick={(e) => {
                               e.stopPropagation();
-                              deleteTravelPlanMutation.mutate(plan.id);
+                              handleDelete(plan.id);
                             }}
                             className="text-red-500 hover:text-red-700 right-0 mt-2"
                           >
                             <Trash2 size={14} />
-                          </Button>
-                          {deleteTravelPlanMutation.isPending && (
+                            {deleteTravelPlanMutation.isPending && (
                             <span className="text-[10px] text-red-600">Deleting...</span>
-                          )}
+                            )}
+                          </Button>
+                          
                         </>
                         ):(<></>)}
                       </div>

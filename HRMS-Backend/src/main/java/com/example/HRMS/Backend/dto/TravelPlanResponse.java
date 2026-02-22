@@ -38,6 +38,8 @@ public class TravelPlanResponse {
     private Long employeeId;
 
     private String employeeEmail;
+    private String employeeFirstName;
+    private String employeeLastName;
 
     private Long employeeFkManagerEmployeeId;
 
