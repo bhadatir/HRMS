@@ -36,4 +36,6 @@ public interface WaitlistRepository extends JpaRepository<BookingWaitingList,Lon
             @Param("targetSlotDatetime") LocalDateTime targetSlotDatetime);
 
     void removeBookingWaitingListsById(Long id);
+
+    List<BookingWaitingList> findAllByTargetSlotDatetimeBetween(LocalDateTime now, LocalDateTime targetSlot);
 }

@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.repository;
 
 import com.example.HRMS.Backend.model.GameBooking;
+import com.example.HRMS.Backend.model.GameType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,5 +26,16 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
     boolean hasPlayedInCycle(@Param("empId") Long empId,
                              @Param("gameTypeId") Long gameTypeId);
 
-    boolean existsByFkGameType_IdAndGameBookingStartTimeAndFkGameBookingStatus_Id(Long id, LocalDateTime targetSlot, int i);
+
+    @Query("SELECT COUNT(gameBooking) > 0 FROM GameBooking gameBooking WHERE gameBooking.fkHostEmployee.id = :empId " +
+            "AND gameBooking.fkGameType.id = :gameTypeId " +
+            "AND gameBooking.fkGameBookingStatus.id = 1 " +
+            "AND gameBooking.gameBookingStartTime > (SELECT gameType.lastCycleResetDatetime FROM GameType gameType " +
+            "WHERE gameType.id = :gameTypeId)")
+    boolean hasActiveBookingInCycle(@Param("empId") Long empId,
+                             @Param("gameTypeId") Long gameTypeId);
+
+    boolean existsByFkGameTypeAndGameBookingStartTimeAndFkGameBookingStatus_Id(GameType gameType, LocalDateTime targetSlot, int i);
+
+    List<GameBooking> findAllByGameBookingEndTimeBeforeAndFkGameBookingStatus_Id(LocalDateTime now, int i);
 }

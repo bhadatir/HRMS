@@ -83,7 +83,7 @@ export default function GameManagement() {
                 <main className="p-6 max-w-5xl mx-auto w-250">
                     {/* Notifications */}
                     {showNotification && (
-                      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
                           <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                             onClick={() => {
@@ -140,7 +140,7 @@ export default function GameManagement() {
                         {
                             const bookingTime = new Date(b.gameBookingStartTime).getTime();
                             const now = new Date().getTime();
-                            const upcommingEnd = now + (2 * 60 * 60 * 1000);
+                            const upcommingEnd = now + (1 * 60 * 60 * 1000);
                             return !b.gameBookingIsDeleted
                             && bookingTime >= now
                             && bookingTime <= upcommingEnd && b.gameBookingStatusId === 1

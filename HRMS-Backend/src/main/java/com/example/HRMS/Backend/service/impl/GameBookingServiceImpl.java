@@ -64,7 +64,9 @@ public class GameBookingServiceImpl implements GameBookingService {
         Long empId = gameBookingRequest.getEmpId();
         Long gameTypeId = gameBookingRequest.getGameTypeId();
         LocalDateTime requestedSlotStartTime = gameBookingRequest.getRequestedSlotStartTime();
-
+        if(gameBookingRepository.hasActiveBookingInCycle(empId, gameTypeId)){
+            return "Only one active booking allow per game per cycle.";
+        }
         List<Long> bookingParticipantsEmpId = gameBookingRequest.getBookingParticipantsEmpId();
 
         if (bookingParticipantsEmpId.isEmpty()) {
@@ -114,8 +116,6 @@ public class GameBookingServiceImpl implements GameBookingService {
                 return "Slot is reserved for first-timers. You have been added to the Priority Waitlist.";
             }
         }
-
-
 
         if (isSlotFull) {
             addToWaitlist(empId, gameTypeId, requestedSlotStartTime, !isSecondTime, bookingParticipantsEmpId);
@@ -204,15 +204,42 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     }
 
-    @Scheduled(cron = "0 0/30 * * * *")
+    @Scheduled(cron = "0 */10 * * * *")
+    @Transactional
+    public void autoUpdateCompletedBookings() {
+        LocalDateTime now = LocalDateTime.now();
+
+        List<GameBooking> expiredBookings = gameBookingRepository
+                .findAllByGameBookingEndTimeBeforeAndFkGameBookingStatus_Id(now, 1);
+
+        if (!expiredBookings.isEmpty()) {
+            GameBookingStatus completedStatus = gameBookingStatusRepository.findGameBookingStatusById(2);
+
+            for (GameBooking booking : expiredBookings) {
+                booking.setFkGameBookingStatus(completedStatus);
+            }
+
+            gameBookingRepository.saveAll(expiredBookings);
+        }
+    }
+
+
+    @Scheduled(cron = "0 */30 * * * *")
+    @Transactional
     public void checkSlotAndUpdateBookings() {
-        LocalDateTime targetSlot = LocalDateTime.now().plusMinutes(30).withSecond(0).withNano(0);
-        List<GameType> gameTypes = gameTypeRepository.findAll();
-        for(GameType gameType: gameTypes){
-            boolean isSloatEmpty = ! gameBookingRepository.existsByFkGameType_IdAndGameBookingStartTimeAndFkGameBookingStatus_Id(
-                    gameType.getId(), targetSlot, 1);
-            if(isSloatEmpty){
-                updateWaitingList(gameType, targetSlot);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime targetSlot = LocalDateTime.now().plusMinutes(30);
+
+        List<BookingWaitingList> upCommingSlots = waitlistRepository.findAllByTargetSlotDatetimeBetween(now, targetSlot);
+
+        for(BookingWaitingList bookingWaitingList: upCommingSlots){
+            LocalDateTime targetTime = bookingWaitingList.getTargetSlotDatetime();
+            GameType gameType = bookingWaitingList.getFkGameType();
+
+            boolean isSloatEmpty = gameBookingRepository.existsByFkGameTypeAndGameBookingStartTimeAndFkGameBookingStatus_Id(
+                    gameType, targetTime, 1);
+            if(!isSloatEmpty){
+                updateWaitingList(gameType, targetTime);
             }
         }
     }
@@ -220,18 +247,20 @@ public class GameBookingServiceImpl implements GameBookingService {
     @Override
     @Transactional
     public void updateWaitingList(GameType gameType, LocalDateTime targetedSloatTime){
-        List<BookingWaitingList> bookingWaitingList = waitlistRepository.findMatchingBookings(gameType.getId(), targetedSloatTime);
 
+        List<BookingWaitingList> bookingWaitingList = waitlistRepository.findMatchingBookings(gameType.getId(), targetedSloatTime);
+        System.out.println(bookingWaitingList);
         if(bookingWaitingList != null && !bookingWaitingList.isEmpty()) {
+
             LocalDateTime now = LocalDateTime.now();
             long minutesDiff = Duration.between(now, targetedSloatTime).toMinutes();
 
-            if (bookingWaitingList.get(0).getIsFirstGame() || minutesDiff <= 30) {
+            if (bookingWaitingList.get(0).getIsFirstGame() || minutesDiff < 30) {
+
                 addInGameBookingWithNotification(bookingWaitingList.get(0));
             }
         }
     }
-
 
     @Transactional
     public void addInGameBookingWithNotification(BookingWaitingList bookingWaitingList){
