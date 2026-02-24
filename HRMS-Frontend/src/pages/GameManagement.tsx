@@ -6,7 +6,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Gamepad2, X, Bell, Book, Gamepad, CheckCircle, Calendar, Clock } from "lucide-react";
+import { Plus, Gamepad2, X, Bell, Book, Gamepad, CheckCircle, Calendar, Clock, Trash } from "lucide-react";
 import GameBookingForm from "../components/GameBookingForm";
 import GameTypeManager from "@/components/GameTypeManager";
 import Notifications from "@/components/Notifications";
@@ -42,7 +42,6 @@ export default function GameManagement() {
         queryKey: ["allWaitingList"], 
         queryFn: () => gameService.getAllWaitingList(token!) });
 
-
     const { data: bookings = [], isLoading } = useQuery({
         queryKey: ["allBookings"],
         queryFn: () => gameService.showAllBookings(token!),
@@ -53,6 +52,11 @@ export default function GameManagement() {
         mutationFn: ({ id, status }: { id: number, status: number }) => 
             gameService.updateBookingStatus(id, status, token!),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allBookings"] })
+    });
+
+    const removeWaitingListMutation = useMutation({
+        mutationFn: (id: number) => gameService.deleteWaitingList(id, token!),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allWaitingList"] })
     });
 
     if(isLoading) return <p>Loading Slots...</p>;    
@@ -168,13 +172,13 @@ export default function GameManagement() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <h2 className="text-xl font-bold text-slate-900 col-span-full">Upcoming Bookings :</h2>
                         {bookings.filter((b: any) => {
-                                        const bookingTime = new Date(b.gameBookingStartTime).getTime();
+                                        const bookingTime = new Date(b.gameBookingEndTime).getTime();
                                         const now = new Date().getTime();
                                         const upcommingEnd = now + (1 * 60 * 60 * 1000);
                                         return !b.gameBookingIsDeleted &&bookingTime >= now && bookingTime <= upcommingEnd && b.gameBookingStatusId === 1;
                                     }).length > 0 ? (
                                     bookings.filter((b: any) => {
-                                        const bookingTime = new Date(b.gameBookingStartTime).getTime();
+                                        const bookingTime = new Date(b.gameBookingEndTime).getTime();
                                         const now = new Date().getTime();
                                         const upcommingEnd = now + (1 * 60 * 60 * 1000);
                                         return !b.gameBookingIsDeleted &&bookingTime >= now && bookingTime <= upcommingEnd && b.gameBookingStatusId === 1;
@@ -245,9 +249,10 @@ export default function GameManagement() {
                                         <div className="flex items-center gap-2 text-sm text-slate-500">
                                             <Clock size={14} /> {new Date(wait.targetSlotDatetime).toTimeString().slice(0,5)} 
                                             - {(() => {
-                                                const gameSlotDuration = wait.gameSlotDuration;
-                                                const endHour = (new Date(wait.targetSlotDatetime).getHours() + Math.floor(gameSlotDuration / 60)) % 24;
-                                                const endMinute = new Date(wait.targetSlotDatetime).getMinutes() + (gameSlotDuration % 60);
+                                                const startDate = new Date(wait.targetSlotDatetime);
+                                                const endDate = new Date(startDate.getTime() + wait.gameSlotDuration * 60000);
+                                                const endHour = endDate.getHours();
+                                                const endMinute = endDate.getMinutes();
                                                 return `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
                                             })()}
                                         </div>
@@ -262,16 +267,16 @@ export default function GameManagement() {
                                                 )}
                                             </div>
                                             
-                                            {wait.gameBookingStatusId === 1 && wait.employeeId === user?.id ? (
                                                 <div className="flex gap-2">
-                                                    {/* <Button size="sm" variant="outline" className="h-7 text-red-600" 
-                                                    onClick={() => {
-                                                        if (confirm("Are you sure you want to cancel this booking?")) {
-                                                            onStatusChange();
+                                                    <Button size="sm" variant="outline" className="h-7 text-red-600" 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (confirm("Are you sure you want to delete this waiting list entry?")) {
+                                                            removeWaitingListMutation.mutate(wait.id);
                                                         }
                                                     }}>
-                                                        <CheckCircle size={14} className="mr-1"/> Cancel
-                                                    </Button> */}
+                                                        <Trash size={14} className="mr-1"/> Delete
+                                                    </Button>
                                                     {/* <Button size="sm" variant="outline" className="h-7 text-gray-600" 
                                                     onClick={() => {
                                                         setShowGameBookingForm(true);
@@ -279,7 +284,6 @@ export default function GameManagement() {
                                                         <Edit size={14} className="mr-1"/> Edit
                                                     </Button> */}
                                                 </div>
-                                            ):null}
                                         </div>
                                     </CardContent>
                                     </Card>

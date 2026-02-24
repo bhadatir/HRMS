@@ -62,7 +62,7 @@ public class GameBookingController {
         return ResponseEntity.ok("game interest added successfully");
     }
 
-    @DeleteMapping("/interest/{gameInterestId}")
+    @PatchMapping("/interest/{gameInterestId}")
     public ResponseEntity<String> removeGameInterest(@PathVariable Long gameInterestId){
         gameBookingService.removeGameInterest(gameInterestId);
         return ResponseEntity.ok("game interest removed successfully");
@@ -81,6 +81,12 @@ public class GameBookingController {
     @GetMapping("/waitList/{waitId}")
     public ResponseEntity<BookingWaitingListResponse> findWaitListById(@PathVariable Long waitId){
         return ResponseEntity.ok(gameBookingService.findWaitListById(waitId));
+    }
+
+    @DeleteMapping("/waitList/{waitId}")
+    public ResponseEntity<String> deleteWaitListById(@PathVariable Long waitId){
+        gameBookingService.deleteWaitListById(waitId);
+        return ResponseEntity.ok("waiting list delete successfully");
     }
 
     @GetMapping("/waitListSeq/{waitId}")

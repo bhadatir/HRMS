@@ -19,7 +19,8 @@ public interface EmployeeGameInterestRepository extends JpaRepository<EmployeeGa
 
     @Modifying
     @Transactional
-    @Query(value = "Delete from EmployeeGameInterest e " +
+    @Query(value = "update EmployeeGameInterest e " +
+            "set e.isInterestDeleted = true " +
             "where e.id = :gameInterestId ")
     void removeEmployeeGameInterestById(Long gameInterestId);
 }

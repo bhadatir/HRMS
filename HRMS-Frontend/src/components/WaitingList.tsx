@@ -38,9 +38,10 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
                     <div className="flex items-center gap-2 text-sm text-slate-500">
                         <Clock size={14} /> {new Date(waitingList?.targetSlotDatetime).toTimeString().slice(0,5)} 
                         - {(() => {
-                            const gameSlotDuration = waitingList?.gameSlotDuration;
-                            const endHour = (new Date(waitingList?.targetSlotDatetime).getHours() + Math.floor(gameSlotDuration / 60)) % 24;
-                            const endMinute = new Date(waitingList?.targetSlotDatetime).getMinutes() + (gameSlotDuration % 60);
+                            const startDate = new Date(waitingList?.targetSlotDatetime);
+                            const endDate = new Date(startDate.getTime() + waitingList?.gameSlotDuration * 60000);
+                            const endHour = endDate.getHours();
+                            const endMinute = endDate.getMinutes();
                             return `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
                         })()}
                     </div>

@@ -43,8 +43,14 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
                 <Calendar size={14} /> {new Date(booking.gameBookingStartTime).toLocaleDateString()}
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-500">
-                <Clock size={14} /> {new Date(booking.gameBookingStartTime).toTimeString().slice(0,5)} 
+                <Clock size={14} /> {new Date(booking.gameBookingStartTime).toTimeString().slice(0,5)}  
                 - {new Date(booking.gameBookingEndTime).toTimeString().slice(0,5)}
+                {(() => {
+                    const startDate = new Date(booking.gameBookingStartTime);
+                    const endDate = new Date(booking.gameBookingEndTime);
+                    const running = (startDate.getTime() < new Date().getTime() && endDate.getTime() > new Date().getTime());
+                    return running ? " Running..." : null;
+                })()}
             </div>
 
             <div className="pt-2 border-t flex justify-between items-center">

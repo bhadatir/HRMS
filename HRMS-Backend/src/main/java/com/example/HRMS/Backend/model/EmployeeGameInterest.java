@@ -28,4 +28,7 @@ public class EmployeeGameInterest {
     @Column(name = "played_in_current_cycle")
     private Integer playedInCurrentCycle = 0;
 
+    @Column(name = "is_interest_deleted")
+    private boolean isInterestDeleted = false;
+
 }

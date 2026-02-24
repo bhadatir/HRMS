@@ -24,7 +24,7 @@ export default function PostManagement() {
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
-  const [size] = useState(10);
+  const [size] = useState(2);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -166,7 +166,10 @@ export default function PostManagement() {
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <div className="flex justify-between w-full">
-                          <CardTitle className="text-xl font-bold text-slate-900">{post.postTitle}</CardTitle>
+                          <CardTitle className="text-xl font-bold text-slate-900">
+                            <p className="text-lg text-gray-700">{post.postTitle} </p>
+                            <p className="text-[10px] text-gray-500">By {post?.employeeEmail || "ROIMA"}</p>
+                          </CardTitle>
                           <div className="flex gap-2 items-center mt-1">
                             <Badge variant="secondary" className="text-[10px] bg-blue-50 text-blue-700">
                               <Eye size={10} className="mr-1" /> {post.postVisibilityName}

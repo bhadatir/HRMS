@@ -41,6 +41,11 @@ export const gameService = {
         return res.data;
     },
 
+    deleteWaitingList: async (waitingListId: number, token: string) => {
+        const res = await api.delete(`/game/waitList/${waitingListId}`, authHeader(token));
+        return res.data;
+    },
+
     addGameType: async (payload: any, token: string) => {
         const res = await api.post("/hr/gameType", payload, authHeader(token));
         return res.data;
@@ -92,7 +97,7 @@ export const gameService = {
     },
 
     updateEmployeeGameInterests: async (gameInterestId: number, token: string) => {
-        const res = await api.delete(`/game/interest/${gameInterestId}`, authHeader(token));
+        const res = await api.patch(`/game/interest/${gameInterestId}`, null, authHeader(token));
         return res.data;
     }
     

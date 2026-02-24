@@ -41,4 +41,6 @@ public interface GameBookingService {
     BookingWaitingListResponse findWaitListById(Long waitId);
 
     List<BookingWaitingListResponse> findWaitListSeqByGameTypeAndSloat(Long waitId);
+
+    void deleteWaitListById(Long waitId);
 }

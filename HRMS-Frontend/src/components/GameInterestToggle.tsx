@@ -22,7 +22,7 @@ export default function GameInterestToggle() {
 
     const mutation = useMutation({
         mutationFn: (gameTypeId: number) => {
-            const existingInterest = myInterests.find((i: any) => Number(i.gameTypeId) === Number(gameTypeId));
+            const existingInterest = myInterests.find((i: any) => (Number(i.gameTypeId) === Number(gameTypeId) && i.interestDeleted === false));
             if(existingInterest) {
                 return gameService.updateEmployeeGameInterests(existingInterest.id, token!);
             } else {
@@ -32,7 +32,7 @@ export default function GameInterestToggle() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["myInterests", user?.id]})
     });
    
-    const isInterested = (gameId: number) => myInterests.some((i: any) => Number(i.gameTypeId) === Number(gameId));
+    const isInterested = (gameId: number) => myInterests.some((i: any) => (Number(i.gameTypeId) === Number(gameId) && i.interestDeleted === false));
 
     return (
         <Card className="bg-slate-50 border-dashed">

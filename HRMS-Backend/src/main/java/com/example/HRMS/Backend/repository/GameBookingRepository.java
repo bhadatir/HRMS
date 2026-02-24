@@ -38,4 +38,6 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
     boolean existsByFkGameTypeAndGameBookingStartTimeAndFkGameBookingStatus_Id(GameType gameType, LocalDateTime targetSlot, int i);
 
     List<GameBooking> findAllByGameBookingEndTimeBeforeAndFkGameBookingStatus_Id(LocalDateTime now, int i);
+
+    List<GameBooking> findAllByGameBookingStartTimeBetween(LocalDateTime now, LocalDateTime targetSlot);
 }

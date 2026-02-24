@@ -6,6 +6,8 @@ import lombok.Data;
 public class EmployeeGameInterestResponse {
     private Long id;
 
+    private boolean isInterestDeleted;
+
     private Long employeeId;
 
     private String employeeEmail;
