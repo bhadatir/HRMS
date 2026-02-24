@@ -174,7 +174,7 @@ export default function GameManagement() {
                         {bookings.filter((b: any) => {
                                         const bookingTime = new Date(b.gameBookingEndTime).getTime();
                                         const now = new Date().getTime();
-                                        const upcommingEnd = now + (1 * 60 * 60 * 1000);
+                                        const upcommingEnd = bookingTime + (1 * 60 * 60 * 1000);
                                         return !b.gameBookingIsDeleted &&bookingTime >= now && bookingTime <= upcommingEnd && b.gameBookingStatusId === 1;
                                     }).length > 0 ? (
                                     bookings.filter((b: any) => {

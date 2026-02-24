@@ -39,7 +39,9 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         queryKey: ["employeeSearch", searchTerm],
         queryFn: () => apiService.searchEmployees(searchTerm, token || ""),
         enabled: searchTerm.length >= 1,
-        select: (suggestions) => suggestions.filter((emp: any) => emp.id !== user?.id && !selectedParticipants.find(p => p.id === emp.id))
+        select: (suggestions) => suggestions.filter((emp: any) => emp.id !== user?.id 
+            && !selectedParticipants.find(p => p.id === emp.id)
+        )
     });
 
     const { data: myInterests = [] } = useQuery({
@@ -65,7 +67,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                 const timeStr = `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
                 
                 setSelectedTime(timeStr);
-                const participants = booking.bookingParticipantResponses?.map((p: any) => ({ id: p.id, name: p.employeeFirstName })) || [];
+                const participants = booking.bookingParticipantResponses?.map((p: any) => ({ id: p.employeeId, name: `${p.employeeFirstName} ${p.employeeLastName}` })) || [];
                 setSelectedParticipants(participants);
 
                 reset({
@@ -292,11 +294,10 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                                                     <Button
                                                         key={slot}
                                                         type="button"
-                                                        title={isPersonallyBusy && "you are not avalible at this time."}
+                                                        title={isPersonallyBusy ? "you are not avalible at this time." : ""}
                                                         disabled={isPersonallyBusy || isWaited}
                                                         className={cn(
-                                                            "text-xs h-10 transition-all border-2",
-                                                            isBooked && "bg-slate-200 text-slate-500",        
+                                                            "text-xs h-10 transition-all border-2",                                                           isBooked && "bg-slate-200 text-slate-500",        
                                                             isPersonallyBusy || isWaited && "bg-slate-200 text-slate-500 cursor-not-allowed",                                                    
                                                             isSelected && "bg-gray-900 text-black",
                                                             !isBooked && !isSelected && "text-slate-500"
@@ -362,10 +363,10 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                             </div>
                         )}
                     </div>
-                    : <p className="text-xs text-gray-500   ">
+                    : <p className="text-xs text-gray-500">
                         {selectedParticipants.length > 0 ?
                             <p>
-                                {selectedGame?.gameName} Game only allow maximum {selectedGame.gameMaxPlayerPerSlot} player per game slot.
+                                {selectedGame?.gameName} Game only allow maximum {selectedGame?.gameMaxPlayerPerSlot} player per game slot.
                             </p>
                             : null
                         }      

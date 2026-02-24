@@ -48,7 +48,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
                 {(() => {
                     const startDate = new Date(booking.gameBookingStartTime);
                     const endDate = new Date(booking.gameBookingEndTime);
-                    const running = (startDate.getTime() < new Date().getTime() && endDate.getTime() > new Date().getTime());
+                    const running = (startDate.getTime() < new Date().getTime() && endDate.getTime() > new Date().getTime() && booking.gameBookingStatusId === 1 && !booking.gameBookingIsDeleted);
                     return running ? " Running..." : null;
                 })()}
             </div>
@@ -63,7 +63,8 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
                     )}
                 </div>
                 
-                {booking.gameBookingStatusId === 1 && booking.employeeId === user?.id ? (
+                {booking.gameBookingStatusId === 1 && booking.employeeId === user?.id 
+                    && !booking.gameBookingIsDeleted && new Date(booking.gameBookingStartTime) > new Date() ? (
                     <div className="flex gap-2">
                         <Button size="sm" variant="outline" className="h-7 text-red-600" 
                         onClick={() => {

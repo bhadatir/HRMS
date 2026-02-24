@@ -140,13 +140,30 @@ public class GameBookingServiceImpl implements GameBookingService {
             bookingParticipant.setFkGameBooking(saveGameBooking);
             bookingParticipantRepository.save(bookingParticipant);
 
+            //if not interested then what ??
+
+            EmployeeGameInterest employeeGameInterest1 = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
+                    (id, gameType.getId());
+
+            if(employeeGameInterest1 != null) {
+                employeeGameInterest1.setPlayedInCurrentCycle(employeeGameInterest1.getPlayedInCurrentCycle() + 1);
+                employeeGameInterestRepository.save(employeeGameInterest1);
+            }else{
+                EmployeeGameInterest employeeGameInterest2 = new EmployeeGameInterest();
+                employeeGameInterest2.setFkGameType(gameType);
+                employeeGameInterest2.setFkEmployee(employeeRepository.findEmployeeById(id));
+                employeeGameInterest2.setPlayedInCurrentCycle(1);
+                employeeGameInterestRepository.save(employeeGameInterest2);
+            }
+
+            notificationService.createNotification(id
+                    ,"Slot Confirmed!"
+                    ,  "You have been promoted to your requested slot => " + gameType.getGameName()
+                            + " : " + requestedSlotStartTime + " => " + employee.getEmployeeEmail() + " book this sloat."
+            );
+
             emails.add(employee1.getEmployeeEmail());
 
-            notificationService.createNotification(employee1.getId()
-                    ,"Slot Confirmed!"
-                    ,  "You Booking is conform for slot => " + gameType.getGameName()
-                            + " : " + requestedSlotStartTime
-            );
         }
 
         emailService.sendEmail(emails,"Slot Confirmed! "
@@ -249,7 +266,6 @@ public class GameBookingServiceImpl implements GameBookingService {
             );
         }
 
-
         List<BookingWaitingList> upComingSlots = waitlistRepository.findAllByTargetSlotDatetimeBetween(now, targetSlot);
         if(upComingSlots == null || upComingSlots.isEmpty()){
             return;
@@ -306,6 +322,26 @@ public class GameBookingServiceImpl implements GameBookingService {
             bookingParticipant.setFkGameBooking(gameBooking);
 
             bookingParticipantRepository.save(bookingParticipant);
+
+            EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
+                    (bookingParticipant.getFkEmployee().getId(), bookingWaitingList.getFkGameType().getId());
+
+            if(employeeGameInterest != null) {
+                employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() + 1);
+                employeeGameInterestRepository.save(employeeGameInterest);
+            }else{
+                    EmployeeGameInterest employeeGameInterest2 = new EmployeeGameInterest();
+                    employeeGameInterest2.setFkGameType(bookingWaitingList.getFkGameType());
+                    employeeGameInterest2.setFkEmployee(bookingParticipant.getFkEmployee());
+                    employeeGameInterest2.setPlayedInCurrentCycle(1);
+                    employeeGameInterestRepository.save(employeeGameInterest2);
+                }
+
+            notificationService.createNotification(bookingWaitingList.getFkHostEmployee().getId()
+                    ,"Slot Confirmed!"
+                    ,  "You have been promoted to your requested slot => " + bookingWaitingList.getFkGameType().getGameName()
+                            + " : " + startTime + " => " + bookingWaitingList.getFkHostEmployee().getEmployeeEmail() + " book this sloat."
+            );
         }
 
         EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
@@ -470,8 +506,8 @@ public class GameBookingServiceImpl implements GameBookingService {
         return employeeGameInterestResponses;
     }
 
-    @Override
     @Transactional
+    @Override
     public void updateGameBooking(Long bookingId, GameBookingRequest gameBookingRequest){
 
         List<Long> existingEmployeesId = bookingParticipantRepository.findEmployeeIdByGameBookingId(bookingId);
@@ -480,7 +516,7 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         gameBooking.setId(bookingId);
 
-        GameBooking savedGameBooking = gameBookingRepository.save(gameBooking);
+        gameBookingRepository.save(gameBooking);
 
         List<Long> newEmpId = gameBookingRequest.getBookingParticipantsEmpId();
 
@@ -494,6 +530,7 @@ public class GameBookingServiceImpl implements GameBookingService {
                 BookingParticipant bookingParticipant = new BookingParticipant();
 
                 bookingParticipant.setFkBookingWaitingList(null);
+                bookingParticipant.setFkEmployee(employee);
                 bookingParticipant.setFkGameBooking(gameBooking);
 
                 bookingParticipantRepository.save(bookingParticipant);
@@ -508,14 +545,14 @@ public class GameBookingServiceImpl implements GameBookingService {
 
             if(!newEmpId.contains(id)) {
                 BookingParticipant bookingParticipant = bookingParticipantRepository.findBookingParticipantByEmployeeIdAndGameBookingId(id, bookingId);
-                bookingParticipantRepository.delete(bookingParticipant);
-
-                Employee employee = employeeRepository.findEmployeeById(id);
-                List<String> emails1 = new ArrayList<>();
-                emails1.add(employee.getEmployeeEmail());
-                emailService.sendEmail(emails1,"Remove from booking","Removed from Game Booking by your friend at :" + Instant.now());
-                notificationService.createNotification(id, "Remove from booking","Removed from Game Booking by your friend at :" + Instant.now());
-
+                if(bookingParticipant != null) {
+                    bookingParticipantRepository.removeBookingParticipantById(bookingParticipant.getId());
+                    Employee employee = employeeRepository.findEmployeeById(id);
+                    List<String> emails1 = new ArrayList<>();
+                    emails1.add(employee.getEmployeeEmail());
+                    emailService.sendEmail(emails1, "Remove from booking", "Removed from Game Booking by your friend at :" + Instant.now());
+                    notificationService.createNotification(id, "Remove from booking", "Removed from Game Booking by your friend at :" + Instant.now());
+                }
             }
         }
 

@@ -2518,3 +2518,881 @@ Caused by: org.springframework.data.mapping.PropertyReferenceException: No prope
 2026-02-24T17:55:43.136+05:30  INFO 28628 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2026-02-24T17:55:43.138+05:30  INFO 28628 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-02-24T17:55:43.140+05:30  INFO 28628 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-24T19:21:11.157+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T19:21:11.361+05:30  INFO 31616 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T19:21:11.367+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T19:21:11.367+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@52fb37d7]]
+2026-02-24T19:21:11.367+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T19:21:11.372+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T19:21:11.374+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T19:21:11.379+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T17:56:39.018+05:30  INFO 28628 --- [HRMS-Backend] [MessageBroker-16] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[2 current WS(2)-HttpStream(0)-HttpPoll(0), 6 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(6)-CONNECTED(6)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 32, active threads = 0, queued tasks = 0, completed tasks = 48], outboundChannel[pool size = 10, active threads = 0, queued tasks = 0, completed tasks = 10], sockJsScheduler[pool size = 16, active threads = 1, queued tasks = 8, completed tasks = 14]
+2026-02-24T18:00:00.044+05:30 ERROR 28628 --- [HRMS-Backend] [MessageBroker-15] o.s.s.s.TaskUtils$LoggingErrorHandler    : Unexpected error occurred in scheduled task
+
+java.lang.NullPointerException: Cannot invoke "org.hibernate.metamodel.mapping.DiscriminatorType.getJdbcJavaType()" because "this.discriminatorType" is null
+	at org.hibernate.sql.ast.tree.expression.EntityTypeLiteral.createSqlSelection(EntityTypeLiteral.java:136) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.sql.ast.tree.expression.EntityTypeLiteral.createDomainResult(EntityTypeLiteral.java:127) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.lambda$visitSelection$18(BaseSqmToSqlAstConverter.java:2309) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at java.base/java.util.Collections$SingletonList.forEach(Collections.java:4967) ~[na:na]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelection(BaseSqmToSqlAstConverter.java:2304) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectClause(BaseSqmToSqlAstConverter.java:2222) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQuerySpec(BaseSqmToSqlAstConverter.java:2093) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQuerySpec(BaseSqmToSqlAstConverter.java:455) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.tree.select.SqmQuerySpec.accept(SqmQuerySpec.java:124) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.spi.BaseSemanticQueryWalker.visitQueryPart(BaseSemanticQueryWalker.java:245) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQueryPart(BaseSqmToSqlAstConverter.java:1947) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectStatement(BaseSqmToSqlAstConverter.java:1630) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectStatement(BaseSqmToSqlAstConverter.java:455) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.tree.select.SqmSelectStatement.accept(SqmSelectStatement.java:238) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.translate(BaseSqmToSqlAstConverter.java:801) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.buildCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:479) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.withCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:385) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.performList(ConcreteSqmSelectQueryPlan.java:359) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.QuerySqmImpl.doList(QuerySqmImpl.java:364) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.spi.AbstractSelectionQuery.list(AbstractSelectionQuery.java:143) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.Query.getResultList(Query.java:120) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution$CollectionExecution.doExecute(JpaQueryExecution.java:132) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution.execute(JpaQueryExecution.java:95) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.doExecute(AbstractJpaQuery.java:160) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.execute(AbstractJpaQuery.java:148) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:170) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:149) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:136) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223) ~[spring-aop-6.2.15.jar:6.2.15]
+	at jdk.proxy2/jdk.proxy2.$Proxy156.findAllByTravelPlanEndDateAndTravelPlanIsDeleted(Unknown Source) ~[na:na]
+	at com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl.autoNotificationForExpenseAdd(TravelPlanServiceImpl.java:408) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:360) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728) ~[spring-aop-6.2.15.jar:6.2.15]
+	at com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl$$SpringCGLIB$$0.autoNotificationForExpenseAdd(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:130) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$2(ScheduledMethodRunnable.java:124) ~[spring-context-6.2.15.jar:6.2.15]
+	at io.micrometer.observation.Observation.observe(Observation.java:498) ~[micrometer-observation-1.15.8.jar:1.15.8]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:124) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.config.Task$OutcomeTrackingRunnable.run(Task.java:87) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.concurrent.ReschedulingRunnable.run(ReschedulingRunnable.java:96) ~[spring-context-6.2.15.jar:6.2.15]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2026-02-24T18:16:32.120+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:16:32.281+05:30  INFO 28628 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:16:32.285+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:16:32.285+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@4977e352]]
+2026-02-24T18:16:32.286+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:16:32.291+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:16:32.294+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:16:32.297+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:16:35.545+05:30  INFO 32820 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 32820 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:16:35.547+05:30  INFO 32820 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:16:36.132+05:30  INFO 32820 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:16:36.219+05:30  INFO 32820 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 81 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:16:36.643+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:16:36.651+05:30  INFO 32820 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:16:36.652+05:30  INFO 32820 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:16:36.689+05:30  INFO 32820 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:16:36.689+05:30  INFO 32820 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1112 ms
+2026-02-24T18:16:36.859+05:30  INFO 32820 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:16:36.897+05:30  INFO 32820 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:16:36.920+05:30  INFO 32820 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:16:37.103+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:16:37.125+05:30  INFO 32820 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:16:37.420+05:30  INFO 32820 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 44900ab6-edb2-4c02-81a2-de1ddf17623d
+2026-02-24T18:16:37.421+05:30  INFO 32820 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:16:37.483+05:30  WARN 32820 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:16:37.502+05:30  INFO 32820 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:16:38.315+05:30  INFO 32820 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:16:39.125+05:30  INFO 32820 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:16:39.389+05:30  INFO 32820 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:16:39.415+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:16:40.340+05:30  WARN 32820 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:16:40.774+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:16:40.774+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2d550996]]
+2026-02-24T18:16:40.775+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:16:40.790+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:16:40.799+05:30  INFO 32820 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.596 seconds (process running for 5.858)
+2026-02-24T18:16:46.996+05:30  INFO 32820 --- [HRMS-Backend] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T18:16:46.997+05:30  INFO 32820 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T18:16:46.999+05:30  INFO 32820 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-24T18:17:40.782+05:30  INFO 32820 --- [HRMS-Backend] [MessageBroker-16] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[2 current WS(2)-HttpStream(0)-HttpPoll(0), 2 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(2)-CONNECTED(2)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 12, active threads = 0, queued tasks = 0, completed tasks = 12], outboundChannel[pool size = 2, active threads = 0, queued tasks = 0, completed tasks = 2], sockJsScheduler[pool size = 16, active threads = 1, queued tasks = 8, completed tasks = 15]
+2026-02-24T18:19:04.554+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:19:04.720+05:30  INFO 32820 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:19:04.724+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:19:04.725+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2d550996]]
+2026-02-24T18:19:04.725+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:19:04.728+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:19:04.730+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:19:04.732+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:19:07.997+05:30  INFO 23996 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 23996 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:19:07.999+05:30  INFO 23996 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:19:08.623+05:30  INFO 23996 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:19:08.718+05:30  INFO 23996 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 88 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:19:09.144+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:19:09.152+05:30  INFO 23996 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:19:09.152+05:30  INFO 23996 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:19:09.196+05:30  INFO 23996 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:19:09.197+05:30  INFO 23996 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1165 ms
+2026-02-24T18:19:09.348+05:30  INFO 23996 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:19:09.386+05:30  INFO 23996 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:19:09.412+05:30  INFO 23996 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:19:09.588+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:19:09.613+05:30  INFO 23996 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:19:09.946+05:30  INFO 23996 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 37e85089-2155-4e3a-b07a-ecf90857e1ea
+2026-02-24T18:19:09.948+05:30  INFO 23996 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:19:10.013+05:30  WARN 23996 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:19:10.029+05:30  INFO 23996 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:19:11.152+05:30  INFO 23996 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:19:12.022+05:30  INFO 23996 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:19:12.256+05:30  INFO 23996 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:19:12.290+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:19:13.118+05:30  WARN 23996 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:19:13.601+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:19:13.601+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@36eff8df]]
+2026-02-24T18:19:13.603+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:19:13.618+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:19:13.629+05:30  INFO 23996 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.967 seconds (process running for 6.226)
+2026-02-24T18:19:40.540+05:30  INFO 23996 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T18:19:40.540+05:30  INFO 23996 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T18:19:40.540+05:30  INFO 23996 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-02-24T18:20:13.609+05:30  INFO 23996 --- [HRMS-Backend] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 7, active threads = 1, queued tasks = 5, completed tasks = 1]
+2026-02-24T18:29:48.285+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:29:48.447+05:30  INFO 23996 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:29:48.449+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:29:48.450+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@36eff8df]]
+2026-02-24T18:29:48.450+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:29:48.454+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:29:48.455+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:29:48.457+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:29:51.677+05:30  INFO 7096 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 7096 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:29:51.680+05:30  INFO 7096 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:29:52.279+05:30  INFO 7096 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:29:52.371+05:30  INFO 7096 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 86 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:29:52.801+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:29:52.810+05:30  INFO 7096 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:29:52.810+05:30  INFO 7096 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:29:52.852+05:30  INFO 7096 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:29:52.852+05:30  INFO 7096 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1142 ms
+2026-02-24T18:29:53.007+05:30  INFO 7096 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:29:53.044+05:30  INFO 7096 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:29:53.069+05:30  INFO 7096 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:29:53.233+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:29:53.254+05:30  INFO 7096 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:29:53.568+05:30  INFO 7096 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 2c134653-2424-434b-9fcf-7a842ab3f87e
+2026-02-24T18:29:53.569+05:30  INFO 7096 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:29:53.624+05:30  WARN 7096 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:29:53.640+05:30  INFO 7096 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:29:54.515+05:30  INFO 7096 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:29:55.392+05:30  INFO 7096 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:29:55.663+05:30  INFO 7096 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:29:55.694+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:29:56.532+05:30  WARN 7096 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:29:56.966+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:29:56.966+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2d550996]]
+2026-02-24T18:29:56.967+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:29:56.986+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:29:56.995+05:30  INFO 7096 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.704 seconds (process running for 5.96)
+2026-02-24T18:30:56.977+05:30  INFO 7096 --- [HRMS-Backend] [MessageBroker-3] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 8, active threads = 1, queued tasks = 5, completed tasks = 2]
+2026-02-24T18:31:40.565+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:31:40.729+05:30  INFO 7096 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:31:40.730+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:31:40.730+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2d550996]]
+2026-02-24T18:31:40.731+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:31:40.734+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:31:40.736+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:31:40.739+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:31:43.943+05:30  INFO 14340 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 14340 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:31:43.945+05:30  INFO 14340 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:31:44.542+05:30  INFO 14340 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:31:44.631+05:30  INFO 14340 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 82 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:31:45.052+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:31:45.060+05:30  INFO 14340 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:31:45.060+05:30  INFO 14340 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:31:45.103+05:30  INFO 14340 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:31:45.104+05:30  INFO 14340 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1123 ms
+2026-02-24T18:31:45.261+05:30  INFO 14340 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:31:45.302+05:30  INFO 14340 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:31:45.325+05:30  INFO 14340 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:31:45.516+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:31:45.541+05:30  INFO 14340 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:31:45.892+05:30  INFO 14340 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 61204057-fdef-49bb-a527-cbc1534061b6
+2026-02-24T18:31:45.894+05:30  INFO 14340 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:31:45.948+05:30  WARN 14340 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:31:45.964+05:30  INFO 14340 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:31:46.751+05:30  INFO 14340 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:31:47.591+05:30  INFO 14340 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:31:47.828+05:30  INFO 14340 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:31:47.853+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:31:48.629+05:30  WARN 14340 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:31:49.024+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:31:49.024+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@560def6c]]
+2026-02-24T18:31:49.025+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:31:49.041+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:31:49.058+05:30  INFO 14340 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.452 seconds (process running for 5.712)
+2026-02-24T18:32:49.024+05:30  INFO 14340 --- [HRMS-Backend] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 6, active threads = 1, queued tasks = 5, completed tasks = 0]
+2026-02-24T18:33:09.843+05:30  INFO 14340 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T18:33:09.844+05:30  INFO 14340 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T18:33:09.846+05:30  INFO 14340 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-24T18:51:49.147+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:51:49.306+05:30  INFO 14340 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:51:49.310+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:51:49.310+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@560def6c]]
+2026-02-24T18:51:49.310+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:51:49.316+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:51:49.318+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:51:49.320+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:51:52.908+05:30  INFO 27848 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 27848 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:51:52.910+05:30  INFO 27848 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:51:53.537+05:30  INFO 27848 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:51:53.626+05:30  INFO 27848 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 83 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:51:54.064+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:51:54.072+05:30  INFO 27848 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:51:54.073+05:30  INFO 27848 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:51:54.111+05:30  INFO 27848 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:51:54.112+05:30  INFO 27848 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1171 ms
+2026-02-24T18:51:54.283+05:30  INFO 27848 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:51:54.323+05:30  INFO 27848 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:51:54.348+05:30  INFO 27848 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:51:54.529+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:51:54.550+05:30  INFO 27848 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:51:54.904+05:30  INFO 27848 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: f396f512-70f8-4b97-9c57-7159edcf0bca
+2026-02-24T18:51:54.905+05:30  INFO 27848 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:51:54.977+05:30  WARN 27848 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:51:54.991+05:30  INFO 27848 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:51:55.801+05:30  INFO 27848 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:51:56.633+05:30  INFO 27848 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:51:56.895+05:30  INFO 27848 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:51:56.928+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:51:57.731+05:30  WARN 27848 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:51:58.171+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:51:58.172+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@52fb37d7]]
+2026-02-24T18:51:58.172+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:51:58.186+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:51:58.195+05:30  INFO 27848 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.635 seconds (process running for 5.91)
+2026-02-24T18:52:09.309+05:30  INFO 27848 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T18:52:09.309+05:30  INFO 27848 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T18:52:09.309+05:30  INFO 27848 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-02-24T18:52:58.171+05:30  INFO 27848 --- [HRMS-Backend] [MessageBroker-6] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[2 current WS(2)-HttpStream(0)-HttpPoll(0), 2 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(2)-CONNECTED(2)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 12, active threads = 0, queued tasks = 0, completed tasks = 12], outboundChannel[pool size = 4, active threads = 0, queued tasks = 0, completed tasks = 4], sockJsScheduler[pool size = 16, active threads = 1, queued tasks = 8, completed tasks = 8]
+2026-02-24T19:00:00.044+05:30 ERROR 27848 --- [HRMS-Backend] [MessageBroker-1] o.s.s.s.TaskUtils$LoggingErrorHandler    : Unexpected error occurred in scheduled task
+
+java.lang.NullPointerException: Cannot invoke "org.hibernate.metamodel.mapping.DiscriminatorType.getJdbcJavaType()" because "this.discriminatorType" is null
+	at org.hibernate.sql.ast.tree.expression.EntityTypeLiteral.createSqlSelection(EntityTypeLiteral.java:136) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.sql.ast.tree.expression.EntityTypeLiteral.createDomainResult(EntityTypeLiteral.java:127) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.lambda$visitSelection$18(BaseSqmToSqlAstConverter.java:2309) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at java.base/java.util.Collections$SingletonList.forEach(Collections.java:4967) ~[na:na]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelection(BaseSqmToSqlAstConverter.java:2304) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectClause(BaseSqmToSqlAstConverter.java:2222) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQuerySpec(BaseSqmToSqlAstConverter.java:2093) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQuerySpec(BaseSqmToSqlAstConverter.java:455) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.tree.select.SqmQuerySpec.accept(SqmQuerySpec.java:124) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.spi.BaseSemanticQueryWalker.visitQueryPart(BaseSemanticQueryWalker.java:245) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQueryPart(BaseSqmToSqlAstConverter.java:1947) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectStatement(BaseSqmToSqlAstConverter.java:1630) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectStatement(BaseSqmToSqlAstConverter.java:455) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.tree.select.SqmSelectStatement.accept(SqmSelectStatement.java:238) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.translate(BaseSqmToSqlAstConverter.java:801) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.buildCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:479) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.withCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:385) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.performList(ConcreteSqmSelectQueryPlan.java:359) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.QuerySqmImpl.doList(QuerySqmImpl.java:364) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.spi.AbstractSelectionQuery.list(AbstractSelectionQuery.java:143) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.Query.getResultList(Query.java:120) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution$CollectionExecution.doExecute(JpaQueryExecution.java:132) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution.execute(JpaQueryExecution.java:95) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.doExecute(AbstractJpaQuery.java:160) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.execute(AbstractJpaQuery.java:148) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:170) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:149) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:136) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223) ~[spring-aop-6.2.15.jar:6.2.15]
+	at jdk.proxy2/jdk.proxy2.$Proxy156.findAllByTravelPlanEndDateAndTravelPlanIsDeleted(Unknown Source) ~[na:na]
+	at com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl.autoNotificationForExpenseAdd(TravelPlanServiceImpl.java:408) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:360) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728) ~[spring-aop-6.2.15.jar:6.2.15]
+	at com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl$$SpringCGLIB$$0.autoNotificationForExpenseAdd(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:130) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$2(ScheduledMethodRunnable.java:124) ~[spring-context-6.2.15.jar:6.2.15]
+	at io.micrometer.observation.Observation.observe(Observation.java:498) ~[micrometer-observation-1.15.8.jar:1.15.8]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:124) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.config.Task$OutcomeTrackingRunnable.run(Task.java:87) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.concurrent.ReschedulingRunnable.run(ReschedulingRunnable.java:96) ~[spring-context-6.2.15.jar:6.2.15]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2026-02-24T19:02:13.088+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T19:02:13.242+05:30  INFO 27848 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T19:02:13.246+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T19:02:13.246+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@52fb37d7]]
+2026-02-24T19:02:13.246+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T19:02:13.252+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T19:02:13.253+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T19:02:13.256+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T19:02:16.432+05:30  INFO 31616 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 31616 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T19:02:16.435+05:30  INFO 31616 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T19:02:17.640+05:30  INFO 31616 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T19:02:17.734+05:30  INFO 31616 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 88 ms. Found 34 JPA repository interfaces.
+2026-02-24T19:02:18.164+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T19:02:18.172+05:30  INFO 31616 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T19:02:18.172+05:30  INFO 31616 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T19:02:18.212+05:30  INFO 31616 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T19:02:18.212+05:30  INFO 31616 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1746 ms
+2026-02-24T19:02:18.385+05:30  INFO 31616 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T19:02:18.426+05:30  INFO 31616 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T19:02:18.450+05:30  INFO 31616 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T19:02:18.626+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T19:02:18.654+05:30  INFO 31616 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T19:02:18.956+05:30  INFO 31616 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: fcc4caf7-77ef-446c-9a23-cf8a744a9e33
+2026-02-24T19:02:18.957+05:30  INFO 31616 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T19:02:19.008+05:30  WARN 31616 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T19:02:19.022+05:30  INFO 31616 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T19:02:19.845+05:30  INFO 31616 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T19:02:20.612+05:30  INFO 31616 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T19:02:20.823+05:30  INFO 31616 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T19:02:20.859+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T19:02:21.675+05:30  WARN 31616 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T19:02:22.086+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T19:02:22.086+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@52fb37d7]]
+2026-02-24T19:02:22.086+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T19:02:22.104+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T19:02:22.113+05:30  INFO 31616 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 6.024 seconds (process running for 6.292)
+2026-02-24T19:02:38.351+05:30  INFO 31616 --- [HRMS-Backend] [http-nio-8080-exec-12] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T19:02:38.351+05:30  INFO 31616 --- [HRMS-Backend] [http-nio-8080-exec-12] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T19:02:38.353+05:30  INFO 31616 --- [HRMS-Backend] [http-nio-8080-exec-12] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-24T19:03:36.658+05:30  WARN 31616 --- [HRMS-Backend] [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m17s595ms575µs700ns).
+2026-02-24T19:04:02.076+05:30  INFO 31616 --- [HRMS-Backend] [MessageBroker-7] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 7, active threads = 1, queued tasks = 6, completed tasks = 0]
+2026-02-24T17:56:39.018+05:30  INFO 28628 --- [HRMS-Backend] [MessageBroker-16] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[2 current WS(2)-HttpStream(0)-HttpPoll(0), 6 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(6)-CONNECTED(6)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 32, active threads = 0, queued tasks = 0, completed tasks = 48], outboundChannel[pool size = 10, active threads = 0, queued tasks = 0, completed tasks = 10], sockJsScheduler[pool size = 16, active threads = 1, queued tasks = 8, completed tasks = 14]
+2026-02-24T18:00:00.044+05:30 ERROR 28628 --- [HRMS-Backend] [MessageBroker-15] o.s.s.s.TaskUtils$LoggingErrorHandler    : Unexpected error occurred in scheduled task
+
+java.lang.NullPointerException: Cannot invoke "org.hibernate.metamodel.mapping.DiscriminatorType.getJdbcJavaType()" because "this.discriminatorType" is null
+	at org.hibernate.sql.ast.tree.expression.EntityTypeLiteral.createSqlSelection(EntityTypeLiteral.java:136) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.sql.ast.tree.expression.EntityTypeLiteral.createDomainResult(EntityTypeLiteral.java:127) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.lambda$visitSelection$18(BaseSqmToSqlAstConverter.java:2309) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at java.base/java.util.Collections$SingletonList.forEach(Collections.java:4967) ~[na:na]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelection(BaseSqmToSqlAstConverter.java:2304) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectClause(BaseSqmToSqlAstConverter.java:2222) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQuerySpec(BaseSqmToSqlAstConverter.java:2093) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQuerySpec(BaseSqmToSqlAstConverter.java:455) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.tree.select.SqmQuerySpec.accept(SqmQuerySpec.java:124) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.spi.BaseSemanticQueryWalker.visitQueryPart(BaseSemanticQueryWalker.java:245) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQueryPart(BaseSqmToSqlAstConverter.java:1947) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectStatement(BaseSqmToSqlAstConverter.java:1630) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectStatement(BaseSqmToSqlAstConverter.java:455) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.tree.select.SqmSelectStatement.accept(SqmSelectStatement.java:238) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.translate(BaseSqmToSqlAstConverter.java:801) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.buildCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:479) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.withCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:385) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.performList(ConcreteSqmSelectQueryPlan.java:359) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.QuerySqmImpl.doList(QuerySqmImpl.java:364) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.spi.AbstractSelectionQuery.list(AbstractSelectionQuery.java:143) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.Query.getResultList(Query.java:120) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution$CollectionExecution.doExecute(JpaQueryExecution.java:132) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution.execute(JpaQueryExecution.java:95) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.doExecute(AbstractJpaQuery.java:160) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.execute(AbstractJpaQuery.java:148) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:170) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:149) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:136) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223) ~[spring-aop-6.2.15.jar:6.2.15]
+	at jdk.proxy2/jdk.proxy2.$Proxy156.findAllByTravelPlanEndDateAndTravelPlanIsDeleted(Unknown Source) ~[na:na]
+	at com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl.autoNotificationForExpenseAdd(TravelPlanServiceImpl.java:408) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:360) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728) ~[spring-aop-6.2.15.jar:6.2.15]
+	at com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl$$SpringCGLIB$$0.autoNotificationForExpenseAdd(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:130) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$2(ScheduledMethodRunnable.java:124) ~[spring-context-6.2.15.jar:6.2.15]
+	at io.micrometer.observation.Observation.observe(Observation.java:498) ~[micrometer-observation-1.15.8.jar:1.15.8]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:124) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.config.Task$OutcomeTrackingRunnable.run(Task.java:87) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.concurrent.ReschedulingRunnable.run(ReschedulingRunnable.java:96) ~[spring-context-6.2.15.jar:6.2.15]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2026-02-24T18:16:32.120+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:16:32.281+05:30  INFO 28628 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:16:32.285+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:16:32.285+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@4977e352]]
+2026-02-24T18:16:32.286+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:16:32.291+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:16:32.294+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:16:32.297+05:30  INFO 28628 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:16:35.545+05:30  INFO 32820 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 32820 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:16:35.547+05:30  INFO 32820 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:16:36.132+05:30  INFO 32820 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:16:36.219+05:30  INFO 32820 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 81 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:16:36.643+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:16:36.651+05:30  INFO 32820 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:16:36.652+05:30  INFO 32820 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:16:36.689+05:30  INFO 32820 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:16:36.689+05:30  INFO 32820 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1112 ms
+2026-02-24T18:16:36.859+05:30  INFO 32820 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:16:36.897+05:30  INFO 32820 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:16:36.920+05:30  INFO 32820 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:16:37.103+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:16:37.125+05:30  INFO 32820 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:16:37.420+05:30  INFO 32820 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 44900ab6-edb2-4c02-81a2-de1ddf17623d
+2026-02-24T18:16:37.421+05:30  INFO 32820 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:16:37.483+05:30  WARN 32820 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:16:37.502+05:30  INFO 32820 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:16:38.315+05:30  INFO 32820 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:16:39.125+05:30  INFO 32820 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:16:39.389+05:30  INFO 32820 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:16:39.415+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:16:40.340+05:30  WARN 32820 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:16:40.774+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:16:40.774+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2d550996]]
+2026-02-24T18:16:40.775+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:16:40.790+05:30  INFO 32820 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:16:40.799+05:30  INFO 32820 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.596 seconds (process running for 5.858)
+2026-02-24T18:16:46.996+05:30  INFO 32820 --- [HRMS-Backend] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T18:16:46.997+05:30  INFO 32820 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T18:16:46.999+05:30  INFO 32820 --- [HRMS-Backend] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-24T18:17:40.782+05:30  INFO 32820 --- [HRMS-Backend] [MessageBroker-16] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[2 current WS(2)-HttpStream(0)-HttpPoll(0), 2 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(2)-CONNECTED(2)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 12, active threads = 0, queued tasks = 0, completed tasks = 12], outboundChannel[pool size = 2, active threads = 0, queued tasks = 0, completed tasks = 2], sockJsScheduler[pool size = 16, active threads = 1, queued tasks = 8, completed tasks = 15]
+2026-02-24T18:19:04.554+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:19:04.720+05:30  INFO 32820 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:19:04.724+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:19:04.725+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2d550996]]
+2026-02-24T18:19:04.725+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:19:04.728+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:19:04.730+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:19:04.732+05:30  INFO 32820 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:19:07.997+05:30  INFO 23996 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 23996 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:19:07.999+05:30  INFO 23996 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:19:08.623+05:30  INFO 23996 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:19:08.718+05:30  INFO 23996 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 88 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:19:09.144+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:19:09.152+05:30  INFO 23996 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:19:09.152+05:30  INFO 23996 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:19:09.196+05:30  INFO 23996 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:19:09.197+05:30  INFO 23996 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1165 ms
+2026-02-24T18:19:09.348+05:30  INFO 23996 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:19:09.386+05:30  INFO 23996 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:19:09.412+05:30  INFO 23996 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:19:09.588+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:19:09.613+05:30  INFO 23996 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:19:09.946+05:30  INFO 23996 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 37e85089-2155-4e3a-b07a-ecf90857e1ea
+2026-02-24T18:19:09.948+05:30  INFO 23996 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:19:10.013+05:30  WARN 23996 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:19:10.029+05:30  INFO 23996 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:19:11.152+05:30  INFO 23996 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:19:12.022+05:30  INFO 23996 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:19:12.256+05:30  INFO 23996 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:19:12.290+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:19:13.118+05:30  WARN 23996 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:19:13.601+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:19:13.601+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@36eff8df]]
+2026-02-24T18:19:13.603+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:19:13.618+05:30  INFO 23996 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:19:13.629+05:30  INFO 23996 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.967 seconds (process running for 6.226)
+2026-02-24T18:19:40.540+05:30  INFO 23996 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T18:19:40.540+05:30  INFO 23996 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T18:19:40.540+05:30  INFO 23996 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-02-24T18:20:13.609+05:30  INFO 23996 --- [HRMS-Backend] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 7, active threads = 1, queued tasks = 5, completed tasks = 1]
+2026-02-24T18:29:48.285+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:29:48.447+05:30  INFO 23996 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:29:48.449+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:29:48.450+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@36eff8df]]
+2026-02-24T18:29:48.450+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:29:48.454+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:29:48.455+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:29:48.457+05:30  INFO 23996 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:29:51.677+05:30  INFO 7096 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 7096 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:29:51.680+05:30  INFO 7096 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:29:52.279+05:30  INFO 7096 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:29:52.371+05:30  INFO 7096 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 86 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:29:52.801+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:29:52.810+05:30  INFO 7096 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:29:52.810+05:30  INFO 7096 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:29:52.852+05:30  INFO 7096 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:29:52.852+05:30  INFO 7096 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1142 ms
+2026-02-24T18:29:53.007+05:30  INFO 7096 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:29:53.044+05:30  INFO 7096 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:29:53.069+05:30  INFO 7096 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:29:53.233+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:29:53.254+05:30  INFO 7096 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:29:53.568+05:30  INFO 7096 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 2c134653-2424-434b-9fcf-7a842ab3f87e
+2026-02-24T18:29:53.569+05:30  INFO 7096 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:29:53.624+05:30  WARN 7096 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:29:53.640+05:30  INFO 7096 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:29:54.515+05:30  INFO 7096 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:29:55.392+05:30  INFO 7096 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:29:55.663+05:30  INFO 7096 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:29:55.694+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:29:56.532+05:30  WARN 7096 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:29:56.966+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:29:56.966+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2d550996]]
+2026-02-24T18:29:56.967+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:29:56.986+05:30  INFO 7096 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:29:56.995+05:30  INFO 7096 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.704 seconds (process running for 5.96)
+2026-02-24T18:30:56.977+05:30  INFO 7096 --- [HRMS-Backend] [MessageBroker-3] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 8, active threads = 1, queued tasks = 5, completed tasks = 2]
+2026-02-24T18:31:40.565+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:31:40.729+05:30  INFO 7096 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:31:40.730+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:31:40.730+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@2d550996]]
+2026-02-24T18:31:40.731+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:31:40.734+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:31:40.736+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:31:40.739+05:30  INFO 7096 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:31:43.943+05:30  INFO 14340 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 14340 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:31:43.945+05:30  INFO 14340 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:31:44.542+05:30  INFO 14340 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:31:44.631+05:30  INFO 14340 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 82 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:31:45.052+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:31:45.060+05:30  INFO 14340 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:31:45.060+05:30  INFO 14340 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:31:45.103+05:30  INFO 14340 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:31:45.104+05:30  INFO 14340 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1123 ms
+2026-02-24T18:31:45.261+05:30  INFO 14340 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:31:45.302+05:30  INFO 14340 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:31:45.325+05:30  INFO 14340 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:31:45.516+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:31:45.541+05:30  INFO 14340 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:31:45.892+05:30  INFO 14340 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: 61204057-fdef-49bb-a527-cbc1534061b6
+2026-02-24T18:31:45.894+05:30  INFO 14340 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:31:45.948+05:30  WARN 14340 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:31:45.964+05:30  INFO 14340 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:31:46.751+05:30  INFO 14340 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:31:47.591+05:30  INFO 14340 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:31:47.828+05:30  INFO 14340 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:31:47.853+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:31:48.629+05:30  WARN 14340 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:31:49.024+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:31:49.024+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@560def6c]]
+2026-02-24T18:31:49.025+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:31:49.041+05:30  INFO 14340 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:31:49.058+05:30  INFO 14340 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.452 seconds (process running for 5.712)
+2026-02-24T18:32:49.024+05:30  INFO 14340 --- [HRMS-Backend] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 6, active threads = 1, queued tasks = 5, completed tasks = 0]
+2026-02-24T18:33:09.843+05:30  INFO 14340 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T18:33:09.844+05:30  INFO 14340 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T18:33:09.846+05:30  INFO 14340 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-24T18:51:49.147+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T18:51:49.306+05:30  INFO 14340 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T18:51:49.310+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T18:51:49.310+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@560def6c]]
+2026-02-24T18:51:49.310+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T18:51:49.316+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:51:49.318+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T18:51:49.320+05:30  INFO 14340 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T18:51:52.908+05:30  INFO 27848 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 27848 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T18:51:52.910+05:30  INFO 27848 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T18:51:53.537+05:30  INFO 27848 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T18:51:53.626+05:30  INFO 27848 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 83 ms. Found 34 JPA repository interfaces.
+2026-02-24T18:51:54.064+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T18:51:54.072+05:30  INFO 27848 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T18:51:54.073+05:30  INFO 27848 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T18:51:54.111+05:30  INFO 27848 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T18:51:54.112+05:30  INFO 27848 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1171 ms
+2026-02-24T18:51:54.283+05:30  INFO 27848 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T18:51:54.323+05:30  INFO 27848 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T18:51:54.348+05:30  INFO 27848 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T18:51:54.529+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T18:51:54.550+05:30  INFO 27848 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T18:51:54.904+05:30  INFO 27848 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: f396f512-70f8-4b97-9c57-7159edcf0bca
+2026-02-24T18:51:54.905+05:30  INFO 27848 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T18:51:54.977+05:30  WARN 27848 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T18:51:54.991+05:30  INFO 27848 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T18:51:55.801+05:30  INFO 27848 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T18:51:56.633+05:30  INFO 27848 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T18:51:56.895+05:30  INFO 27848 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T18:51:56.928+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T18:51:57.731+05:30  WARN 27848 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T18:51:58.171+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T18:51:58.172+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@52fb37d7]]
+2026-02-24T18:51:58.172+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T18:51:58.186+05:30  INFO 27848 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T18:51:58.195+05:30  INFO 27848 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 5.635 seconds (process running for 5.91)
+2026-02-24T18:52:09.309+05:30  INFO 27848 --- [HRMS-Backend] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T18:52:09.309+05:30  INFO 27848 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T18:52:09.309+05:30  INFO 27848 --- [HRMS-Backend] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-02-24T18:52:58.171+05:30  INFO 27848 --- [HRMS-Backend] [MessageBroker-6] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[2 current WS(2)-HttpStream(0)-HttpPoll(0), 2 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(2)-CONNECTED(2)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 12, active threads = 0, queued tasks = 0, completed tasks = 12], outboundChannel[pool size = 4, active threads = 0, queued tasks = 0, completed tasks = 4], sockJsScheduler[pool size = 16, active threads = 1, queued tasks = 8, completed tasks = 8]
+2026-02-24T19:00:00.044+05:30 ERROR 27848 --- [HRMS-Backend] [MessageBroker-1] o.s.s.s.TaskUtils$LoggingErrorHandler    : Unexpected error occurred in scheduled task
+
+java.lang.NullPointerException: Cannot invoke "org.hibernate.metamodel.mapping.DiscriminatorType.getJdbcJavaType()" because "this.discriminatorType" is null
+	at org.hibernate.sql.ast.tree.expression.EntityTypeLiteral.createSqlSelection(EntityTypeLiteral.java:136) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.sql.ast.tree.expression.EntityTypeLiteral.createDomainResult(EntityTypeLiteral.java:127) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.lambda$visitSelection$18(BaseSqmToSqlAstConverter.java:2309) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at java.base/java.util.Collections$SingletonList.forEach(Collections.java:4967) ~[na:na]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelection(BaseSqmToSqlAstConverter.java:2304) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectClause(BaseSqmToSqlAstConverter.java:2222) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQuerySpec(BaseSqmToSqlAstConverter.java:2093) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQuerySpec(BaseSqmToSqlAstConverter.java:455) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.tree.select.SqmQuerySpec.accept(SqmQuerySpec.java:124) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.spi.BaseSemanticQueryWalker.visitQueryPart(BaseSemanticQueryWalker.java:245) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitQueryPart(BaseSqmToSqlAstConverter.java:1947) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectStatement(BaseSqmToSqlAstConverter.java:1630) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.visitSelectStatement(BaseSqmToSqlAstConverter.java:455) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.tree.select.SqmSelectStatement.accept(SqmSelectStatement.java:238) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.sql.BaseSqmToSqlAstConverter.translate(BaseSqmToSqlAstConverter.java:801) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.buildCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:479) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.withCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:385) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.performList(ConcreteSqmSelectQueryPlan.java:359) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.sqm.internal.QuerySqmImpl.doList(QuerySqmImpl.java:364) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.spi.AbstractSelectionQuery.list(AbstractSelectionQuery.java:143) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.hibernate.query.Query.getResultList(Query.java:120) ~[hibernate-core-6.6.41.Final.jar:6.6.41.Final]
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution$CollectionExecution.doExecute(JpaQueryExecution.java:132) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution.execute(JpaQueryExecution.java:95) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.doExecute(AbstractJpaQuery.java:160) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.execute(AbstractJpaQuery.java:148) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:170) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:149) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69) ~[spring-data-commons-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:136) ~[spring-data-jpa-3.5.8.jar:3.5.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223) ~[spring-aop-6.2.15.jar:6.2.15]
+	at jdk.proxy2/jdk.proxy2.$Proxy156.findAllByTravelPlanEndDateAndTravelPlanIsDeleted(Unknown Source) ~[na:na]
+	at com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl.autoNotificationForExpenseAdd(TravelPlanServiceImpl.java:408) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:360) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.15.jar:6.2.15]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728) ~[spring-aop-6.2.15.jar:6.2.15]
+	at com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl$$SpringCGLIB$$0.autoNotificationForExpenseAdd(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:130) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$2(ScheduledMethodRunnable.java:124) ~[spring-context-6.2.15.jar:6.2.15]
+	at io.micrometer.observation.Observation.observe(Observation.java:498) ~[micrometer-observation-1.15.8.jar:1.15.8]
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:124) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.config.Task$OutcomeTrackingRunnable.run(Task.java:87) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54) ~[spring-context-6.2.15.jar:6.2.15]
+	at org.springframework.scheduling.concurrent.ReschedulingRunnable.run(ReschedulingRunnable.java:96) ~[spring-context-6.2.15.jar:6.2.15]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539) ~[na:na]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) ~[na:na]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2026-02-24T19:02:13.088+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T19:02:13.242+05:30  INFO 27848 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T19:02:13.246+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T19:02:13.246+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@52fb37d7]]
+2026-02-24T19:02:13.246+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T19:02:13.252+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T19:02:13.253+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T19:02:13.256+05:30  INFO 27848 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-24T19:02:16.432+05:30  INFO 31616 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Starting HrmsBackendApplication using Java 17.0.18 with PID 31616 (C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend\target\classes started by bhadatir in C:\Users\bhadatir\OneDrive - Roima Intelligence Inc\Desktop\ROIMA Intern task\HRMS\HRMS-Backend)
+2026-02-24T19:02:16.435+05:30  INFO 31616 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-02-24T19:02:17.640+05:30  INFO 31616 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-24T19:02:17.734+05:30  INFO 31616 --- [HRMS-Backend] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 88 ms. Found 34 JPA repository interfaces.
+2026-02-24T19:02:18.164+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-24T19:02:18.172+05:30  INFO 31616 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-24T19:02:18.172+05:30  INFO 31616 --- [HRMS-Backend] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-02-24T19:02:18.212+05:30  INFO 31616 --- [HRMS-Backend] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-24T19:02:18.212+05:30  INFO 31616 --- [HRMS-Backend] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1746 ms
+2026-02-24T19:02:18.385+05:30  INFO 31616 --- [HRMS-Backend] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-24T19:02:18.426+05:30  INFO 31616 --- [HRMS-Backend] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.41.Final
+2026-02-24T19:02:18.450+05:30  INFO 31616 --- [HRMS-Backend] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-24T19:02:18.626+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-24T19:02:18.654+05:30  INFO 31616 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-24T19:02:18.956+05:30  INFO 31616 --- [HRMS-Backend] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: fcc4caf7-77ef-446c-9a23-cf8a744a9e33
+2026-02-24T19:02:18.957+05:30  INFO 31616 --- [HRMS-Backend] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-24T19:02:19.008+05:30  WARN 31616 --- [HRMS-Backend] [main] org.hibernate.orm.deprecation            : HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-24T19:02:19.022+05:30  INFO 31616 --- [HRMS-Backend] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-24T19:02:19.845+05:30  INFO 31616 --- [HRMS-Backend] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-24T19:02:20.612+05:30  INFO 31616 --- [HRMS-Backend] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T19:02:20.823+05:30  INFO 31616 --- [HRMS-Backend] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2026-02-24T19:02:20.859+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-24T19:02:21.675+05:30  WARN 31616 --- [HRMS-Backend] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-24T19:02:22.086+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-02-24T19:02:22.086+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@52fb37d7]]
+2026-02-24T19:02:22.086+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-02-24T19:02:22.104+05:30  INFO 31616 --- [HRMS-Backend] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-24T19:02:22.113+05:30  INFO 31616 --- [HRMS-Backend] [main] c.e.HRMS.Backend.HrmsBackendApplication  : Started HrmsBackendApplication in 6.024 seconds (process running for 6.292)
+2026-02-24T19:02:38.351+05:30  INFO 31616 --- [HRMS-Backend] [http-nio-8080-exec-12] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-24T19:02:38.351+05:30  INFO 31616 --- [HRMS-Backend] [http-nio-8080-exec-12] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-24T19:02:38.353+05:30  INFO 31616 --- [HRMS-Backend] [http-nio-8080-exec-12] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-24T19:03:36.658+05:30  WARN 31616 --- [HRMS-Backend] [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m17s595ms575µs700ns).
+2026-02-24T19:04:02.076+05:30  INFO 31616 --- [HRMS-Backend] [MessageBroker-7] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 7, active threads = 1, queued tasks = 6, completed tasks = 0]
+2026-02-24T19:21:11.157+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-24T19:21:11.361+05:30  INFO 31616 --- [HRMS-Backend] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-02-24T19:21:11.367+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2026-02-24T19:21:11.367+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@52fb37d7]]
+2026-02-24T19:21:11.367+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2026-02-24T19:21:11.372+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-24T19:21:11.374+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-24T19:21:11.379+05:30  INFO 31616 --- [HRMS-Backend] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

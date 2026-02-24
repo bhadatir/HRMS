@@ -23,7 +23,7 @@ import java.util.List;
 
 @Aspect
 @Component
-@Slf4j
+//@Slf4j
 @RequiredArgsConstructor
 public class AuditLoggingAspect {
 
@@ -42,8 +42,8 @@ public class AuditLoggingAspect {
         Long newStatus = (Long) args[1];
         CvStatusType cvStatusType = cvStatusTypeRepository.findCvStatusTypeById(newStatus);
 
-        log.info("AUDIT LOG - Referral ID: {} | Status changed to: {} | Timestamp: {}",
-                referralId, cvStatusType.getCvStatusTypeName() , Instant.now());
+//        log.info("AUDIT LOG - Referral ID: {} | Status changed to: {} | Timestamp: {}",
+//                referralId, cvStatusType.getCvStatusTypeName() , Instant.now());
 
         AuditLog log = new AuditLog();
         log.setEntityName("Referral");
@@ -63,8 +63,8 @@ public class AuditLoggingAspect {
         Object[] args = joinPoint.getArgs();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        log.info("AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: {}",
-                LocalDateTime.now());
+//        log.info("AUDIT LOG - New Referral Created | Recipient info logged | Timestamp: {}",
+//                LocalDateTime.now());
 
         if(args.length>0){
             ReferFriendRequest referFriendRequest = (ReferFriendRequest) args[0];
@@ -87,8 +87,8 @@ public class AuditLoggingAspect {
         Object[] args = joinPoint.getArgs();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        log.info("AUDIT LOG - Job Share By User | Recipient info logged | Timestamp: {}",
-                LocalDateTime.now());
+//        log.info("AUDIT LOG - Job Share By User | Recipient info logged | Timestamp: {}",
+//                LocalDateTime.now());
 
         if(args.length>0){
             JobShareRequest jobShareRequest = (JobShareRequest) args[0];
