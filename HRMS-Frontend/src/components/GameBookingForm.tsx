@@ -219,6 +219,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         onSuccess: (data) => {
             window.alert(typeof data === "string" ? data : "Booking saved!");
             queryClient.invalidateQueries({ queryKey: ["allBookings"] });
+            queryClient.invalidateQueries({ queryKey: ["allWaitingList"] });
             onSuccess();
         }
     });

@@ -34,7 +34,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
         )}
         <Card key={booking.id} className="hover:shadow-md transition-shadow border-slate-200">
             <CardContent className="p-4 space-y-3">
-                <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start">
                     <Badge variant="outline">Game Name: {booking.gameTypeName}</Badge>
                     <Badge variant="outline" className="capitalize">{gameBookingStatusOptions.find((s: any) => s.id === booking.gameBookingStatusId)?.gameBookingStatusName || "Unknown Status"}</Badge>   
             </div>

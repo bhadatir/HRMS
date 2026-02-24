@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.repository;
 
 import com.example.HRMS.Backend.model.BookingWaitingList;
+import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -55,7 +56,10 @@ public interface WaitlistRepository extends JpaRepository<BookingWaitingList,Lon
             @Param("gameTypeId") Long gameTypeId,
             @Param("targetSlotDatetime") LocalDateTime targetSlotDatetime);
 
-    void removeBookingWaitingListsById(Long id);
+
+    void removeBookingWaitingListById(Long id);
 
     List<BookingWaitingList> findAllByTargetSlotDatetimeBetween(LocalDateTime now, LocalDateTime targetSlot);
+
+    List<BookingWaitingList> findAllByTargetSlotDatetimeBefore(LocalDateTime now);
 }

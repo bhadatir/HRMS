@@ -13,6 +13,7 @@ import Notifications from "@/components/Notifications";
 import BookingCard from "@/components/BookingCard";
 import GameInterestToggle from "@/components/GameInterestToggle";
 import { Card, CardContent } from "@/components/ui/card";
+import WaitingList from "@/components/WaitingList";
 
 export default function GameManagement() {
     const { token, user, unreadNotifications } = useAuth();
@@ -22,8 +23,10 @@ export default function GameManagement() {
     const [gameType, setGameType] = useState<number | null>(null);
     const [gameBookingStatusId, setgameBookingStatusId] = useState<number | null>(null);
     const [showNotification, setShowNotification] = useState(false);
-    const [showGameInterestForm, setShowGameIntrestForm] = useState(false);
+    const [showGameIntrestForm, setShowGameIntrestForm] = useState(false);
+    const [showWaitingList, setShowWaitingList] = useState(false);
     const [viewMode, setViewMode] = useState<"My Bookings" | "Waiting List">("My Bookings");
+    const [waitingListId, setWaitingListId] = useState<number>(0);
 
     const { data: gameTypes = [] } = useQuery({
         queryKey: ["gameTypes"],
@@ -109,6 +112,19 @@ export default function GameManagement() {
                       </div>
                     )}
 
+                    {/* Waiting List */}
+                    {showWaitingList && (
+                      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl max-w-3xl w-full relative h-100 overflow-y-auto">
+                          <Button title="Close Waiting List" variant="ghost" className="absolute right-2 top-2" 
+                            onClick={() => {
+                            setShowWaitingList(false);
+                          }}><X /></Button>
+                          <WaitingList waitingListId={waitingListId} onSuccess={() => setShowWaitingList(false)} />
+                        </div>
+                      </div>
+                    )}
+
                     {/* add game booking */}
                     {showGameBookingForm && (
                         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -136,7 +152,7 @@ export default function GameManagement() {
                     )}
 
                     {/* Game Interest */}
-                    {showGameInterestForm && (
+                    {showGameIntrestForm && (
                       <div className="absolute right-2 top-16 z-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-xl max-w-lg w-full relative h-max">
                           <Button title="Close Game Interests" variant="ghost" className="absolute right-2 top-2" 
@@ -212,7 +228,11 @@ export default function GameManagement() {
                                 allWaitingList.map((wait: any) => ((
                                     wait.hostEmployeeId === user?.id || wait.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id))
                                     && (
-                                    <Card key={wait.id} className="hover:shadow-md transition-shadow border-slate-200">
+                                    <Card key={wait.id} className="hover:shadow-md transition-shadow border-slate-200 cursor-pointer"
+                                        onClick={() => {
+                                            setWaitingListId(wait.id);
+                                            setShowWaitingList(true);
+                                        }}>
                                         <CardContent className="p-4 space-y-3">
                                             <div className="flex justify-between items-start">
                                                 <Badge variant="outline">Game Name: {wait.gameTypeName}</Badge>

@@ -26,6 +26,16 @@ export const gameService = {
         return res.data;
     },
 
+    getWaitingListById: async (waitingListId: number, token: string) => {
+        const res = await api.get(`/game/waitList/${waitingListId}`, authHeader(token));
+        return res.data;
+    },
+
+    getWaitingListSeqById: async (waitingListId: number, token: string) => {
+        const res = await api.get(`/game/waitListSeq/${waitingListId}`, authHeader(token));
+        return res.data;
+    },
+
     getAllWaitingList: async (token: string) => {
         const res = await api.get("/game/waitList", authHeader(token));
         return res.data;

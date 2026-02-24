@@ -41,4 +41,6 @@ public interface BookingParticipantRepository extends JpaRepository<BookingParti
             "where p.fkGameBooking.id = :bookingId " +
             "And p.fkEmployee.id = :id ")
     BookingParticipant findBookingParticipantByEmployeeIdAndGameBookingId(Long id, Long bookingId);
+
+    void removeBookingParticipantById(Long id);
 }

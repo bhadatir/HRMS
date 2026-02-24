@@ -4,6 +4,7 @@ import com.example.HRMS.Backend.dto.BookingWaitingListResponse;
 import com.example.HRMS.Backend.dto.EmployeeGameInterestResponse;
 import com.example.HRMS.Backend.dto.GameBookingRequest;
 import com.example.HRMS.Backend.dto.GameBookingResponse;
+import com.example.HRMS.Backend.model.BookingWaitingList;
 import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameBookingStatus;
 import com.example.HRMS.Backend.model.GameType;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -75,10 +78,21 @@ public class GameBookingController {
         return ResponseEntity.ok(gameBookingService.findWaitList());
     }
 
+    @GetMapping("/waitList/{waitId}")
+    public ResponseEntity<BookingWaitingListResponse> findWaitListById(@PathVariable Long waitId){
+        return ResponseEntity.ok(gameBookingService.findWaitListById(waitId));
+    }
+
+    @GetMapping("/waitListSeq/{waitId}")
+    public ResponseEntity<List<BookingWaitingListResponse>> findWaitListSeqByGameTypeAndSloat(@PathVariable Long waitId){
+        return ResponseEntity.ok(gameBookingService.findWaitListSeqByGameTypeAndSloat(waitId));
+    }
+
     @GetMapping("/allGameBookingStatus")
     public ResponseEntity<List<GameBookingStatus>> showAllGameBookingStatus() {
         return ResponseEntity.ok(gameBookingStatusRepository.findAll());
     }
+
 
 
 }

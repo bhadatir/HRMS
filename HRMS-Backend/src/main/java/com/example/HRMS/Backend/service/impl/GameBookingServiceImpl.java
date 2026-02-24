@@ -204,8 +204,20 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     @Scheduled(cron = "0 */10 * * * *")
     @Transactional
-    public void autoUpdateCompletedBookings() {
+    public void autoUpdateCompletedBookingsAndDeletePastWaitingListEntry() {
         LocalDateTime now = LocalDateTime.now();
+
+        List<BookingWaitingList> expiredBookingWaitingLists = waitlistRepository.findAllByTargetSlotDatetimeBefore(now);
+
+        if (!expiredBookingWaitingLists.isEmpty()) {
+            for (BookingWaitingList bookingWaitingList : expiredBookingWaitingLists) {
+                List<BookingParticipantResponse> bookingParticipants = bookingParticipantRepository.findAllByBookingWaitingListId(bookingWaitingList.getId());
+                for(BookingParticipantResponse res : bookingParticipants){
+                    bookingParticipantRepository.removeBookingParticipantById(res.getId());
+                }
+                waitlistRepository.removeBookingWaitingListById(bookingWaitingList.getId());
+            }
+        }
 
         List<GameBooking> expiredBookings = gameBookingRepository
                 .findAllByGameBookingEndTimeBeforeAndFkGameBookingStatus_Id(now, 1);
@@ -228,7 +240,9 @@ public class GameBookingServiceImpl implements GameBookingService {
         LocalDateTime targetSlot = LocalDateTime.now().plusMinutes(30);
 
         List<BookingWaitingList> upCommingSlots = waitlistRepository.findAllByTargetSlotDatetimeBetween(now, targetSlot);
-
+        if(upCommingSlots == null || upCommingSlots.isEmpty()){
+            return;
+        }
         for(BookingWaitingList bookingWaitingList: upCommingSlots){
             LocalDateTime targetTime = bookingWaitingList.getTargetSlotDatetime();
             GameType gameType = bookingWaitingList.getFkGameType();
@@ -330,6 +344,39 @@ public class GameBookingServiceImpl implements GameBookingService {
             response.setBookingParticipantResponses(bookingParticipantResponses);
 
             bookingWaitingListResponses.add(response);
+        }
+        return bookingWaitingListResponses;
+    }
+
+    @Override
+    public BookingWaitingListResponse findWaitListById(Long waitId){
+        BookingWaitingList bookingWaitingList = waitlistRepository.findBookingWaitingListsById(waitId);
+        BookingWaitingListResponse response = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
+
+        List<BookingParticipantResponse> bookingParticipantResponses =
+                bookingParticipantRepository.findAllByGameBookingId(bookingWaitingList.getId());
+
+        response.setBookingParticipantResponses(bookingParticipantResponses);
+
+        return response;
+    }
+
+    @Override
+    public List<BookingWaitingListResponse> findWaitListSeqByGameTypeAndSloat(Long waitId){
+        BookingWaitingList bookingWaitingList = waitlistRepository.findBookingWaitingListsById(waitId);
+        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findMatchingBookings(bookingWaitingList.getFkGameType().getId(),
+                bookingWaitingList.getTargetSlotDatetime());
+        List<BookingWaitingListResponse> bookingWaitingListResponses = new ArrayList<>();
+
+        for(BookingWaitingList list : bookingWaitingLists){
+            BookingWaitingListResponse bookingWaitingListResponse = modelMapper.map(list,BookingWaitingListResponse.class);
+
+            List<BookingParticipantResponse> bookingParticipantResponses =
+                    bookingParticipantRepository.findAllByBookingWaitingListId(list.getId());
+
+            bookingWaitingListResponse.setBookingParticipantResponses(bookingParticipantResponses);
+
+            bookingWaitingListResponses.add(bookingWaitingListResponse);
         }
         return bookingWaitingListResponses;
     }

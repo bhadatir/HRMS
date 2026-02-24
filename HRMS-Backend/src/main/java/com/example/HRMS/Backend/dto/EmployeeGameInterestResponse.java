@@ -13,4 +13,6 @@ public class EmployeeGameInterestResponse {
     private Long gameTypeId;
 
     private String gameTypeName;
+
+    private Integer playedInCurrentCycle;
 }

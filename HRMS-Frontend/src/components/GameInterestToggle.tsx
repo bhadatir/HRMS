@@ -31,7 +31,7 @@ export default function GameInterestToggle() {
         }, 
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["myInterests", user?.id]})
     });
-
+   
     const isInterested = (gameId: number) => myInterests.some((i: any) => Number(i.gameTypeId) === Number(gameId));
 
     return (
@@ -43,12 +43,13 @@ export default function GameInterestToggle() {
                 <div className="flex flex-wrap gap-2">
                     {allGames.map((game: any) => (
                         <Badge 
+                            title="game with total played game in current cycle"
                             key={game.id}
                             className={isInterested(game.id) ? "cursor-pointer bg-green-100 text-green-700"
                                 : "cursor-pointer bg-gray-100 text-gray-700"}
                             onClick={() => mutation.mutate(game.id)}
                         >
-                            {game.gameName}
+                            {game.gameName} {isInterested(game.id) ? " : " + myInterests.find((interest: any) => game.id === interest.gameTypeId)?.playedInCurrentCycle + " times" : null}
                         </Badge>
                     ))}
                 </div>

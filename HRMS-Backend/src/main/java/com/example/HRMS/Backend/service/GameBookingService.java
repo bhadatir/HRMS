@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.dto.EmployeeGameInterestResponse;
 import com.example.HRMS.Backend.dto.GameBookingRequest;
 import com.example.HRMS.Backend.dto.GameBookingResponse;
 import com.example.HRMS.Backend.model.BookingParticipant;
+import com.example.HRMS.Backend.model.BookingWaitingList;
 import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameType;
 
@@ -36,4 +37,8 @@ public interface GameBookingService {
     List<EmployeeGameInterestResponse> findGameInterestByEmp(Long empId);
 
     List<BookingWaitingListResponse> findWaitList();
+
+    BookingWaitingListResponse findWaitListById(Long waitId);
+
+    List<BookingWaitingListResponse> findWaitListSeqByGameTypeAndSloat(Long waitId);
 }
