@@ -1,5 +1,6 @@
 package com.example.HRMS.Backend.service;
 
+import com.example.HRMS.Backend.dto.BookingWaitingListResponse;
 import com.example.HRMS.Backend.dto.EmployeeGameInterestResponse;
 import com.example.HRMS.Backend.dto.GameBookingRequest;
 import com.example.HRMS.Backend.dto.GameBookingResponse;
@@ -33,4 +34,6 @@ public interface GameBookingService {
     void removeGameInterest(Long gameInterestId);
 
     List<EmployeeGameInterestResponse> findGameInterestByEmp(Long empId);
+
+    List<BookingWaitingListResponse> findWaitList();
 }

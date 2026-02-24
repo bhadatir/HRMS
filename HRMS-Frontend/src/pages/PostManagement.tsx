@@ -1,14 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { postService } from "../api/postService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Plus, X, MessageSquare, Search, Eye, Edit, Delete, Bell, Trash } from "lucide-react";
+import { Plus, X, MessageSquare, Search, Eye, Edit, Bell, Trash, ArrowLeft, ArrowRight } from "lucide-react";
 import PostForm from "../components/PostForm";
 import LikeButton from "@/components/LikeButton";
 import CommentSection from "@/components/CommentSection";
@@ -23,7 +23,17 @@ export default function PostManagement() {
   const [editPostId, setEditPostId] = useState<number>(0);
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(0);
+  const [size] = useState(10);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const employeeEmail = urlParams.get("employeeEmail");
+    if (employeeEmail) {
+      setSearchTerm(employeeEmail);
+    }
+  }, []);
+  
   const postVisibilityOptions = {
     [user?.roleName as string]: true,
     "EVERYONE": true,
@@ -31,10 +41,10 @@ export default function PostManagement() {
     [user?.departmentName as string]: true
   };
 
-  const { data: allPosts, isLoading } = useQuery({
-    queryKey: ["allPosts"],
-    queryFn: () => postService.showAllPosts(token || ""),
-    enabled: !!token,
+  const { data, isLoading } = useQuery({
+  queryKey: ["allPosts", page],
+  queryFn: () => postService.showAllPosts(token || "", page, size),
+  enabled: !!token
   });
 
   const removePost = useMutation({
@@ -49,20 +59,20 @@ export default function PostManagement() {
   });
 
   const filteredPosts = useMemo(() => {
-    if (!allPosts) return [];
-    return allPosts
+    if (!data?.content) return [];
+    return data.content
       .filter((post: any) => !post.postIsDeleted && 
-        (post.postTitle.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        (post.postTitle?.toLowerCase().includes(searchTerm.toLowerCase()) || 
          post.postTags?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         post.employeeFirstName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         post.employeeEmail.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         post.employeeFirstName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         post.employeeEmail?.toLowerCase().includes(searchTerm.toLowerCase()) || 
          post.postTagResponses?.map((tag: any) => ` ${tag.tagTypeName}`).join("")?.toLowerCase().includes(searchTerm.toLowerCase()) ||
          post.postTagResponses?.map((tag: any) => tag.tagTypeName.toLowerCase()).includes(searchTerm.toLowerCase()) || 
-         post.postCreatedAt.split("T")[0].includes(searchTerm.toLowerCase()) ||
-         post.postContent.toLowerCase().includes(searchTerm.toLowerCase())) && 
+         post.postCreatedAt?.split("T")[0].includes(searchTerm.toLowerCase()) ||
+         post.postContent?.toLowerCase().includes(searchTerm.toLowerCase())) && 
         (post.postVisibilityName in postVisibilityOptions))
       .sort((a: any, b: any) => new Date(b.postCreatedAt).getTime() - new Date(a.postCreatedAt).getTime());
-  }, [allPosts, searchTerm]);
+  }, [data?.content, searchTerm]);
 
   const handleDelete = (postId: number) => {
     const reason = window.prompt("Please enter reason for deleting this post:", "")?.trim();
@@ -70,6 +80,7 @@ export default function PostManagement() {
       removePost.mutate({ postId, reason });
     }
   };
+  
 
   return (
     <SidebarProvider>
@@ -77,7 +88,7 @@ export default function PostManagement() {
       <SidebarInset className="bg-slate-50">
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-2 w-150">
-            <SidebarTrigger />
+            {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Company Feed</h3>
           </div>
 
@@ -87,11 +98,14 @@ export default function PostManagement() {
               placeholder="Search posts..." 
               className="pl-9"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(0);
+              }}
             />
           </div>
 
-          <Button onClick={() => setShowForm(true)} className="gap-2 text-black">
+          <Button onClick={() => setShowForm(true)} className="gap-2 mr-2 text-black">
             <Plus size={18} /> New Post
           </Button>
 
@@ -143,7 +157,9 @@ export default function PostManagement() {
           <div className="space-y-6">
             {isLoading ? (
               <p className="text-center text-slate-400">Loading feed...</p>
-            ) : filteredPosts.length > 0  ? (
+            ) : 
+            (
+              filteredPosts.length > 0  ? (
               filteredPosts.map((post: any) => (
                 ( (post.postVisibilityName in postVisibilityOptions) ? (
                   <Card key={post.id} className="hover:shadow-md transition-shadow border-slate-200">
@@ -213,10 +229,40 @@ export default function PostManagement() {
                     </CardContent>
                   </Card>
                 ) : null)
-              ))
+              )
+            )
             ) : (
               <div className="text-center py-20 text-slate-400">No posts found.</div>
+            )
             )}
+
+            {filteredPosts.length > 0  ? (
+              <div className="flex justify-center gap-4 mt-6">
+                <Button 
+                  className="text-gray-700"
+                  disabled={page === 0}
+                  onClick={() => setPage(old => Math.max(old - 1, 0))}
+                >
+                  <ArrowLeft size={16} className="mr-2" />Previous
+                </Button>
+
+                <span className="text-sm text-gray-600 mt-2">
+                  Page {page + 1} of {data?.totalPages ?? 1}
+                </span>
+
+                <Button
+                  className="text-gray-700"
+                  disabled={page + 1 >= (data?.totalPages ?? 1)}
+                  onClick={() => {
+                    if (page + 1 < (data?.totalPages ?? 1)) {
+                      setPage(old => old + 1);
+                    }
+                  }}
+                >
+                  Next <ArrowRight size={16} className="ml-2" />
+                </Button>
+              </div>
+            ):null}
           </div>
         </main>
       </SidebarInset>

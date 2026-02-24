@@ -85,6 +85,9 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseResponse.setExpenseExpenseStatusId(expense.getFkExpenseExpenseStatus().getId());
             expenseResponse.setExpenseExpenseStatusName(expense.getFkExpenseExpenseStatus().getExpenseStatusName());
 
+            if(expense.getFkExpenseExpenseStatus().getId() == 3){
+                expenseResponse.setReasonForRejectExpense(expense.getReasonForRejectExpense());
+            }
             List<ExpenseProof> expenseProofs = expenseProofRepository.findExpenseProofByFkExpense_Id(expense.getId());
             List<ExpenseProofResponse> expenseProofResponses = new ArrayList<>();
             for(ExpenseProof expenseProof : expenseProofs){
@@ -134,8 +137,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public void updateExpenseStatus(Long expId, Long statusId){
+    public void updateExpenseStatus(Long expId, Long statusId, String reason){
         Expense expense = expenseRepository.findExpensesById(expId);
+        if(statusId == 3)expense.setReasonForRejectExpense(reason);
         expense.setFkExpenseExpenseStatus(expenseStatusRepository.findExpenseStatusById(statusId));
         expenseRepository.save(expense);
 

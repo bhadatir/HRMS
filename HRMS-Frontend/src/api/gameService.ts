@@ -21,6 +21,16 @@ export const gameService = {
     return res.data;
     },
 
+    getAllGameBookingStatus: async (token: string) => {
+        const res = await api.get("/game/allGameBookingStatus", authHeader(token));
+        return res.data;
+    },
+
+    getAllWaitingList: async (token: string) => {
+        const res = await api.get("/game/waitList", authHeader(token));
+        return res.data;
+    },
+
     addGameType: async (payload: any, token: string) => {
         const res = await api.post("/hr/gameType", payload, authHeader(token));
         return res.data;

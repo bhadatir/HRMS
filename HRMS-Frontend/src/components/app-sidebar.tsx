@@ -20,6 +20,7 @@ export function AppSidebar() {
     { title: "Job Management", icon: Briefcase, url: "/job-management" },
     { title: "Post Management", icon: Mail, url: "/post-management" },
     { title: "Game Management", icon: Building, url: "/game-management" },
+    ...(user?.roleName === "MANAGER" ? [{ title: "Team Member Data", icon: Building2, url: "/team-member-data" }] : []),
   ]
 
   return (
@@ -46,9 +47,9 @@ export function AppSidebar() {
         </div>
       </SidebarContent>
       <SidebarFooter className="p-4 border-t">
-        <SidebarMenuButton onClick={logout} className="text-red-500 hover:text-red-600">
+        <SidebarMenuButton onClick={logout} className="text-red-500 bg-slate-500">
           <LogOut />
-          <span>Logout</span>
+          <span >Logout</span>
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>

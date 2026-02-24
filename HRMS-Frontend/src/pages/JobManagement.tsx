@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ReferFriend from "../components/ReferFriend.tsx";
 import ShareJob from "../components/ShareJob.tsx";
-import { Plus, X, Calendar, Search, DollarSign, Share, UserPlus, Edit, Bell, IndianRupee } from "lucide-react";
+import { Plus, X, Calendar, Search, DollarSign, Share, UserPlus, Edit, Bell, IndianRupee, Forward, BookOpenIcon } from "lucide-react";
 import JobForm from "../components/JobForm.tsx";
 import JobDetailView from "@/components/JobDetailView.tsx";
 import Notifications from "@/components/Notifications.tsx";
@@ -60,7 +60,7 @@ export default function JobManagement() {
       <SidebarInset className="bg-slate-50">
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-2">
-            <SidebarTrigger />
+            {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Job Board</h3>
           </div>
 
@@ -191,6 +191,7 @@ export default function JobManagement() {
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <Badge variant="outline" 
+                        title="Change Job Status"
                         onClick={(e) => {
                           if (user?.roleName !== "HR") return;
                           e.stopPropagation();
@@ -234,8 +235,8 @@ export default function JobManagement() {
                         onClick={(e) => e.stopPropagation()}
                         target="_blank" 
                         rel="noreferrer"
-                        className="text-blue-600 hover:underline flex items-center gap-1 text-xs"
-                    >View Job Description</a>
+                        className="text-blue-600 flex items-center gap-1 text-xs"
+                    ><BookOpenIcon size={12} className="mr-1" />View Job Description</a>
 
                     <div className="mt-2 flex justify-between gap-2">
                         <Button 

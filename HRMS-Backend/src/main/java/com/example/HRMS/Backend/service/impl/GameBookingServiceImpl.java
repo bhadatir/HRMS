@@ -1,9 +1,6 @@
 package com.example.HRMS.Backend.service.impl;
 
-import com.example.HRMS.Backend.dto.BookingParticipantResponse;
-import com.example.HRMS.Backend.dto.EmployeeGameInterestResponse;
-import com.example.HRMS.Backend.dto.GameBookingRequest;
-import com.example.HRMS.Backend.dto.GameBookingResponse;
+import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.DynamicCycleService;
@@ -11,6 +8,7 @@ import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.GameBookingService;
 import com.example.HRMS.Backend.service.NotificationService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -223,7 +221,6 @@ public class GameBookingServiceImpl implements GameBookingService {
         }
     }
 
-
     @Scheduled(cron = "0 */30 * * * *")
     @Transactional
     public void checkSlotAndUpdateBookings() {
@@ -321,6 +318,23 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
+    public List<BookingWaitingListResponse> findWaitList(){
+        List<BookingWaitingListResponse> bookingWaitingListResponses = new ArrayList<>();
+        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findAll();
+        for(BookingWaitingList bookingWaitingList : bookingWaitingLists){
+            BookingWaitingListResponse response = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
+
+            List<BookingParticipantResponse> bookingParticipantResponses =
+                    bookingParticipantRepository.findAllByGameBookingId(bookingWaitingList.getId());
+
+            response.setBookingParticipantResponses(bookingParticipantResponses);
+
+            bookingWaitingListResponses.add(response);
+        }
+        return bookingWaitingListResponses;
+    }
+
+    @Override
     public GameBookingResponse findBookingByEmpId(Long empId)
     {
         return modelMapper.map(
@@ -383,8 +397,57 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
+    @Transactional
     public void updateGameBooking(Long bookingId, GameBookingRequest gameBookingRequest){
 
+        List<Long> existingEmployeesId = bookingParticipantRepository.findEmployeeIdByGameBookingId(bookingId);
+
+        GameBooking gameBooking = modelMapper.map(gameBookingRequest, GameBooking.class);
+
+        gameBooking.setId(bookingId);
+
+        GameBooking savedGameBooking = gameBookingRepository.save(gameBooking);
+
+        List<Long> newEmpId = gameBookingRequest.getBookingParticipantsEmpId();
+
+        List<String> emails = new ArrayList<>();
+
+        for(Long id : newEmpId){
+            Employee employee = employeeRepository.findEmployeeById(id);
+
+            if(!existingEmployeesId.contains(id)) {
+
+                BookingParticipant bookingParticipant = new BookingParticipant();
+
+                bookingParticipant.setFkBookingWaitingList(null);
+                bookingParticipant.setFkGameBooking(gameBooking);
+
+                bookingParticipantRepository.save(bookingParticipant);
+
+                emails.add(employee.getEmployeeEmail());
+                notificationService.createNotification(id, "Game Booking complete", "You are added in Game booking by your friend at :" + Instant.now());
+
+            }
+        }
+
+        for(Long id : existingEmployeesId){
+
+            if(!newEmpId.contains(id)) {
+                BookingParticipant bookingParticipant = bookingParticipantRepository.findBookingParticipantByEmployeeIdAndGameBookingId(id, bookingId);
+                bookingParticipantRepository.delete(bookingParticipant);
+
+                Employee employee = employeeRepository.findEmployeeById(id);
+                List<String> emails1 = new ArrayList<>();
+                emails1.add(employee.getEmployeeEmail());
+                emailService.sendEmail(emails1,"Remove from booking","Removed from Game Booking by your friend at :" + Instant.now());
+                notificationService.createNotification(id, "Remove from booking","Removed from Game Booking by your friend at :" + Instant.now());
+
+            }
+        }
+
+        if(!emails.isEmpty()){
+            emailService.sendEmail(emails, "Game Booking complete","You are added in Game booking by your friend at :" + Instant.now());
+        }
     }
 
 }

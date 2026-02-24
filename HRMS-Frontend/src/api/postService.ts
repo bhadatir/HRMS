@@ -25,8 +25,8 @@ export const postService = {
     return res.data;
   },
 
-  showAllPosts: async (token: string) => {
-    const res = await api.get("/post/", authHeader(token));
+  showAllPosts: async (token: string, page: number, size: number) => {
+    const res = await api.get(`/post/?page=${page}&size=${size}`, authHeader(token));
     return res.data;
   },
 

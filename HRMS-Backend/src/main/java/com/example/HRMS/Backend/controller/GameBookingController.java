@@ -1,10 +1,14 @@
 package com.example.HRMS.Backend.controller;
 
+import com.example.HRMS.Backend.dto.BookingWaitingListResponse;
 import com.example.HRMS.Backend.dto.EmployeeGameInterestResponse;
 import com.example.HRMS.Backend.dto.GameBookingRequest;
 import com.example.HRMS.Backend.dto.GameBookingResponse;
 import com.example.HRMS.Backend.model.GameBooking;
+import com.example.HRMS.Backend.model.GameBookingStatus;
 import com.example.HRMS.Backend.model.GameType;
+import com.example.HRMS.Backend.repository.GameBookingStatusRepository;
+import com.example.HRMS.Backend.repository.WaitlistRepository;
 import com.example.HRMS.Backend.service.GameBookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,8 @@ import java.util.List;
 public class GameBookingController {
 
     private final GameBookingService gameBookingService;
+    private final WaitlistRepository waitlistRepository;
+    private final GameBookingStatusRepository gameBookingStatusRepository;
 
     @PostMapping("/")
     public ResponseEntity<Object> addGameBooking(@Valid @RequestBody GameBookingRequest gameBookingRequest) {
@@ -63,5 +69,16 @@ public class GameBookingController {
     public ResponseEntity<List<EmployeeGameInterestResponse>> findGameInterestByEmp(@PathVariable Long empId){
         return ResponseEntity.ok(gameBookingService.findGameInterestByEmp(empId));
     }
+
+    @GetMapping("/waitList")
+    public ResponseEntity<List<BookingWaitingListResponse>> findWaitList(){
+        return ResponseEntity.ok(gameBookingService.findWaitList());
+    }
+
+    @GetMapping("/allGameBookingStatus")
+    public ResponseEntity<List<GameBookingStatus>> showAllGameBookingStatus() {
+        return ResponseEntity.ok(gameBookingStatusRepository.findAll());
+    }
+
 
 }

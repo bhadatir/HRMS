@@ -61,8 +61,8 @@ public class HrController {
     }
 
     @PatchMapping("/expense/{expId}/{statusId}")
-    public ResponseEntity<String > updateExpenseStatus(@PathVariable Long expId, @PathVariable Long statusId)
-    {   expenseService.updateExpenseStatus(expId, statusId);
+    public ResponseEntity<String > updateExpenseStatus(@PathVariable Long expId, @PathVariable Long statusId, @RequestParam String reason)
+    {   expenseService.updateExpenseStatus(expId, statusId, reason);
         return ResponseEntity.ok("status update successful");
     }
 

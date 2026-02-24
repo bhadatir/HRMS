@@ -31,7 +31,7 @@ export default function Dashboard() {
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
           
           <div className="flex items-center gap-2">
-            <SidebarTrigger />
+            {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">My Dashboard</h3>
           </div>
           <div className="relative inline-block">
@@ -72,10 +72,7 @@ export default function Dashboard() {
               <div className="text-center md:text-left">
                 <h1 className="text-3xl font-bold">{user.employeeFirstName} {user.employeeLastName}</h1>
                 <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-2">
-                  <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-none">
-                    ID: {user.id}
-                  </Badge>
-                  <Badge variant="outline" className="text-slate-500 border-slate-700">
+                    <Badge variant="outline" className="text-slate-500 border-slate-700">
                     {user.roleName || "Employee"}
                   </Badge>
                 </div>

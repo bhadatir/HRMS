@@ -17,9 +17,9 @@ public interface ExpenseService {
 
     void saveExpenseWithProof(@Valid ExpenseRequest expenseRequest, List<MultipartFile> files, List<Long> proofTypeId) throws IOException;
 
-    void updateExpenseStatus(Long expId, Long statusId);
+    void updateExpenseStatus(Long expId, Long statusId, String reason);
 
-    List<ExpenseResponse> getExpenseById(Long employeeid, Long travelPlanId);
+    List<ExpenseResponse> getExpenseById(Long employeeId, Long travelPlanId);
 
     List<ExpenseProofResponse> getExpenseProofById(Long expenseId);
 }

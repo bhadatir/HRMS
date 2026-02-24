@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { gameService } from "../api/gameService";
-import { apiService } from "../api/apiService"; // Assuming this handles employee search
+import { apiService } from "../api/apiService";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,6 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
     
-    // States for Time and Employee Selection
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
@@ -24,19 +23,23 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
 
     const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm();
 
-    // 1. Fetch Game Types and All Bookings
     const { data: gameTypes = [] } = useQuery({ 
         queryKey: ["allGameTypes"], 
         queryFn: () => gameService.getAllGames(token!) });
+
     const { data: allBookings = [] } = useQuery({ 
         queryKey: ["allBookings"], 
         queryFn: () => gameService.showAllBookings(token!) });
 
-    // 2. Employee Search Query
+    const { data: allWaitingList = [] } = useQuery({ 
+        queryKey: ["allWaitingList"], 
+        queryFn: () => gameService.getAllWaitingList(token!) });
+
     const { data: suggestions } = useQuery({
         queryKey: ["employeeSearch", searchTerm],
         queryFn: () => apiService.searchEmployees(searchTerm, token || ""),
         enabled: searchTerm.length >= 1,
+        select: (suggestions) => suggestions.filter((emp: any) => emp.id !== user?.id && !selectedParticipants.find(p => p.id === emp.id))
     });
 
     const { data: myInterests = [] } = useQuery({
@@ -54,7 +57,6 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     const selectedDate = watch("date");
     const selectedGame = filteredGames.find((g: any) => g.id === Number(selectedGameId));
 
-    // 3. Handle Edit Mode Loading
     useEffect(() => {
         if (editBookingId) {
             const booking = allBookings.find((b: any) => b.id === editBookingId);
@@ -63,8 +65,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                 const timeStr = `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
                 
                 setSelectedTime(timeStr);
-                // Note: Ensure your backend booking response includes participant names
-                const participants = booking.participants?.map((p: any) => ({ id: p.id, name: p.name })) || [];
+                const participants = booking.bookingParticipantResponses?.map((p: any) => ({ id: p.id, name: p.employeeFirstName })) || [];
                 setSelectedParticipants(participants);
 
                 reset({
@@ -75,7 +76,6 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         }
     }, [editBookingId, allBookings, reset]);
 
-    // 4. Slots & Booked Logic
     const slots = useMemo(() => {
         if (!selectedGame) return [];
         const items = [];
@@ -92,11 +92,15 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         return items;
     }, [selectedGame]);
 
+    // if slot this perticular sloat book by other so in sloat selection show this slot is full
     const bookedTimes = useMemo(() => {
         if (!selectedDate || !selectedGameId) return new Set();
         return new Set(
             allBookings
-                .filter((b: any) => !b.gameBookingIsDeleted && b.gameTypeId === Number(selectedGameId) && b.gameBookingStartTime.startsWith(selectedDate) && b.id !== editBookingId)
+                .filter((b: any) => !b.gameBookingIsDeleted &&
+                     b.gameBookingStatusId === 1 &&
+                     b.gameTypeId === Number(selectedGameId) 
+                    && b.gameBookingStartTime.startsWith(selectedDate) && b.id !== editBookingId)
                 .map((b: any) => {
                     const dateObj = new Date(b.gameBookingStartTime);
                     return `${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
@@ -104,7 +108,94 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         );
     }, [allBookings, selectedDate, selectedGameId, editBookingId]);
 
-    // 5. Participant Selection Logic
+    // if i am in waiting list for 11-12 for any one game and then i try to book full sloat 11:30-12:00 so it not give me this access to wait for this sloat 
+    const waitedTimes = useMemo(() => {
+        if (!selectedDate || !user?.id) return [];
+        return allWaitingList.filter((w: any) => 
+                w.waitingStatusIsActive &&
+                w.targetSlotDatetime.startsWith(selectedDate) &&
+                (w.hostEmployeeId === user.id || w.bookingParticipantResponses?.some((p: any) => p.employeeId === user.id))
+            ).map((w: any) => {
+                const start = new Date(w.targetSlotDatetime);
+                return {
+                start: start.getHours() * 60 + start.getMinutes(),
+                end: start.getHours() * 60 + start.getMinutes() + w.gameSlotDuration
+                };
+            });
+    }, [allWaitingList, selectedDate, user?.id]);
+
+    // this is for like if i book 11-12 and then try to book 11:30-12:00 in other game then 11:30 should be marked as busy slot.
+    const myBusySlots = useMemo(() => {
+        if (!selectedDate || !user?.id) return [];
+        return allBookings.filter((b: any) => 
+            !b.gameBookingIsDeleted && 
+            b.gameBookingStatusId === 1 &&
+            b.gameBookingStartTime.startsWith(selectedDate) &&
+            (b.employeeId === user.id || b.bookingParticipantResponses?.some((p: any) => p.employeeId === user.id))
+        ).map((b: any) => {
+            const start = new Date(b.gameBookingStartTime);
+            const end = new Date(b.gameBookingEndTime);
+            return {
+            start: start.getHours() * 60 + start.getMinutes(),
+            end: end.getHours() * 60 + end.getMinutes()
+            };
+        });
+    }, [allBookings, selectedDate, user?.id]);
+
+    // if i book sloat with Participant but Participant is in other waiting list so that employee mark as In Waiting List
+    const busyWaitingEmployeeIds = useMemo(() => {
+        if (!selectedDate || !selectedTime || !selectedGame) return new Set<number>();
+
+        const selectedStartStr = `${selectedDate}T${selectedTime}:00`;
+        const selectedStart = new Date(selectedStartStr).getTime();
+        const selectedEnd = selectedStart + (selectedGame.gameSlotDuration * 60000);
+
+        const busyIds = new Set<number>();
+
+        allWaitingList.forEach((w: any) => {
+            if (!w.waitingStatusIsActive) return;
+
+            const wStart = new Date(w.targetSlotDatetime).getTime();
+            const wEnd = new Date(w.targetSlotDatetime).getTime() + (w.gameSlotDuration * 60000);
+
+            const isOverlapping = (selectedStart < wEnd && selectedEnd > wStart);
+
+            if (isOverlapping) {
+                busyIds.add(w.hostEmployeeId);
+                w.bookingParticipantResponses?.forEach((p: any) => busyIds.add(p.employeeId));
+            }
+        });
+
+        return busyIds;
+    }, [allWaitingList, selectedDate, selectedTime, selectedGame]);
+
+    // if i book sloat with Participant but Participant is in other booking so that employee mark as Already in a game
+    const busyEmployeeIds = useMemo(() => {
+        if (!selectedDate || !selectedTime || !selectedGame) return new Set<number>();
+
+        const selectedStartStr = `${selectedDate}T${selectedTime}:00`;
+        const selectedStart = new Date(selectedStartStr).getTime();
+        const selectedEnd = selectedStart + (selectedGame.gameSlotDuration * 60000);
+
+        const busyIds = new Set<number>();
+
+        allBookings.forEach((b: any) => {
+            if (b.gameBookingIsDeleted || b.gameBookingStatusId !== 1) return;
+
+            const bStart = new Date(b.gameBookingStartTime).getTime();
+            const bEnd = new Date(b.gameBookingEndTime).getTime();
+
+            const isOverlapping = (selectedStart < bEnd && selectedEnd > bStart);
+
+            if (isOverlapping) {
+                busyIds.add(b.employeeId);
+                b.bookingParticipantResponses?.forEach((p: any) => busyIds.add(p.employeeId));
+            }
+        });
+
+        return busyIds;
+    }, [allBookings, selectedDate, selectedTime, selectedGame]);
+
     const handleAddParticipant = (emp: any) => {
         if(!selectedGame) {
             window.alert("Please select a game first");
@@ -121,10 +212,9 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         setSelectedParticipants(selectedParticipants.filter(p => p.id !== id));
     };
 
-    // 6. Final Mutation
     const mutation = useMutation({
         mutationFn: (data: any) => editBookingId 
-            ? gameService.updateBooking(editBookingId, data, token!) // Assuming update method exists
+            ? gameService.updateBooking(editBookingId, data, token!) 
             : gameService.addBooking(data, token!),
         onSuccess: (data) => {
             window.alert(typeof data === "string" ? data : "Booking saved!");
@@ -183,9 +273,17 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                                         <div className="grid grid-cols-4 gap-2 p-4">
                                             {slots.map((slot) => {
                                                 
+                                                const slotMinutes = parseInt(slot.split(":")[0]) * 60 + parseInt(slot.split(":")[1]);
+                                                const isPersonallyBusy = myBusySlots.some((busy: any) => 
+                                                slotMinutes >= busy.start && slotMinutes < busy.end
+                                                );
+                                                const isWaited = waitedTimes.some((wait: any) => 
+                                                slotMinutes >= wait.start && slotMinutes < wait.end
+                                                );
+
                                                 const slotDateTime = new Date(`${selectedDate}T${slot}:00`);
                                                 if (slotDateTime < new Date()) return null;
-
+                                                
                                                 const isBooked = bookedTimes.has(slot);
                                                 const isSelected = selectedTime === slot;
 
@@ -193,17 +291,22 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                                                     <Button
                                                         key={slot}
                                                         type="button"
-                                                        variant={isSelected ? "default" : "outline"}
+                                                        title={isPersonallyBusy && "you are not avalible at this time."}
+                                                        disabled={isPersonallyBusy || isWaited}
                                                         className={cn(
                                                             "text-xs h-10 transition-all border-2",
-                                                            isBooked && "bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed",
-                                                            isSelected && "bg-gray-600 text-black border-blue-700",
-                                                            !isBooked && !isSelected && "hover:border-blue-500 text-slate-700"
+                                                            isBooked && "bg-slate-200 text-slate-500",        
+                                                            isPersonallyBusy || isWaited && "bg-slate-200 text-slate-500 cursor-not-allowed",                                                    
+                                                            isSelected && "bg-gray-900 text-black",
+                                                            !isBooked && !isSelected && "text-slate-500"
                                                         )}
                                                         onClick={() => setSelectedTime(slot)}
                                                     >
                                                         {slot}
-                                                        {isBooked && <span className="block text-[8px] mt-1 uppercase">Full</span>}
+                                                        {isPersonallyBusy ? <span className="block text-[8px] mt-1 uppercase">Busy</span>
+                                                        : isWaited ? <span className="block text-[8px] mt-1 uppercase">Wait</span>
+                                                        : isBooked ? <span className="block text-[8px] mt-1 uppercase">Full</span>
+                                                        : null}
                                                     </Button>
                                                 );
                                             })}
@@ -222,32 +325,52 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                     {selectedGame && selectedParticipants.length < selectedGame.gameMaxPlayerPerSlot-1 ? 
                     <div className="relative">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                        <Input placeholder="Search participants..." className="pl-9" value={searchTerm}
+                        <Input placeholder="Search participants..."
+                            disabled={!selectedTime} 
+                            className="pl-9" value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setShowDropdown(true); }}
                             onFocus={() => setShowDropdown(true)}
                         />
-                        {showDropdown && suggestions && suggestions.length > 0 &&(
+
+                        {showDropdown && suggestions && (
                             <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-48 overflow-auto">
-                                {suggestions.map((emp: any) => (
-                                    <button key={emp.id} type="button" className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 border-b"
-                                        onClick={() => handleAddParticipant(emp)}>
-                                        <User size={14} className="text-blue-600" />
-                                        <span className="text-sm">{emp.employeeFirstName} {emp.employeeLastName}</span>
-                                    </button>
-                                ))}
+                                {suggestions.map((emp: any) => {
+                                    const isBusy = busyEmployeeIds.has(emp.id) || busyWaitingEmployeeIds.has(emp.id);
+
+                                    return (
+                                        <button
+                                            key={emp.id}
+                                            type="button"
+                                            disabled={isBusy}
+                                            className={cn(
+                                                "w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors",
+                                                isBusy ? "bg-slate-50 opacity-60 cursor-not-allowed" : ""
+                                            )}
+                                            onClick={() => !isBusy && handleAddParticipant(emp)}
+                                        >
+                                            <User size={14} className={isBusy ? "text-slate-400" : "text-blue-600"} />
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
+                                                {isBusy ? busyWaitingEmployeeIds.has(emp.id) ? <span className="text-[10px] text-orange-500 font-bold">In waiting list</span> 
+                                                 : <span className="text-[10px] text-red-500 font-bold">Already in a game</span>
+                                                 : <span className="text-[10px] text-green-500 font-bold">Available</span>}
+                                            </div>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
                     : <p className="text-xs text-gray-500   ">
                         {selectedParticipants.length > 0 ?
                             <p>
-                                {selectedGame.gameName} Game only allow maximum {selectedGame.gameMaxPlayerPerSlot} player per game slot.
+                                {selectedGame?.gameName} Game only allow maximum {selectedGame.gameMaxPlayerPerSlot} player per game slot.
                             </p>
                             : null
                         }      
                       </p>}
 
-                    {/* Selected Participant Chips */}
+                    {/* Selected Participant */}
                     <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-slate-50 rounded-lg border border-dashed">
                         {selectedParticipants.length === 0 && <p className="text-xs text-slate-400">No participants added.</p>}
                         {selectedParticipants.map((p) => (

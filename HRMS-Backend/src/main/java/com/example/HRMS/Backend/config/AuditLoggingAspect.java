@@ -1,10 +1,13 @@
 package com.example.HRMS.Backend.config;
 
+import com.example.HRMS.Backend.dto.JobShareRequest;
 import com.example.HRMS.Backend.dto.ReferFriendRequest;
 import com.example.HRMS.Backend.model.AuditLog;
 import com.example.HRMS.Backend.model.CvStatusType;
+import com.example.HRMS.Backend.model.ShareJobData;
 import com.example.HRMS.Backend.repository.AuditLogRepository;
 import com.example.HRMS.Backend.repository.CvStatusTypeRepository;
+import com.example.HRMS.Backend.repository.ShareJobDataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Aspect
 @Component
@@ -25,6 +29,7 @@ public class AuditLoggingAspect {
 
     private final AuditLogRepository auditRepo;
     private final CvStatusTypeRepository cvStatusTypeRepository;
+    private final ShareJobDataRepository shareJobDataRepository;
 
     @AfterReturning(
             pointcut = "execution(* com.example.HRMS.Backend.service.JobService.updateStatus(..))"
@@ -71,6 +76,33 @@ public class AuditLoggingAspect {
             log.setPerformedBy(email);
 
             auditRepo.save(log);
+        }
+
+    }
+
+    @AfterReturning(
+            pointcut = "execution(* com.example.HRMS.Backend.service.JobService.shareJob(..))"
+    )
+    public void logJobShare(JoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        log.info("AUDIT LOG - Job Share By User | Recipient info logged | Timestamp: {}",
+                LocalDateTime.now());
+
+        if(args.length>0){
+            JobShareRequest jobShareRequest = (JobShareRequest) args[0];
+
+            for(String recipientEmail : jobShareRequest.getEmails()){
+                ShareJobData log = new ShareJobData();
+                log.setShareJobBy(email);
+                log.setFkJobId(jobShareRequest.getFkJobId());
+                log.setReceiverEmail(recipientEmail);
+                log.setTimestamp(Instant.now());
+
+                shareJobDataRepository.save(log);
+            }
+
         }
 
     }

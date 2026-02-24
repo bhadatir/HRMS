@@ -9,6 +9,7 @@ import com.example.HRMS.Backend.service.PostService;
 import com.example.HRMS.Backend.service.impl.OrgChartServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,8 +34,9 @@ public class PostController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<PostResponse>> allPost() {
-        return ResponseEntity.ok(postService.showAllPosts());
+    public Page<PostResponse> allPost( @RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size) {
+        return postService.showAllPosts(page, size);
     }
 
     @GetMapping("/{postId}")

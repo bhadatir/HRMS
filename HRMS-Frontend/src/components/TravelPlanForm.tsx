@@ -177,6 +177,7 @@ export default function TravelPlanForm({ editTravelPlanId, onSuccess }: { editTr
               {showDropdown && suggestions && suggestions.length > 0 && (
                 <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-48 overflow-auto">
                   {suggestions.map((emp: any) => (
+                    emp.id !== user?.id && !selectedEmployees.find(e => e.id === emp.id) && (
                     <button
                       key={emp.id}
                       type="button"
@@ -186,6 +187,7 @@ export default function TravelPlanForm({ editTravelPlanId, onSuccess }: { editTr
                       <User size={14} className="text-blue-600" />
                       <span className="text-sm">{emp.employeeFirstName} {emp.employeeLastName}</span>
                     </button>
+                   )
                   ))}
                 </div>
               )}

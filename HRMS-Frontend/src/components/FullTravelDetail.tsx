@@ -54,8 +54,8 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
   }, [allExpenses]);
 
   const approveMutation = useMutation({
-    mutationFn: ({ expenseId, statusId }: { expenseId: number; statusId: number }) =>
-      travelService.updateExpenseStatus(expenseId, statusId, token || ""),
+    mutationFn: ({ expenseId, statusId, reason }: { expenseId: number; statusId: number; reason: string }) =>
+      travelService.updateExpenseStatus(expenseId, statusId, reason, token || ""),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["travelPlan", travelPlan]});
       await queryClient.invalidateQueries({ queryKey: ["travelPlanExpense"] });
@@ -69,6 +69,18 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
   });
 
   if (isLoadingData) return <div className="p-10">Loading Details...</div>;
+
+  const handleExpenseApproval = (expenseId: number, statusId: number) => {
+    if(statusId === 2) {
+      const confirm = window.confirm("Are you sure you want to approve this expense?");
+      if (confirm) approveMutation.mutate({ expenseId, statusId, reason: "Approved by HR" });
+    } else {
+      const reason = window.prompt("Please enter reason for approval:", "")?.trim();
+      if (reason) {
+        approveMutation.mutate({ expenseId, statusId, reason });
+      }
+    }
+  };
 
   return (
         <>
@@ -145,6 +157,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                         <TableHead>Proofs</TableHead>
                         <TableHead>Status</TableHead>
                         {user?.roleName !== "EMPLOYEE" && <TableHead className="text-right">Actions</TableHead>}
+                        {<TableHead >Reason</TableHead>}
                       </>
                     ) : (
                       <>
@@ -162,7 +175,6 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                       <TableCell>{exp.expenseDate.split("T")[0]}</TableCell>
                       <TableCell>
                         <p className="font-medium">{exp.expenseRemark}</p>
-                        <p className="text-[10px] text-slate-400">ID: {exp.id}</p>
                       </TableCell>
                       <TableCell className="font-bold flex text-slate-900"><IndianRupee className="mt-1" size={14} />{exp.expenseAmount}</TableCell>
                       <TableCell>
@@ -195,7 +207,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                                 size="sm" 
                                 variant="outline" 
                                 className="text-green-600 border-green-200 hover:bg-green-50"
-                                onClick={() => approveMutation.mutate({ expenseId: exp.id, statusId: 2 })}
+                                onClick={() => handleExpenseApproval(exp.id, 2)}
                                 disabled={approveMutation.isPending}
                               >
                                 <CheckCircle size={16} />
@@ -204,7 +216,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                                 size="sm" 
                                 variant="outline" 
                                 className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => approveMutation.mutate({ expenseId: exp.id, statusId: 4 })}
+                                onClick={() => handleExpenseApproval(exp.id, 3)}
                                 disabled={approveMutation.isPending}
                               >
                                 <XCircle size={16} />
@@ -217,7 +229,8 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                             )}
                           </div>
                         </TableCell>
-                      )}
+                      )}                      
+                      <TableCell>{exp.reasonForRejectExpense || "-"}</TableCell>
                     </TableRow>
                   )
                 ):(
@@ -240,7 +253,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
               )}
               {viewMode === "DOCUMENTS" && allDocs.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-10">
+                  <TableCell colSpan={5} className="text-center py-10">
                     <div className="flex flex-col items-center gap-2">
                       <FileText size={32} className="text-slate-400" />
                       <p className="text-sm text-slate-400">No travel documents uploaded yet.</p>
@@ -250,7 +263,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
               )}
               {viewMode === "EXPENSES" && allExpenses.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-10">
+                  <TableCell colSpan={7} className="text-center py-10">
                     <div className="flex flex-col items-center gap-2">
                       <FileText size={32} className="text-slate-400" />
                       <p className="text-sm text-slate-400">No travel expenses uploaded yet.</p>

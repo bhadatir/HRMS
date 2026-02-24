@@ -64,8 +64,8 @@ export const travelService = {
     return res.data;
   },
 
-  updateExpenseStatus: async (expenseId: number, statusId: number, token: string) => {
-    const res = await api.patch(`/hr/expense/${expenseId}/${statusId}`,null, authHeader(token));
+  updateExpenseStatus: async (expenseId: number, statusId: number, reason: string, token: string) => {
+    const res = await api.patch(`/hr/expense/${expenseId}/${statusId}?reason=${encodeURIComponent(reason)}`,null, authHeader(token));
     return res.data;
   },
 

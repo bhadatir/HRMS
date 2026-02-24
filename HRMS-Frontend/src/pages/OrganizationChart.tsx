@@ -46,7 +46,7 @@ export default function OrganizationChart() {
       <SidebarInset className="flex flex-1 flex-col w-full bg-slate-50">
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-20">
           <div className="flex items-center gap-2">
-            <SidebarTrigger />
+            {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold">Managerial Chain</h3>
           </div>
 
@@ -98,7 +98,7 @@ export default function OrganizationChart() {
           </div>
         </header>
 
-        <div className="p-6 max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500 w-250">
+        <div className="p-6 max-w-6xl mx-auto space-y-8 w-250">
           {isLoading ? (
             <div className="p-10 text-center text-slate-500 font-medium">Loading employee data...</div>
           ) : isError ? (
@@ -117,6 +117,7 @@ export default function OrganizationChart() {
                   </div>
                 </div>
               )}
+
               <section className="bg-white p-4 rounded-lg border shadow-sm">
                 <Breadcrumb>
                   <BreadcrumbList>

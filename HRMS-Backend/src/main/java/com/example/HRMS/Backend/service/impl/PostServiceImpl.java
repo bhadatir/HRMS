@@ -15,6 +15,9 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,25 +73,27 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostResponse> showAllPosts(){
-        List<PostResponse> postResponses =new ArrayList<>();
+    public Page<PostResponse> showAllPosts(int page, int size) {
 
-        List<Post> posts = postRepository.findAll();
+        Pageable pageable = PageRequest.of(page, size);
 
-        for(Post post:posts){
-            PostResponse postResponse = modelMapper.map(post,PostResponse.class);
-            postResponses.add(postResponse);
+        Page<Post> postPage = postRepository.findByPostIsDeletedFalse(pageable);
 
-            List<PostTag> postTags = postTagRepository.findPostTagsByFkPost_Id(post.getId());
-            List<PostTagResponse> postTagResponses = new ArrayList<>();
-            for(PostTag postTag : postTags) {
-                PostTagResponse postTagResponse = modelMapper.map(postTag, PostTagResponse.class);
-                postTagResponses.add(postTagResponse);
-            }
+        return postPage.map(post -> {
+
+            PostResponse postResponse = modelMapper.map(post, PostResponse.class);
+
+            List<PostTag> postTags = postTagRepository
+                    .findPostTagsByFkPost_Id(post.getId());
+
+            List<PostTagResponse> postTagResponses = postTags.stream()
+                    .map(tag -> modelMapper.map(tag, PostTagResponse.class))
+                    .toList();
+
             postResponse.setPostTagResponses(postTagResponses);
-        }
 
-        return postResponses;
+            return postResponse;
+        });
     }
 
     @Override

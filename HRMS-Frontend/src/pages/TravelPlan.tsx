@@ -70,18 +70,22 @@ export default function TravelPlan() {
   
     if(user?.roleName === "MANAGER" && !isSearchLoading && searchFilter) {
       return allPlans.filter((plan: any) => 
-        plan.employeeFkManagerEmployeeId === user.id 
-        || (plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false))
-        && searchFilter.includes(plan.id));
+        plan.employeeTravelPlanResponses.some((resp: any) => {
+          return resp.employeeFkManagerEmployeeId === user.id;
+        }) || plan.employeeTravelPlanResponses.some((resp: any) => {
+          return resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false;
+        })
+        && searchFilter.includes(plan.id)
+      );
     }
 
     if(user?.roleName === "MANAGER" && !isSearchLoading && !searchFilter) {
-      return allPlans.filter((plan: any) => plan.employeeFkManagerEmployeeId === user.id
+      return allPlans.filter((plan: any) => 
+        plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeFkManagerEmployeeId === user.id)
       || (plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false)));
     }
 
     // if role hr so hr add exp only on that in which hr is going in travel is remaining
-
 
     if (!searchFilter) return allPlans;
     return allPlans.filter((plan: any) => searchFilter.includes(plan.id));
@@ -102,7 +106,7 @@ export default function TravelPlan() {
       <SidebarInset className="bg-slate-50">
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-2">
-            <SidebarTrigger />
+            {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Travel Management</h3>
             {searchFilter && searchFilter.length > 0 ?(
               <Badge variant="outline">{searchFilter.length} results</Badge>
@@ -214,7 +218,7 @@ export default function TravelPlan() {
           {/* Full travel details modal */}
           {fullTravelDetails && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-2xl w-full relative p-6 h-150 overflow-y-auto">
+              <div className="bg-white rounded-xl max-w-4xl w-full relative p-6 h-150 overflow-y-auto">
                 <Button title="Close Travel Details" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setFullTravelDetails(null);
                 }}><X /></Button>
@@ -268,12 +272,13 @@ export default function TravelPlan() {
                       </div>
                     </div>
 
-                    {/* manager also add doc so update thia */}
-
+                    {/* manager also add doc so update this */}
                     
-                    {user?.roleName === "HR" || user?.roleName === "EMPLOYEE" || (user?.roleName === "MANAGER" && plan.employeeFkManagerEmployeeId !== user.id) ? (
+                    {user?.roleName === "HR" || user?.roleName === "EMPLOYEE" || 
+                      (user?.roleName === "MANAGER" && plan.employeeTravelPlanResponses.some((resp: any) => 
+                          resp.employeeEmail === user.employeeEmail)) ? (
                       <div className="mt-2 flex justify-between gap-2">
-                        { new Date(plan.travelPlanStartDate) > new Date() ? (
+                        { new Date(plan.travelPlanEndDate) > new Date() ? (
                         <Button 
                           title="Add Travel Document"
                           onClick={(e) => {

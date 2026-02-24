@@ -38,7 +38,7 @@ public class DynamicPostServiceImpl implements DynamicPostService {
 
                 Post post = new Post();
 
-                post.setPostContentUrl("dummy url");
+                post.setPostContentUrl("http://localhost:8080/uploads/happyBirthDay.png");
                 post.setPostTitle("Happy BirthDay");
                 post.setPostContent("Wish you Happy BirthDay " + employee.getEmployeeFirstName());
                 post.setFkPostVisibility(postVisibilityRepository.findPostVisibilitiesById(1L));
@@ -59,11 +59,15 @@ public class DynamicPostServiceImpl implements DynamicPostService {
             }
             if(employee.getEmployeeHireDate().getMonth() == localDate.getMonth() &&
                     employee.getEmployeeHireDate().getDayOfMonth() == localDate.getDayOfMonth()){
+
+                int year = localDate.getYear() - employee.getEmployeeHireDate().getYear();
+
                 Post post = new Post();
 
-                post.setPostContentUrl("dummy url");
+                post.setPostContentUrl("http://localhost:8080/uploads/WorkingAnniversary.png");
                 post.setPostTitle("Happy Working Anniversary");
-                post.setPostContent("Happy Working Anniversary " + employee.getEmployeeFirstName());
+                post.setPostContent("Happy Working Anniversary " + employee.getEmployeeFirstName() +
+                        " to complete : " + year + " years at ROIMA.");
                 post.setFkPostVisibility(postVisibilityRepository.findPostVisibilitiesById(1L));
 
                 postRepository.save(post);

@@ -13,6 +13,7 @@ public class BookingParticipantResponse {
 
     private Long bookingWaitingListId;
 
+    private Long employeeId;
     private String employeeEmail;
     private String employeeFirstName;
     private String employeeLastName;

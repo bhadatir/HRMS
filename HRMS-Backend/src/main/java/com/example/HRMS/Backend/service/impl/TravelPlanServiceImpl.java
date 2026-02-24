@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.hibernate.type.descriptor.java.CoercionHelper.toLong;
@@ -229,7 +232,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     @Override
     public List<TravelPlanResponse> showAllTravelPlan(){
         List<TravelPlanResponse> travelPlanResponses = new ArrayList<>();
-        for(TravelPlan travelPlan:travelPlanRepository.findAll()){
+        for(TravelPlan travelPlan : travelPlanRepository.findAll()){
             TravelPlanResponse travelPlanResponse = modelMapper.map(travelPlan,TravelPlanResponse.class);
 
             List<EmployeeTravelPlanResponse> employeeTravelPlanResponses = new ArrayList<>();
@@ -396,5 +399,30 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         return travelDocsTypeRepository.findAll();
     }
 
+    @Scheduled(cron = "0 0 * * * *")
+    @Transactional
+    public void autoNotificationForExpenseAdd() {
+        LocalDate now = LocalDate.now().minusDays(5);
+
+        List<TravelPlan> travelPlans = travelPlanRepository
+                .findAllByTravelPlanEndDateAndTravelPlanIsDeleted(now, false);
+
+        if (!travelPlans.isEmpty()) {
+            for(TravelPlan travelPlan : travelPlans) {
+                List<Long> employeeIdByTravelPlanId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlan.getId());
+
+                for (Long id : employeeIdByTravelPlanId) {
+                    notificationService.createNotification(id
+                            , "Expense Upload reminder"
+                            , "For Travel Plan : "
+                                    + travelPlan.getTravelPlanName() +
+                                    " You have now only 5 days remaining to add expense "
+                    );
+                }
+            }
+
+        }
+
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.dto;
 
 import com.example.HRMS.Backend.model.GameBookingStatus;
+import com.example.HRMS.Backend.model.GameType;
 import lombok.Data;
 
 import java.time.Instant;
@@ -23,6 +24,8 @@ public class GameBookingResponse {
     private Long gameTypeId;
 
     private String gameTypeName;
+
+    private Integer gameSlotDuration;
 
     private Long employeeId;
 

@@ -1,5 +1,6 @@
 package com.example.HRMS.Backend.dto;
 
+import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.time.Instant;
@@ -18,6 +19,8 @@ public class ExpenseResponse {
     private String expenseRemark;
 
     private Instant expenseUploadedAt;
+
+    private String reasonForRejectExpense;
 
     private Long expenseExpenseStatusId;
     private String expenseExpenseStatusName;

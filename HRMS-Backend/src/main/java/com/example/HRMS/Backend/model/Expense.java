@@ -46,5 +46,7 @@ public class Expense {
     @JoinColumn(name = "fk_employee_travel_plan_id", nullable = false)
     private EmployeeTravelPlan fkEmployeeTravelPlan;
 
+    @Column(name = "reason_for_reject_expense")
+    private String reasonForRejectExpense;
 
 }

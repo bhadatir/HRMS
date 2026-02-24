@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.model.JobType;
 import com.example.HRMS.Backend.model.PostVisibility;
 import com.example.HRMS.Backend.model.TagType;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.beans.Visibility;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface PostService {
     void savePost(PostRequest postRequest, MultipartFile file) throws IOException;
 
-    List<PostResponse> showAllPosts();
+    Page<PostResponse> showAllPosts(int page, int size);
 
     PostResponse showPostByPostId(Long postId);
 

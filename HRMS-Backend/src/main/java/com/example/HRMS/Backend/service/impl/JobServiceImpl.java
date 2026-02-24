@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -164,7 +165,7 @@ public class JobServiceImpl implements JobService {
         List<String> emails = new ArrayList<>();
         emails.add(referFriendRequest.getReferFriendEmail());
         emails.add(job.getFkJobOwnerEmployee().getEmployeeEmail());
-        emails.add("tirthbhadani3@gmail.com");
+        emails.add("tirthbhadani3@gmail.com"); // Specific HR person (Anjum)
 
         for(CvReviewer cvReviewer : cvReviewers)
         {

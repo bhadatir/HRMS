@@ -23,13 +23,33 @@ public interface WaitlistRepository extends JpaRepository<BookingWaitingList,Lon
     boolean hasAppliedInCycle(@Param("empId") Long empId,
                              @Param("gameTypeId") Long gameTypeId);
 
-    @Query(value = "SELECT bwl.pk_waiting_id, bwl.is_first_game, bwl.target_slot_datetime, bwl.waiting_list_created_at " +
-            ", bwl.waiting_status_is_active, bwl.fk_game_type_id, bwl.fk_host_employee_id " +
-            "FROM booking_waiting_list bwl inner join employee_game_interest egi on egi.fk_employee_id = bwl.fk_host_employee_id " +
+//    @Query(value = "SELECT bwl.pk_waiting_id, bwl.is_first_game, bwl.target_slot_datetime, bwl.waiting_list_created_at " +
+//            ", bwl.waiting_status_is_active, bwl.fk_game_type_id, bwl.fk_host_employee_id " +
+//            "FROM booking_waiting_list bwl inner join employee_game_interest egi on egi.fk_employee_id = bwl.fk_host_employee_id " +
+//            "WHERE bwl.fk_game_type_id = :gameTypeId " +
+//            "AND bwl.target_slot_datetime = :targetSlotDatetime " +
+//            "order by egi.played_in_current_cycle ASC, " +
+//            "bwl.waiting_list_created_at ASC",
+//            nativeQuery = true)
+
+    @Query(value = "WITH GroupStats AS ( " +
+            "SELECT " +
+            "bwl.pk_waiting_id, " +
+            "AVG(egi_all.played_in_current_cycle) AS avg_group_played " +
+            "FROM booking_waiting_list bwl " +
+            "INNER JOIN booking_participants bp " +
+            "ON bwl.pk_waiting_id = bp.fk_booking_waiting_list_id " +
+            "INNER JOIN employee_game_interest egi_all " +
+            "ON egi_all.fk_employee_id = bwl.fk_host_employee_id " +
+            "OR egi_all.fk_employee_id = bp.fk_employee_id " +
             "WHERE bwl.fk_game_type_id = :gameTypeId " +
+            "AND egi_all.fk_game_type_id = :gameTypeId " +
             "AND bwl.target_slot_datetime = :targetSlotDatetime " +
-            "order by egi.played_in_current_cycle ASC, " +
-            "bwl.waiting_list_created_at ASC",
+            "GROUP BY bwl.pk_waiting_id) " +
+            "SELECT bwl.* " +
+            "FROM GroupStats gs " +
+            "JOIN booking_waiting_list bwl ON bwl.pk_waiting_id = gs.pk_waiting_id " +
+            "ORDER BY gs.avg_group_played ASC, bwl.waiting_list_created_at ASC ",
             nativeQuery = true)
     List<BookingWaitingList> findMatchingBookings(
             @Param("gameTypeId") Long gameTypeId,

@@ -14,6 +14,7 @@ public interface BookingParticipantRepository extends JpaRepository<BookingParti
     @Query(value = "Select new com.example.HRMS.Backend.dto.BookingParticipantResponse( " +
             "b.id, " +
             "b.fkBookingWaitingList.id, " +
+            "b.fkEmployee.id,  " +
             "b.fkEmployee.employeeEmail, " +
             "b.fkEmployee.employeeFirstName, b.fkEmployee.employeeLastName) from " +
             "BookingParticipant b where b.fkGameBooking.id = :id ")
@@ -22,10 +23,22 @@ public interface BookingParticipantRepository extends JpaRepository<BookingParti
     @Query(value = "Select new com.example.HRMS.Backend.dto.BookingParticipantResponse( " +
             "b.id, " +
             "b.fkBookingWaitingList.id, " +
+            "b.fkEmployee.id, " +
             "b.fkEmployee.employeeEmail, " +
             "b.fkEmployee.employeeFirstName, b.fkEmployee.employeeLastName) from " +
             "BookingParticipant b where b.fkBookingWaitingList.id = :bookingWaitingListId ")
     List<BookingParticipantResponse> findAllByBookingWaitingListId(Long bookingWaitingListId);
 
     List<BookingParticipant> findByFkBookingWaitingList_Id(Long id);
+
+    @Query(value = "select p.fkEmployee.id " +
+            "from BookingParticipant p " +
+            "where p.fkGameBooking.id = :bookingId ")
+    List<Long> findEmployeeIdByGameBookingId(Long bookingId);
+
+    @Query(value = "select BookingParticipant " +
+            "from BookingParticipant p " +
+            "where p.fkGameBooking.id = :bookingId " +
+            "And p.fkEmployee.id = :id ")
+    BookingParticipant findBookingParticipantByEmployeeIdAndGameBookingId(Long id, Long bookingId);
 }

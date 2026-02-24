@@ -2,26 +2,49 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, CheckCircle } from "lucide-react";
+import { Calendar, Clock, CheckCircle, Edit } from "lucide-react";
+import { useState } from "react";
+import GameBookingForm from "./GameBookingForm";
+import { useAuth } from "@/context/AuthContext";
+import { gameService } from "@/api/gameService";
+import { useQuery } from "@tanstack/react-query";
 
 export default function BookingCard({ booking, onStatusChange }: { booking: any, onStatusChange: () => void }) {
+    const [showGameBookingForm, setShowGameBookingForm] = useState(false);
+    const { user, token } = useAuth();
+
+    const { data: gameBookingStatusOptions = [] } = useQuery({
+        queryKey: ["gameBookingStatusOptions"],
+        queryFn: () => gameService.getAllGameBookingStatus(token!)
+    });
+
     return (
+        <>
+        {/* add game booking */}
+        {showGameBookingForm && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl w-full max-w-md relative h-150 overflow-y-auto">     
+                    <Button variant="ghost" className="absolute top-2 right-2" 
+                    onClick={() => {
+                        setShowGameBookingForm(false);
+                    }}>X</Button>
+                    <GameBookingForm editBookingId={booking.id} onSuccess={() => setShowGameBookingForm(false)} />
+                </div>
+            </div>
+        )}
         <Card key={booking.id} className="hover:shadow-md transition-shadow border-slate-200">
             <CardContent className="p-4 space-y-3">
                 <div className="flex justify-between items-start">
                     <Badge variant="outline">Game Name: {booking.gameTypeName}</Badge>
-                    {booking.isSecondTimePlay && <Badge className="bg-orange-100 text-orange-700">2nd Play</Badge>}
-                    <Badge className={booking.gameBookingStatusId === 1 ? "bg-green-100 text-green-700" : booking.gameBookingStatusId === 2 ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}>
-                    {booking.gameBookingStatusId === 1 ? "Confirmed" : booking.gameBookingStatusId === 2 ? "Completed" : "Cancelled"}
-                </Badge>    
+                    <Badge variant="outline" className="capitalize">{gameBookingStatusOptions.find((s: any) => s.id === booking.gameBookingStatusId)?.gameBookingStatusName || "Unknown Status"}</Badge>   
             </div>
             
             <div className="flex items-center gap-2 text-sm font-semibold">
                 <Calendar size={14} /> {new Date(booking.gameBookingStartTime).toLocaleDateString()}
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-500">
-                <Clock size={14} /> {new Date(booking.gameBookingStartTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} 
-                - {new Date(booking.gameBookingEndTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                <Clock size={14} /> {new Date(booking.gameBookingStartTime).toTimeString().slice(0,5)} 
+                - {new Date(booking.gameBookingEndTime).toTimeString().slice(0,5)}
             </div>
 
             <div className="pt-2 border-t flex justify-between items-center">
@@ -34,7 +57,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
                     )}
                 </div>
                 
-                {booking.gameBookingStatusId === 1 && (
+                {booking.gameBookingStatusId === 1 && booking.employeeId === user?.id ? (
                     <div className="flex gap-2">
                         <Button size="sm" variant="outline" className="h-7 text-red-600" 
                         onClick={() => {
@@ -44,10 +67,17 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
                         }}>
                             <CheckCircle size={14} className="mr-1"/> Cancel
                         </Button>
+                        {/* <Button size="sm" variant="outline" className="h-7 text-gray-600" 
+                        onClick={() => {
+                            setShowGameBookingForm(true);
+                        }}>
+                            <Edit size={14} className="mr-1"/> Edit
+                        </Button> */}
                     </div>
-                )}
+                ):null}
             </div>
         </CardContent>
         </Card>
+        </>
     );
 }

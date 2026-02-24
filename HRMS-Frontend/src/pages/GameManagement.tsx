@@ -5,12 +5,14 @@ import { useAuth } from "../context/AuthContext";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
-import { Plus, Gamepad2, X, Bell, Book, Gamepad } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Gamepad2, X, Bell, Book, Gamepad, CheckCircle, Calendar, Clock } from "lucide-react";
 import GameBookingForm from "../components/GameBookingForm";
 import GameTypeManager from "@/components/GameTypeManager";
 import Notifications from "@/components/Notifications";
 import BookingCard from "@/components/BookingCard";
 import GameInterestToggle from "@/components/GameInterestToggle";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function GameManagement() {
     const { token, user, unreadNotifications } = useAuth();
@@ -18,18 +20,30 @@ export default function GameManagement() {
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
     const [showGameTypeForm, setShowGameTypeForm] = useState(false);
     const [gameType, setGameType] = useState<number | null>(null);
+    const [gameBookingStatusId, setgameBookingStatusId] = useState<number | null>(null);
     const [showNotification, setShowNotification] = useState(false);
     const [showGameInterestForm, setShowGameIntrestForm] = useState(false);
+    const [viewMode, setViewMode] = useState<"My Bookings" | "Waiting List">("My Bookings");
 
     const { data: gameTypes = [] } = useQuery({
         queryKey: ["gameTypes"],
         queryFn: () => gameService.getAllGames(token!)
     });
 
+    const { data: gameBookingStatusOptions = [] } = useQuery({
+        queryKey: ["gameBookingStatusOptions"],
+        queryFn: () => gameService.getAllGameBookingStatus(token!)
+    });
+
+    const { data: allWaitingList = [] } = useQuery({ 
+        queryKey: ["allWaitingList"], 
+        queryFn: () => gameService.getAllWaitingList(token!) });
+
+
     const { data: bookings = [], isLoading } = useQuery({
         queryKey: ["allBookings"],
         queryFn: () => gameService.showAllBookings(token!),
-        select: (bookings) => bookings.filter((b: any) => !gameType || b.gameTypeId === gameType)
+        select: (bookings) => bookings.filter((b: any) => (!gameType || b.gameTypeId === gameType) && (!gameBookingStatusId || b.gameBookingStatusId === gameBookingStatusId))
     });
 
     const statusMutation = useMutation({
@@ -46,7 +60,8 @@ export default function GameManagement() {
             <SidebarInset className="bg-slate-50">
                 <header className="flex h-16 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
                     <div className="flex items-center gap-2">
-                        <SidebarTrigger /><h3 className="font-bold">Game Zone</h3>
+                        {/* <SidebarTrigger /> */}
+                        <h3 className="font-bold">Game Zone</h3>
                         <select className="border rounded-md px-2 py-1 text-sm" value={gameType || ""} onChange={(e) => setGameType(Number(e.target.value))}>
                             <option value="">All Games</option>
                             {gameTypes.map((g: any) => <option key={g.id} value={g.id}>{g.gameName}</option>)}
@@ -97,12 +112,12 @@ export default function GameManagement() {
                     {/* add game booking */}
                     {showGameBookingForm && (
                         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white rounded-xl w-full max-w-md relative h-150 overflow-y-auto"> 
-                                <GameBookingForm onSuccess={() => setShowGameBookingForm(false)} />
+                            <div className="bg-white rounded-xl w-full max-w-md relative h-150 overflow-y-auto">     
                                 <Button variant="ghost" className="absolute top-2 right-2" 
                                 onClick={() => {
                                     setShowGameBookingForm(false);
                                 }}>X</Button>
+                                <GameBookingForm onSuccess={() => setShowGameBookingForm(false)} />
                             </div>
                         </div>
                     )}
@@ -136,32 +151,48 @@ export default function GameManagement() {
                     {/* upcomming games */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <h2 className="text-xl font-bold text-slate-900 col-span-full">Upcoming Bookings :</h2>
-                        {bookings.filter((b: any) => 
-                        {
-                            const bookingTime = new Date(b.gameBookingStartTime).getTime();
-                            const now = new Date().getTime();
-                            const upcommingEnd = now + (1 * 60 * 60 * 1000);
-                            return !b.gameBookingIsDeleted
-                            && bookingTime >= now
-                            && bookingTime <= upcommingEnd && b.gameBookingStatusId === 1
-                        }).length > 0 ? (
-                            <>
-                                
-                                {bookings.filter((b: any) => new Date(b.gameBookingStartTime) > new Date()).map((b: any) => (
+                        {bookings.filter((b: any) => {
+                                        const bookingTime = new Date(b.gameBookingStartTime).getTime();
+                                        const now = new Date().getTime();
+                                        const upcommingEnd = now + (1 * 60 * 60 * 1000);
+                                        return !b.gameBookingIsDeleted &&bookingTime >= now && bookingTime <= upcommingEnd && b.gameBookingStatusId === 1;
+                                    }).length > 0 ? (
+                                    bookings.filter((b: any) => {
+                                        const bookingTime = new Date(b.gameBookingStartTime).getTime();
+                                        const now = new Date().getTime();
+                                        const upcommingEnd = now + (1 * 60 * 60 * 1000);
+                                        return !b.gameBookingIsDeleted &&bookingTime >= now && bookingTime <= upcommingEnd && b.gameBookingStatusId === 1;
+                                    }).map((b: any) => (
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />
-                                ))}
-                            </>
-                        ): (
-                            <p className="text-slate-500 italic">No upcoming bookings.</p>
-                        )}
+                                ))
+                            ) : (
+                                <p className="text-slate-500 italic">No upcoming bookings in the next hour.</p>
+                            )}
+                    </div>
+
+                    
+                    <div className="flex items-center justify-between gap-2 my-5">
+                        <div className="flex flex-row items-center gap-4">
+                            <Button className={viewMode === "My Bookings" ? "rounded-md border text-gray-900" : "rounded-md text-gray-300"}
+                                size="sm"
+                                onClick={()=>setViewMode("My Bookings")}> My Bookings</Button>
+                            <Button className={viewMode === "Waiting List" ? "rounded-md border text-gray-900" : "rounded-md text-gray-300"}
+                                size="sm"
+                                onClick={()=>setViewMode("Waiting List")}> Waiting List</Button>
+                        </div>
+                        {viewMode === "My Bookings" && <select className="border rounded-md px-2 py-1 text-sm" value={gameBookingStatusId || ""} 
+                            onChange={(e) => setgameBookingStatusId(Number(e.target.value))}>
+                            <option value="">All Statuses</option>
+                            {gameBookingStatusOptions.map((g: any) => <option key={g.id} value={g.id}>{g.gameBookingStatusName}</option>)}
+                        </select>}
                     </div>
 
                     {/* my bookings  */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <h2 className="text-xl font-bold text-slate-900 col-span-full mt-5">My Bookings :</h2>
+                    {viewMode === "My Bookings" && (
+                    <div className="mt-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
                         {bookings.filter((b: any) => b.employeeId === user?.id).length > 0 ? (
-                            <>
-                                
+                            <>                                
                                 {bookings.filter((b: any) => b.employeeId === user?.id).map((b: any) => (
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />        
                                 ))}
@@ -169,7 +200,77 @@ export default function GameManagement() {
                         ): (
                             <p className="text-slate-500 italic">You have no bookings yet.</p>
                         )}
+                        </div>
                     </div>
+                    )}
+
+                    {/* WaitingList */}
+                    {viewMode === "Waiting List" && (
+                    <div className="my-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {allWaitingList.length > 0 ? (
+                                allWaitingList.map((wait: any) => ((
+                                    wait.hostEmployeeId === user?.id || wait.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id))
+                                    && (
+                                    <Card key={wait.id} className="hover:shadow-md transition-shadow border-slate-200">
+                                        <CardContent className="p-4 space-y-3">
+                                            <div className="flex justify-between items-start">
+                                                <Badge variant="outline">Game Name: {wait.gameTypeName}</Badge>
+                                                <Badge variant="outline" className="capitalize">{wait.waitingStatusIsActive ? "Active" : "Inactive"}</Badge>   
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-2 text-sm font-semibold">
+                                            <Calendar size={14} /> {new Date(wait.targetSlotDatetime).toLocaleDateString()}
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                                            <Clock size={14} /> {new Date(wait.targetSlotDatetime).toTimeString().slice(0,5)} 
+                                            - {(() => {
+                                                const gameSlotDuration = wait.gameSlotDuration;
+                                                const endHour = (new Date(wait.targetSlotDatetime).getHours() + Math.floor(gameSlotDuration / 60)) % 24;
+                                                const endMinute = new Date(wait.targetSlotDatetime).getMinutes() + (gameSlotDuration % 60);
+                                                return `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
+                                            })()}
+                                        </div>
+
+                                        <div className="pt-2 border-t flex justify-between items-center">
+                                            <div className="space-y-1">
+                                                <div className="text-[10px] text-slate-400">Host: {wait.hostEmployeeEmail}</div>
+                                                {wait.bookingParticipantResponses.length > 0 && (
+                                                    <div className="text-[10px] text-slate-400 ">
+                                                        Participants: {wait.bookingParticipantResponses.map((p: any) => p.employeeEmail).join(", ")}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            {wait.gameBookingStatusId === 1 && wait.employeeId === user?.id ? (
+                                                <div className="flex gap-2">
+                                                    {/* <Button size="sm" variant="outline" className="h-7 text-red-600" 
+                                                    onClick={() => {
+                                                        if (confirm("Are you sure you want to cancel this booking?")) {
+                                                            onStatusChange();
+                                                        }
+                                                    }}>
+                                                        <CheckCircle size={14} className="mr-1"/> Cancel
+                                                    </Button> */}
+                                                    {/* <Button size="sm" variant="outline" className="h-7 text-gray-600" 
+                                                    onClick={() => {
+                                                        setShowGameBookingForm(true);
+                                                    }}>
+                                                        <Edit size={14} className="mr-1"/> Edit
+                                                    </Button> */}
+                                                </div>
+                                            ):null}
+                                        </div>
+                                    </CardContent>
+                                    </Card>
+                                    )
+                                )
+                        )) : (
+                            <p className="text-slate-500 italic">No one is on the waiting list.</p>
+                        )}
+                        </div>
+                    </div>
+                    )}
                 </main>
             </SidebarInset>
         </SidebarProvider>
