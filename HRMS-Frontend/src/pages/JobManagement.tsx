@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ReferFriend from "../components/ReferFriend.tsx";
 import ShareJob from "../components/ShareJob.tsx";
-import { Plus, X, Calendar, Search, DollarSign, Share, UserPlus, Edit, Bell, IndianRupee, Forward, BookOpenIcon } from "lucide-react";
+import { Plus, X, Calendar, Search, DollarSign, Share, UserPlus, Edit, Bell, IndianRupee, Forward, BookOpenIcon, Trash } from "lucide-react";
 import JobForm from "../components/JobForm.tsx";
 import JobDetailView from "@/components/JobDetailView.tsx";
 import Notifications from "@/components/Notifications.tsx";
@@ -189,32 +189,47 @@ export default function JobManagement() {
                   onClick={() => setSelectedJobId(job.id)}
                 >
                   <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <Badge variant="outline" 
-                        title="Change Job Status"
-                        onClick={(e) => {
-                          if (user?.roleName !== "HR") return;
-                          e.stopPropagation();
-                          handleDelete(job.id);
-                        }}
-                        className={job.jobIsActive ? "border-green-500 text-green-500" : "border-red-500 text-red-500"} >
-                        {job.jobIsActive ? "Open" : "Closed"}
-                      </Badge>
-                      
-                      {user?.roleName === "HR" && 
-                        <Button 
-                          title="Edit job"
+                    <div className="flex flex-row items-center justify-between">
+                      <div className="flex items-center gap-2 justify-between">
+                        <CardTitle className="text-lg font-bold">{job.jobTitle}</CardTitle>
+                        <Badge variant="outline" 
+                          title="Change Job Status"
                           onClick={(e) => {
-                            e.stopPropagation();
-                            setEditJobId(job.id);
+                            if (user?.roleName !== "HR") return;
                           }}
-                          className="text-gray-600 mt-2"
-                        >
-                          <Edit size={14} />
-                        </Button>
-                        }
+                          className={job.jobIsActive ? "border-green-500 text-green-500" : "border-red-500 text-red-500"} >
+                          {job.jobIsActive ? "Open" : "Closed"}
+                        </Badge>
+                      </div>
+
+                      <div className="flex justify-between items-start">                     
+                        {user?.id === job.employeeId && user?.roleName === "HR" && job.jobIsActive && 
+                          <div className="flex gap-2">
+                            <Button 
+                              title="Edit job"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditJobId(job.id);
+                              }}
+                              className="text-gray-600"
+                            >
+                              <Edit size={14} />
+                            </Button>
+                            <Button 
+                              title="close job"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(job.id);
+                              }}
+                              className="text-gray-600"
+                            >
+                              <Trash size={14} className="text-red-500" />
+                            </Button>
+                          </div>
+                          }
+                      </div>
+                      
                     </div>
-                    <CardTitle className="text-xl font-bold">{job.jobTitle}</CardTitle>
                   </CardHeader>
                   
                   <CardContent className="space-y-4">
@@ -238,6 +253,9 @@ export default function JobManagement() {
                         className="text-blue-600 flex items-center gap-1 text-xs"
                     ><BookOpenIcon size={12} className="mr-1" />View Job Description</a>
 
+                    {user?.id != job.employeeId && <p className="text-xs text-slate-500 mt-1">Created by : {job.employeeEmail}</p>}
+
+                    {user?.id != job.employeeId && job.jobIsActive && (
                     <div className="mt-2 flex justify-between gap-2">
                         <Button 
                         title="Share this job"
@@ -260,7 +278,8 @@ export default function JobManagement() {
                         >
                           <UserPlus size={14} />
                         </Button>
-                    </div>  
+                    </div>
+                    )}  
 
                   </CardContent>
                 </Card>

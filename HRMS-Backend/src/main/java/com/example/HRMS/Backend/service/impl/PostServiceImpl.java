@@ -103,6 +103,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void addTagOnPost(Long postId, Long tagTypeId){
+
+        if(Boolean.TRUE.equals(postRepository.findPostsById(postId).getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be add tags.");
+        }
+
         PostTag postTag = new PostTag();
         postTag.setFkPost(postRepository.findById(postId).orElseThrow(
                 () -> new RuntimeException("post id is required")
@@ -130,6 +135,10 @@ public class PostServiceImpl implements PostService {
     public void updatePost(Long postId, @Valid PostRequest postRequest, MultipartFile file) throws IOException {
         Post post = postRepository.findPostsById(postId);
 
+        if(Boolean.TRUE.equals(post.getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be edit it.");
+        }
+
         if(file != null && !file.isEmpty()){
             String time = Instant.now().toString().replace(":","-");
 
@@ -149,6 +158,18 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void addComment(CommentRequest commentRequest){
+
+        if(commentRequest.getFkPostId()!=null &&  Boolean.TRUE.equals(postRepository.findPostsById(commentRequest.getFkPostId()).getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be add comments.");
+        }
+
+        if(commentRequest.getParentCommentId()!=null && commentsRepository.findCommentById(commentRequest.getParentCommentId()) != null) {
+            Comment parentComment = commentsRepository.findCommentById(commentRequest.getParentCommentId());
+            if (Boolean.TRUE.equals(parentComment.getFkPost().getPostIsDeleted())) {
+                throw new RuntimeException("deleted parent comment cannot be add sub comments.");
+            }
+        }
+
         Comment comment = new Comment();
 
         comment.setCommentContent(commentRequest.getCommentContent());
@@ -185,6 +206,26 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void addLike(LikeRequest likeRequest){
+
+        if(likeRequest.getFkPostId()!=null && postRepository.findPostsById(likeRequest.getFkPostId()) == null){
+            Comment comment = commentsRepository.findCommentById(likeRequest.getFkCommentId());
+            if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
+                throw new RuntimeException("deleted parent comment cannot be add like.");
+            }
+        }
+        if(likeRequest.getFkPostId() == null && likeRequest.getFkCommentId() != null){
+            Comment comment = commentsRepository.findCommentById(likeRequest.getFkCommentId());
+            if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
+                throw new RuntimeException("deleted parent comment cannot be add like.");
+            }
+        }
+
+
+        if(likeRequest.getFkPostId()!=null && postRepository.findPostsById(likeRequest.getFkPostId()) != null && Boolean.TRUE.equals(postRepository.findPostsById(likeRequest.getFkPostId()).getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be add like.");
+        }
+
+
         Like like =new Like();
 
         like.setFkLikeEmployee(employeeRepository.findEmployeeById(likeRequest.getFkLikeEmployeeId()));
@@ -232,7 +273,17 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void removeCommentByHr(Long commentId, String reason){
+
         Comment comment = commentsRepository.findCommentById(commentId);
+
+        if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be remove comments.");
+        }
+
+        if(comment.getParentComment()!=null && comment.getParentComment().getFkPost() != null && Boolean.TRUE.equals(comment.getParentComment().getFkPost().getPostIsDeleted())){
+            throw new RuntimeException("deleted parent comment cannot be remove sub comments.");
+        }
+
         commentsRepository.makeCommentIdDeleted(commentId);
         commentsRepository.addReasonForDeletion(commentId, reason);
         likesRepository.removeLikesForDeletedComment(commentId);
@@ -252,6 +303,11 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void removePostByHr(Long postId, String reason){
         Post post = postRepository.findPostsById(postId);
+
+        if(Boolean.TRUE.equals(post.getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be remove again.");
+        }
+
         post.setPostIsDeleted(true);
         post.setReasonForDeletePost(reason);
         List<Comment> comments = commentsRepository.findCommentByFkPost_Id(postId);
@@ -264,6 +320,7 @@ public class PostServiceImpl implements PostService {
 
         likesRepository.removeLikesByFkPost(post);
 
+        if(post.getFkPostEmployee() != null){
         String email = post.getFkPostEmployee().getEmployeeEmail();
         List<String> emails = new ArrayList<>();
         emails.add(email);
@@ -277,10 +334,22 @@ public class PostServiceImpl implements PostService {
                         + post.getPostTitle() + " post content : "
                         + post.getPostContent()
         );
+        }
     }
 
     @Override
     public void removeComment(Long commentId, String reason){
+
+        Comment comment = commentsRepository.findCommentById(commentId);
+
+        if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be remove comments.");
+        }
+
+        if(comment.getParentComment()!=null && comment.getParentComment().getFkPost() != null && Boolean.TRUE.equals(comment.getParentComment().getFkPost().getPostIsDeleted())){
+            throw new RuntimeException("deleted parent comment cannot be remove sub comments.");
+        }
+
         commentsRepository.makeCommentIdDeleted(commentId);
         commentsRepository.addReasonForDeletion(commentId, reason);
         likesRepository.removeLikesForDeletedComment(commentId);
@@ -290,6 +359,11 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void removePost(Long postId, String reason){
         Post post = postRepository.findPostsById(postId);
+
+        if(Boolean.TRUE.equals(post.getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be remove again.");
+        }
+
         post.setPostIsDeleted(true);
         post.setReasonForDeletePost(reason);
         postRepository.save(post);
@@ -307,6 +381,15 @@ public class PostServiceImpl implements PostService {
     @Transactional
         public void removeLikeByCommentId(Long commentId, Long employeeId){
         Comment comment = commentsRepository.findCommentById(commentId);
+
+        if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be remove likes.");
+        }
+
+        if(comment.getParentComment()!=null && comment.getParentComment().getFkPost() != null && Boolean.TRUE.equals(comment.getParentComment().getFkPost().getPostIsDeleted())){
+            throw new RuntimeException("deleted parent comment cannot be remove sub comments likes.");
+        }
+
         Employee employee = employeeRepository.findEmployeeById(employeeId);
         likesRepository.removeLikeByFkCommentAndFkLikeEmployee(comment,employee);
     }
@@ -315,6 +398,11 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void removeLikeByPostId(Long postId, Long employeeId){
         Post post = postRepository.findPostsById(postId);
+
+        if(Boolean.TRUE.equals(post.getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be remove likes.");
+        }
+
         Employee employee = employeeRepository.findEmployeeById(employeeId);
         likesRepository.removeLikeByFkPostAndFkLikeEmployee(post,employee);
     }
@@ -333,6 +421,11 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void removePostTagFromPost(Long postId, Long tagTypeId){
         Post post = postRepository.findPostsById(postId);
+
+        if(Boolean.TRUE.equals(post.getPostIsDeleted())){
+            throw new RuntimeException("deleted post cannot be remove tags.");
+        }
+
         TagType tagType = tagTypesRepository.findTagTypeById(tagTypeId);
         postTagRepository.removePostTagByFkPostAndFkTagType(post, tagType);
     }

@@ -21,11 +21,15 @@ public interface CommentsRepository extends JpaRepository<Comment,Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "WITH CommentChain AS (" +
-            "SELECT pk_comment_id from comments where pk_comment_id = :commentId " +
+    @Query(value = "WITH CommentChain AS ( " +
+            "SELECT pk_comment_id " +
+            "FROM comments " +
+            "WHERE pk_comment_id = :commentId " +
             "UNION ALL " +
-            "SELECT c.pk_comment_id from comments c " +
-            "inner join comments cc on c.parent_comment_id = cc.pk_comment_id " +
+            "SELECT c.pk_comment_id " +
+            "FROM comments c " +
+            "INNER JOIN CommentChain cc " +
+            "ON c.parent_comment_id = cc.pk_comment_id " +
             ") " +
             "update comments " +
             "set comment_is_deleted = 1 " +

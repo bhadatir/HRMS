@@ -3,6 +3,7 @@ package com.example.HRMS.Backend.service.impl;
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
+import com.example.HRMS.Backend.service.AuthService;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.JobService;
 import com.example.HRMS.Backend.service.NotificationService;
@@ -41,6 +42,7 @@ public class JobServiceImpl implements JobService {
     private final CvStatusTypeRepository cvStatusTypeRepository;
     private final ModelMapper modelMapper;
     private final EmailService emailService;
+    private final AuthService authService;
     private final NotificationService notificationService;
 
     @Value("${img.path}")
@@ -48,6 +50,7 @@ public class JobServiceImpl implements JobService {
 
     @Value("${URL.path}")
     private String URL;
+
 
     @Override
     public void saveJob(@Valid JobRequest jobRequest, MultipartFile file) throws IOException {
@@ -75,6 +78,17 @@ public class JobServiceImpl implements JobService {
     @Override
     public void updateJob(Long jobId, @Valid JobRequest jobRequest, MultipartFile file) throws IOException {
         Job job = jobRepository.findJobById(jobId);
+
+        if(Boolean.FALSE.equals(job.getJobIsActive())){
+            throw new RuntimeException("closed job cannot be edit.");
+        }
+
+        Employee user = authService.getLoginUser();
+
+        if(user != job.getFkJobOwnerEmployee()){
+            throw new RuntimeException("job owner can update job.");
+        }
+
         JobType jobType = jobTypeRepository.findJobTypesById(jobRequest.getFkJobTypeId());
         Employee employee = employeeRepository.findEmployeeById(jobRequest.getFkJobOwnerEmployeeId());
 
@@ -98,6 +112,17 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void saveCvReviewer(Long jobId, Long empCvReviewerId){
+
+        Job job = jobRepository.findJobById(jobId);
+        if(Boolean.FALSE.equals(job.getJobIsActive())){
+            throw new RuntimeException("closed job cannot be add reviewer.");
+        }
+
+        Employee user = authService.getLoginUser();
+        if(user != job.getFkJobOwnerEmployee()){
+            throw new RuntimeException("job owner only add cv reviewer.");
+        }
+
         CvReviewer cvReviewer = new CvReviewer();
         cvReviewer.setCvReviewerCreatedAt(Instant.now());
         cvReviewer.setFkJob(jobRepository.findJobById(jobId));
@@ -108,8 +133,17 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void shareJob(JobShareRequest jobShareRequest){
+
         JobShare jobShare = new JobShare();
         Job job = jobRepository.findJobById(jobShareRequest.getFkJobId());
+
+        if(Boolean.FALSE.equals(job.getJobIsActive())){
+            throw new RuntimeException("closed job cannot be share.");
+        }
+        Employee user = authService.getLoginUser();
+        if(user == job.getFkJobOwnerEmployee()){
+            throw new RuntimeException("job owner cannot share job.");
+        }
         jobShare.setFkJob(job);
         jobShare.setJobShareCreatedAt(Instant.now());
         jobShare.setFkJobShareEmployee(employeeRepository.findEmployeeById(jobShareRequest.getFkJobShareEmployeeId()));
@@ -131,6 +165,15 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void referFriend(ReferFriendRequest referFriendRequest, MultipartFile file) throws IOException{
+        Job job = jobRepository.findJobById(referFriendRequest.getFkJobId());
+        if(Boolean.FALSE.equals(job.getJobIsActive())){
+            throw new RuntimeException("closed job cannot be refer friends.");
+        }
+        Employee user = authService.getLoginUser();
+        if(user == job.getFkJobOwnerEmployee()){
+            throw new RuntimeException("job owner cannot refer friends.");
+        }
+
         ReferFriend referFriend = new ReferFriend();
 
         Long fkReferFriendEmployeeId = referFriendRequest.getFkReferFriendEmployeeId();
@@ -153,8 +196,6 @@ public class JobServiceImpl implements JobService {
         Employee employee = employeeRepository.findEmployeeById(fkReferFriendEmployeeId);
         referFriend.setFkReferFriendEmployee(employee);
         referFriend.setReferFriendEmail(referFriendRequest.getReferFriendEmail());
-
-        Job job =jobRepository.findJobById(referFriendRequest.getFkJobId());
 
         referFriend.setFkJob(job);
         referFriend.setReferFriendReviewStatusChangedAt(Instant.now());
@@ -236,9 +277,21 @@ public class JobServiceImpl implements JobService {
     @Transactional
     @Override
     public void updateStatus(Long referId, Long statusId, String reason){
+
         ReferFriend referFriend = referFriendRepository.findById(referId).orElseThrow(
                 () -> new RuntimeException("refer friend not found")
         );
+
+        Job job = referFriend.getFkJob();
+        if(Boolean.FALSE.equals(job.getJobIsActive())){
+            throw new RuntimeException("closed job cannot be update cv status.");
+        }
+
+        Employee user = authService.getLoginUser();
+        if(user != job.getFkJobOwnerEmployee()){
+            throw new RuntimeException("job owner only update cv status.");
+        }
+
         referFriend.setFkCvStatusType(cvStatusTypeRepository.findById(statusId).orElseThrow(
                 () -> new RuntimeException("cv status type not found")
         ));
@@ -274,8 +327,19 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void changeJobStatus(Long jobId, String reason){
+
         Job job = jobRepository.findJobById(jobId);
-        job.setJobIsActive(!job.getJobIsActive());
+
+        if(Boolean.FALSE.equals(job.getJobIsActive())){
+            throw new RuntimeException("closed job cannot be update status.");
+        }
+
+        Employee user = authService.getLoginUser();
+        if(user != job.getFkJobOwnerEmployee()){
+            throw new RuntimeException("job owner only update status.");
+        }
+
+        job.setJobIsActive(false);
         job.setReasonForDeActiveJob(reason);
         jobRepository.save(job);
     }

@@ -24,7 +24,7 @@ export default function PostManagement() {
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
-  const [size] = useState(2);
+  const [size] = useState(20);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -49,8 +49,8 @@ export default function PostManagement() {
 
   const removePost = useMutation({
     mutationFn: ({ postId, reason }: { postId: number; reason: string }) => {
-      if (user?.roleName === "HR") {
-        return postService.removePostByHr(postId, reason, token || "");
+      if (user?.roleName === "HR" && data?.content.find((post: any) => post.id === postId)?.employeeId !== user.id) {
+      return postService.removePostByHr(postId, reason, token || "");
       } else {
         return postService.removePostByEmp(postId, reason, token || "");
       }
@@ -188,13 +188,14 @@ export default function PostManagement() {
                               </Button>
                             </div>
                           )}
-                          {(user?.roleName === "HR" || user?.id === post.employeeId) && (  
+                          {(user?.roleName === "HR" || user?.id === post.employeeId) 
+                            && (  
                             <Button variant="ghost" size="sm" className="ml-2" onClick={(e) => {
                               e.stopPropagation();
                               handleDelete(post.id);
                             }}>
                             <Trash size={16} className="text-red-600" />
-                            {removePost.isPending && <span className="text-[10px] text-red-600">Deleting...</span>}
+                            {removePost.isPending && removePost.variables?.postId === post?.id ? <span className="text-[10px] text-red-600">Deleting...</span> : null}
                             </Button>
                           )}
                         </div>

@@ -126,7 +126,7 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
                   <TableHead>Referred By</TableHead>
                   <TableHead>CV</TableHead>
                   <TableHead>Status</TableHead>
-                  {user?.roleName === "HR" && job?.jobIsActive && <TableHead>Actions</TableHead>}
+                  {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive && <TableHead>Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -150,7 +150,7 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
                         {ref.cvStatusTypeName}
                       </Badge>
                     </TableCell>
-                    {user?.roleName === "HR" && job?.jobIsActive && (
+                    {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive && (
                       <TableCell className="text-right space-x-2">
                         {ref.cvStatusTypeName === "PENDING" &&
                         <>
@@ -186,7 +186,7 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
             </Table>
           ) : (
             <div className="space-y-6">
-              {user?.roleName === "HR" && job?.jobIsActive &&  (
+              {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive &&  (
                 <div className="relative max-w-sm w-full">
                   <div className="flex gap-2 items-end max-w-sm">
                     <div className="flex-1 space-y-1">

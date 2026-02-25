@@ -156,7 +156,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                         <TableHead>Amount</TableHead>
                         <TableHead>Proofs</TableHead>
                         <TableHead>Status</TableHead>
-                        {user?.roleName !== "EMPLOYEE" && <TableHead className="text-right">Actions</TableHead>}
+                        {user?.roleName == "HR" && !plan?.travelPlanIsDeleted && <TableHead className="text-right">Actions</TableHead>}
                         {<TableHead >Reason</TableHead>}
                       </>
                     ) : (
@@ -198,17 +198,17 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                           {exp.expenseExpenseStatusName}
                         </Badge>
                       </TableCell>
-                      {user?.roleName === "HR" && (
+                      {user?.roleName === "HR" && !plan?.travelPlanIsDeleted && (
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             {exp.expenseExpenseStatusName === "PENDING" ? (
                             <>
-                              <Button 
+                              <Button
                                 size="sm" 
                                 variant="outline" 
                                 className="text-green-600 border-green-200 hover:bg-green-50"
                                 onClick={() => handleExpenseApproval(exp.id, 2)}
-                                disabled={approveMutation.isPending}
+                                disabled={approveMutation.isPending || plan?.travelPlanIsDeleted}
                               >
                                 <CheckCircle size={16} />
                               </Button>
@@ -217,7 +217,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                                 variant="outline" 
                                 className="text-red-600 border-red-200 hover:bg-red-50"
                                 onClick={() => handleExpenseApproval(exp.id, 3)}
-                                disabled={approveMutation.isPending}
+                                disabled={approveMutation.isPending || plan?.travelPlanIsDeleted}
                               >
                                 <XCircle size={16} />
                               </Button>

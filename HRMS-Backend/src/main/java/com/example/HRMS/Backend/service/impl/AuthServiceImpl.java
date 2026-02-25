@@ -183,4 +183,12 @@ public class AuthServiceImpl implements AuthService {
     public List<EmployeeSearch> getEmployeeByName(String query){
         return employeeRepository.searchEmployeeByName(query);
     }
+
+    @Override
+    public Employee getLoginUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return employeeRepository.findEmployeeByEmployeeEmail(email)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
 }

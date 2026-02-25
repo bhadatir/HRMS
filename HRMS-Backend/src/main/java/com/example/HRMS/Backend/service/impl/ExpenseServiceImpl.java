@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,20 @@ public class ExpenseServiceImpl implements ExpenseService {
     public void saveExpense(ExpenseRequest expenseRequest){
         Expense expense = new Expense();
         EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
+
+        TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
+
+        if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
+            throw new RuntimeException("closed travel plan cannot be add expenses.");
+        }
+
+        LocalDate travelEndDate = travelPlan.getTravelPlanStartDate();
+        LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
+
+        if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelEndDate)){
+            throw new RuntimeException("only add expense between travel plan end date and after ending travel plan 10 days duration.");
+        }
+
         ExpenseStatus expenseStatus = expenseStatusRepository.findExpenseStatusById(1L);
         expense.setExpenseAmount(expenseRequest.getExpenseAmount());
         expense.setExpenseDate(expenseRequest.getExpenseDate());
@@ -50,7 +65,6 @@ public class ExpenseServiceImpl implements ExpenseService {
         expenseRepository.save(expense);
 
         List<String> emails = new ArrayList<>();
-        TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
         Employee employee = travelPlan.getFkTravelPlanHREmployee();
         emails.add(employee.getEmployeeEmail());
 
@@ -122,6 +136,24 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public void saveExpenseProof(Long proofTypeId, Long expenseId, MultipartFile file) throws IOException {
+
+        Expense expense = expenseRepository.findExpensesById(expenseId);
+
+        EmployeeTravelPlan employeeTravelPlan =  expense.getFkEmployeeTravelPlan();
+
+        TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
+
+        if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
+            throw new RuntimeException("closed travel plan cannot be add expense proof.");
+        }
+
+        LocalDate travelEndDate = travelPlan.getTravelPlanStartDate();
+        LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
+
+        if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelEndDate)){
+            throw new RuntimeException("only add expense proof between travel plan end date and after ending travel plan 10 days duration.");
+        }
+
         ExpenseProof expenseProof = new ExpenseProof();
 
         String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
@@ -139,6 +171,15 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public void updateExpenseStatus(Long expId, Long statusId, String reason){
         Expense expense = expenseRepository.findExpensesById(expId);
+
+        EmployeeTravelPlan employeeTravelPlan =  expense.getFkEmployeeTravelPlan();
+
+        TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
+
+        if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
+            throw new RuntimeException("closed travel plan cannot be update expense status.");
+        }
+
         if(statusId == 3)expense.setReasonForRejectExpense(reason);
         expense.setFkExpenseExpenseStatus(expenseStatusRepository.findExpenseStatusById(statusId));
         expenseRepository.save(expense);
@@ -154,9 +195,24 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public void saveExpenseWithProof(@Valid ExpenseRequest expenseRequest, List<MultipartFile> files, List<Long> proofTypeId) throws IOException {
+
+        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
+
+        TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
+
+        if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
+            throw new RuntimeException("closed travel plan cannot be be add expenses.");
+        }
+
+        LocalDate travelEndDate = travelPlan.getTravelPlanStartDate();
+        LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
+
+        if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelEndDate)){
+            throw new RuntimeException("only add expense with proof between travel plan end date and after ending travel plan 10 days duration.");
+        }
+
         Instant time = Instant.now();
         Expense expense = new Expense();
-        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
         ExpenseStatus expenseStatus = expenseStatusRepository.findExpenseStatusById(expenseRequest.getFkExpenseExpenseStatusId());
         expense.setExpenseAmount(expenseRequest.getExpenseAmount());
         expense.setExpenseDate(expenseRequest.getExpenseDate());

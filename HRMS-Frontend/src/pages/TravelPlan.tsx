@@ -235,8 +235,7 @@ export default function TravelPlan() {
             ) : filteredPlans.length > 0 ? (
               filteredPlans.sort((a: any, b: any) => new Date(b.travelPlanStartDate).getTime() 
                                                       - new Date(a.travelPlanStartDate).getTime())
-              .map((plan: any) => (
-                plan.travelPlanIsDeleted === false ? 
+              .map((plan: any) => 
                 (
                 <Card key={plan.id} 
                   onClick={() => setFullTravelDetails(plan.id)}
@@ -244,7 +243,10 @@ export default function TravelPlan() {
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-xl font-bold text-blue-600">{plan.travelPlanName}</CardTitle>
-                      <Badge variant="outline">{plan.travelPlanIsReturn ? "Return" : "One-Way"}</Badge>
+                      <div className="flex items-center gap-1">  
+                        <Badge variant="outline">{plan.travelPlanIsReturn ? "Return" : "One-Way"}</Badge>
+                        <Badge variant="outline">{plan.travelPlanIsDeleted ? "Deleted" : "Active"}</Badge>
+                      </div>
                     </div>
                     <CardDescription className="flex items-center gap-1 mt-1">
                       <MapPin size={14} /> {plan.travelPlanFrom} → {plan.travelPlanTo}
@@ -278,8 +280,9 @@ export default function TravelPlan() {
                       (user?.roleName === "MANAGER" && plan.employeeTravelPlanResponses.some((resp: any) => 
                           resp.employeeEmail === user.employeeEmail)) ? (
                       <div className="mt-2 flex justify-between gap-2">
-                        { new Date(plan.travelPlanEndDate) > new Date() ? (
-                        <Button 
+                        { new Date(plan.travelPlanEndDate) > new Date() && !plan.travelPlanIsDeleted ? (
+                        <Button
+                          disabled={plan.travelPlanIsDeleted}
                           title="Add Travel Document"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -291,14 +294,16 @@ export default function TravelPlan() {
                         </Button>
                         ):(<></>)}
 
-                        {user?.roleName !== "HR" || (user?.roleName === "HR" && user?.id !== plan.employeeId ) ? ((() => {
+                        { (user?.roleName !== "HR" || (user?.roleName === "HR" && user?.id !== plan.employeeId )) 
+                          && !plan.travelPlanIsDeleted ? ((() => {
                           const now = new Date().getTime();
                           const planEndDate = new Date(plan.travelPlanEndDate).getTime();
                           const tenDays = 10 * 24 * 60 * 60 * 1000;
                           const expiryDate = planEndDate + tenDays;
                           const canClaim = now >= planEndDate && now <= expiryDate;
                           return canClaim && (  
-                            <Button 
+                            <Button                             
+                              disabled={plan.travelPlanIsDeleted}
                               title="Claim Travel Expense"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -323,9 +328,10 @@ export default function TravelPlan() {
                         // );
                         }))():null}
 
-                        {user?.roleName === "HR" && new Date(plan.travelPlanStartDate) > new Date() ? (
+                        {user?.roleName === "HR" && !plan.travelPlanIsDeleted && new Date(plan.travelPlanStartDate) > new Date() ? (
                           <>
                           <Button 
+                            disabled={plan.travelPlanIsDeleted}
                             title="Edit Travel Plan"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -337,6 +343,7 @@ export default function TravelPlan() {
                           <Edit size={14} />
                           </Button>
                           <Button 
+                            disabled={plan.travelPlanIsDeleted}
                             title="Delete Travel Plan"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -345,9 +352,9 @@ export default function TravelPlan() {
                             className="text-red-500 hover:text-red-700 right-0 mt-2"
                           >
                             <Trash2 size={14} />
-                            {deleteTravelPlanMutation.isPending && (
+                            {deleteTravelPlanMutation.isPending && deleteTravelPlanMutation.variables.travelPlanId === plan.id ? (
                             <span className="text-[10px] text-red-600">Deleting...</span>
-                            )}
+                            ) : null}
                           </Button>
                           
                         </>
@@ -356,7 +363,6 @@ export default function TravelPlan() {
                     ) : null}
                   </CardContent>
                 </Card>
-                ) : null
               ))
             ) : (
               <div className="col-span-full py-20 text-center text-slate-400">No travel plans found.</div>

@@ -91,10 +91,10 @@ export default function CommentSection({ postId }: { postId: number }) {
                 {(user?.roleName === "HR" || user?.id === comment.employeeId) && (
                     <button
                     onClick={() => handleDelete(comment.id)}
-                          className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
+                          className="flex opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
                   >
                     <Trash2 size={12} />
-                    {removeCommentMutation.isPending && <span className="text-[10px] text-red-600">Deleting...</span>}
+                    {removeCommentMutation.isPending && removeCommentMutation.variables?.commentId === comment.id ? <span className="text-[10px] text-red-600"> Deleting...</span> : null}
                   </button>
                 )}
               </div>

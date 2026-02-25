@@ -93,6 +93,14 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     @Override
     public void updateTravelPlan(@Valid TravelPlanRequest travelPlanRequest, Long travelPlanId){
 
+        if(Boolean.TRUE.equals(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanIsDeleted())){
+            throw new RuntimeException("closed travel plan cannot be edit.");
+        }
+
+        if(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanStartDate().isBefore(LocalDate.now())){
+            throw new RuntimeException("only edit travel plan before it start.");
+        }
+
         List<Long> existingEmployeesId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlanId);
 
         TravelPlan travelPlan = modelMapper.map(travelPlanRequest, TravelPlan.class);
@@ -166,6 +174,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     @Override
     public void markEmployeeTravelPlanAsDelete(Long empId, Long travelPlanId){
 
+        if(Boolean.FALSE.equals(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanIsDeleted())){
+            throw new RuntimeException("open travel plan cannot be mark as delete to employee travel plan.");
+        }
+
         Employee employee = employeeRepository.findEmployeeById(empId);
 
         Long employeeTravelPlanId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(empId,travelPlanId);
@@ -184,6 +196,15 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     @Transactional
     @Override
     public void markAsDeleted(Long travelPlanId, String reason){
+
+        if(Boolean.TRUE.equals(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanIsDeleted())){
+            throw new RuntimeException("closed travel plan cannot be mark as deleted.");
+        }
+
+        if(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanStartDate().isBefore(LocalDate.now())){
+            throw new RuntimeException("only delete travel plan before it start.");
+        }
+
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
         travelPlan.setTravelPlanIsDeleted(true);
         travelPlan.setReasonForDeleteTravelPlan(reason);
@@ -257,6 +278,23 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     @Override
     public void saveDocByEmployee(Long employeeTravelPlanId, MultipartFile file, Long docTypeId, Long employeeId) throws IOException {
 
+        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
+
+        if(employeeTravelPlan == null){
+            throw new RemoteException("employeeTravelPlan not found");
+        }
+
+
+        TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
+
+        if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
+            throw new RuntimeException("closed travel plan cannot be add docs.");
+        }
+
+        if(travelPlan.getTravelPlanStartDate().isBefore(LocalDate.now())){
+            throw new RuntimeException("only add docs before travel plan start.");
+        }
+
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        String email = authentication.getName();
 //        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
@@ -273,12 +311,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         TravelDoc travelDoc = new TravelDoc();
         travelDoc.setFkEmployee(employeeRepository.findEmployeeById(empId));
 
-        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
-
-        if(employeeTravelPlan == null){
-            throw new RemoteException("employeeTravelPlan not found");
-        }
-
         travelDoc.setFkEmployeeTravelPlan(employeeTravelPlan);
         travelDoc.setTravelDocUrl(URL + filePath);
         travelDoc.setTravelDocUploadedAt(Instant.now());
@@ -289,6 +321,17 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
     @Override
     public void saveDocByHr(Long travelPlanId, MultipartFile file, Long docTypeId, Long employeeId) throws IOException {
+
+        TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
+
+        if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
+            throw new RuntimeException("closed travel plan cannot be add docs.");
+        }
+
+        if(travelPlan.getTravelPlanStartDate().isBefore(LocalDate.now())){
+            throw new RuntimeException("only add docs before travel plan start.");
+        }
+
 
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        String email = authentication.getName();
