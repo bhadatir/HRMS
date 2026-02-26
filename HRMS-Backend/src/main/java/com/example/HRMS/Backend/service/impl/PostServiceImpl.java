@@ -1,28 +1,22 @@
 package com.example.HRMS.Backend.service.impl;
 
-import ch.qos.logback.core.model.Model;
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.NotificationService;
 import com.example.HRMS.Backend.service.PostService;
-import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.beans.Visibility;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
@@ -30,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,7 +92,17 @@ public class PostServiceImpl implements PostService {
                     .toList();
 
             postResponse.setPostTagResponses(postTagResponses);
+
             postResponse.setCommentCount(commentsRepository.totalCommentByPostId(post.getId()));
+
+            PageRequest topFive = PageRequest.of(0, 2);
+            List<Like> recentLikes = likesRepository.findRecentLikes(post.getId(), topFive);
+
+            List<String> likerNames = recentLikes.stream()
+                    .map(like -> like.getFkLikeEmployee().getEmployeeFirstName() + " " + like.getFkLikeEmployee().getEmployeeLastName())
+                    .collect(Collectors.toList());
+
+            postResponse.setRecentLikerNames(likerNames);
 
             return postResponse;
         });
@@ -114,7 +119,17 @@ public class PostServiceImpl implements PostService {
                 .toList();
 
         postResponse.setPostTagResponses(postTagResponses);
+
         postResponse.setCommentCount(commentsRepository.totalCommentByPostId(postId));
+
+        PageRequest topFive = PageRequest.of(0, 2);
+        List<Like> recentLikes = likesRepository.findRecentLikes(postId, topFive);
+
+        List<String> likerNames = recentLikes.stream()
+                .map(like -> like.getFkLikeEmployee().getEmployeeFirstName() + " " + like.getFkLikeEmployee().getEmployeeLastName())
+                .collect(Collectors.toList());
+
+        postResponse.setRecentLikerNames(likerNames);
         return postResponse;
     }
 

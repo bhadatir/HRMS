@@ -45,4 +45,6 @@ public class PostResponse {
     private String reasonForDeletePost;
 
     private List<PostTagResponse> postTagResponses;
+
+    private List<String> recentLikerNames;
 }

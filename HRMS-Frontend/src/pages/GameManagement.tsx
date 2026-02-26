@@ -132,7 +132,7 @@ export default function GameManagement() {
                     {/* add game booking */}
                     {showGameBookingForm && (
                         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white rounded-xl w-full max-w-md relative h-150 overflow-y-auto">     
+                            <div className="bg-white rounded-xl w-full max-w-2xl relative h-150 overflow-y-auto">     
                                 <Button variant="ghost" className="absolute top-2 right-2" 
                                 onClick={() => {
                                     setShowGameBookingForm(false);

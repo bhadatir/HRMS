@@ -208,7 +208,14 @@ export default function PostManagement() {
                         <div className="flex items-center gap-6">
                           <div className="flex items-center gap-1 text-slate-500 cursor-pointer transition-colors">
                             <LikeButton postId={post.id} />
+                            {post.recentLikerNames?.length > 0 && (
+                              <p className="text-[10px] text-slate-500">
+                                Liked by <span className="font-bold text-slate-700">{post.recentLikerNames.join(", ")}</span>
+                                {post.recentLikerNames.length > 2 && ` and ${post.recentLikerNames.length - 2} others`}
+                              </p>
+                            )}
                           </div>
+                           
                           <div className="flex items-center gap-1 text-slate-500 cursor-pointer transition-colors"
                             onClick={() => setShowComments(!showComments)}>
                             <MessageSquare size={18} />

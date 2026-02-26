@@ -39,6 +39,7 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: commentId ? ["commentLikes", commentId] : ["postLikes", postId] });
+      queryClient.invalidateQueries({ queryKey: ["allPosts"] });
     }
   });
 

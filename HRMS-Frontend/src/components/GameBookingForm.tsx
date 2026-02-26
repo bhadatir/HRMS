@@ -280,7 +280,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                             <TableBody>
                                 <TableRow>
                                     <TableCell className="p-4">
-                                        <div className="grid grid-cols-4 gap-2 p-4">
+                                        <div className="grid grid-cols-5 gap-2 p-4">
                                             {slots.map((slot) => {
                                                 
                                                 const slotMinutes = parseInt(slot.split(":")[0]) * 60 + parseInt(slot.split(":")[1]);

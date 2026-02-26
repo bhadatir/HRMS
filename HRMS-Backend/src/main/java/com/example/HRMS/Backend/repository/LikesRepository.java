@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.Like;
 import com.example.HRMS.Backend.model.Post;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -40,4 +41,9 @@ public interface LikesRepository extends JpaRepository<Like,Long> {
     void removeLikesForDeletedComment(Long commentId);
 
     void removeLikesByFkPost(Post fkPost);
+
+    @Query("""
+        SELECT pl FROM Like pl WHERE pl.fkPost.id = :postId ORDER BY pl.likeCreatedAt DESC
+        """)
+    List<Like> findRecentLikes(@Param("postId") Long postId, Pageable pageable);
 }
