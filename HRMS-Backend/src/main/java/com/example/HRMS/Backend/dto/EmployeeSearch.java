@@ -16,5 +16,19 @@ public class EmployeeSearch {
 
     private String employeeLastName;
 
+    private String employeeEmail;
+
+    private Long roleId;
+
     private String roleName;
+
+    private Long positionId;
+
+    private String positionName;
+
+    private Long departmentId;
+
+    private String departmentName;
 }
+
+

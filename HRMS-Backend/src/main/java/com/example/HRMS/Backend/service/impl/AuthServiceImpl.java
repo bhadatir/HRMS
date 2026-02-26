@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -180,8 +183,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<EmployeeSearch> getEmployeeByName(String query){
-        return employeeRepository.searchEmployeeByName(query);
+    public Page<EmployeeSearch> getEmployeeByName(String query, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return employeeRepository.searchEmployeeByName(query, pageable);
     }
 
     @Override

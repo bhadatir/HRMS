@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { jobService } from "../api/jobService";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -20,6 +20,7 @@ import {
   IndianRupee
 } from "lucide-react";
 import { apiService } from "@/api/apiService";
+import { cn } from "@/lib/utils";
 
 export default function JobDetailView({ jobId, onSuccess }: { jobId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
@@ -28,12 +29,22 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
   const [newReviewerId, setNewReviewerId] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-
-  const { data: suggestions } = useQuery({
-      queryKey: ["employeeSearch", searchTerm],
-      queryFn: () => apiService.searchEmployees(searchTerm, token || ""),
-      enabled: searchTerm.length >= 1,
+ 
+  const {
+    data: infiniteData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: ["employeeSearchInfinite", searchTerm],
+    queryFn: ({ pageParam = 0 }) => 
+      apiService.searchEmployees(searchTerm, pageParam, 10, token || ""),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => 
+      lastPage.last ? undefined : lastPage.number + 1,
+    enabled: searchTerm.length >= 1,
   });
+  const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
     
   const { data: job, isLoading: jobLoading } = useQuery({
     queryKey: ["jobDetail", jobId],
@@ -203,24 +214,36 @@ export default function JobDetailView({ jobId, onSuccess }: { jobId: number | nu
                     </div>
                   </div>
 
-                  {showDropdown && suggestions && suggestions.length > 0 && (
-                    <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-auto">
-                      {suggestions.map((emp: any) => ( emp.id !== job?.employeeId 
-                          && emp.roleName === "EMPLOYEE"
-                          && !job?.cvReviewerResponses?.some((rev: any) => rev.employeeId === emp.id) && (
+                  {showDropdown && suggestions.length > 0 && (
+                    <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
+                      {suggestions.map((emp: any) => {
+
+                        if (emp.id === user?.id || emp.roleName !== "EMPLOYEE" || job?.cvReviewerResponses?.some((rev: any) => rev.employeeId === emp.id)) return null;
+
+                        return (
                         <button
                           key={emp.id}
                           className="w-full text-left px-4 py-3 hover:bg-slate-100 flex items-center gap-3 border-b last:border-none"
                           onClick={() => handleSelectUser(emp.id)}
                         >
-                          <div className="bg-blue-100 p-1.5 rounded-full">
                             <User size={14} className="text-blue-600" />
-                          </div>
-                          <div>
+                            <div>
                             <p className="text-sm font-semibold text-slate-900">{emp.employeeFirstName} {emp.employeeLastName}</p>
-                          </div>
+                            </div>
                         </button>
-                      )))}
+                        );
+                      })} 
+
+                      {hasNextPage && (
+                        <Button
+                          variant="ghost"
+                          className="w-full text-[10px] text-blue-600 h-8"
+                          onClick={() => fetchNextPage()}
+                          disabled={isFetchingNextPage}
+                        >
+                          {isFetchingNextPage ? "Loading more..." : "Show More Results"}
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>

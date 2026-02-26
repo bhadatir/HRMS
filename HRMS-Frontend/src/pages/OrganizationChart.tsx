@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,12 +21,22 @@ export default function OrganizationChart() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);  
   const [showNotification, setShowNotification] = useState(false);
-
-  const { data: suggestions } = useQuery({
-    queryKey: ["employeeSearch", searchTerm],
-    queryFn: () => apiService.searchEmployees(searchTerm, token || ""),
+  
+  const {
+    data: infiniteData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: ["employeeSearchInfinite", searchTerm],
+    queryFn: ({ pageParam = 0 }) => 
+      apiService.searchEmployees(searchTerm, pageParam, 10, token || ""),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => 
+      lastPage.last ? undefined : lastPage.number + 1,
     enabled: searchTerm.length >= 1,
   });
+  const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
   const { data: orgData, isLoading, isError } = useQuery({
     queryKey: ["orgChart", selectedId],
@@ -65,8 +75,8 @@ export default function OrganizationChart() {
               />
             </div>
 
-            {showDropdown && suggestions && suggestions.length > 0 && (
-              <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-auto">
+            {showDropdown && suggestions.length > 0 && (
+              <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
                 {suggestions.map((emp: any) => (
                   <button
                     key={emp.id}
@@ -81,6 +91,17 @@ export default function OrganizationChart() {
                     </div>
                   </button>
                 ))}
+
+                {hasNextPage && (
+                  <Button
+                    variant="ghost"
+                    className="w-full text-[10px] text-blue-600 h-8"
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                  >
+                    {isFetchingNextPage ? "Loading more..." : "Show More Results"}
+                  </Button>
+                )}
               </div>
             )}
           </div>

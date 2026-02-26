@@ -1,11 +1,9 @@
 package com.example.HRMS.Backend.service.impl;
 
-import com.example.HRMS.Backend.dto.EmployeeTravelPlanResponse;
-import com.example.HRMS.Backend.dto.TravelDocResponse;
-import com.example.HRMS.Backend.dto.TravelPlanRequest;
-import com.example.HRMS.Backend.dto.TravelPlanResponse;
+import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
+import com.example.HRMS.Backend.service.AuthService;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.NotificationService;
 import com.example.HRMS.Backend.service.TravelPlanService;
@@ -16,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -39,6 +38,8 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     private final TravelDocRepository travelDocRepository;
 
     private final ExpenseStatusRepository expenseStatusRepository;
+
+    private final AuthService authService;
 
     private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
 
@@ -75,6 +76,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             Employee employee = employeeRepository.findById(id).orElseThrow(
                     () -> new RuntimeException("Employee not found"));
 
+            if(isEmpAvailable(id, travelPlanRequest.getTravelPlanStartDate(), travelPlanRequest.getTravelPlanEndDate())) {
+                throw new RuntimeException("emp is not available at this travel period");
+            }
+
             EmployeeTravelPlan employeeTravelPlan = new EmployeeTravelPlan();
             employeeTravelPlan.setFkEmployee(employee);
             employeeTravelPlan.setEmployeeTravelPlanCreatedAt(Instant.now());
@@ -101,6 +106,12 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             throw new RuntimeException("only edit travel plan before it start.");
         }
 
+        Employee user = authService.getLoginUser();
+        Long hrEmpId = travelPlanRequest.getFkTravelPlanHREmployeeId();
+        if(user != employeeRepository.findEmployeeById(hrEmpId)){
+            throw new RuntimeException("travel plan owner only update travel plan.");
+        }
+
         List<Long> existingEmployeesId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlanId);
 
         TravelPlan travelPlan = modelMapper.map(travelPlanRequest, TravelPlan.class);
@@ -122,6 +133,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 if(employeeTravelPlanId != null){
                     EmployeeTravelPlan employeeTravelPlan1 = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
 
+                    if(isEmpAvailable(id, travelPlanRequest.getTravelPlanStartDate(), travelPlanRequest.getTravelPlanEndDate())) {
+                        throw new RuntimeException("emp is not available at this travel period");
+                    }
+
                     employeeTravelPlan1.setEmployeeIsDeletedFromTravel(false);
 
                     employeeTravelPlanRepository.save(employeeTravelPlan1);
@@ -136,6 +151,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     notificationService.createNotification(id,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
 
                 } else {
+
+                    if(isEmpAvailable(id, travelPlanRequest.getTravelPlanStartDate(), travelPlanRequest.getTravelPlanEndDate())) {
+                        throw new RuntimeException("emp is not available at this travel period");
+                    }
 
                     EmployeeTravelPlan employeeTravelPlan = new EmployeeTravelPlan();
                     employeeTravelPlan.setFkEmployee(employee);
@@ -174,10 +193,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     @Override
     public void markEmployeeTravelPlanAsDelete(Long empId, Long travelPlanId){
 
-        if(Boolean.FALSE.equals(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanIsDeleted())){
-            throw new RuntimeException("open travel plan cannot be mark as delete to employee travel plan.");
-        }
-
         Employee employee = employeeRepository.findEmployeeById(empId);
 
         Long employeeTravelPlanId = employeeTravelPlanRepository.findEmployeeTravelPlanByEmployeeIdAndTravelPlanId(empId,travelPlanId);
@@ -206,6 +221,12 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         }
 
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
+
+        Employee user = authService.getLoginUser();
+        if(user != travelPlan.getFkTravelPlanHREmployee()){
+            throw new RuntimeException("travel plan owner only delete travel plan.");
+        }
+
         travelPlan.setTravelPlanIsDeleted(true);
         travelPlan.setReasonForDeleteTravelPlan(reason);
         travelPlanRepository.save(travelPlan);
@@ -284,7 +305,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             throw new RemoteException("employeeTravelPlan not found");
         }
 
-
         TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
 
         if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
@@ -331,6 +351,12 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         if(travelPlan.getTravelPlanStartDate().isBefore(LocalDate.now())){
             throw new RuntimeException("only add docs before travel plan start.");
         }
+
+        Employee user = authService.getLoginUser();
+
+        if(user != travelPlan.getFkTravelPlanHREmployee() && !employeeTravelPlanRepository.isEmployeeTravelPlanByEmployeeIdAndTravelPlanIdExist(user.getId(), travelPlanId)){
+                throw new RuntimeException("you are not in this travel plan member or not an owner so you cannot add docs.");
+            }
 
 
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -466,6 +492,13 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         }
 
+    }
+
+    @Override
+    public boolean isEmpAvailable(Long id, LocalDate startDate, LocalDate endDate){
+        return travelPlanRepository.findAllByGameBookingStartTimeBetween(
+                id, startDate, endDate
+        );
     }
 
 }

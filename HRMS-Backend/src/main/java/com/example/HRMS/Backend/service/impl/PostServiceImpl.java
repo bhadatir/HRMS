@@ -73,11 +73,17 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostResponse> showAllPosts(int page, int size) {
+    public Page<PostResponse> showAllPosts(String searchTerm, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Post> postPage = postRepository.findByPostIsDeletedFalse(pageable);
+        Page<Post> postPage ;
+
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            postPage = postRepository.searchPosts(searchTerm, pageable);
+        } else {
+            postPage = postRepository.findByPostIsDeletedFalse(pageable);
+        }
 
         return postPage.map(post -> {
 
@@ -91,6 +97,7 @@ public class PostServiceImpl implements PostService {
                     .toList();
 
             postResponse.setPostTagResponses(postTagResponses);
+            postResponse.setCommentCount(commentsRepository.totalCommentByPostId(post.getId()));
 
             return postResponse;
         });
@@ -98,7 +105,17 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse showPostByPostId(Long postId){
-        return modelMapper.map(postRepository.findPostsById(postId),PostResponse.class);
+        PostResponse postResponse = modelMapper.map(postRepository.findPostsById(postId),PostResponse.class);
+        List<PostTag> postTags = postTagRepository
+                .findPostTagsByFkPost_Id(postId);
+
+        List<PostTagResponse> postTagResponses = postTags.stream()
+                .map(tag -> modelMapper.map(tag, PostTagResponse.class))
+                .toList();
+
+        postResponse.setPostTagResponses(postTagResponses);
+        postResponse.setCommentCount(commentsRepository.totalCommentByPostId(postId));
+        return postResponse;
     }
 
     @Override

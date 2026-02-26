@@ -32,6 +32,8 @@ public class PostResponse {
 
     private Long employeeId;
 
+    private Integer commentCount;
+
     private String employeeEmail;
 
     private String employeeFirstName;

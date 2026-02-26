@@ -42,4 +42,11 @@ public interface CommentsRepository extends JpaRepository<Comment,Long> {
             "set c.reasonForDeleteComment = :reason " +
             "where c.id = :commentId ")
     void addReasonForDeletion(Long commentId, String reason);
+
+    @Query("""
+    SELECT count(*) as total
+    FROM Comment c where c.fkPost.id = :postId
+    and c.commentIsDeleted= false
+    """)
+    Integer totalCommentByPostId(Long postId);
 }

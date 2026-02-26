@@ -123,6 +123,15 @@ public class JobServiceImpl implements JobService {
             throw new RuntimeException("job owner only add cv reviewer.");
         }
 
+        if(user == employeeRepository.findEmployeeById(empCvReviewerId)){
+            throw new RuntimeException("job owner can not add it self in reviewer.");
+        }
+
+        if(cvReviewerRepository.findCvReviewerIsExist(empCvReviewerId, jobId))
+        {
+            throw new RuntimeException("Cv Reviewer already in this job");
+        }
+
         CvReviewer cvReviewer = new CvReviewer();
         cvReviewer.setCvReviewerCreatedAt(Instant.now());
         cvReviewer.setFkJob(jobRepository.findJobById(jobId));

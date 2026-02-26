@@ -3,13 +3,14 @@ package com.example.HRMS.Backend.service;
 import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.dto.TravelPlanResponse;
-import com.example.HRMS.Backend.model.TravelDoc;
 import com.example.HRMS.Backend.model.TravelDocsType;
 import com.example.HRMS.Backend.model.TravelPlan;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface TravelPlanService {
@@ -42,4 +43,6 @@ public interface TravelPlanService {
     void markEmployeeTravelPlanAsDelete(Long empId, Long travelPlanId);
 
     List<TravelDocsType> getAllDocTypes();
+
+    boolean isEmpAvailable(Long id, LocalDate startDate, LocalDate endDate);
 }

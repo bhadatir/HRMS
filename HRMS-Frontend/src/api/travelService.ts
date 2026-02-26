@@ -35,6 +35,11 @@ export const travelService = {
     return res.data;
   },
 
+  isEmpAvailableForTravel: async (employeeId: number, startDate: string, endDate: string, token: string) => {
+    const res = await api.get(`/hr/isEmpAvailable/${employeeId}?startDate=${startDate}&endDate=${endDate}`, authHeader(token));
+    return res.data;
+  },
+
   updateTravelPlan: async (travelPlanId: number, data: any, token: string) => {
     const res = await api.put(`/hr/travelPlan/${travelPlanId}`, data, authHeader(token));
     return res.data;

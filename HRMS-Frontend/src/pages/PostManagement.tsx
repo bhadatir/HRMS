@@ -41,15 +41,18 @@ export default function PostManagement() {
     [user?.departmentName as string]: true
   };
 
-  const { data, isLoading } = useQuery({
-  queryKey: ["allPosts", page],
-  queryFn: () => postService.showAllPosts(token || "", page, size),
-  enabled: !!token
+  const { data: allPosts, isLoading } = useQuery({
+    queryKey: ["allPosts", page, searchTerm], 
+    queryFn: () => postService.showAllPosts(searchTerm, page, size, token || ""),
+    enabled: !!token,
+    placeholderData: (previousData) => previousData,
   });
+  
+  const filteredPosts = allPosts?.content || []; 
 
   const removePost = useMutation({
     mutationFn: ({ postId, reason }: { postId: number; reason: string }) => {
-      if (user?.roleName === "HR" && data?.content.find((post: any) => post.id === postId)?.employeeId !== user.id) {
+      if (user?.roleName === "HR" && allPosts?.content.find((post: any) => post.id === postId)?.employeeId !== user.id) {
       return postService.removePostByHr(postId, reason, token || "");
       } else {
         return postService.removePostByEmp(postId, reason, token || "");
@@ -58,28 +61,13 @@ export default function PostManagement() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allPosts"] })
   });
 
-  const filteredPosts = useMemo(() => {
-    if (!data?.content) return [];
-    return data.content
-      .filter((post: any) => !post.postIsDeleted && 
-        (post.postTitle?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         post.postTags?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         post.employeeFirstName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         post.employeeEmail?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         post.postTagResponses?.map((tag: any) => ` ${tag.tagTypeName}`).join("")?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         post.postTagResponses?.map((tag: any) => tag.tagTypeName.toLowerCase()).includes(searchTerm.toLowerCase()) || 
-         post.postCreatedAt?.split("T")[0].includes(searchTerm.toLowerCase()) ||
-         post.postContent?.toLowerCase().includes(searchTerm.toLowerCase())) && 
-        (post.postVisibilityName in postVisibilityOptions))
-      .sort((a: any, b: any) => new Date(b.postCreatedAt).getTime() - new Date(a.postCreatedAt).getTime());
-  }, [data?.content, searchTerm]);
-
   const handleDelete = (postId: number) => {
     const reason = window.prompt("Please enter reason for deleting this post:", "")?.trim();
     if (reason) {
       removePost.mutate({ postId, reason });
     }
   };
+  
   
 
   return (
@@ -161,7 +149,7 @@ export default function PostManagement() {
             (
               filteredPosts.length > 0  ? (
               filteredPosts.map((post: any) => (
-                ( (post.postVisibilityName in postVisibilityOptions) ? (
+                ( (post.postVisibilityName in postVisibilityOptions || post?.employeeId === user?.id) ? (
                   <Card key={post.id} className="hover:shadow-md transition-shadow border-slate-200">
                     <CardHeader>
                       <div className="flex justify-between items-start">
@@ -225,6 +213,8 @@ export default function PostManagement() {
                             onClick={() => setShowComments(!showComments)}>
                             <MessageSquare size={18} />
                             <span className="text-xs font-bold">Comments</span>
+                            <span className="text-xs font-bold">{post.commentCount > 0 ? `${post.commentCount}` : "0"}
+                            </span>
                           </div>
                         </div>                      
                         <PostTags postId={post.id} isOwner={user?.id === post.employeeId} />
@@ -251,14 +241,14 @@ export default function PostManagement() {
                 </Button>
 
                 <span className="text-sm text-gray-600 mt-2">
-                  Page {page + 1} of {data?.totalPages ?? 1}
+                  Page {page + 1} of {filteredPosts?.totalPages ?? 1}
                 </span>
 
                 <Button
                   className="text-gray-700"
-                  disabled={page + 1 >= (data?.totalPages ?? 1)}
+                  disabled={page + 1 >= (filteredPosts?.totalPages ?? 1)}
                   onClick={() => {
-                    if (page + 1 < (data?.totalPages ?? 1)) {
+                    if (page + 1 < (filteredPosts?.totalPages ?? 1)) {
                       setPage(old => old + 1);
                     }
                   }}

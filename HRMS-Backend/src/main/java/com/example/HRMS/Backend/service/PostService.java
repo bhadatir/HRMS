@@ -15,7 +15,7 @@ import java.util.List;
 public interface PostService {
     void savePost(PostRequest postRequest, MultipartFile file) throws IOException;
 
-    Page<PostResponse> showAllPosts(int page, int size);
+    Page<PostResponse> showAllPosts(String searchTerm, int page, int size);
 
     PostResponse showPostByPostId(Long postId);
 

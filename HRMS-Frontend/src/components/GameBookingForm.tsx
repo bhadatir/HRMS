@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { gameService } from "../api/gameService";
 import { apiService } from "../api/apiService";
 import { useAuth } from "../context/AuthContext";
@@ -35,14 +35,21 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         queryKey: ["allWaitingList"], 
         queryFn: () => gameService.getAllWaitingList(token!) });
 
-    const { data: suggestions } = useQuery({
-        queryKey: ["employeeSearch", searchTerm],
-        queryFn: () => apiService.searchEmployees(searchTerm, token || ""),
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
+        queryKey: ["employeeSearchInfinite", searchTerm],
+        queryFn: ({ pageParam = 0 }) => 
+        apiService.searchEmployees(searchTerm, pageParam, 10, token || ""),
+        initialPageParam: 0,
+        getNextPageParam: (lastPage) => 
+        lastPage.last ? undefined : lastPage.number + 1,
         enabled: searchTerm.length >= 1,
-        select: (suggestions) => suggestions.filter((emp: any) => emp.id !== user?.id 
-            && !selectedParticipants.find(p => p.id === emp.id)
-        )
     });
+    const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
     const { data: myInterests = [] } = useQuery({
         queryKey: ["myInterests", user?.id],
@@ -334,32 +341,44 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                             onFocus={() => setShowDropdown(true)}
                         />
 
-                        {showDropdown && suggestions && (
-                            <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-48 overflow-auto">
-                                {suggestions.map((emp: any) => {
-                                    const isBusy = busyEmployeeIds.has(emp.id) || busyWaitingEmployeeIds.has(emp.id);
+                        {showDropdown && suggestions.length > 0 && (
+                            <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-40 overflow-y-auto">
+                                {suggestions.map((emp: any,) => {
+                                const isBusy = busyEmployeeIds.has(emp.id) || busyWaitingEmployeeIds.has(emp.id);
 
-                                    return (
-                                        <button
-                                            key={emp.id}
-                                            type="button"
-                                            disabled={isBusy}
-                                            className={cn(
+                                if (emp.id === user?.id || selectedParticipants.find(e => e.id === emp.id)) return null;
+
+                                return (
+                                <button
+                                    key={emp.id}
+                                    className={cn(
                                                 "w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors",
                                                 isBusy ? "bg-slate-50 opacity-60 cursor-not-allowed" : ""
                                             )}
-                                            onClick={() => !isBusy && handleAddParticipant(emp)}
-                                        >
-                                            <User size={14} className={isBusy ? "text-slate-400" : "text-blue-600"} />
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
-                                                {isBusy ? busyWaitingEmployeeIds.has(emp.id) ? <span className="text-[10px] text-orange-500 font-bold">In waiting list</span> 
-                                                 : <span className="text-[10px] text-red-500 font-bold">Already in a game</span>
-                                                 : <span className="text-[10px] text-green-500 font-bold">Available</span>}
-                                            </div>
-                                        </button>
-                                    );
-                                })}
+                                    onClick={() => !isBusy && handleAddParticipant(emp)}
+                                    disabled={isBusy}
+                                >
+                                    <User size={14} className={isBusy ? "text-slate-400" : "text-blue-600"} />
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
+                                        {isBusy ? busyWaitingEmployeeIds.has(emp.id) ? <span className="text-[10px] text-orange-500 font-bold">In waiting list</span> 
+                                         : <span className="text-[10px] text-red-500 font-bold">Already in a game</span>
+                                         : <span className="text-[10px] text-green-500 font-bold">Available</span>}
+                                    </div>
+                                </button>
+                                );
+                                })} 
+
+                                {hasNextPage && (
+                                <Button
+                                    variant="ghost"
+                                    className="w-full text-[10px] text-blue-600 h-8"
+                                    onClick={() => fetchNextPage()}
+                                    disabled={isFetchingNextPage}
+                                >
+                                    {isFetchingNextPage ? "Loading more..." : "Show More Results"}
+                                </Button>
+                                )}
                             </div>
                         )}
                     </div>

@@ -34,6 +34,7 @@ export default function CommentSection({ postId }: { postId: number }) {
       setNewComment("");
       setReplyTo(null);
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
+      queryClient.invalidateQueries({ queryKey: ["allPosts"] });
     }
   });
 
@@ -45,7 +46,10 @@ export default function CommentSection({ postId }: { postId: number }) {
         return postService.removeCommentByOwner(commentId, reason, token || "");
       }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["postComments", postId] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
+      queryClient.invalidateQueries({ queryKey: ["allPosts"] });
+    }
   });
 
   const handleReplyClick = (comment: any) => {

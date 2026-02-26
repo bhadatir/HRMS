@@ -34,9 +34,10 @@ public class PostController {
     }
 
     @GetMapping("/")
-    public Page<PostResponse> allPost( @RequestParam(defaultValue = "0") int page,
+    public Page<PostResponse> allPost( @RequestParam String searchTerm,
+                                       @RequestParam(defaultValue = "0") int page,
                                        @RequestParam(defaultValue = "10") int size) {
-        return postService.showAllPosts(page, size);
+        return postService.showAllPosts(searchTerm, page, size);
     }
 
     @GetMapping("/{postId}")
@@ -132,6 +133,11 @@ public class PostController {
     @GetMapping("/visibilities")
     public ResponseEntity<List<PostVisibility>> getAllVisibilities() {
         return ResponseEntity.ok(postService.getAllVisibilities());
+    }
+
+    @GetMapping("/totalComments/{postId}")
+    public ResponseEntity<Integer> totalComment(@PathVariable Long postId) {
+        return ResponseEntity.ok(commentsRepository.totalCommentByPostId(postId));
     }
 
 }

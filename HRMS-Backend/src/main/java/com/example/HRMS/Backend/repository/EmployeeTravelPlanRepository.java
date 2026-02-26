@@ -50,4 +50,12 @@ public interface EmployeeTravelPlanRepository extends JpaRepository<EmployeeTrav
             "where e.fkEmployee.id = :id " +
             "and e.fkTravelPlan = :id1 ")
     EmployeeTravelPlan findByFkEmployeeIdAndFkTravelPlanId(Long id, Long id1);
+
+
+    @Query(value = "select count(e) > 0 " +
+            "from EmployeeTravelPlan e " +
+            "where e.fkEmployee.id = :empId " +
+            "and e.fkTravelPlan.id = :travelPlanId ")
+    boolean isEmployeeTravelPlanByEmployeeIdAndTravelPlanIdExist(@Param("empId") Long empId, @Param("travelPlanId") Long travelPlanId);
+
 }

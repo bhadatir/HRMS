@@ -1,19 +1,19 @@
 package com.example.HRMS.Backend.controller;
 
-import com.example.HRMS.Backend.dto.JobRequest;
-import com.example.HRMS.Backend.dto.ReferFriendResponse;
-import com.example.HRMS.Backend.dto.TravelDocResponse;
-import com.example.HRMS.Backend.dto.TravelPlanRequest;
+import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -64,6 +64,16 @@ public class HrController {
     public ResponseEntity<String > updateExpenseStatus(@PathVariable Long expId, @PathVariable Long statusId, @RequestParam String reason)
     {   expenseService.updateExpenseStatus(expId, statusId, reason);
         return ResponseEntity.ok("status update successful");
+    }
+
+    @GetMapping("/isEmpAvailable/{empId}")
+    public boolean isEmpAvailable(@PathVariable Long empId,
+                                  @RequestParam String startDate,
+                                  @RequestParam String endDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate1 = LocalDate.parse(startDate, formatter);
+        LocalDate endDate1 = LocalDate.parse(endDate, formatter);
+        return travelPlanService.isEmpAvailable(empId, startDate1, endDate1);
     }
 
     @PostMapping("/game")

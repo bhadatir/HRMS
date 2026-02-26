@@ -11,6 +11,7 @@ import com.example.HRMS.Backend.service.PostService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,8 +34,10 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<EmployeeSearch>> getEmployee(@RequestParam String query) throws IOException {
-        return ResponseEntity.ok(authService.getEmployeeByName(query));
+    public ResponseEntity<Page<EmployeeSearch>> getEmployee(@RequestParam String query,
+                                                            @RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(authService.getEmployeeByName(query, page, size));
     }
 
     @PatchMapping("/profileImage/{empId}")

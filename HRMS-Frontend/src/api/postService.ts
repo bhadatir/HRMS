@@ -25,8 +25,8 @@ export const postService = {
     return res.data;
   },
 
-  showAllPosts: async (token: string, page: number, size: number) => {
-    const res = await api.get(`/post/?page=${page}&size=${size}`, authHeader(token));
+  showAllPosts: async (searchTerm: string, page: number, size: number, token: string) => {
+    const res = await api.get(`/post/?searchTerm=${searchTerm}&page=${page}&size=${size}`, authHeader(token));
     return res.data;
   },
 
@@ -122,5 +122,5 @@ export const postService = {
   getAllVisibilities: async (token: string) => {
     const res = await api.get(`/post/visibilities`, authHeader(token));
     return res.data;
-  },
+  }
 };

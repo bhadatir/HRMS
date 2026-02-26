@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.dto.ExpenseRequest;
 import com.example.HRMS.Backend.dto.ExpenseResponse;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
+import com.example.HRMS.Backend.service.AuthService;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.ExpenseService;
 import com.example.HRMS.Backend.service.NotificationService;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,11 +39,18 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ModelMapper modelMapper;
     private final TravelDocRepository travelDocRepository;
     private final NotificationService notificationService;
+    private final AuthService authService;
 
     @Override
     public void saveExpense(ExpenseRequest expenseRequest){
+
         Expense expense = new Expense();
+
         EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
+
+        if(employeeTravelPlan == null || employeeTravelPlan.getEmployeeIsDeletedFromTravel() ){
+            throw new RuntimeException("employee travel plan not found or you are deleted from this travel.");
+        }
 
         TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
 
@@ -141,6 +150,10 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         EmployeeTravelPlan employeeTravelPlan =  expense.getFkEmployeeTravelPlan();
 
+        if(employeeTravelPlan == null || employeeTravelPlan.getEmployeeIsDeletedFromTravel() ){
+            throw new RuntimeException("employee travel plan not found or you are deleted from this travel.");
+        }
+
         TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
 
         if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
@@ -180,6 +193,11 @@ public class ExpenseServiceImpl implements ExpenseService {
             throw new RuntimeException("closed travel plan cannot be update expense status.");
         }
 
+        Employee user = authService.getLoginUser();
+        if(user != travelPlan.getFkTravelPlanHREmployee()){
+            throw new RuntimeException("travel plan owner only update travel plan expense status.");
+        }
+
         if(statusId == 3)expense.setReasonForRejectExpense(reason);
         expense.setFkExpenseExpenseStatus(expenseStatusRepository.findExpenseStatusById(statusId));
         expenseRepository.save(expense);
@@ -197,6 +215,10 @@ public class ExpenseServiceImpl implements ExpenseService {
     public void saveExpenseWithProof(@Valid ExpenseRequest expenseRequest, List<MultipartFile> files, List<Long> proofTypeId) throws IOException {
 
         EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
+
+        if(employeeTravelPlan == null || employeeTravelPlan.getEmployeeIsDeletedFromTravel() ){
+            throw new RuntimeException("employee travel plan not found or you are deleted from this travel.");
+        }
 
         TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
 

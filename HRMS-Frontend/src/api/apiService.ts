@@ -41,8 +41,8 @@ export const apiService = {
     return res.data;
   },
 
-  searchEmployees: async (query: string, token: string) => {
-    const res = await api.get(`/user/search?query=${query}`, authHeader(token));
+  searchEmployees: async (query: string, page: number, size: number, token: string) => {
+    const res = await api.get(`/user/search?query=${query}&page=${page}&size=${size}`, authHeader(token));
     return res.data;
   },
 

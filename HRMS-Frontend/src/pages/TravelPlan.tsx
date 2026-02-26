@@ -260,6 +260,7 @@ export default function TravelPlan() {
                     </div>
                     
                     <p className="text-sm text-slate-500 line-clamp-2">{plan.travelPlanDetails}</p>
+                    {user?.id !== plan.employeeId && <p className="text-xs text-slate-400">Created by: {plan.employeeEmail}</p>}
 
                     <div className="space-y-2">
                       <p className="text-xs font-bold text-slate-400 uppercase">Team Members</p>
@@ -280,7 +281,10 @@ export default function TravelPlan() {
                       (user?.roleName === "MANAGER" && plan.employeeTravelPlanResponses.some((resp: any) => 
                           resp.employeeEmail === user.employeeEmail)) ? (
                       <div className="mt-2 flex justify-between gap-2">
-                        { new Date(plan.travelPlanEndDate) > new Date() && !plan.travelPlanIsDeleted ? (
+                        { new Date(plan.travelPlanEndDate) > new Date() 
+                          && (user?.id === plan.employeeId || 
+                              plan?.employeeTravelPlanResponses.some((resp: any) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false))
+                          && !plan.travelPlanIsDeleted ? (
                         <Button
                           disabled={plan.travelPlanIsDeleted}
                           title="Add Travel Document"
@@ -294,7 +298,9 @@ export default function TravelPlan() {
                         </Button>
                         ):(<></>)}
 
-                        { (user?.roleName !== "HR" || (user?.roleName === "HR" && user?.id !== plan.employeeId )) 
+                        { (user?.roleName !== "HR" || (user?.roleName === "HR" && user?.id !== plan.employeeId 
+                            && plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false)
+                         )) 
                           && !plan.travelPlanIsDeleted ? ((() => {
                           const now = new Date().getTime();
                           const planEndDate = new Date(plan.travelPlanEndDate).getTime();
@@ -328,7 +334,7 @@ export default function TravelPlan() {
                         // );
                         }))():null}
 
-                        {user?.roleName === "HR" && !plan.travelPlanIsDeleted && new Date(plan.travelPlanStartDate) > new Date() ? (
+                        {user?.roleName === "HR" && user?.id === plan.employeeId && !plan.travelPlanIsDeleted && new Date(plan.travelPlanStartDate) > new Date() ? (
                           <>
                           <Button 
                             disabled={plan.travelPlanIsDeleted}

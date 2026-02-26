@@ -3,6 +3,7 @@ package com.example.HRMS.Backend.service;
 
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.Employee;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public interface AuthService {
 
     void addProfileImage(Long empId, MultipartFile file) throws IOException;
 
-    List<EmployeeSearch> getEmployeeByName(String query);
+    Page<EmployeeSearch> getEmployeeByName(String query, int page, int size);
 
     Employee getLoginUser();
 }
