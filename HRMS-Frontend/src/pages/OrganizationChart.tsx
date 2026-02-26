@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
@@ -10,7 +10,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown } from "lucide-react";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Search, User, Bell, X } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
@@ -142,7 +142,7 @@ export default function OrganizationChart() {
               <section className="bg-white p-4 rounded-lg border shadow-sm">
                 <Breadcrumb>
                   <BreadcrumbList>
-                    {orgData?.managerChain?.map((manager: any, index: number) => (
+                    {orgData?.managerChain?.map((manager: any) => (
                       <div key={manager.employeeId} className="flex items-center">
                         <BreadcrumbItem>
                           <button 

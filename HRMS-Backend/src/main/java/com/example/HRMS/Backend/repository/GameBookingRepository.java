@@ -40,4 +40,13 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
     List<GameBooking> findAllByGameBookingEndTimeBeforeAndFkGameBookingStatus_Id(LocalDateTime now, int i);
 
     List<GameBooking> findAllByGameBookingStartTimeBetween(LocalDateTime now, LocalDateTime targetSlot);
+
+    @Query("SELECT COUNT(b) > 0 FROM GameBooking b " +
+            "WHERE b.fkHostEmployee.id = :empId " +
+            "AND b.gameBookingIsDeleted = false " +
+            "AND ((:start < b.gameBookingEndTime AND :end > b.gameBookingStartTime))")
+    boolean existsOverlappingBooking(@Param("empId") Long empId,
+                                     @Param("start") LocalDateTime start,
+                                     @Param("end") LocalDateTime end);
+
 }

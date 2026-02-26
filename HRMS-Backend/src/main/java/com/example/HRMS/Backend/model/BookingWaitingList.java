@@ -24,6 +24,9 @@ public class BookingWaitingList {
     @Column(name = "target_slot_datetime")
     private LocalDateTime targetSlotDatetime;
 
+    @Column(name = "target_slot_end_datetime")
+    private LocalDateTime targetSlotEndDatetime;
+
     @Column(name = "is_first_game")
     private Boolean isFirstGame = true;
 

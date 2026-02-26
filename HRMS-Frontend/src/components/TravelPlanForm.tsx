@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMutation, useQueries, useQuery, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { travelService } from "../api/travelService";
 import { apiService } from "../api/apiService"; 
 import { useAuth } from "../context/AuthContext";
@@ -230,7 +230,7 @@ const getMutation = useMutation({
                                   isBusy ? "bg-slate-50 opacity-60 cursor-not-allowed" : ""
                               )}
                       onClick={() => !isBusy && handleSelectEmployee(emp)}
-                      disabled={isBusy}
+                      disabled={isBusy || isLoadingBusy}
                   >
                       <User size={14} className={isBusy ? "text-slate-400" : "text-blue-600"} />
                       <div className="flex flex-col">

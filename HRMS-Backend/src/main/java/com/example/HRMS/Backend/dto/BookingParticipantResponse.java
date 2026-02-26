@@ -1,6 +1,5 @@
 package com.example.HRMS.Backend.dto;
 
-import com.example.HRMS.Backend.model.BookingWaitingList;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -14,15 +14,13 @@ import {
   CheckCircle, 
   XCircle, 
   ExternalLink, 
-  UserPlus, 
   UserCheck, 
   User,
   IndianRupee
 } from "lucide-react";
 import { apiService } from "@/api/apiService";
-import { cn } from "@/lib/utils";
 
-export default function JobDetailView({ jobId, onSuccess }: { jobId: number | null; onSuccess: () => void }) {
+export default function JobDetailView({ jobId }: { jobId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<"REFERRALS" | "REVIEWERS">("REFERRALS");

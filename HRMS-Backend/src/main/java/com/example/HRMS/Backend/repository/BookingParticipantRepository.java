@@ -4,8 +4,10 @@ import com.example.HRMS.Backend.dto.BookingParticipantResponse;
 import com.example.HRMS.Backend.model.BookingParticipant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -43,4 +45,18 @@ public interface BookingParticipantRepository extends JpaRepository<BookingParti
     BookingParticipant findBookingParticipantByEmployeeIdAndGameBookingId(Long id, Long bookingId);
 
     void removeBookingParticipantById(Long id);
+
+    @Query("SELECT COUNT(b) > 0 FROM BookingParticipant b " +
+            "WHERE b.fkEmployee.id = :empId " +
+            "AND ((:start < b.fkGameBooking.gameBookingEndTime AND :end > b.fkGameBooking.gameBookingStartTime))")
+    boolean existsOverlappingBookingParticipant(@Param("empId") Long empId,
+                                     @Param("start") LocalDateTime start,
+                                     @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(b) > 0 FROM BookingParticipant b " +
+            "WHERE b.fkEmployee.id = :empId " +
+            "AND ((:start < b.fkBookingWaitingList.targetSlotEndDatetime AND :end > b.fkBookingWaitingList.targetSlotDatetime))")
+    boolean existsOverlappingBookingWaitingListParticipant(@Param("empId") Long empId,
+                                                @Param("start") LocalDateTime start,
+                                                @Param("end") LocalDateTime end);
 }

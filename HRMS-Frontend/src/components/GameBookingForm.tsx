@@ -21,7 +21,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedParticipants, setSelectedParticipants] = useState<{id: number, name: string}[]>([]);
 
-    const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm();
+    const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
 
     const { data: gameTypes = [] } = useQuery({ 
         queryKey: ["allGameTypes"], 
@@ -55,6 +55,22 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         queryKey: ["myInterests", user?.id],
         queryFn: () => gameService.getEmployeeGameInterests(user?.id!, token!),
         enabled: !!user?.id
+    });
+
+    
+    const mutation = useMutation({
+        mutationFn: (data: any) => editBookingId 
+            ? gameService.updateBooking(editBookingId, data, token!) 
+            : gameService.addBooking(data, token!),
+        onSuccess: (data) => {
+            window.alert(typeof data === "string" ? data : "Booking saved!");
+            queryClient.invalidateQueries({ queryKey: ["allBookings"] });
+            queryClient.invalidateQueries({ queryKey: ["allWaitingList"] });
+            onSuccess();
+        },
+        onError: (error: any) => {
+        alert(error.response?.data?.message || "Booking failed");
+    }
     });
 
     const filteredGames = useMemo(() => {
@@ -220,18 +236,6 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     const removeParticipant = (id: number) => {
         setSelectedParticipants(selectedParticipants.filter(p => p.id !== id));
     };
-
-    const mutation = useMutation({
-        mutationFn: (data: any) => editBookingId 
-            ? gameService.updateBooking(editBookingId, data, token!) 
-            : gameService.addBooking(data, token!),
-        onSuccess: (data) => {
-            window.alert(typeof data === "string" ? data : "Booking saved!");
-            queryClient.invalidateQueries({ queryKey: ["allBookings"] });
-            queryClient.invalidateQueries({ queryKey: ["allWaitingList"] });
-            onSuccess();
-        }
-    });
 
     const onSubmit = (data: any) => {
         if (!selectedTime) return alert("Please select a slot");

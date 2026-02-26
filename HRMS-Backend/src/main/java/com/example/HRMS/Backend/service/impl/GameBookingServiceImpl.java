@@ -10,8 +10,10 @@ import com.example.HRMS.Backend.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -56,11 +58,61 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         Long empId = gameBookingRequest.getEmpId();
         Long gameTypeId = gameBookingRequest.getGameTypeId();
+
+        GameType gameType = gameTypeRepository.findGameTypeById(gameTypeId);
+        int gameSlotDuration = gameType.getGameSlotDuration();
+
         LocalDateTime requestedSlotStartTime = gameBookingRequest.getRequestedSlotStartTime();
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1).minusHours(LocalDateTime.now().getHour()).minusMinutes(LocalDateTime.now().getMinute());
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime sloatEndTime = requestedSlotStartTime.plusMinutes(gameSlotDuration);
+
+        LocalDateTime tomorrow = now.plusDays(1).minusHours(LocalDateTime.now().getHour()).minusMinutes(LocalDateTime.now().getMinute());
 
         if(requestedSlotStartTime.isBefore(tomorrow) && gameBookingRepository.hasActiveBookingInCycle(empId, gameTypeId)){
-                return "Only one active booking allow per game per day.";
+            return "Only one active booking allow per game per day.";
+        }
+
+        //for game booking
+        if (gameBookingRepository.existsOverlappingBooking(gameBookingRequest.getEmpId(), requestedSlotStartTime, sloatEndTime)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have another game booked at this time.");
+        }
+
+        if (requestedSlotStartTime.isBefore(now)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot book a slot in the past.");
+        }
+
+        for (Long participantId : gameBookingRequest.getBookingParticipantsEmpId()) {
+            if (gameBookingRepository.existsOverlappingBooking(participantId, requestedSlotStartTime, sloatEndTime)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "One of your participants is already in another game at this time.");
+            }
+        }
+
+        //for game booking participant
+        if (bookingParticipantRepository.existsOverlappingBookingParticipant(gameBookingRequest.getEmpId(), requestedSlotStartTime, sloatEndTime)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have participant in another game booked at this time.");
+        }
+
+        for (Long participantId : gameBookingRequest.getBookingParticipantsEmpId()) {
+            if (bookingParticipantRepository.existsOverlappingBookingParticipant(participantId, requestedSlotStartTime, sloatEndTime)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "One of your participants is already in another game booking participant at this time.");
+            }
+        }
+
+        //for game booking waiting list
+        if (waitlistRepository.existsOverlappingBookingWaitingList(gameBookingRequest.getEmpId(), requestedSlotStartTime, sloatEndTime)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have waiting in another game at this time.");
+        }
+
+        for (Long participantId : gameBookingRequest.getBookingParticipantsEmpId()) {
+            if (bookingParticipantRepository.existsOverlappingBookingWaitingListParticipant(participantId, requestedSlotStartTime, sloatEndTime)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "One of your participants is already in another game booking participants waiting list at this time.");
+            }
+        }
+
+        for (Long participantId : gameBookingRequest.getBookingParticipantsEmpId()) {
+            if (waitlistRepository.existsOverlappingBookingWaitingList(participantId, requestedSlotStartTime, sloatEndTime)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "One of your participants is already in another game booking waiting list at this time.");
+            }
         }
 
         List<Long> bookingParticipantsEmpId = gameBookingRequest.getBookingParticipantsEmpId();
@@ -71,14 +123,9 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id(empId, gameTypeId);
 
-        GameType gameType = gameTypeRepository.findGameTypeById(gameTypeId);
-        int gameSlotDuration = gameType.getGameSlotDuration();
-
         //requir to check cycle with all diff upcomming cycles.
         boolean isSecondTime = gameBookingRepository.hasPlayedInCycle(empId, gameTypeId)
                 || waitlistRepository.hasAppliedInCycle(empId, gameTypeId);
-
-        LocalDateTime sloatEndTime = requestedSlotStartTime.plusMinutes(gameSlotDuration);
 
         List<GameBooking> gameBookingById = gameBookingRepository.findGameBookingByFkGameType_Id(gameTypeId);
 
@@ -108,13 +155,13 @@ public class GameBookingServiceImpl implements GameBookingService {
             long minutesUntilSlot = Duration.between(LocalDateTime.now(), requestedSlotStartTime).toMinutes();
 
             if (minutesUntilSlot > 30) {
-                addToWaitlist(empId, gameTypeId, requestedSlotStartTime, false, bookingParticipantsEmpId);
+                addToWaitlist(empId, gameTypeId, requestedSlotStartTime, sloatEndTime, false, bookingParticipantsEmpId);
                 return "Slot is reserved for first-timers. You have been added to the Priority Waitlist.";
             }
         }
 
         if (isSlotFull) {
-            addToWaitlist(empId, gameTypeId, requestedSlotStartTime, !isSecondTime, bookingParticipantsEmpId);
+            addToWaitlist(empId, gameTypeId, requestedSlotStartTime, sloatEndTime, !isSecondTime, bookingParticipantsEmpId);
             return "Slot is full. You are on the waitlist.";
         }
 
@@ -177,13 +224,14 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     @Transactional
     @Override
-    public void addToWaitlist(Long empId, Long gameId, LocalDateTime slot, Boolean isFirstGame, List<Long> bookingParticipantsEmpId) {
+    public void addToWaitlist(Long empId, Long gameId, LocalDateTime slot, LocalDateTime endTime, Boolean isFirstGame, List<Long> bookingParticipantsEmpId) {
         BookingWaitingList bookingWaitingList = new BookingWaitingList();
         Employee employee = employeeRepository.findEmployeeById(empId);
         GameType gameType = gameTypeRepository.findGameTypeById(gameId);
         bookingWaitingList.setFkHostEmployee(employee);
         bookingWaitingList.setFkGameType(gameType);
         bookingWaitingList.setTargetSlotDatetime(slot);
+        bookingWaitingList.setTargetSlotEndDatetime(endTime);
         bookingWaitingList.setIsFirstGame(isFirstGame);
         waitlistRepository.save(bookingWaitingList);
 
@@ -386,7 +434,7 @@ public class GameBookingServiceImpl implements GameBookingService {
             BookingWaitingListResponse response = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
 
             List<BookingParticipantResponse> bookingParticipantResponses =
-                    bookingParticipantRepository.findAllByGameBookingId(bookingWaitingList.getId());
+                    bookingParticipantRepository.findAllByBookingWaitingListId(bookingWaitingList.getId());
 
             response.setBookingParticipantResponses(bookingParticipantResponses);
 
@@ -401,7 +449,7 @@ public class GameBookingServiceImpl implements GameBookingService {
         BookingWaitingListResponse response = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
 
         List<BookingParticipantResponse> bookingParticipantResponses =
-                bookingParticipantRepository.findAllByGameBookingId(bookingWaitingList.getId());
+                bookingParticipantRepository.findAllByBookingWaitingListId(bookingWaitingList.getId());
 
         response.setBookingParticipantResponses(bookingParticipantResponses);
 

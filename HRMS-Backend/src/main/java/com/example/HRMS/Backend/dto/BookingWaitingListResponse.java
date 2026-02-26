@@ -13,6 +13,8 @@ public class BookingWaitingListResponse {
 
     private LocalDateTime targetSlotDatetime;
 
+    private LocalDateTime targetSlotEndDatetime;
+
     private Boolean isFirstGame;
 
     private Boolean waitingStatusIsActive;

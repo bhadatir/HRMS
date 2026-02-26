@@ -9,7 +9,6 @@ import { X, Bell, Search} from "lucide-react";
 import Notifications from "@/components/Notifications.tsx";
 import { apiService } from "@/api/apiService.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import PostManagement from "./PostManagement";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 
@@ -19,7 +18,7 @@ export default function TeamMemberData() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: orgData, isLoading, isError } = useQuery({
+  const { data: orgData } = useQuery({
     queryKey: ["orgChart", user?.id],
     queryFn: () => apiService.fetchOrgChart(user?.id || 0, token || ""),
     enabled: !!user?.id,

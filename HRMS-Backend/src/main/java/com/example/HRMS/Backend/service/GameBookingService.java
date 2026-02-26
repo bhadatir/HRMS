@@ -18,7 +18,7 @@ public interface GameBookingService {
 
     List<GameBookingResponse> findAllGameBooking();
 
-    void addToWaitlist(Long empId, Long gameId, LocalDateTime slot, Boolean isFirstGame, List<Long> bookingParticipantsEmpId);
+    void addToWaitlist(Long empId, Long gameId, LocalDateTime slot, LocalDateTime end, Boolean isFirstGame, List<Long> bookingParticipantsEmpId);
 
     void updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId);
 

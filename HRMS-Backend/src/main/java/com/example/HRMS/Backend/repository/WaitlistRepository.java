@@ -62,4 +62,12 @@ public interface WaitlistRepository extends JpaRepository<BookingWaitingList,Lon
     List<BookingWaitingList> findAllByTargetSlotDatetimeBetween(LocalDateTime now, LocalDateTime targetSlot);
 
     List<BookingWaitingList> findAllByTargetSlotDatetimeBefore(LocalDateTime now);
+
+    @Query("SELECT COUNT(b) > 0 FROM BookingWaitingList b " +
+            "WHERE b.fkHostEmployee.id = :empId " +
+            "AND b.waitingStatusIsActive = true " +
+            "AND ((:start < (b.targetSlotEndDatetime) AND :end > b.targetSlotDatetime))")
+    boolean existsOverlappingBookingWaitingList(@Param("empId") Long empId,
+                                     @Param("start") LocalDateTime start,
+                                     @Param("end") LocalDateTime end);
 }

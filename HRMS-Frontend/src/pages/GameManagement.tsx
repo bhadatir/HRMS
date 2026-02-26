@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { gameService } from "../api/gameService";
 import { useAuth } from "../context/AuthContext";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Gamepad2, X, Bell, Book, Gamepad, CheckCircle, Calendar, Clock, Trash } from "lucide-react";
+import { Plus, Gamepad2, X, Bell, Gamepad, Calendar, Clock, Trash } from "lucide-react";
 import GameBookingForm from "../components/GameBookingForm";
 import GameTypeManager from "@/components/GameTypeManager";
 import Notifications from "@/components/Notifications";
@@ -211,9 +211,10 @@ export default function GameManagement() {
                     {viewMode === "My Bookings" && (
                     <div className="mt-2">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
-                        {bookings.filter((b: any) => b.employeeId === user?.id).length > 0 ? (
+                        {bookings.length > 0 ? (
                             <>                                
-                                {bookings.filter((b: any) => b.employeeId === user?.id).map((b: any) => (
+                                {bookings.map((b: any) => ((b.employeeId === user?.id || b.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id)) 
+                                    && !b.gameBookingIsDeleted) && (
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />        
                                 ))}
                             </>
@@ -230,7 +231,8 @@ export default function GameManagement() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {allWaitingList.length > 0 ? (
                                 allWaitingList.map((wait: any) => ((
-                                    wait.hostEmployeeId === user?.id || wait.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id))
+                                    wait.hostEmployeeId === user?.id || wait.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id)
+                                    )
                                     && (
                                     <Card key={wait.id} className="hover:shadow-md transition-shadow border-slate-200 cursor-pointer"
                                         onClick={() => {
@@ -240,7 +242,6 @@ export default function GameManagement() {
                                         <CardContent className="p-4 space-y-3">
                                             <div className="flex justify-between items-start">
                                                 <Badge variant="outline">Game Name: {wait.gameTypeName}</Badge>
-                                                <Badge variant="outline" className="capitalize">{wait.waitingStatusIsActive ? "Active" : "Inactive"}</Badge>   
                                         </div>
                                         
                                         <div className="flex items-center gap-2 text-sm font-semibold">
@@ -268,21 +269,25 @@ export default function GameManagement() {
                                             </div>
                                             
                                                 <div className="flex gap-2">
-                                                    <Button size="sm" variant="outline" className="h-7 text-red-600" 
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        if (confirm("Are you sure you want to delete this waiting list entry?")) {
-                                                            removeWaitingListMutation.mutate(wait.id);
-                                                        }
-                                                    }}>
-                                                        <Trash size={14} className="mr-1"/> Delete
-                                                    </Button>
-                                                    {/* <Button size="sm" variant="outline" className="h-7 text-gray-600" 
-                                                    onClick={() => {
-                                                        setShowGameBookingForm(true);
-                                                    }}>
-                                                        <Edit size={14} className="mr-1"/> Edit
-                                                    </Button> */}
+                                                    {wait.hostEmployeeId === user?.id && 
+                                                        <>
+                                                        <Button size="sm" variant="outline" className="h-7 text-red-600" 
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (confirm("Are you sure you want to delete this waiting list entry?")) {
+                                                                removeWaitingListMutation.mutate(wait.id);
+                                                            }
+                                                        }}>
+                                                            <Trash size={14} className="mr-1"/> Delete
+                                                        </Button>
+                                                        {/* <Button size="sm" variant="outline" className="h-7 text-gray-600" 
+                                                        onClick={() => {
+                                                            setShowGameBookingForm(true);
+                                                        }}>
+                                                            <Edit size={14} className="mr-1"/> Edit
+                                                        </Button> */}
+                                                        </>
+                                                    }
                                                 </div>
                                         </div>
                                     </CardContent>
