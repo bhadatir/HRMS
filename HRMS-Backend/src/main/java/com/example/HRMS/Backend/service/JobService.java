@@ -4,6 +4,7 @@ import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.Job;
 import com.example.HRMS.Backend.model.JobType;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,4 +34,4 @@ public interface JobService {
     List<JobType> getAllJobTypes();
 
     void changeJobStatus(Long jobId, String reason);
-}
+    }

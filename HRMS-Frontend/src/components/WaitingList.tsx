@@ -56,11 +56,11 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
                 <TableHeader>
                   <TableRow className="bg-slate-50">
                       <>
-                        <TableHead>Rank</TableHead>
-                        <TableHead>Host</TableHead>
-                        <TableHead>Created At</TableHead>
-                        <TableHead>Is FirstGame</TableHead>
-                        <TableHead>Participates</TableHead>
+                        <TableHead className="text-center">Rank</TableHead>
+                        <TableHead className="text-center">Host</TableHead>
+                        <TableHead className="text-center">Created At</TableHead>
+                        <TableHead className="text-center">Is FirstGame</TableHead>
+                        <TableHead className="text-center">Participates</TableHead>
                       </>
                   </TableRow>
                 </TableHeader>

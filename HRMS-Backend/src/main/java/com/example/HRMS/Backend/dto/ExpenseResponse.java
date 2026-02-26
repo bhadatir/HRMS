@@ -25,7 +25,9 @@ public class ExpenseResponse {
     private Long expenseExpenseStatusId;
     private String expenseExpenseStatusName;
 
-    private long employeeTravelPlanId;
+    private Long employeeTravelPlanId;
+
+    private String employeeEmail;
 
     private List<ExpenseProofResponse> expenseProofResponses;
 

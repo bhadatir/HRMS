@@ -16,7 +16,9 @@ import {
   ExternalLink, 
   UserCheck, 
   User,
-  IndianRupee
+  IndianRupee,
+  Search,
+  Plus
 } from "lucide-react";
 import { apiService } from "@/api/apiService";
 
@@ -56,6 +58,13 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     enabled: !!jobId && !!token && viewMode === "REFERRALS",
   });
 
+  const filteredReferrals = referrals.filter((ref: any) => 
+    ref.referFriendName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ref.referFriendEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ref.employeeEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ref.cvStatusTypeName.toLowerCase().includes(searchTerm.toLowerCase()) 
+  );
+
   const updateCvStatusMutation = useMutation({
     mutationFn: ({ referId, statusId, reason }: { referId: number; statusId: number; reason: string }) =>
       jobService.updateReferCvStatus(referId, statusId, reason, token || ""),
@@ -83,11 +92,16 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     setShowDropdown(false);
     addReviewerMutation.mutate();
   };
-
+  
   const handleUpdateCvStatus = (referId: number, statusId: number) => {
-    const reason = window.prompt("Please enter reason for updating CV status:", "")?.trim();
-    if (reason) {
-      updateCvStatusMutation.mutate({ referId, statusId, reason });
+    if(statusId === 5) {
+      const confirm = window.confirm("Are you sure you want to approve this cv?");
+      if (confirm) updateCvStatusMutation.mutate({ referId, statusId, reason: "Approved by HR" });
+    } else {
+      const reason = window.prompt("Please enter reason for approval:", "")?.trim();
+      if (reason) {
+        updateCvStatusMutation.mutate({ referId, statusId, reason });
+      }
     }
   };
 
@@ -121,6 +135,72 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
             <Button className={viewMode === "REFERRALS" ? "rounded-md border text-gray-700" : "rounded-md text-gray-400"}
                 size="sm"
                 onClick={()=>setViewMode("REFERRALS")}><Users size={18} /> Referrals</Button>
+
+            {viewMode === "REFERRALS" ? (
+              <div className="relative max-w-sm w-full">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                <Input 
+                  placeholder="Search refer data..." 
+                  className="pl-9"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                  }}
+                />
+              </div>
+            ):(
+              <>
+              {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive &&  (
+                <div className="relative max-w-sm w-full">                 
+                  <Plus className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400"/>
+                  <Input 
+                    placeholder="Add Reviewer..." 
+                    className="pl-9"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setShowDropdown(true);
+                    }}
+                    onFocus={() => setShowDropdown(true)}
+                  />
+
+                  {showDropdown && suggestions.length > 0 && (
+                    <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
+                      {suggestions.map((emp: any) => {
+
+                        if (emp.id === user?.id || emp.roleName !== "EMPLOYEE" || job?.cvReviewerResponses?.some((rev: any) => rev.employeeId === emp.id)) return null;
+
+                        return (
+                        <button
+                          key={emp.id}
+                          className="w-full text-left px-4 py-3 hover:bg-slate-100 flex items-center gap-3 border-b last:border-none"
+                          onClick={() => handleSelectUser(emp.id)}
+                        >
+                            <User size={14} className="text-blue-600" />
+                            <div>
+                            <p className="text-sm font-semibold text-slate-900">{emp.employeeFirstName} {emp.employeeLastName}</p>
+                            </div>
+                        </button>
+                        );
+                      })} 
+
+                      {hasNextPage && (
+                        <Button
+                          variant="ghost"
+                          className="w-full text-[10px] text-blue-600 h-8"
+                          onClick={() => fetchNextPage()}
+                          disabled={isFetchingNextPage}
+                        >
+                          {isFetchingNextPage ? "Loading more..." : "Show More Results"}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+              </>
+            )}
+
             <Button className={viewMode === "REVIEWERS" ? "rounded-md border text-gray-700" : "rounded-md text-gray-400"}
                 size="sm"
                 onClick={()=>setViewMode("REVIEWERS")}><UserCheck size={18} /> Reviewers</Button>
@@ -131,15 +211,16 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Candidate</TableHead>
-                  <TableHead>Referred By</TableHead>
-                  <TableHead>CV</TableHead>
-                  <TableHead>Status</TableHead>
-                  {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive && <TableHead>Actions</TableHead>}
+                  <TableHead className="text-center">Candidate</TableHead>
+                  <TableHead className="text-center">Referred By</TableHead>
+                  <TableHead className="text-center">CV</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive && <TableHead className="text-center">Actions</TableHead>}
+                  {<TableHead className="text-center">Reason</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {referrals.map((ref: any) => (
+                {filteredReferrals.map((ref: any) => (
                   <TableRow key={ref.id}>
                     <TableCell>
                       <p className="font-bold">{ref.referFriendName}</p>
@@ -178,12 +259,13 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                         </>
                         }
                       </TableCell>
-                    )}
+                    )}                    
+                    <TableCell>{ref.reasonForCvStatusChange || "-"}</TableCell>
                   </TableRow>
                 ))}
-                {referrals.length === 0 && (
+                {filteredReferrals.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={user?.roleName === "HR" ? 5 : 4} className="text-center py-10">
+                  <TableCell colSpan={user?.roleName === "HR" ? 6 : 5} className="text-center py-10">
                     <div className="flex flex-col items-center gap-2">
                       <FileText size={32} className="text-slate-400" />
                       <p className="text-sm text-slate-400">No referrals added yet.</p>
@@ -194,77 +276,23 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
               </TableBody>
             </Table>
           ) : (
-            <div className="space-y-6">
-              {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive &&  (
-                <div className="relative max-w-sm w-full">
-                  <div className="flex gap-2 items-end max-w-sm">
-                    <div className="flex-1 space-y-1">
-                      <label className="text-xs font-bold text-slate-500">ADD REVIEWER (ID)</label>
-                      <Input 
-                        placeholder="Enter Employee Name..." 
-                        value={searchTerm}
-                        onChange={(e) => {
-                          setSearchTerm(e.target.value);
-                          setShowDropdown(true);
-                        }}
-                        onFocus={() => setShowDropdown(true)}
-                      />
-                    </div>
-                  </div>
-
-                  {showDropdown && suggestions.length > 0 && (
-                    <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
-                      {suggestions.map((emp: any) => {
-
-                        if (emp.id === user?.id || emp.roleName !== "EMPLOYEE" || job?.cvReviewerResponses?.some((rev: any) => rev.employeeId === emp.id)) return null;
-
-                        return (
-                        <button
-                          key={emp.id}
-                          className="w-full text-left px-4 py-3 hover:bg-slate-100 flex items-center gap-3 border-b last:border-none"
-                          onClick={() => handleSelectUser(emp.id)}
-                        >
-                            <User size={14} className="text-blue-600" />
-                            <div>
-                            <p className="text-sm font-semibold text-slate-900">{emp.employeeFirstName} {emp.employeeLastName}</p>
-                            </div>
-                        </button>
-                        );
-                      })} 
-
-                      {hasNextPage && (
-                        <Button
-                          variant="ghost"
-                          className="w-full text-[10px] text-blue-600 h-8"
-                          onClick={() => fetchNextPage()}
-                          disabled={isFetchingNextPage}
-                        >
-                          {isFetchingNextPage ? "Loading more..." : "Show More Results"}
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                  <UserCheck size={16} className="text-blue-600" /> Assigned Reviewers
-                </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">                   
-                  {job?.cvReviewerResponses?.map((rev: any) => (
-                  <Card key={rev.id} className="border-slate-200 flex items-start gap-4 p-4">
-                    <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold truncate max-w-[120px]" title={rev.employeeEmail}>
-                            {rev.employeeEmail}
-                        </p>
-                    </div>                    
-                  </Card>
-                  ))}
-                  {(!job?.cvReviewerResponses || job.cvReviewerResponses.length === 0) && (
-                    <p className="text-xs text-slate-400 italic">No reviewers assigned yet.</p>
-                  )}
-                </div>
+            <div className="space-y-2">
+              <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                <UserCheck size={16} className="text-blue-600" /> Assigned Reviewers
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">                   
+                {job?.cvReviewerResponses?.map((rev: any) => (
+                <Card key={rev.id} className="border-slate-200 flex items-start gap-4 p-4">
+                  <div className="flex flex-col gap-1">
+                      <p className="text-sm font-semibold truncate max-w-[180px]" title={rev.employeeEmail}>
+                          {rev.employeeEmail}
+                      </p>
+                  </div>                    
+                </Card>
+                ))}
+                {(!job?.cvReviewerResponses || job.cvReviewerResponses.length === 0) && (
+                  <p className="text-xs text-slate-400 italic">No reviewers assigned yet.</p>
+                )}
               </div>
             </div>
           )}

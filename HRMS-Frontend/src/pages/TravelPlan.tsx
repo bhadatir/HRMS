@@ -186,7 +186,7 @@ export default function TravelPlan() {
                   setStartDate("");
                   setEndDate("");
                 }}><X /></Button>
-                <AddExpenseForm travelPlanId={activeExpenseId} startDate={startDate} endDate={endDate} onSuccess={() => {
+                <AddExpenseForm travelPlanId={activeExpenseId} onSuccess={() => {
                   setActiveExpenseId(null);
                   setStartDate("");
                   setEndDate("");
@@ -303,10 +303,10 @@ export default function TravelPlan() {
                          )) 
                           && !plan.travelPlanIsDeleted ? ((() => {
                           const now = new Date().getTime();
-                          const planEndDate = new Date(plan.travelPlanEndDate).getTime();
+                          const planStartDate = new Date(plan.travelPlanStartDate).getTime();
                           const tenDays = 10 * 24 * 60 * 60 * 1000;
-                          const expiryDate = planEndDate + tenDays;
-                          const canClaim = now >= planEndDate && now <= expiryDate;
+                          const expiryDate = planStartDate + tenDays;
+                          const canClaim = now >= planStartDate && now <= expiryDate;
                           return canClaim && (  
                             <Button                             
                               disabled={plan.travelPlanIsDeleted}

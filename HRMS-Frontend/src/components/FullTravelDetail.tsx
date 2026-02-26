@@ -6,12 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plane, Calendar, MapPin, FileText, CheckCircle, XCircle, ExternalLink, IndianRupee } from "lucide-react";
+import { Plane, Calendar, MapPin, FileText, CheckCircle, XCircle, ExternalLink, IndianRupee, Search } from "lucide-react";
+import { Input } from "./ui/input";
 
 export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan: number| null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<"EXPENSES" | "DOCUMENTS">("EXPENSES");
+  const [expenseSearchTerm, setExpenseSearchTerm] = useState("");
+  const [docSearchTerm, setDocSearchTerm] = useState("");
 
   const { data: plan, isLoading: planLoading } = useQuery({
     queryKey: ["travelPlan", travelPlan],
@@ -40,18 +43,32 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
     }
   });
 
+  const allDocsFiltered = allDocs.filter((doc: any) =>
+    doc.travelDocsTypeName.toLowerCase().includes(docSearchTerm.toLowerCase()) ||
+    doc.employeeEmail.toLowerCase().includes(docSearchTerm.toLowerCase()) ||
+    doc.travelDocUploadedAt.toLowerCase().includes(docSearchTerm.toLowerCase()) ||
+    doc.fkRoleRoleName.toLowerCase().includes(docSearchTerm.toLowerCase())
+  );
+
   const allExpenses = expenseResults.flatMap((result) => result.data || []);
+  const filteredExpenses = allExpenses.filter((exp: any) =>
+    exp.expenseUploadedAt.toLowerCase().includes(expenseSearchTerm.toLowerCase()) ||
+    exp.expenseAmount.toString().includes(expenseSearchTerm) ||
+    exp.expenseDate.toLowerCase().includes(expenseSearchTerm.toLowerCase()) ||
+    exp.expenseExpenseStatusName.toLowerCase().includes(expenseSearchTerm.toLowerCase()) ||
+    exp.employeeEmail.toLowerCase().includes(expenseSearchTerm.toLowerCase())
+  );
   const isLoadingData = planLoading || (viewMode === "EXPENSES" ? expenseResults.some(r => r.isLoading) : docsLoading);
 
   const totalExpenseAmount = useMemo(() => {
-    return allExpenses.reduce((total, exp:any) => total + exp.expenseAmount, 0);
-  }, [allExpenses]);
+    return filteredExpenses.reduce((total, exp:any) => total + exp.expenseAmount, 0);
+  }, [filteredExpenses]);
 
   const approvedTotal = useMemo(() => {
-    return allExpenses
+    return filteredExpenses
       .filter((exp:any) => exp.expenseExpenseStatusName === "APPROVED")
       .reduce((total, exp:any) => total + exp.expenseAmount, 0);
-  }, [allExpenses]);
+  }, [filteredExpenses]);
 
   const approveMutation = useMutation({
     mutationFn: ({ expenseId, statusId, reason }: { expenseId: number; statusId: number; reason: string }) =>
@@ -63,7 +80,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
       await queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
       
       alert("Status updated successfully");
-      onSuccess();
+      // onSuccess();
     },
     onError: (err: any) => alert(err.message)
   });
@@ -125,7 +142,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                 <FileText className="text-blue-600" /> {viewMode === "EXPENSES" ? "Expenses" : "Travel Documents"}
 
                 {viewMode === "EXPENSES" && 
-                  <div className="ml-4 flex-col">
+                  <div className="ml-2 flex-col">
                     <p className="text-sm flex font-medium text-slate-500">
                     Total: <IndianRupee size={14} className="mt-1"/>{totalExpenseAmount.toLocaleString()}
                     </p>
@@ -134,6 +151,22 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                     </p>
                   </div>
                 }
+
+                <div className={`${viewMode === "EXPENSES" ? "" : "ml-10"} relative`}>
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                  <Input 
+                    placeholder={`Search ${viewMode.toLowerCase()}...`} 
+                    className="pl-9"
+                    value={viewMode === "EXPENSES" ? expenseSearchTerm : docSearchTerm}
+                    onChange={(e) => {
+                      if(viewMode === "EXPENSES") {
+                        setExpenseSearchTerm(e.target.value);
+                      } else {
+                        setDocSearchTerm(e.target.value);
+                      }
+                    }}
+                  />
+                </div>
               
                 <div className="flex bg-gray-100 p-1 rounded-lg w-max right-10 absolute">
                   <Button className={viewMode === "EXPENSES" ? "rounded-md border text-gray-700" : "rounded-md text-gray-400"}
@@ -151,30 +184,34 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                   <TableRow className="bg-slate-50">
                     {viewMode === "EXPENSES" ? (
                       <>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Proofs</TableHead>
-                        <TableHead>Status</TableHead>
-                        {user?.roleName == "HR" && plan.employeeId === user?.id && !plan?.travelPlanIsDeleted && <TableHead className="text-right">Actions</TableHead>}
-                        {<TableHead >Reason</TableHead>}
+                        <TableHead className="text-center">Date</TableHead>
+                        <TableHead className="text-center">Uploaded by</TableHead>
+                        <TableHead className="text-center">Remark</TableHead>
+                        <TableHead className="text-center">Amount</TableHead>
+                        <TableHead className="text-center">Proofs</TableHead>
+                        <TableHead className="text-center">Status</TableHead>
+                        {user?.roleName === "HR" && plan.employeeId === user?.id && !plan?.travelPlanIsDeleted && <TableHead className="text-center">Actions</TableHead>}
+                        {<TableHead className="text-center">Reason</TableHead>}
                       </>
                     ) : (
                       <>
-                        <TableHead>Document Type</TableHead>
-                        <TableHead>Uploaded By</TableHead>
-                        <TableHead>Uploaded At</TableHead>
-                        <TableHead>View</TableHead>
+                        <TableHead className="text-center">Document Type</TableHead>
+                        <TableHead className="text-center">Uploaded By</TableHead>
+                        <TableHead className="text-center">Uploaded At</TableHead>
+                        <TableHead className="text-center">View</TableHead>
                       </>
                     )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  { viewMode === "EXPENSES" ? allExpenses.map((exp: any) => (
+                  { viewMode === "EXPENSES" ? filteredExpenses.map((exp: any) => (
                     <TableRow key={exp.id}>
                       <TableCell>{exp.expenseDate.split("T")[0]}</TableCell>
                       <TableCell>
-                        <p className="font-medium">{exp.expenseRemark}</p>
+                        <p className="font-medium max-w-[120px] truncate">{exp.employeeEmail}</p>
+                      </TableCell>
+                      <TableCell>
+                        <p className="font-medium max-w-[120px] truncate">{exp.expenseRemark}</p>
                       </TableCell>
                       <TableCell className="font-bold flex text-slate-900"><IndianRupee className="mt-1" size={14} />{exp.expenseAmount}</TableCell>
                       <TableCell>
@@ -202,7 +239,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             {exp.expenseExpenseStatusName === "PENDING" ? (
-                            <>
+                            <div className="flex gap-1 items-center">
                               <Button
                                 size="sm" 
                                 variant="outline" 
@@ -221,9 +258,9 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                               >
                                 <XCircle size={16} />
                               </Button>
-                            </>
+                            </div>
                             ) : (
-                              <span className="text-green-600 flex items-center gap-1 justify-end">
+                              <span className="text-green-600 flex items-center gap-2 mr-8">
                                 <CheckCircle size={16} /> Done
                               </span>
                             )}
@@ -234,7 +271,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                     </TableRow>
                   )
                 ):(
-                  allDocs.map((doc: any) => (
+                  allDocsFiltered.map((doc: any) => (
                     !doc.docIsDeletedFromTravel ? (
                     <TableRow key={doc.id}>
                       <TableCell className="font-medium">{doc.travelDocsTypeName}</TableCell>
@@ -251,9 +288,9 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                     ) : null
                 ))
               )}
-              {viewMode === "DOCUMENTS" && allDocs.length === 0 && (
+              {viewMode === "DOCUMENTS" && allDocsFiltered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-10">
+                  <TableCell colSpan={4} className="text-center py-10">
                     <div className="flex flex-col items-center gap-2">
                       <FileText size={32} className="text-slate-400" />
                       <p className="text-sm text-slate-400">No travel documents uploaded yet.</p>
@@ -261,9 +298,9 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                   </TableCell>
                 </TableRow>
               )}
-              {viewMode === "EXPENSES" && allExpenses.length === 0 && (
+              {viewMode === "EXPENSES" && filteredExpenses.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10">
+                  <TableCell colSpan={user?.roleName === "HR" ? 8 : 7} className="text-center py-10">
                     <div className="flex flex-col items-center gap-2">
                       <FileText size={32} className="text-slate-400" />
                       <p className="text-sm text-slate-400">No travel expenses uploaded yet.</p>

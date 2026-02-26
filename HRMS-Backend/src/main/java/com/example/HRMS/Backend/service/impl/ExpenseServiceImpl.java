@@ -31,6 +31,7 @@ import java.util.Objects;
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
+    private final EmployeeRepository employeeRepository;
     private final ExpenseStatusRepository expenseStatusRepository;
     private final ExpenseRepository expenseRepository;
     private final ExpenseProofTypeRepository expenseProofTypeRepository;
@@ -58,11 +59,11 @@ public class ExpenseServiceImpl implements ExpenseService {
             throw new RuntimeException("closed travel plan cannot be add expenses.");
         }
 
-        LocalDate travelEndDate = travelPlan.getTravelPlanStartDate();
-        LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
+        LocalDate travelStartDate = travelPlan.getTravelPlanStartDate();
+        LocalDate travelAddDeadLine = travelStartDate.plusDays(10);
 
-        if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelEndDate)){
-            throw new RuntimeException("only add expense between travel plan end date and after ending travel plan 10 days duration.");
+        if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelStartDate)){
+            throw new RuntimeException("only add expense between travel plan Start date and after ending travel plan 10 days duration.");
         }
 
         ExpenseStatus expenseStatus = expenseStatusRepository.findExpenseStatusById(1L);
@@ -99,6 +100,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseResponse.setExpenseAmount(expense.getExpenseAmount());
             expenseResponse.setExpenseRemark(expense.getExpenseRemark());
             expenseResponse.setExpenseUploadedAt(expense.getExpenseUploadedAt());
+            expenseResponse.setEmployeeEmail(employeeRepository.findEmployeeById(employeeId).getEmployeeEmail());
 
             //it is correct??
             expenseResponse.setId(expense.getId());

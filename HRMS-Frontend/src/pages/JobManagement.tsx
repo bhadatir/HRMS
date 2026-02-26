@@ -113,7 +113,7 @@ export default function JobManagement() {
           {/* job details with reviewer and referral management */}
           {selectedJobId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
+              <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => setSelectedJobId(null)}>
                   <X />
