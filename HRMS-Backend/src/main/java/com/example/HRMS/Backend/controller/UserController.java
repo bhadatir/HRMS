@@ -2,24 +2,16 @@ package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.EmployeeResponse;
 import com.example.HRMS.Backend.dto.EmployeeSearch;
-import com.example.HRMS.Backend.model.Employee;
-import com.example.HRMS.Backend.model.TravelDoc;
-import com.example.HRMS.Backend.repository.EmployeeRepository;
-import com.example.HRMS.Backend.repository.TravelDocRepository;
 import com.example.HRMS.Backend.service.AuthService;
-import com.example.HRMS.Backend.service.PostService;
-import com.example.HRMS.Backend.service.TravelPlanService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/api/user")
@@ -38,6 +30,18 @@ public class UserController {
                                                             @RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(authService.getEmployeeByName(query, page, size));
+    }
+
+    @GetMapping("/travel/search")
+    public ResponseEntity<Page<EmployeeSearch>> getAvailableEmployeeForTravel(@RequestParam String query,
+                                                                     @RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "10") int size,
+                                                                     @RequestParam String startDate,
+                                                                     @RequestParam String endDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate1 = LocalDate.parse(startDate, formatter);
+        LocalDate endDate1 = LocalDate.parse(endDate, formatter);
+        return ResponseEntity.ok(authService.getAvailableEmployeeForTravel(query, page, size, startDate1, endDate1));
     }
 
     @PatchMapping("/profileImage/{empId}")

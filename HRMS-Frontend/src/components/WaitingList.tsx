@@ -1,13 +1,16 @@
-import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { gameService } from "@/api/gameService";
-import { Calendar, Clock, Gamepad } from "lucide-react";
+import { Calendar, Clock, Search } from "lucide-react";
+import { Input } from "./ui/input";
+import { useState } from "react";
 
 export default function WaitingList({waitingListId, onSuccess}: {waitingListId: number, onSuccess: () => void}) {
   const { token } = useAuth();
+  const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
 
   const { data: waitingList } = useQuery({
     queryKey: ["waitingList", waitingListId],
@@ -20,6 +23,12 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
     queryFn: () => gameService.getWaitingListSeqById(waitingListId, token || ""),
     enabled: !!waitingListId && !!token,
   });
+
+  const filteredWaitingListSeq = waitingListSeq?.filter((wls: any) =>
+    wls.hostEmployeeEmail.toLowerCase().includes(waitingListSearchTerm.toLowerCase()) ||
+    wls.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(waitingListSearchTerm.toLowerCase())) ||
+    wls.waitingListCreatedAt.toLowerCase().includes(waitingListSearchTerm.toLowerCase())
+  );
 
   return (
         <>
@@ -47,6 +56,17 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
                     </div>
                 </CardDescription>
               </div>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search Waiting List..."
+                  className="pl-9"
+                  value={waitingListSearchTerm}
+                  onChange={(e) => {                  
+                    setWaitingListSearchTerm(e.target.value);
+                  }}
+                />
+              </div>
               <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50 mt-2">
                 {waitingList?.waitingStatusIsActive ? "Active" : "Inactive"}
               </Badge>
@@ -65,7 +85,7 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {waitingListSeq?.map((wls: any, index: number) => (
+                    {filteredWaitingListSeq?.map((wls: any, index: number) => (
                     <TableRow key={wls.id}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{wls.hostEmployeeEmail}</TableCell>

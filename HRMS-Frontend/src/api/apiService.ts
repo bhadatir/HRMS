@@ -46,6 +46,11 @@ export const apiService = {
     return res.data;
   },
 
+  searchAvailableEmployeeForTravel: async (query: string, page: number, size: number, startDate: string, endDate: string, token: string) => {
+    const res = await api.get(`/user/travel/search?query=${query}&page=${page}&size=${size}&startDate=${startDate}&endDate=${endDate}`, authHeader(token));
+    return res.data;
+  },
+
   fetchOrgChart: async (employeeId: number, token: string) => {
     const res = await api.get(`/org-chart/${employeeId}`, authHeader(token));
     return res.data;

@@ -56,7 +56,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
             <div className="pt-2 border-t flex justify-between items-center">
                 <div className="space-y-1">
                     <div className="text-[10px] text-slate-400">Host: {booking.employeeEmail}</div>
-                    {booking.bookingParticipantResponses.length > 0 && (
+                    {booking?.bookingParticipantResponses?.length > 0 && (
                         <div className="text-[10px] text-slate-400 ">
                             Participants: {booking.bookingParticipantResponses.map((p: any) => p.employeeEmail).join(", ")}
                         </div>

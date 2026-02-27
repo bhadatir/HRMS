@@ -2,18 +2,17 @@ package com.example.HRMS.Backend.service.impl;
 
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
-import com.example.HRMS.Backend.repository.DepartmentRepository;
-import com.example.HRMS.Backend.repository.EmployeeRepository;
-import com.example.HRMS.Backend.repository.PositionRepository;
-import com.example.HRMS.Backend.repository.RoleRepository;
+import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.AuthService;
 import com.example.HRMS.Backend.service.EmailService;
+import com.example.HRMS.Backend.service.TravelPlanService;
 import com.example.HRMS.Backend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +45,8 @@ public class AuthServiceImpl implements AuthService {
     private final EmployeeRepository employeeRepository;
 
     private final ModelMapper modelMapper;
+
+    private final TravelPlanRepository travelPlanRepository;
 
     private final RoleRepository roleRepository;
 
@@ -186,6 +188,22 @@ public class AuthServiceImpl implements AuthService {
     public Page<EmployeeSearch> getEmployeeByName(String query, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
         return employeeRepository.searchEmployeeByName(query, pageable);
+    }
+
+    @Override
+    public Page<EmployeeSearch> getAvailableEmployeeForTravel(String query, int page, int size, LocalDate startDate, LocalDate endDate){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<EmployeeSearch> employeeSearches = employeeRepository.searchEmployeeByName(query, pageable);
+        if (employeeSearches == null || startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Page and date must not be null");
+        }
+
+        List<EmployeeSearch> filteredList = employeeSearches.getContent()
+                .stream()
+                .filter(emp -> !travelPlanRepository.findAllByGameBookingStartTimeBetween(emp.getId(), startDate, endDate))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(filteredList, pageable, filteredList.size());
     }
 
     @Override

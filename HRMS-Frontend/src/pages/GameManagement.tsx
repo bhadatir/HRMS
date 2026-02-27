@@ -6,7 +6,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Gamepad2, X, Bell, Gamepad, Calendar, Clock, Trash } from "lucide-react";
+import { Plus, Gamepad2, X, Bell, Gamepad, Calendar, Clock, Trash, Search } from "lucide-react";
 import GameBookingForm from "../components/GameBookingForm";
 import GameTypeManager from "@/components/GameTypeManager";
 import Notifications from "@/components/Notifications";
@@ -14,6 +14,7 @@ import BookingCard from "@/components/BookingCard";
 import GameInterestToggle from "@/components/GameInterestToggle";
 import { Card, CardContent } from "@/components/ui/card";
 import WaitingList from "@/components/WaitingList";
+import { Input } from "@/components/ui/input";
 
 export default function GameManagement() {
     const { token, user, unreadNotifications } = useAuth();
@@ -27,6 +28,8 @@ export default function GameManagement() {
     const [showWaitingList, setShowWaitingList] = useState(false);
     const [viewMode, setViewMode] = useState<"My Bookings" | "Waiting List">("My Bookings");
     const [waitingListId, setWaitingListId] = useState<number>(0);
+    const [bookingSearchTerm, setBookingSearchTerm] = useState("");
+    const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
 
     const { data: gameTypes = [] } = useQuery({
         queryKey: ["gameTypes"],
@@ -38,28 +41,51 @@ export default function GameManagement() {
         queryFn: () => gameService.getAllGameBookingStatus(token!)
     });
 
-    const { data: allWaitingList = [] } = useQuery({ 
-        queryKey: ["allWaitingList"], 
-        queryFn: () => gameService.getAllWaitingList(token!) });
+    const { data: upcomingBookings = [] } = useQuery({
+        queryKey: ["upcomingBookings"],
+        queryFn: () => gameService.upcommingBookings(token!)
+    });
 
-    const { data: bookings = [], isLoading } = useQuery({
-        queryKey: ["allBookings"],
-        queryFn: () => gameService.showAllBookings(token!),
+    const { data: WaitingListByEmpId = [] } = useQuery({ 
+        queryKey: ["WaitingList", user?.id], 
+        queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, token!) });
+
+    const { data: bookingsByEmpId = [], isLoading } = useQuery({
+        queryKey: ["Bookings", user?.id],
+        queryFn: () => gameService.findGameBookingById(user?.id, token!),
         select: (bookings) => bookings.filter((b: any) => (!gameType || b.gameTypeId === gameType) && (!gameBookingStatusId || b.gameBookingStatusId === gameBookingStatusId))
     });
 
     const statusMutation = useMutation({
         mutationFn: ({ id, status }: { id: number, status: number }) => 
             gameService.updateBookingStatus(id, status, token!),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allBookings"] })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings", user?.id] })
     });
 
     const removeWaitingListMutation = useMutation({
         mutationFn: (id: number) => gameService.deleteWaitingList(id, token!),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allWaitingList"] })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] })
     });
 
-    if(isLoading) return <p>Loading Slots...</p>;    
+    const filteredBookings = bookingsByEmpId.filter((b: any) => {
+        const searchTerm = bookingSearchTerm?.toLowerCase();
+        return b.gameTypeName.toLowerCase().includes(searchTerm) ||
+            b.employeeEmail.toLowerCase().includes(searchTerm) ||
+            b.gameBookingStartTime.toLowerCase().includes(searchTerm) ||
+            b.gameBookingEndTime.toLowerCase().includes(searchTerm) ||
+            b.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(searchTerm));          
+    });
+
+    const filteredWaitingList = WaitingListByEmpId.filter((w: any) => {
+        const searchTerm = waitingListSearchTerm?.toLowerCase();
+        return w.gameTypeName.toLowerCase().includes(searchTerm) ||
+            w.targetSlotDatetime.toLowerCase().includes(searchTerm) ||
+            w.targetSlotEndDatetime.toLowerCase().includes(searchTerm) ||
+            w.hostEmployeeEmail.toLowerCase().includes(searchTerm) ||
+            w.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(searchTerm));
+    });
+
+    if(isLoading) return <p className="text-center py-4 justify-center">Loading...</p>;    
 
     return (
         <SidebarProvider>
@@ -171,23 +197,12 @@ export default function GameManagement() {
                     {/* upcomming games */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <h2 className="text-xl font-bold text-slate-900 col-span-full">Upcoming Bookings :</h2>
-                        {bookings.filter((b: any) => {
-                                        const bookingTime = new Date(b.gameBookingEndTime).getTime();
-                                        const now = new Date().getTime();
-                                        const upcommingEnd = bookingTime + (1 * 60 * 60 * 1000);
-                                        return !b.gameBookingIsDeleted &&bookingTime >= now && bookingTime <= upcommingEnd && b.gameBookingStatusId === 1;
-                                    }).length > 0 ? (
-                                    bookings.filter((b: any) => {
-                                        const bookingTime = new Date(b.gameBookingEndTime).getTime();
-                                        const now = new Date().getTime();
-                                        const upcommingEnd = now + (1 * 60 * 60 * 1000);
-                                        return !b.gameBookingIsDeleted &&bookingTime >= now && bookingTime <= upcommingEnd && b.gameBookingStatusId === 1;
-                                    }).map((b: any) => (
+                        
+                        {upcomingBookings.map((b: any) => (
+                                !b.gameBookingIsDeleted && b.gameBookingStatusId === 1 && (
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />
-                                ))
-                            ) : (
-                                <p className="text-slate-500 italic">No upcoming bookings in the next hour.</p>
-                            )}
+                                )))
+                        }
                     </div>
 
                     
@@ -200,20 +215,39 @@ export default function GameManagement() {
                                 size="sm"
                                 onClick={()=>setViewMode("Waiting List")}> Waiting List</Button>
                         </div>
-                        {viewMode === "My Bookings" && <select className="border rounded-md px-2 py-1 text-sm" value={gameBookingStatusId || ""} 
-                            onChange={(e) => setgameBookingStatusId(Number(e.target.value))}>
-                            <option value="">All Statuses</option>
-                            {gameBookingStatusOptions.map((g: any) => <option key={g.id} value={g.id}>{g.gameBookingStatusName}</option>)}
-                        </select>}
+                        <div className="flex items-center gap-2">
+                            <div className="relative">
+                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                                <Input 
+                                    placeholder={`Search ${viewMode.toLowerCase()}...`} 
+                                    className="pl-9"
+                                    value={viewMode === "My Bookings" ? bookingSearchTerm : waitingListSearchTerm}
+                                    onChange={(e) => {
+                                    if(viewMode === "My Bookings") {
+                                        setBookingSearchTerm(e.target.value);
+                                    } else {
+                                        setWaitingListSearchTerm(e.target.value);
+                                    }
+                                    }}
+                                />
+                            </div>
+                            {viewMode === "My Bookings" && <select className="border rounded-md px-2 py-1 text-sm" value={gameBookingStatusId || ""} 
+                                onChange={(e) => setgameBookingStatusId(Number(e.target.value))}>
+                                <option value="">All Statuses</option>
+                                {gameBookingStatusOptions.map((g: any) => <option key={g.id} value={g.id}>{g.gameBookingStatusName}</option>)}
+                            </select>}
+                        </div>
                     </div>
 
                     {/* my bookings  */}
                     {viewMode === "My Bookings" && (
                     <div className="mt-2">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
-                        {bookings.length > 0 ? (
+                        {filteredBookings.length > 0 ? (
                             <>                                
-                                {bookings.map((b: any) => ((b.employeeId === user?.id || b.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id)) 
+                                {filteredBookings
+                                    .sort((a: any, b: any) => new Date(b.gameBookingStartTime).getTime() - new Date(a.gameBookingStartTime).getTime())
+                                    .map((b: any) => ((b.employeeId === user?.id || b.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id)) 
                                     && !b.gameBookingIsDeleted) && (
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />        
                                 ))}
@@ -229,8 +263,8 @@ export default function GameManagement() {
                     {viewMode === "Waiting List" && (
                     <div className="my-5">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {allWaitingList.length > 0 ? (
-                                allWaitingList.map((wait: any) => ((
+                        {filteredWaitingList.length > 0 ? (
+                                filteredWaitingList.map((wait: any) => ((
                                     wait.hostEmployeeId === user?.id || wait.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id)
                                     )
                                     && (

@@ -15,7 +15,7 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
 
     List<GameBooking> findGameBookingByFkGameType_Id(Long fkGameTypeId);
 
-    GameBooking findGameBookingByFkHostEmployee_Id(Long fkHostEmployeeId);
+    List<GameBooking> findGameBookingByFkHostEmployee_Id(Long fkHostEmployeeId);
 
     GameBooking findGameBookingById(Long pkGameBookingId);
 

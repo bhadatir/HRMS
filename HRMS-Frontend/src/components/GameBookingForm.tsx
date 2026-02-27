@@ -74,7 +74,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     });
 
     const filteredGames = useMemo(() => {
-        const interestIds = myInterests.map((i: any) => i.gameTypeId);
+        const interestIds = myInterests.filter((i: any) => !i.interestDeleted).map((i: any) => i.gameTypeId);
         return gameTypes.filter((g: any) => interestIds.includes(g.id));
     }, [gameTypes, myInterests]);
 

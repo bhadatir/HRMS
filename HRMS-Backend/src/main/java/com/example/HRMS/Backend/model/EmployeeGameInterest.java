@@ -2,11 +2,13 @@ package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Data
 @Entity
 @Table(name = "employee_game_interest")
 public class EmployeeGameInterest {

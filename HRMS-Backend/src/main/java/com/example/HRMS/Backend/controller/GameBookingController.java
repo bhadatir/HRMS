@@ -40,8 +40,13 @@ public class GameBookingController {
     }
 
     @GetMapping("/{empId}")
-    public ResponseEntity<GameBookingResponse> bookingByEmpId(@PathVariable Long empId){
+    public ResponseEntity<List<GameBookingResponse>> bookingByEmpId(@PathVariable Long empId){
         return ResponseEntity.ok(gameBookingService.findBookingByEmpId(empId));
+    }
+
+    @GetMapping("/upcommingBooking")
+    public ResponseEntity<List<GameBookingResponse>> upcommingBooking(){
+        return ResponseEntity.ok(gameBookingService.findUpcommingBooking());
     }
 
     @PatchMapping("/status")
@@ -71,6 +76,11 @@ public class GameBookingController {
     @GetMapping("/interest/{empId}")
     public ResponseEntity<List<EmployeeGameInterestResponse>> findGameInterestByEmp(@PathVariable Long empId){
         return ResponseEntity.ok(gameBookingService.findGameInterestByEmp(empId));
+    }
+
+    @GetMapping("/waitList/emp/{empId}")
+    public ResponseEntity<List<BookingWaitingListResponse>> findWaitListbyEmpId(@PathVariable Long empId){
+        return ResponseEntity.ok(gameBookingService.findWaitListbyEmpId(empId));
     }
 
     @GetMapping("/waitList")

@@ -10,7 +10,6 @@ import { useAuth } from "../context/AuthContext";
 import { useForm } from "react-hook-form";
 import { Search, User, X, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 type TravelPlanFormInputs = {
   travelPlanName: string;
@@ -41,32 +40,24 @@ export default function TravelPlanForm({ editTravelPlanId, onSuccess }: { editTr
     }
   });
 
+const startDate = watch("travelPlanStartDate");
+const endDate = watch("travelPlanEndDate");
+
   const {
     data: infiniteData,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
   } = useInfiniteQuery({
-    queryKey: ["employeeSearchInfinite", searchTerm],
+    queryKey: ["employeeSearchInfinite", searchTerm, startDate, endDate],
     queryFn: ({ pageParam = 0 }) => 
-      apiService.searchEmployees(searchTerm, pageParam, 10, token || ""),
+      apiService.searchAvailableEmployeeForTravel(searchTerm, pageParam, 5, startDate, endDate, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => 
       lastPage.last ? undefined : lastPage.number + 1,
-    enabled: searchTerm.length >= 1,
+    enabled: searchTerm.length >= 1 && !!startDate && !!endDate,
   });
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
-
-const startDate = watch("travelPlanStartDate");
-const endDate = watch("travelPlanEndDate");
-
-const availabilityResults = useQueries({
-  queries: (suggestions || []).map((emp: any) => ({
-    queryKey: ["empAvailability", emp.id, startDate, endDate],
-    queryFn: () => travelService.isEmpAvailableForTravel(emp.id, startDate, endDate, token || ""),
-    enabled: !!emp.id && !!startDate && !!endDate && showDropdown,
-  })),
-});
 
 const getMutation = useMutation({
   mutationFn: () => travelService.getTravelPlanById(editTravelPlanId!, token || ""),
@@ -215,28 +206,19 @@ const getMutation = useMutation({
 
             {showDropdown && suggestions.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-40 overflow-y-auto">
-                {suggestions.map((emp: any, index: number) => {
-                  const queryStatus = availabilityResults[index];
-                  const isBusy = queryStatus?.data === true;
-                  const isLoadingBusy = queryStatus?.isLoading;
+                {suggestions.map((emp: any) => {
 
                   if (emp.id === user?.id || selectedEmployees.find(e => e.id === emp.id)) return null;
 
                   return (
                   <button
                       key={emp.id}
-                      className={cn(
-                                  "w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors",
-                                  isBusy ? "bg-slate-50 opacity-60 cursor-not-allowed" : ""
-                              )}
-                      onClick={() => !isBusy && handleSelectEmployee(emp)}
-                      disabled={isBusy || isLoadingBusy}
+                      className="w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors"                                 
+                      onClick={() => handleSelectEmployee(emp)}
                   >
-                      <User size={14} className={isBusy ? "text-slate-400" : "text-blue-600"} />
+                      <User size={14} className="text-blue-600" />
                       <div className="flex flex-col">
                           <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
-                          {isBusy ? <span className="text-[10px] text-red-500 font-bold">Already in a other travel plan</span>
-                           : <span className="text-[10px] text-green-500 font-bold">Available</span>}
                       </div>
                   </button>
                   );

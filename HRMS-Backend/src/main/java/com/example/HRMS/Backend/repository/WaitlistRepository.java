@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.repository;
 
 import com.example.HRMS.Backend.model.BookingWaitingList;
+import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -70,4 +71,6 @@ public interface WaitlistRepository extends JpaRepository<BookingWaitingList,Lon
     boolean existsOverlappingBookingWaitingList(@Param("empId") Long empId,
                                      @Param("start") LocalDateTime start,
                                      @Param("end") LocalDateTime end);
+
+    List<BookingWaitingList> findBookingWaitingListsByFkHostEmployee(Employee employeeById);
 }

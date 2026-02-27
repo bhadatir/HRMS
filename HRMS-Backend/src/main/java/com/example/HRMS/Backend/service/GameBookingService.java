@@ -24,7 +24,7 @@ public interface GameBookingService {
 
     void updateWaitingList(GameType gameType, LocalDateTime targetedSloatTime);
 
-    GameBookingResponse findBookingByEmpId(Long empId);
+    List<GameBookingResponse> findBookingByEmpId(Long empId);
 
     void updateGameBooking(Long bookingId, GameBookingRequest gameBookingRequest);
 
@@ -43,4 +43,8 @@ public interface GameBookingService {
     List<BookingWaitingListResponse> findWaitListSeqByGameTypeAndSloat(Long waitId);
 
     void deleteWaitListById(Long waitId);
+
+    List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId);
+
+    List<GameBookingResponse> findUpcommingBooking();
 }

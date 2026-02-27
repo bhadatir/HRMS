@@ -2,6 +2,7 @@ package com.example.HRMS.Backend.repository;
 
 import com.example.HRMS.Backend.dto.BookingParticipantResponse;
 import com.example.HRMS.Backend.model.BookingParticipant;
+import com.example.HRMS.Backend.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -59,4 +60,6 @@ public interface BookingParticipantRepository extends JpaRepository<BookingParti
     boolean existsOverlappingBookingWaitingListParticipant(@Param("empId") Long empId,
                                                 @Param("start") LocalDateTime start,
                                                 @Param("end") LocalDateTime end);
+
+    List<BookingParticipant> findBookingParticipantByFkEmployee(Employee emp);
 }

@@ -59,6 +59,24 @@ public class GameBookingServiceImpl implements GameBookingService {
         Long empId = gameBookingRequest.getEmpId();
         Long gameTypeId = gameBookingRequest.getGameTypeId();
 
+        EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id(empId, gameTypeId);
+        if(employeeGameInterest == null || employeeGameInterest.isInterestDeleted()){
+            return "you are not interested in this game.";
+        }
+        List<Long> bookingParticipantsEmpId = gameBookingRequest.getBookingParticipantsEmpId();
+
+        if (bookingParticipantsEmpId.isEmpty()) {
+            throw new IllegalArgumentException("Participant list cannot be null or empty");
+        }
+
+        for(Long id : bookingParticipantsEmpId) {
+            EmployeeGameInterest employeeGameInterest1 = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
+                    (id, gameTypeId);
+            if (employeeGameInterest1 == null || employeeGameInterest1.isInterestDeleted()) {
+                return "your participant are not interested in this game.";
+            }
+        }
+
         GameType gameType = gameTypeRepository.findGameTypeById(gameTypeId);
         int gameSlotDuration = gameType.getGameSlotDuration();
 
@@ -114,14 +132,6 @@ public class GameBookingServiceImpl implements GameBookingService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "One of your participants is already in another game booking waiting list at this time.");
             }
         }
-
-        List<Long> bookingParticipantsEmpId = gameBookingRequest.getBookingParticipantsEmpId();
-
-        if (bookingParticipantsEmpId.isEmpty()) {
-            throw new IllegalArgumentException("Participant list cannot be null or empty");
-        }
-
-        EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id(empId, gameTypeId);
 
         //requir to check cycle with all diff upcomming cycles.
         boolean isSecondTime = gameBookingRepository.hasPlayedInCycle(empId, gameTypeId)
@@ -187,21 +197,11 @@ public class GameBookingServiceImpl implements GameBookingService {
             bookingParticipant.setFkGameBooking(saveGameBooking);
             bookingParticipantRepository.save(bookingParticipant);
 
-            //if not interested then what ??
-
             EmployeeGameInterest employeeGameInterest1 = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
                     (id, gameType.getId());
 
-            if(employeeGameInterest1 != null) {
-                employeeGameInterest1.setPlayedInCurrentCycle(employeeGameInterest1.getPlayedInCurrentCycle() + 1);
-                employeeGameInterestRepository.save(employeeGameInterest1);
-            }else{
-                EmployeeGameInterest employeeGameInterest2 = new EmployeeGameInterest();
-                employeeGameInterest2.setFkGameType(gameType);
-                employeeGameInterest2.setFkEmployee(employeeRepository.findEmployeeById(id));
-                employeeGameInterest2.setPlayedInCurrentCycle(1);
-                employeeGameInterestRepository.save(employeeGameInterest2);
-            }
+            employeeGameInterest1.setPlayedInCurrentCycle(employeeGameInterest1.getPlayedInCurrentCycle() + 1);
+            employeeGameInterestRepository.save(employeeGameInterest1);
 
             notificationService.createNotification(id
                     ,"Slot Confirmed!"
@@ -427,6 +427,25 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
+    public List<GameBookingResponse> findUpcommingBooking(){
+        List<GameBooking> gameBookings = gameBookingRepository.findAllByGameBookingStartTimeBetween(LocalDateTime.now().minusHours(2), LocalDateTime.now().plusHours(2));
+        List<GameBookingResponse> gameBookingResponses = new ArrayList<>();
+        for(GameBooking gameBooking :gameBookings)
+        {
+            GameBookingResponse gameBookingResponse = modelMapper.map(gameBooking,
+                    GameBookingResponse.class);
+
+            List<BookingParticipantResponse> bookingParticipantResponses =
+                    bookingParticipantRepository.findAllByGameBookingId(gameBooking.getId());
+
+            gameBookingResponse.setBookingParticipantResponses(bookingParticipantResponses);
+
+            gameBookingResponses.add(gameBookingResponse);
+        }
+        return gameBookingResponses;
+    }
+
+    @Override
     public List<BookingWaitingListResponse> findWaitList(){
         List<BookingWaitingListResponse> bookingWaitingListResponses = new ArrayList<>();
         List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findAll();
@@ -440,6 +459,40 @@ public class GameBookingServiceImpl implements GameBookingService {
 
             bookingWaitingListResponses.add(response);
         }
+        return bookingWaitingListResponses;
+    }
+
+    @Override
+    public List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId){
+        List<BookingWaitingListResponse> bookingWaitingListResponses = new ArrayList<>();
+        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByFkHostEmployee(employeeRepository.findEmployeeById(empId));
+        for(BookingWaitingList bookingWaitingList : bookingWaitingLists){
+            BookingWaitingListResponse response = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
+
+            List<BookingParticipantResponse> bookingParticipantResponses =
+                    bookingParticipantRepository.findAllByBookingWaitingListId(bookingWaitingList.getId());
+
+            response.setBookingParticipantResponses(bookingParticipantResponses);
+
+            bookingWaitingListResponses.add(response);
+        }
+
+        List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findBookingParticipantByFkEmployee(employeeRepository.findEmployeeById(empId));
+
+        for(BookingParticipant bookingParticipant : bookingParticipants)
+        {
+            if(bookingParticipant.getFkBookingWaitingList() != null){
+                BookingWaitingListResponse bookingWaitingListResponse = modelMapper.map(bookingParticipant.getFkBookingWaitingList(),BookingWaitingListResponse.class);
+
+                List<BookingParticipantResponse> bookingParticipantResponses =
+                        bookingParticipantRepository.findAllByBookingWaitingListId(bookingParticipant.getFkBookingWaitingList().getId());
+
+                bookingWaitingListResponse.setBookingParticipantResponses(bookingParticipantResponses);
+
+                bookingWaitingListResponses.add(bookingWaitingListResponse);
+            }
+        }
+
         return bookingWaitingListResponses;
     }
 
@@ -487,12 +540,38 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public GameBookingResponse findBookingByEmpId(Long empId)
+    public List<GameBookingResponse> findBookingByEmpId(Long empId)
     {
-        return modelMapper.map(
-                gameBookingRepository.findGameBookingByFkHostEmployee_Id(empId),
-                GameBookingResponse.class);
+        List<GameBooking> gameBookings = gameBookingRepository.findGameBookingByFkHostEmployee_Id(empId);
+        List<GameBookingResponse> gameBookingResponses = new ArrayList<>();
+        for(GameBooking gameBooking : gameBookings)
+        {
+            GameBookingResponse gameBookingResponse = modelMapper.map(gameBooking,GameBookingResponse.class);
 
+            List<BookingParticipantResponse> bookingParticipantResponses =
+                    bookingParticipantRepository.findAllByGameBookingId(gameBooking.getId());
+
+            gameBookingResponse.setBookingParticipantResponses(bookingParticipantResponses);
+
+            gameBookingResponses.add(gameBookingResponse);
+        }
+        List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findBookingParticipantByFkEmployee(employeeRepository.findEmployeeById(empId));
+
+        for(BookingParticipant bookingParticipant : bookingParticipants)
+        {
+            if(bookingParticipant.getFkGameBooking() != null){
+                GameBookingResponse gameBookingResponse = modelMapper.map(bookingParticipant.getFkGameBooking(),GameBookingResponse.class);
+
+                List<BookingParticipantResponse> bookingParticipantResponses =
+                        bookingParticipantRepository.findAllByGameBookingId(bookingParticipant.getFkGameBooking().getId());
+
+                gameBookingResponse.setBookingParticipantResponses(bookingParticipantResponses);
+
+                gameBookingResponses.add(gameBookingResponse);
+            }
+        }
+
+        return gameBookingResponses;
     }
 
     @Override
