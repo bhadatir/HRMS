@@ -44,6 +44,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final EmployeeRepository employeeRepository;
 
+    private final GameTypeRepository gameTypeRepository;
+
     private final ModelMapper modelMapper;
 
     private final TravelPlanRepository travelPlanRepository;
@@ -204,6 +206,16 @@ public class AuthServiceImpl implements AuthService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(filteredList, pageable, filteredList.size());
+    }
+
+    @Override
+    public
+    Page<EmployeeSearch> getAvailableParticipants(String query, int page, int size,
+                                                  LocalDateTime startDate1,
+                                                  Long gameTypeId){
+        Pageable pageable = PageRequest.of(page, size);
+        LocalDateTime endDate1 = startDate1.plusMinutes(gameTypeRepository.findGameTypeById(gameTypeId).getGameSlotDuration());
+        return employeeRepository.searchAvailableParticipants(query, startDate1, endDate1, gameTypeId, pageable);
     }
 
     @Override

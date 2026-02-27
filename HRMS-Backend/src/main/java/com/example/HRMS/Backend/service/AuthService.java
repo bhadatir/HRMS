@@ -29,4 +29,6 @@ public interface AuthService {
     Employee getLoginUser();
 
     Page<EmployeeSearch> getAvailableEmployeeForTravel(String query, int page, int size, LocalDate startDate, LocalDate endDate);
+
+    Page<EmployeeSearch> getAvailableParticipants(String query, int page, int size, LocalDateTime startDate1, Long gameTypeId);
 }

@@ -1,3 +1,4 @@
+import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 
 
@@ -88,6 +89,11 @@ export const gameService = {
 
     upcommingBookings: async (token: string) => {
         const res = await api.get("/game/upcommingBooking", authHeader(token));
+        return res.data;
+    },
+
+    getAvalaibleSlots: async (gameTypeId: number, empId: number, date: string, token: string) => {
+        const res = await api.get(`/game/getSlot?gameTypeId=${gameTypeId}&empId=${empId}&date1=${date}`, authHeader(token));
         return res.data;
     },
 

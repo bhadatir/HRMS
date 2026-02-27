@@ -1,9 +1,6 @@
 package com.example.HRMS.Backend.controller;
 
-import com.example.HRMS.Backend.dto.BookingWaitingListResponse;
-import com.example.HRMS.Backend.dto.EmployeeGameInterestResponse;
-import com.example.HRMS.Backend.dto.GameBookingRequest;
-import com.example.HRMS.Backend.dto.GameBookingResponse;
+import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.BookingWaitingList;
 import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameBookingStatus;
@@ -16,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -107,6 +105,15 @@ public class GameBookingController {
     @GetMapping("/allGameBookingStatus")
     public ResponseEntity<List<GameBookingStatus>> showAllGameBookingStatus() {
         return ResponseEntity.ok(gameBookingStatusRepository.findAll());
+    }
+
+    @GetMapping("/getSlot")
+    public ResponseEntity<List<SlotAvailabilityResponse>> getAvailableSlots(@RequestParam Long gameTypeId,
+                                                                            @RequestParam Long empId,
+                                                                            @RequestParam String date1) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(date1, formatter);
+        return ResponseEntity.ok(gameBookingService.getAvailableSlots(gameTypeId, empId, date));
     }
 
 

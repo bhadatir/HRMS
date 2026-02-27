@@ -51,6 +51,11 @@ export const apiService = {
     return res.data;
   },
 
+  searchParticipants: async (query: string, page: number, size: number, startDateTime: string, gameTypeId: number, token: string) => {
+    const res = await api.get(`/user/participants/search?query=${query}&page=${page}&size=${size}&startDate=${startDateTime}&gameTypeId=${gameTypeId}`, authHeader(token));
+    return res.data;
+  },
+
   fetchOrgChart: async (employeeId: number, token: string) => {
     const res = await api.get(`/org-chart/${employeeId}`, authHeader(token));
     return res.data;

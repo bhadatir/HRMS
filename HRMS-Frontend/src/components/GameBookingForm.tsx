@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 import { Card, CardTitle, CardHeader, CardContent } from "./ui/card";
 import { Search, User, X, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function GameBookingForm({ editBookingId, onSuccess }: { editBookingId?: number | null; onSuccess: () => void }) {
     const { token, user } = useAuth();
@@ -27,34 +27,24 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         queryKey: ["allGameTypes"], 
         queryFn: () => gameService.getAllGames(token!) });
 
-    const { data: allBookings = [] } = useQuery({ 
-        queryKey: ["allBookings"], 
-        queryFn: () => gameService.showAllBookings(token!) });
-
-    const { data: allWaitingList = [] } = useQuery({ 
-        queryKey: ["allWaitingList"], 
-        queryFn: () => gameService.getAllWaitingList(token!) });
-
-    const {
-        data: infiniteData,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage
-    } = useInfiniteQuery({
-        queryKey: ["employeeSearchInfinite", searchTerm],
-        queryFn: ({ pageParam = 0 }) => 
-        apiService.searchEmployees(searchTerm, pageParam, 10, token || ""),
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => 
-        lastPage.last ? undefined : lastPage.number + 1,
-        enabled: searchTerm.length >= 1,
+    const { data: bookingsByEmpId = [] } = useQuery({
+        queryKey: ["Bookings", user?.id],
+        queryFn: () => gameService.findGameBookingById(user?.id, token!),
     });
-    const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
     const { data: myInterests = [] } = useQuery({
         queryKey: ["myInterests", user?.id],
         queryFn: () => gameService.getEmployeeGameInterests(user?.id!, token!),
         enabled: !!user?.id
+    });
+
+    const gameTypeId = Number(watch("gameTypeId"));
+    const date = watch("date");
+
+    const { data: slots = [] } = useQuery({
+        queryKey: ["availableSlots", gameTypeId, date],
+        queryFn: () => gameService.getAvalaibleSlots(gameTypeId, user?.id!, date, token!),
+        enabled: !!gameTypeId && !!date
     });
 
     
@@ -78,13 +68,31 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         return gameTypes.filter((g: any) => interestIds.includes(g.id));
     }, [gameTypes, myInterests]);
 
-    const selectedGameId = watch("gameTypeId");
+        const selectedGameId = watch("gameTypeId");
     const selectedDate = watch("date");
     const selectedGame = filteredGames.find((g: any) => g.id === Number(selectedGameId));
 
+    const slotStartDateTime = selectedDate ? `${selectedDate} ${`${selectedTime}:00.0000000` || "00:00:00.0000000"}` : null;
+
+    const {
+        data: infiniteData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
+        queryKey: ["employeeSearchInfinite", searchTerm, slotStartDateTime, selectedGameId],
+        queryFn: ({ pageParam = 0 }) => 
+        apiService.searchParticipants(searchTerm, pageParam, 10, slotStartDateTime || "", selectedGameId || 0, token || ""),
+        initialPageParam: 0,
+        getNextPageParam: (lastPage) => 
+        lastPage.last ? undefined : lastPage.number + 1,
+        enabled: searchTerm.length >= 1 && !!slotStartDateTime && !!selectedGameId,
+    });
+    const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
+
     useEffect(() => {
         if (editBookingId) {
-            const booking = allBookings.find((b: any) => b.id === editBookingId);
+            const booking = bookingsByEmpId.find((b: any) => b.id === editBookingId);
             if (booking) {
                 const startTime = new Date(booking.gameBookingStartTime);
                 const timeStr = `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
@@ -99,127 +107,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                 });
             }
         }
-    }, [editBookingId, allBookings, reset]);
-
-    const slots = useMemo(() => {
-        if (!selectedGame) return [];
-        const items = [];
-        const start = selectedGame.operatingStart.split(":");
-        const end = selectedGame.operatingEnd.split(":");
-        let current = parseInt(start[0]) * 60 + parseInt(start[1]);
-        const endTime = parseInt(end[0]) * 60 + parseInt(end[1]);
-        while (current < endTime) {
-            const h = Math.floor(current / 60).toString().padStart(2, '0');
-            const m = (current % 60).toString().padStart(2, '0');
-            items.push(`${h}:${m}`);
-            current += selectedGame.gameSlotDuration;
-        }
-        return items;
-    }, [selectedGame]);
-
-    // if slot this perticular sloat book by other so in sloat selection show this slot is full
-    const bookedTimes = useMemo(() => {
-        if (!selectedDate || !selectedGameId) return new Set();
-        return new Set(
-            allBookings
-                .filter((b: any) => !b.gameBookingIsDeleted &&
-                     b.gameBookingStatusId === 1 &&
-                     b.gameTypeId === Number(selectedGameId) 
-                    && b.gameBookingStartTime.startsWith(selectedDate) && b.id !== editBookingId)
-                .map((b: any) => {
-                    const dateObj = new Date(b.gameBookingStartTime);
-                    return `${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
-                })
-        );
-    }, [allBookings, selectedDate, selectedGameId, editBookingId]);
-
-    // if i am in waiting list for 11-12 for any one game and then i try to book full sloat 11:30-12:00 so it not give me this access to wait for this sloat 
-    const waitedTimes = useMemo(() => {
-        if (!selectedDate || !user?.id) return [];
-        return allWaitingList.filter((w: any) => 
-                w.waitingStatusIsActive &&
-                w.targetSlotDatetime.startsWith(selectedDate) &&
-                (w.hostEmployeeId === user.id || w.bookingParticipantResponses?.some((p: any) => p.employeeId === user.id))
-            ).map((w: any) => {
-                const start = new Date(w.targetSlotDatetime);
-                return {
-                start: start.getHours() * 60 + start.getMinutes(),
-                end: start.getHours() * 60 + start.getMinutes() + w.gameSlotDuration
-                };
-            });
-    }, [allWaitingList, selectedDate, user?.id]);
-
-    // this is for like if i book 11-12 and then try to book 11:30-12:00 in other game then 11:30 should be marked as busy slot.
-    const myBusySlots = useMemo(() => {
-        if (!selectedDate || !user?.id) return [];
-        return allBookings.filter((b: any) => 
-            !b.gameBookingIsDeleted && 
-            b.gameBookingStatusId === 1 &&
-            b.gameBookingStartTime.startsWith(selectedDate) &&
-            (b.employeeId === user.id || b.bookingParticipantResponses?.some((p: any) => p.employeeId === user.id))
-        ).map((b: any) => {
-            const start = new Date(b.gameBookingStartTime);
-            const end = new Date(b.gameBookingEndTime);
-            return {
-            start: start.getHours() * 60 + start.getMinutes(),
-            end: end.getHours() * 60 + end.getMinutes()
-            };
-        });
-    }, [allBookings, selectedDate, user?.id]);
-
-    // if i book sloat with Participant but Participant is in other waiting list so that employee mark as In Waiting List
-    const busyWaitingEmployeeIds = useMemo(() => {
-        if (!selectedDate || !selectedTime || !selectedGame) return new Set<number>();
-
-        const selectedStartStr = `${selectedDate}T${selectedTime}:00`;
-        const selectedStart = new Date(selectedStartStr).getTime();
-        const selectedEnd = selectedStart + (selectedGame.gameSlotDuration * 60000);
-
-        const busyIds = new Set<number>();
-
-        allWaitingList.forEach((w: any) => {
-            if (!w.waitingStatusIsActive) return;
-
-            const wStart = new Date(w.targetSlotDatetime).getTime();
-            const wEnd = new Date(w.targetSlotDatetime).getTime() + (w.gameSlotDuration * 60000);
-
-            const isOverlapping = (selectedStart < wEnd && selectedEnd > wStart);
-
-            if (isOverlapping) {
-                busyIds.add(w.hostEmployeeId);
-                w.bookingParticipantResponses?.forEach((p: any) => busyIds.add(p.employeeId));
-            }
-        });
-
-        return busyIds;
-    }, [allWaitingList, selectedDate, selectedTime, selectedGame]);
-
-    // if i book sloat with Participant but Participant is in other booking so that employee mark as Already in a game
-    const busyEmployeeIds = useMemo(() => {
-        if (!selectedDate || !selectedTime || !selectedGame) return new Set<number>();
-
-        const selectedStartStr = `${selectedDate}T${selectedTime}:00`;
-        const selectedStart = new Date(selectedStartStr).getTime();
-        const selectedEnd = selectedStart + (selectedGame.gameSlotDuration * 60000);
-
-        const busyIds = new Set<number>();
-
-        allBookings.forEach((b: any) => {
-            if (b.gameBookingIsDeleted || b.gameBookingStatusId !== 1) return;
-
-            const bStart = new Date(b.gameBookingStartTime).getTime();
-            const bEnd = new Date(b.gameBookingEndTime).getTime();
-
-            const isOverlapping = (selectedStart < bEnd && selectedEnd > bStart);
-
-            if (isOverlapping) {
-                busyIds.add(b.employeeId);
-                b.bookingParticipantResponses?.forEach((p: any) => busyIds.add(p.employeeId));
-            }
-        });
-
-        return busyIds;
-    }, [allBookings, selectedDate, selectedTime, selectedGame]);
+    }, [editBookingId, bookingsByEmpId, reset]);
 
     const handleAddParticipant = (emp: any) => {
         if(!selectedGame) {
@@ -285,41 +173,34 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                                 <TableRow>
                                     <TableCell className="p-4">
                                         <div className="grid grid-cols-5 gap-2 p-4">
-                                            {slots.map((slot) => {
-                                                
-                                                const slotMinutes = parseInt(slot.split(":")[0]) * 60 + parseInt(slot.split(":")[1]);
-                                                const isPersonallyBusy = myBusySlots.some((busy: any) => 
-                                                slotMinutes >= busy.start && slotMinutes < busy.end
-                                                );
-                                                const isWaited = waitedTimes.some((wait: any) => 
-                                                slotMinutes >= wait.start && slotMinutes < wait.end
-                                                );
-
-                                                const slotDateTime = new Date(`${selectedDate}T${slot}:00`);
-                                                if (slotDateTime < new Date()) return null;
-                                                
-                                                const isBooked = bookedTimes.has(slot);
-                                                const isSelected = selectedTime === slot;
+                                            {slots?.map((slot: any) => {                                                
+                        
+                                                const isSelected = selectedTime === slot.time;
+                                                const isPersonallyBusy = slot.status === "BUSY";
+                                                const isBooked = slot.status === "FULL";
+                                                const isWaited = slot.status === "WAIT";
 
                                                 return (
                                                     <Button
-                                                        key={slot}
+                                                        key={slot.time}
                                                         type="button"
                                                         title={isPersonallyBusy ? "you are not avalible at this time." : ""}
                                                         disabled={isPersonallyBusy || isWaited}
                                                         className={cn(
-                                                            "text-xs h-10 transition-all border-2",                                                           isBooked && "bg-slate-200 text-slate-500",        
+                                                            "text-xs h-10 transition-all border-2",                    
+                                                            isBooked && "bg-slate-200 text-slate-500",                                         
                                                             isPersonallyBusy || isWaited && "bg-slate-200 text-slate-500 cursor-not-allowed",                                                    
                                                             isSelected && "bg-gray-900 text-black",
                                                             !isBooked && !isSelected && "text-slate-500"
                                                         )}
-                                                        onClick={() => setSelectedTime(slot)}
+                                                        onClick={() => setSelectedTime(slot.time)}
                                                     >
-                                                        {slot}
+                                                        {slot.time}
                                                         {isPersonallyBusy ? <span className="block text-[8px] mt-1 uppercase">Busy</span>
                                                         : isWaited ? <span className="block text-[8px] mt-1 uppercase">Wait</span>
                                                         : isBooked ? <span className="block text-[8px] mt-1 uppercase">Full</span>
                                                         : null}
+                                                        
                                                     </Button>
                                                 );
                                             })}
@@ -348,26 +229,18 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                         {showDropdown && suggestions.length > 0 && (
                             <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-40 overflow-y-auto">
                                 {suggestions.map((emp: any,) => {
-                                const isBusy = busyEmployeeIds.has(emp.id) || busyWaitingEmployeeIds.has(emp.id);
 
                                 if (emp.id === user?.id || selectedParticipants.find(e => e.id === emp.id)) return null;
 
                                 return (
                                 <button
                                     key={emp.id}
-                                    className={cn(
-                                                "w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors",
-                                                isBusy ? "bg-slate-50 opacity-60 cursor-not-allowed" : ""
-                                            )}
-                                    onClick={() => !isBusy && handleAddParticipant(emp)}
-                                    disabled={isBusy}
+                                    className="w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors"
+                                    onClick={() => handleAddParticipant(emp)}
                                 >
-                                    <User size={14} className={isBusy ? "text-slate-400" : "text-blue-600"} />
+                                    <User size={14} className="text-blue-600" />
                                     <div className="flex flex-col">
                                         <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
-                                        {isBusy ? busyWaitingEmployeeIds.has(emp.id) ? <span className="text-[10px] text-orange-500 font-bold">In waiting list</span> 
-                                         : <span className="text-[10px] text-red-500 font-bold">Already in a game</span>
-                                         : <span className="text-[10px] text-green-500 font-bold">Available</span>}
                                     </div>
                                 </button>
                                 );

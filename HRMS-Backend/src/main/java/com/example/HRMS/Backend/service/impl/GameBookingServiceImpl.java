@@ -15,10 +15,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -686,6 +684,55 @@ public class GameBookingServiceImpl implements GameBookingService {
         if(!emails.isEmpty()){
             emailService.sendEmail(emails, "Game Booking complete","You are added in Game booking by your friend at :" + Instant.now());
         }
+    }
+
+    @Override
+    public List<SlotAvailabilityResponse> getAvailableSlots(Long gameTypeId, Long employeeId, LocalDate date) {
+        GameType game = gameTypeRepository.findGameTypeById(gameTypeId);
+        List<SlotAvailabilityResponse> response = new ArrayList<>();
+
+        LocalTime current = game.getOperatingStart().toLocalTime();
+        LocalTime end = game.getOperatingEnd().toLocalTime();
+
+        List<GameBooking> dayBookings = gameBookingRepository.findActiveBookingsByDate(date);
+        List<BookingWaitingList> dayWaiting = waitlistRepository.findActiveWaitingByDate(date, employeeId);
+
+        while (current.isBefore(end)) {
+            LocalDateTime slotStart = LocalDateTime.of(date, current);
+            if(slotStart.isAfter(LocalDateTime.now())) {
+
+                LocalDateTime slotEnd = slotStart.plusMinutes(game.getGameSlotDuration());
+                String timeStr = current.toString();
+
+                String status = "AVAILABLE";
+
+                boolean isFull = dayBookings.stream().anyMatch(b ->
+                        b.getFkGameType().getId().equals(gameTypeId) &&
+                                b.getGameBookingStartTime().equals(slotStart));
+
+                boolean isUserInBooking = dayBookings.stream().anyMatch(b -> {
+                    boolean isParticipant = bookingParticipantRepository.findByFkGameBooking_Id(b.getId()).stream().anyMatch(p -> p.getFkEmployee().getId().equals(employeeId)) &&
+                            (slotStart.isBefore(b.getGameBookingEndTime()) && slotEnd.isAfter(b.getGameBookingStartTime()));
+                    boolean isHost = b.getFkHostEmployee().getId().equals(employeeId);
+
+                    boolean overlaps = slotStart.isBefore(b.getGameBookingEndTime()) &&
+                            slotEnd.isAfter(b.getGameBookingStartTime());
+
+                    return (isHost || isParticipant) && overlaps;
+                });
+
+                boolean isWaiting = dayWaiting.stream().anyMatch(w ->
+                        (slotStart.isBefore(w.getTargetSlotEndDatetime()) && slotEnd.isAfter(w.getTargetSlotDatetime())));
+
+                if (isFull) status = "FULL";
+                else if (isUserInBooking) status = "BUSY";
+                else if (isWaiting) status = "WAIT";
+
+                response.add(new SlotAvailabilityResponse(timeStr, status));
+            }
+            current = current.plusMinutes(game.getGameSlotDuration());
+        }
+        return response;
     }
 
 }

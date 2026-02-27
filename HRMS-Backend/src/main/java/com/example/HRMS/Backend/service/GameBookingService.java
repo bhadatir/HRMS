@@ -1,14 +1,12 @@
 package com.example.HRMS.Backend.service;
 
-import com.example.HRMS.Backend.dto.BookingWaitingListResponse;
-import com.example.HRMS.Backend.dto.EmployeeGameInterestResponse;
-import com.example.HRMS.Backend.dto.GameBookingRequest;
-import com.example.HRMS.Backend.dto.GameBookingResponse;
+import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.BookingParticipant;
 import com.example.HRMS.Backend.model.BookingWaitingList;
 import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameType;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,4 +45,7 @@ public interface GameBookingService {
     List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId);
 
     List<GameBookingResponse> findUpcommingBooking();
-}
+
+    List<SlotAvailabilityResponse> getAvailableSlots(Long gameTypeId, Long employeeId, LocalDate date);
+
+    }

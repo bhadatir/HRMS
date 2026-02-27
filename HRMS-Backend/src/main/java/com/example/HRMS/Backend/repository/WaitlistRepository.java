@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -73,4 +74,11 @@ public interface WaitlistRepository extends JpaRepository<BookingWaitingList,Lon
                                      @Param("end") LocalDateTime end);
 
     List<BookingWaitingList> findBookingWaitingListsByFkHostEmployee(Employee employeeById);
+
+    @Query("SELECT w FROM BookingWaitingList w LEFT JOIN BookingParticipant wp ON wp.fkBookingWaitingList.id = w.id " +
+            "WHERE w.waitingStatusIsActive = true " +
+            "AND CAST(w.targetSlotDatetime AS LocalDate) = :date " +
+            "AND (w.fkHostEmployee.id = :empId OR wp.fkEmployee.id = :empId)")
+    List<BookingWaitingList> findActiveWaitingByDate(@Param("date") LocalDate date, @Param("empId") Long empId);
+
 }
