@@ -6,7 +6,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Gamepad2, X, Bell, Gamepad, Calendar, Clock, Trash, Search } from "lucide-react";
+import { Plus, Gamepad2, X, Bell, Gamepad, Calendar, Clock, Trash, Search, ArrowRight, ArrowLeft } from "lucide-react";
 import GameBookingForm from "../components/GameBookingForm";
 import GameTypeManager from "@/components/GameTypeManager";
 import Notifications from "@/components/Notifications";
@@ -30,6 +30,8 @@ export default function GameManagement() {
     const [waitingListId, setWaitingListId] = useState<number>(0);
     const [bookingSearchTerm, setBookingSearchTerm] = useState("");
     const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
+    const [page, setPage] = useState(0);
+    const [size] = useState(10);
 
     const { data: gameTypes = [] } = useQuery({
         queryKey: ["gameTypes"],
@@ -50,11 +52,15 @@ export default function GameManagement() {
         queryKey: ["WaitingList", user?.id], 
         queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, token!) });
 
-    const { data: bookingsByEmpId = [], isLoading } = useQuery({
-        queryKey: ["Bookings", user?.id],
-        queryFn: () => gameService.findGameBookingById(user?.id, token!),
-        select: (bookings) => bookings.filter((b: any) => (!gameType || b.gameTypeId === gameType) && (!gameBookingStatusId || b.gameBookingStatusId === gameBookingStatusId))
+    const { data: bookingsByEmpId, isLoading } = useQuery({
+        queryKey: ["Bookings", user?.id, page, bookingSearchTerm],
+        queryFn: () => gameService.findGameBookingById(user?.id, bookingSearchTerm, page, size, token!),
+        enabled: !!user?.id,
+        placeholderData: (previousData) => previousData,
     });
+
+    const filteredBookings = bookingsByEmpId?.content || [];   
+      
 
     const statusMutation = useMutation({
         mutationFn: ({ id, status }: { id: number, status: number }) => 
@@ -65,15 +71,6 @@ export default function GameManagement() {
     const removeWaitingListMutation = useMutation({
         mutationFn: (id: number) => gameService.deleteWaitingList(id, token!),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] })
-    });
-
-    const filteredBookings = bookingsByEmpId.filter((b: any) => {
-        const searchTerm = bookingSearchTerm?.toLowerCase();
-        return b.gameTypeName.toLowerCase().includes(searchTerm) ||
-            b.employeeEmail.toLowerCase().includes(searchTerm) ||
-            b.gameBookingStartTime.toLowerCase().includes(searchTerm) ||
-            b.gameBookingEndTime.toLowerCase().includes(searchTerm) ||
-            b.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(searchTerm));          
     });
 
     const filteredWaitingList = WaitingListByEmpId.filter((w: any) => {
@@ -225,6 +222,7 @@ export default function GameManagement() {
                                     onChange={(e) => {
                                     if(viewMode === "My Bookings") {
                                         setBookingSearchTerm(e.target.value);
+                                        setPage(0);
                                     } else {
                                         setWaitingListSearchTerm(e.target.value);
                                     }
@@ -243,19 +241,44 @@ export default function GameManagement() {
                     {viewMode === "My Bookings" && (
                     <div className="mt-2">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
-                        {filteredBookings.length > 0 ? (
+                        {filteredBookings && filteredBookings.length > 0 ? (
                             <>                                
-                                {filteredBookings
-                                    .sort((a: any, b: any) => new Date(b.gameBookingStartTime).getTime() - new Date(a.gameBookingStartTime).getTime())
-                                    .map((b: any) => ((b.employeeId === user?.id || b.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id)) 
-                                    && !b.gameBookingIsDeleted) && (
+                                {filteredBookings.filter((b: any) => (!gameType || b.gameTypeId === gameType) && (!gameBookingStatusId || b.gameBookingStatusId === gameBookingStatusId))
+                                    .map((b: any) => 
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />        
-                                ))}
+                                )}
                             </>
-                        ): (
+                        ) : (
                             <p className="text-slate-500 italic">You have no bookings yet.</p>
                         )}
                         </div>
+                        {bookingsByEmpId?.totalPages > 0  ? (
+                            <div className="flex justify-center gap-4 mt-6">
+                                <Button 
+                                className="text-gray-700"
+                                disabled={page === 0}
+                                onClick={() => setPage(old => Math.max(old - 1, 0))}
+                                >
+                                <ArrowLeft size={16} className="mr-2" />Previous
+                                </Button>
+
+                                <span className="text-sm text-gray-600 mt-2">
+                                Page {page + 1} of {bookingsByEmpId?.totalPages ?? 1}
+                                </span>
+
+                                <Button
+                                className="text-gray-700"
+                                disabled={page + 1 >= (bookingsByEmpId?.totalPages ?? 1)}
+                                onClick={() => {
+                                    if (page + 1 < (bookingsByEmpId?.totalPages ?? 1)) {
+                                    setPage(old => old + 1);
+                                    }
+                                }}
+                                >
+                                Next <ArrowRight size={16} className="ml-2" />
+                                </Button>
+                            </div>
+                            ):null}
                     </div>
                     )}
 

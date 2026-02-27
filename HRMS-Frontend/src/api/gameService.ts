@@ -77,8 +77,8 @@ export const gameService = {
 
 
 
-    findGameBookingById: async (gameBookingId: number, token: string) => {
-        const res = await api.get(`/game/${gameBookingId}`, authHeader(token));
+    findGameBookingById: async (gameBookingId: number, searchTerm: string, page: number, size: number, token: string) => {
+        const res = await api.get(`/game/${gameBookingId}?searchTerm=${searchTerm}&page=${page}&size=${size}`, authHeader(token));
         return res.data;
     },
 

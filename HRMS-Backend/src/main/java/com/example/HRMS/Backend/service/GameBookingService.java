@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.model.BookingParticipant;
 import com.example.HRMS.Backend.model.BookingWaitingList;
 import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameType;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ public interface GameBookingService {
 
     void updateWaitingList(GameType gameType, LocalDateTime targetedSloatTime);
 
-    List<GameBookingResponse> findBookingByEmpId(Long empId);
+    Page<GameBookingResponse> findBookingByEmpId(Long empId, String searchTerm, int page, int size);
 
     void updateGameBooking(Long bookingId, GameBookingRequest gameBookingRequest);
 

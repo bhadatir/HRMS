@@ -10,6 +10,9 @@ import com.example.HRMS.Backend.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -538,38 +542,20 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public List<GameBookingResponse> findBookingByEmpId(Long empId)
-    {
-        List<GameBooking> gameBookings = gameBookingRepository.findGameBookingByFkHostEmployee_Id(empId);
-        List<GameBookingResponse> gameBookingResponses = new ArrayList<>();
-        for(GameBooking gameBooking : gameBookings)
-        {
-            GameBookingResponse gameBookingResponse = modelMapper.map(gameBooking,GameBookingResponse.class);
+    public Page<GameBookingResponse> findBookingByEmpId(Long empId, String searchTerm, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
 
-            List<BookingParticipantResponse> bookingParticipantResponses =
+        Page<GameBooking> gameBookings = gameBookingRepository.findBookingsByUserAndSearch(empId, searchTerm, pageable);
+
+        return gameBookings.map(gameBooking -> {
+            GameBookingResponse response = modelMapper.map(gameBooking, GameBookingResponse.class);
+
+            List<BookingParticipantResponse> participants =
                     bookingParticipantRepository.findAllByGameBookingId(gameBooking.getId());
 
-            gameBookingResponse.setBookingParticipantResponses(bookingParticipantResponses);
-
-            gameBookingResponses.add(gameBookingResponse);
-        }
-        List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findBookingParticipantByFkEmployee(employeeRepository.findEmployeeById(empId));
-
-        for(BookingParticipant bookingParticipant : bookingParticipants)
-        {
-            if(bookingParticipant.getFkGameBooking() != null){
-                GameBookingResponse gameBookingResponse = modelMapper.map(bookingParticipant.getFkGameBooking(),GameBookingResponse.class);
-
-                List<BookingParticipantResponse> bookingParticipantResponses =
-                        bookingParticipantRepository.findAllByGameBookingId(bookingParticipant.getFkGameBooking().getId());
-
-                gameBookingResponse.setBookingParticipantResponses(bookingParticipantResponses);
-
-                gameBookingResponses.add(gameBookingResponse);
-            }
-        }
-
-        return gameBookingResponses;
+            response.setBookingParticipantResponses(participants);
+            return response;
+        });
     }
 
     @Override

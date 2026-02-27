@@ -24,7 +24,7 @@ export default function PostManagement() {
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
-  const [size] = useState(20);
+  const [size] = useState(2);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -237,7 +237,7 @@ export default function PostManagement() {
             )
             )}
 
-            {filteredPosts.length > 0  ? (
+            {allPosts?.totalPages > 0  ? (
               <div className="flex justify-center gap-4 mt-6">
                 <Button 
                   className="text-gray-700"
@@ -248,14 +248,14 @@ export default function PostManagement() {
                 </Button>
 
                 <span className="text-sm text-gray-600 mt-2">
-                  Page {page + 1} of {filteredPosts?.totalPages ?? 1}
+                  Page {page + 1} of {allPosts?.totalPages ?? 1}
                 </span>
 
                 <Button
                   className="text-gray-700"
-                  disabled={page + 1 >= (filteredPosts?.totalPages ?? 1)}
+                  disabled={page + 1 >= (allPosts?.totalPages ?? 1)}
                   onClick={() => {
-                    if (page + 1 < (filteredPosts?.totalPages ?? 1)) {
+                    if (page + 1 < (allPosts?.totalPages ?? 1)) {
                       setPage(old => old + 1);
                     }
                   }}

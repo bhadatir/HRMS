@@ -1,7 +1,10 @@
 package com.example.HRMS.Backend.repository;
 
+import com.example.HRMS.Backend.model.BookingParticipant;
 import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,7 +19,16 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
 
     List<GameBooking> findGameBookingByFkGameType_Id(Long fkGameTypeId);
 
-    List<GameBooking> findGameBookingByFkHostEmployee_Id(Long fkHostEmployeeId);
+    @Query("SELECT DISTINCT b FROM GameBooking b " +
+                "LEFT JOIN BookingParticipant bp ON bp.fkGameBooking.id = b.id " +
+                "WHERE (b.fkHostEmployee.id = :empId OR bp.fkEmployee.id = :empId) " +
+                "AND b.gameBookingIsDeleted = false " +
+                "AND (lower(b.fkGameType.gameName) LIKE lower(concat(:searchTerm, '%')) " +
+                "OR lower(b.fkHostEmployee.employeeFirstName) LIKE lower(concat(:searchTerm, '%'))) " +
+                "ORDER BY b.gameBookingStartTime DESC")
+    Page<GameBooking> findBookingsByUserAndSearch(@Param("empId") Long empId,
+                                                      @Param("searchTerm") String searchTerm,
+                                                      Pageable pageable);
 
     GameBooking findGameBookingById(Long pkGameBookingId);
 

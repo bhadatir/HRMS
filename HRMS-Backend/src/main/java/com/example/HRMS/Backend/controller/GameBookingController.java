@@ -10,6 +10,7 @@ import com.example.HRMS.Backend.repository.WaitlistRepository;
 import com.example.HRMS.Backend.service.GameBookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,8 +39,11 @@ public class GameBookingController {
     }
 
     @GetMapping("/{empId}")
-    public ResponseEntity<List<GameBookingResponse>> bookingByEmpId(@PathVariable Long empId){
-        return ResponseEntity.ok(gameBookingService.findBookingByEmpId(empId));
+    public Page<GameBookingResponse> bookingByEmpId(@PathVariable Long empId,
+                                      @RequestParam String searchTerm,
+                                      @RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "10") int size) {
+        return gameBookingService.findBookingByEmpId(empId, searchTerm, page, size);
     }
 
     @GetMapping("/upcommingBooking")
