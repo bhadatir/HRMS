@@ -202,7 +202,9 @@ public class AuthServiceImpl implements AuthService {
 
         List<EmployeeSearch> filteredList = employeeSearches.getContent()
                 .stream()
-                .filter(emp -> !travelPlanRepository.findAllByGameBookingStartTimeBetween(emp.getId(), startDate, endDate))
+                .filter(emp -> {
+                    return !travelPlanRepository.findAllByTravelStartTimeBetween(emp.getId(), startDate, endDate);
+                })
                 .collect(Collectors.toList());
 
         return new PageImpl<>(filteredList, pageable, filteredList.size());

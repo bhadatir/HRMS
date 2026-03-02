@@ -54,7 +54,7 @@ export default function GameManagement() {
 
     const { data: bookingsByEmpId, isLoading } = useQuery({
         queryKey: ["Bookings", user?.id, page, bookingSearchTerm],
-        queryFn: () => gameService.findGameBookingById(user?.id, bookingSearchTerm, page, size, token!),
+        queryFn: () => gameService.findGameBookingByUserId(user?.id, bookingSearchTerm, page, size, token!),
         enabled: !!user?.id,
         placeholderData: (previousData) => previousData,
     });

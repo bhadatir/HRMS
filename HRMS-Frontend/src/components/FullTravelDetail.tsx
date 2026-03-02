@@ -31,24 +31,10 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
   });
 
   const {data: allDocs = [], isLoading: docsLoading} = useQuery({
-    queryKey: ["travelPlanDocs", travelPlan],
-    queryFn: () => travelService.findTravelDocByPlanId(travelPlan!, token || ""),
+    queryKey: ["travelPlanDocs", travelPlan, docSearchTerm],
+    queryFn: () => travelService.findTravelDocByPlanId(travelPlan!, user?.id || 0, docSearchTerm, token || ""),
     enabled: !!token && !!travelPlan && viewMode === "DOCUMENTS",
-    select: (data) => {
-      if(user?.roleName === "HR" || user?.roleName === "EMPLOYEE") return data;
-      if(user?.roleName === "MANAGER") {
-        return data.filter((doc: any) => doc.employeeFkManagerEmployeeId === user.id || doc.employeeId === user.id);
-      }
-      return [];
-    }
   });
-
-  const allDocsFiltered = allDocs.filter((doc: any) =>
-    doc.travelDocsTypeName.toLowerCase().includes(docSearchTerm.toLowerCase()) ||
-    doc.employeeEmail.toLowerCase().includes(docSearchTerm.toLowerCase()) ||
-    doc.travelDocUploadedAt.toLowerCase().includes(docSearchTerm.toLowerCase()) ||
-    doc.fkRoleRoleName.toLowerCase().includes(docSearchTerm.toLowerCase())
-  );
 
   const allExpenses = expenseResults.flatMap((result) => result.data || []);
   const filteredExpenses = allExpenses.filter((exp: any) =>
@@ -76,9 +62,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["travelPlan", travelPlan]});
       await queryClient.invalidateQueries({ queryKey: ["travelPlanExpense"] });
-
-      await queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
-      
+      await queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });      
       alert("Status updated successfully");
       // onSuccess();
     },
@@ -132,6 +116,18 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                   <p className="text-xs text-slate-500 font-bold uppercase">Created At</p>
                   <p className="font-semibold">{plan?.travelPlanCreatedAt.split("T")[0]}</p>
                 </div>
+              </div>
+              <div className="col-span-1 md:col-span-3">
+                <p className="text-xs text-slate-500 font-bold uppercase">Travel Plan Deleted Members</p>
+                <p className="font-semibold">{plan?.employeeTravelPlanResponses?.map((e: any) => {
+                  return e.employeeIsDeletedFromTravel === true ? `${e.employeeEmail}` : null;
+                }).filter((name: any) => name !== null).join(", ")}</p>
+              </div>
+              <div className="col-span-1 md:col-span-3">
+                <p className="text-xs text-slate-500 font-bold uppercase">Travel Plan Active Members</p>
+                <p className="font-semibold">{plan?.employeeTravelPlanResponses?.map((e: any) => {
+                  return e.employeeIsDeletedFromTravel === false ? `${e.employeeEmail}` : null;
+                }).filter((name: any) => name !== null).join(", ")}</p>
               </div>
             </CardContent>
         </Card>
@@ -271,7 +267,8 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                     </TableRow>
                   )
                 ):(
-                  allDocsFiltered.map((doc: any) => (
+                  <>
+                  {allDocs.map((doc: any) => (
                     !doc.docIsDeletedFromTravel ? (
                     <TableRow key={doc.id}>
                       <TableCell className="font-medium">{doc.travelDocsTypeName}</TableCell>
@@ -286,9 +283,10 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                       </TableCell>
                     </TableRow>
                     ) : null
-                ))
+                ))}
+                </>
               )}
-              {viewMode === "DOCUMENTS" && allDocsFiltered.length === 0 && (
+              {viewMode === "DOCUMENTS" && allDocs.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-10">
                     <div className="flex flex-col items-center gap-2">

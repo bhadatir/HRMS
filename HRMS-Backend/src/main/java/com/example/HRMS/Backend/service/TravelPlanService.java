@@ -36,7 +36,7 @@ public interface TravelPlanService {
 
     List<TravelDocResponse> findTravelDocByFkEmployeeId(Long empId,Long travelPlanId);
 
-    List<TravelDocResponse> findAllTravelPlanDocByTravelPlan(Long travelPlanId);
+    List<TravelDocResponse> findAllTravelPlanDocByTravelPlan(Long travelPlanId, Long empId, String searchTerm);
 
     void markAsDeleted(Long travelPlanId, String reason);
 

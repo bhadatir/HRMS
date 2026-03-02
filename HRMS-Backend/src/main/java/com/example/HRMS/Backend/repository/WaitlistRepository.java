@@ -81,4 +81,14 @@ public interface WaitlistRepository extends JpaRepository<BookingWaitingList,Lon
             "AND (w.fkHostEmployee.id = :empId OR wp.fkEmployee.id = :empId)")
     List<BookingWaitingList> findActiveWaitingByDate(@Param("date") LocalDate date, @Param("empId") Long empId);
 
+    @Query("SELECT DISTINCT w FROM BookingWaitingList w " +
+            "JOIN BookingParticipant wp on wp.fkBookingWaitingList = w " +
+            "WHERE w.waitingStatusIsActive = true " +
+            "AND (w.fkHostEmployee.id IN :empIds OR wp.fkEmployee.id IN :empIds) " +
+            "AND (CAST(w.targetSlotDatetime AS LocalDate) <= :endDate " +
+            "AND CAST(w.targetSlotEndDatetime AS LocalDate) >= :startDate)")
+    List<BookingWaitingList> findOverlappingWaitlists(@Param("empIds") List<Long> empIds,
+                                                      @Param("startDate") LocalDate startDate,
+                                                      @Param("endDate") LocalDate endDate);
+
 }

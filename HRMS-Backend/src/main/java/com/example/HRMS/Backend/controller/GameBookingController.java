@@ -38,7 +38,7 @@ public class GameBookingController {
         return ResponseEntity.ok(gameBookingService.findAllGameBooking());
     }
 
-    @GetMapping("/{empId}")
+    @GetMapping("/empId/{empId}")
     public Page<GameBookingResponse> bookingByEmpId(@PathVariable Long empId,
                                       @RequestParam String searchTerm,
                                       @RequestParam(defaultValue = "0") int page,

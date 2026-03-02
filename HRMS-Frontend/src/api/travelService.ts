@@ -107,8 +107,8 @@ export const travelService = {
     return res.data;
   },
 
-  findTravelDocByPlanId: async (travelPlanId: number, token: string) => {
-    const res = await api.get(`/travel/travelDoc/${travelPlanId}`, authHeader(token));
+  findTravelDocByPlanId: async (travelPlanId: number, empId: number, searchTerm: string, token: string) => {
+    const res = await api.get(`/travel/travelDoc/${travelPlanId}?empId=${empId}&searchTerm=${searchTerm}`, authHeader(token));
     return res.data;
   }
 

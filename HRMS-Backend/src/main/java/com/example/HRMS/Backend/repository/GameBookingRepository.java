@@ -65,6 +65,24 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
                                      @Param("start") LocalDateTime start,
                                      @Param("end") LocalDateTime end);
 
+    @Query("SELECT COUNT(b) > 0 FROM GameBooking b " +
+            "WHERE b.fkHostEmployee.id = :empId " +
+            "AND b.gameBookingIsDeleted = false " +
+            "AND ((:start <= cast(b.gameBookingEndTime as date) AND :end >= cast(b.gameBookingStartTime as date)))")
+    boolean existsOverlappingBookingBYDate(@Param("empId") Long empId,
+                                     @Param("start") LocalDate start,
+                                     @Param("end") LocalDate end);
+
+        @Query("SELECT DISTINCT b FROM GameBooking b " +
+                "JOIN BookingParticipant bp on bp.fkGameBooking = b " +
+                "WHERE b.gameBookingIsDeleted = false " +
+                "AND (b.fkHostEmployee.id IN :empIds OR bp.fkEmployee.id IN :empIds) " +
+                "AND (CAST(b.gameBookingStartTime AS LocalDate) <= :endDate " +
+                "AND CAST(b.gameBookingEndTime AS LocalDate) >= :startDate)")
+        List<GameBooking> findOverlappingBookings(@Param("empIds") List<Long> empIds,
+                                                  @Param("startDate") LocalDate startDate,
+                                                  @Param("endDate") LocalDate endDate);
+
     @Query("SELECT b FROM GameBooking b WHERE b.gameBookingIsDeleted = false " +
             "AND b.fkGameBookingStatus.id = 1 " +
             "AND b.gameBookingIsDeleted = false " +

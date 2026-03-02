@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.repository;
 
 import com.example.HRMS.Backend.model.Employee;
+import com.example.HRMS.Backend.model.EmployeeTravelPlan;
 import com.example.HRMS.Backend.model.TravelPlan;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -48,6 +49,7 @@ public interface TravelPlanRepository extends JpaRepository<TravelPlan, Long> {
           AND tp.travelPlanIsDeleted = false
           AND emp.employeeIsDeletedFromTravel = false
     """)
-    boolean findAllByGameBookingStartTimeBetween(Long id,  LocalDate startDate, LocalDate endDate);
+    boolean findAllByTravelStartTimeBetween(Long id,  LocalDate startDate, LocalDate endDate);
+
 }
 

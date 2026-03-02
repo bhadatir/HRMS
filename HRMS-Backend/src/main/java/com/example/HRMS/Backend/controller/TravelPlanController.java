@@ -91,8 +91,10 @@ public class TravelPlanController {
     }
 
     @GetMapping("/travelDoc/{travelPlanId}")
-    public ResponseEntity<List<TravelDocResponse>> showAllTravelPlanDocByTravelPlan(@PathVariable Long travelPlanId) {
-        return ResponseEntity.ok(travelPlanService.findAllTravelPlanDocByTravelPlan(travelPlanId));
+    public ResponseEntity<List<TravelDocResponse>> showAllTravelPlanDocByTravelPlan(@PathVariable Long travelPlanId,
+                                                                                    @RequestParam Long empId,
+                                                                                    @RequestParam String searchTerm){
+        return ResponseEntity.ok(travelPlanService.findAllTravelPlanDocByTravelPlan(travelPlanId, empId, searchTerm));
     }
 
     @GetMapping("/docTypes")

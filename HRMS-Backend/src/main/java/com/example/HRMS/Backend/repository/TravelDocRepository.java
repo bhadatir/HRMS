@@ -5,6 +5,8 @@ import com.example.HRMS.Backend.model.EmployeeTravelPlan;
 import com.example.HRMS.Backend.model.TravelDoc;
 import com.example.HRMS.Backend.model.TravelPlan;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,8 +29,6 @@ public interface TravelDocRepository extends JpaRepository<TravelDoc, Long> {
 
     List<TravelDoc> findTravelDocsByFkEmployeeTravelPlan_Id(Long employeeTravelPlanId);
 
-    List<TravelDoc> findByFkTravelPlan(TravelPlan fkTravelPlan);
-
     @Modifying
     @Transactional
     @Query("UPDATE TravelDoc td " +
@@ -39,5 +39,28 @@ public interface TravelDocRepository extends JpaRepository<TravelDoc, Long> {
 
     List<TravelDoc> findByFkEmployeeAndFkTravelPlan(Employee fkEmployee, TravelPlan fkTravelPlan);
 
-    List<TravelDoc> findTravelDocsByFkTravelPlan(TravelPlan fkTravelPlan);
+    @Query("SELECT DISTINCT td FROM TravelDoc td " +
+            "LEFT JOIN td.fkEmployeeTravelPlan etp " +
+            "WHERE (td.fkTravelPlan.id = :fkTravelPlanId OR etp.fkTravelPlan.id = :fkTravelPlanId) " +
+            "AND (" +
+            "   :roleId = 3 " +
+            "   OR (:roleId = 2 AND (td.fkEmployee.id = :empId OR td.fkEmployee.fkManagerEmployee.id = :empId)) " +
+            "   OR (:roleId = 1 AND EXISTS ( " +
+            "       SELECT 1 FROM EmployeeTravelPlan memberCheck " +
+            "       WHERE memberCheck.fkTravelPlan.id = :fkTravelPlanId " +
+            "       AND memberCheck.fkEmployee.id = :empId " +
+            "       AND memberCheck.employeeIsDeletedFromTravel = false" +
+            "   ))" +
+            ") " +
+            "AND (lower(td.fkEmployee.employeeEmail) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR lower(td.fkTravelDocsType.travelDocsTypeName) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR CAST(td.travelDocUploadedAt AS string) LIKE concat(:searchTerm, '%')) " +
+            "ORDER BY td.travelDocUploadedAt DESC")
+    List<TravelDoc> findTravelDocs(
+            @Param("fkTravelPlanId") Long fkTravelPlanId,
+            @Param("empId") Long empId,
+            @Param("roleId") Long roleId,
+            @Param("searchTerm") String searchTerm
+    );
+
 }

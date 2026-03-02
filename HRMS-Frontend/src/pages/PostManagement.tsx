@@ -24,7 +24,7 @@ export default function PostManagement() {
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
-  const [size] = useState(2);
+  const [size] = useState(20);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);

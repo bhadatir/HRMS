@@ -27,11 +27,6 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         queryKey: ["allGameTypes"], 
         queryFn: () => gameService.getAllGames(token!) });
 
-    const { data: bookingsByEmpId = [] } = useQuery({
-        queryKey: ["Bookings", user?.id],
-        queryFn: () => gameService.findGameBookingById(user?.id, token!),
-    });
-
     const { data: myInterests = [] } = useQuery({
         queryKey: ["myInterests", user?.id],
         queryFn: () => gameService.getEmployeeGameInterests(user?.id!, token!),
@@ -89,25 +84,6 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         enabled: searchTerm.length >= 1 && !!slotStartDateTime && !!selectedGameId,
     });
     const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
-
-    useEffect(() => {
-        if (editBookingId) {
-            const booking = bookingsByEmpId.find((b: any) => b.id === editBookingId);
-            if (booking) {
-                const startTime = new Date(booking.gameBookingStartTime);
-                const timeStr = `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
-                
-                setSelectedTime(timeStr);
-                const participants = booking.bookingParticipantResponses?.map((p: any) => ({ id: p.employeeId, name: `${p.employeeFirstName} ${p.employeeLastName}` })) || [];
-                setSelectedParticipants(participants);
-
-                reset({
-                    gameTypeId: booking.gameTypeId,
-                    date: booking.gameBookingStartTime.split("T")[0],
-                });
-            }
-        }
-    }, [editBookingId, bookingsByEmpId, reset]);
 
     const handleAddParticipant = (emp: any) => {
         if(!selectedGame) {

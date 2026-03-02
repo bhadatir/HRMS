@@ -50,177 +50,117 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     private final EmployeeGameInterestRepository employeeGameInterestRepository;
 
+    private final TravelPlanRepository travelPlanRepository;
 
 
-    //it, handle game sloat booking request by checking available sloat
-    // and in single chain how many times this given host employee play.
     @Override
     @Transactional
-    public String attemptBooking(GameBookingRequest gameBookingRequest) {
-
-        Long empId = gameBookingRequest.getEmpId();
-        Long gameTypeId = gameBookingRequest.getGameTypeId();
-
-        EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id(empId, gameTypeId);
-        if(employeeGameInterest == null || employeeGameInterest.isInterestDeleted()){
-            return "you are not interested in this game.";
-        }
-        List<Long> bookingParticipantsEmpId = gameBookingRequest.getBookingParticipantsEmpId();
-
-        if (bookingParticipantsEmpId.isEmpty()) {
-            throw new IllegalArgumentException("Participant list cannot be null or empty");
-        }
-
-        for(Long id : bookingParticipantsEmpId) {
-            EmployeeGameInterest employeeGameInterest1 = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
-                    (id, gameTypeId);
-            if (employeeGameInterest1 == null || employeeGameInterest1.isInterestDeleted()) {
-                return "your participant are not interested in this game.";
-            }
-        }
+    public String attemptBooking(GameBookingRequest request) {
+        Long empId = request.getEmpId();
+        Long gameTypeId = request.getGameTypeId();
+        LocalDateTime startTime = request.getRequestedSlotStartTime();
+        List<Long> participantIds = request.getBookingParticipantsEmpId();
 
         GameType gameType = gameTypeRepository.findGameTypeById(gameTypeId);
-        int gameSlotDuration = gameType.getGameSlotDuration();
-
-        LocalDateTime requestedSlotStartTime = gameBookingRequest.getRequestedSlotStartTime();
+        LocalDateTime endTime = startTime.plusMinutes(gameType.getGameSlotDuration());
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime sloatEndTime = requestedSlotStartTime.plusMinutes(gameSlotDuration);
+        LocalDateTime tomorrowStart = now.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        LocalDateTime tomorrow = now.plusDays(1).minusHours(LocalDateTime.now().getHour()).minusMinutes(LocalDateTime.now().getMinute());
-
-        if(requestedSlotStartTime.isBefore(tomorrow) && gameBookingRepository.hasActiveBookingInCycle(empId, gameTypeId)){
-            return "Only one active booking allow per game per day.";
-        }
-
-        //for game booking
-        if (gameBookingRepository.existsOverlappingBooking(gameBookingRequest.getEmpId(), requestedSlotStartTime, sloatEndTime)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have another game booked at this time.");
-        }
-
-        if (requestedSlotStartTime.isBefore(now)) {
+        if (startTime.isBefore(now)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot book a slot in the past.");
         }
-
-        for (Long participantId : gameBookingRequest.getBookingParticipantsEmpId()) {
-            if (gameBookingRepository.existsOverlappingBooking(participantId, requestedSlotStartTime, sloatEndTime)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "One of your participants is already in another game at this time.");
-            }
+        if (participantIds == null || participantIds.isEmpty()) {
+            throw new IllegalArgumentException("Participant list cannot be empty");
         }
 
-        //for game booking participant
-        if (bookingParticipantRepository.existsOverlappingBookingParticipant(gameBookingRequest.getEmpId(), requestedSlotStartTime, sloatEndTime)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have participant in another game booked at this time.");
+        EmployeeGameInterest hostInterest = validateInterest(empId, gameTypeId);
+        for (Long pId : participantIds) {
+            validateInterest(pId, gameTypeId);
         }
 
-        for (Long participantId : gameBookingRequest.getBookingParticipantsEmpId()) {
-            if (bookingParticipantRepository.existsOverlappingBookingParticipant(participantId, requestedSlotStartTime, sloatEndTime)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "One of your participants is already in another game booking participant at this time.");
-            }
+        List<Long> allInvolved = new ArrayList<>(participantIds);
+        allInvolved.add(empId);
+
+        for (Long id : allInvolved) {
+            validateNoConflicts(id, startTime, endTime);
         }
 
-        //for game booking waiting list
-        if (waitlistRepository.existsOverlappingBookingWaitingList(gameBookingRequest.getEmpId(), requestedSlotStartTime, sloatEndTime)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have waiting in another game at this time.");
+        if (startTime.isBefore(tomorrowStart) && gameBookingRepository.hasActiveBookingInCycle(empId, gameTypeId)) {
+            return "Only one active booking allowed per game per day.";
         }
 
-        for (Long participantId : gameBookingRequest.getBookingParticipantsEmpId()) {
-            if (bookingParticipantRepository.existsOverlappingBookingWaitingListParticipant(participantId, requestedSlotStartTime, sloatEndTime)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "One of your participants is already in another game booking participants waiting list at this time.");
-            }
-        }
-
-        for (Long participantId : gameBookingRequest.getBookingParticipantsEmpId()) {
-            if (waitlistRepository.existsOverlappingBookingWaitingList(participantId, requestedSlotStartTime, sloatEndTime)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "One of your participants is already in another game booking waiting list at this time.");
-            }
-        }
-
-        //requir to check cycle with all diff upcomming cycles.
         boolean isSecondTime = gameBookingRepository.hasPlayedInCycle(empId, gameTypeId)
                 || waitlistRepository.hasAppliedInCycle(empId, gameTypeId);
 
-        List<GameBooking> gameBookingById = gameBookingRepository.findGameBookingByFkGameType_Id(gameTypeId);
+        boolean isSlotFull = gameBookingRepository.findGameBookingByFkGameType_Id(gameTypeId).stream()
+                .anyMatch(b -> b.getGameBookingStartTime().isEqual(startTime) && b.getFkGameBookingStatus().getId() == 1);
 
-
-        Employee employee = employeeRepository.findEmployeeById(empId);
-        GameBookingStatus gameBookingStatus = gameBookingStatusRepository.findGameBookingStatusById(1);
-
-        GameBooking saveGameBooking = new GameBooking();
-
-        boolean isSlotFull=false;
-
-        //first time or if sloat is empty then gameBookingById is null so check that
-        if(gameBookingById != null) {
-            for(GameBooking gameBooking:gameBookingById) {
-                if (gameBooking.getGameBookingStartTime().isEqual(requestedSlotStartTime)
-                        && gameBooking.getFkGameBookingStatus().getId() == 1) {
-                    isSlotFull = true;
-                    break;
-                }
-            }
-        }
-
-
-        //if given host employee come to book same game in same cycle second time so
-        //it not get sloat directly, but it, go in waiting list
-        if (isSecondTime) {
-            long minutesUntilSlot = Duration.between(LocalDateTime.now(), requestedSlotStartTime).toMinutes();
-
-            if (minutesUntilSlot > 30) {
-                addToWaitlist(empId, gameTypeId, requestedSlotStartTime, sloatEndTime, false, bookingParticipantsEmpId);
-                return "Slot is reserved for first-timers. You have been added to the Priority Waitlist.";
-            }
+        if (isSecondTime && Duration.between(now, startTime).toMinutes() > 30) {
+            addToWaitlist(empId, gameTypeId, startTime, endTime, false, participantIds);
+            return "Slot is reserved for first-timers. You have been added to the Priority Waitlist.";
         }
 
         if (isSlotFull) {
-            addToWaitlist(empId, gameTypeId, requestedSlotStartTime, sloatEndTime, !isSecondTime, bookingParticipantsEmpId);
+            addToWaitlist(empId, gameTypeId, startTime, endTime, !isSecondTime, participantIds);
             return "Slot is full. You are on the waitlist.";
         }
 
-        employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle()+1);
-        employeeGameInterestRepository.save(employeeGameInterest);
+        return finalizeBooking(empId, gameType, startTime, endTime, participantIds, hostInterest);
+    }
 
-        saveGameBooking.setFkGameBookingStatus(gameBookingStatus);
-        saveGameBooking.setGameBookingCreatedAt(Instant.now());
-        saveGameBooking.setFkHostEmployee(employee);
-        saveGameBooking.setGameBookingStartTime(requestedSlotStartTime);
-        saveGameBooking.setGameBookingEndTime(sloatEndTime);
-        saveGameBooking.setFkGameType(gameType);
+    private EmployeeGameInterest validateInterest(Long empId, Long gameTypeId) {
+        EmployeeGameInterest interest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id(empId, gameTypeId);
+        if (interest == null || interest.isInterestDeleted()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Employee (ID: " + empId + ") is not interested in this game.");
+        }
+        return interest;
+    }
 
-        gameBookingRepository.save(saveGameBooking);
+    private void validateNoConflicts(Long id, LocalDateTime start, LocalDateTime end) {
+        if (travelPlanRepository.findAllByTravelStartTimeBetween(id, start.toLocalDate(), end.toLocalDate())) {
+            throw new RuntimeException("Employee " + id + " has a travel plan during this period.");
+        }
+        if (gameBookingRepository.existsOverlappingBooking(id, start, end) ||
+                bookingParticipantRepository.existsOverlappingBookingParticipant(id, start, end) ||
+                waitlistRepository.existsOverlappingBookingWaitingList(id, start, end) ||
+                bookingParticipantRepository.existsOverlappingBookingWaitingListParticipant(id, start, end)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Conflict detected for employee ID: " + id);
+        }
+    }
 
+    private String finalizeBooking(Long hostId, GameType type, LocalDateTime start, LocalDateTime end, List<Long> pIds, EmployeeGameInterest hostInterest) {
+        Employee host = employeeRepository.findEmployeeById(hostId);
+
+        GameBooking booking = new GameBooking();
+        booking.setFkHostEmployee(host);
+        booking.setFkGameType(type);
+        booking.setGameBookingStartTime(start);
+        booking.setGameBookingEndTime(end);
+        booking.setGameBookingCreatedAt(Instant.now());
+        booking.setFkGameBookingStatus(gameBookingStatusRepository.findGameBookingStatusById(1));
+        gameBookingRepository.save(booking);
+
+        hostInterest.setPlayedInCurrentCycle(hostInterest.getPlayedInCurrentCycle() + 1);
+        employeeGameInterestRepository.save(hostInterest);
 
         List<String> emails = new ArrayList<>();
+        for (Long pId : pIds) {
+            Employee p = employeeRepository.findEmployeeById(pId);
 
-        for(Long id : bookingParticipantsEmpId){
-            Employee employee1 = employeeRepository.findEmployeeById(id);
-            BookingParticipant bookingParticipant = new BookingParticipant();
-            bookingParticipant.setFkEmployee(employee1);
-            bookingParticipant.setFkGameBooking(saveGameBooking);
-            bookingParticipantRepository.save(bookingParticipant);
+            BookingParticipant bp = new BookingParticipant();
+            bp.setFkEmployee(p);
+            bp.setFkGameBooking(booking);
+            bookingParticipantRepository.save(bp);
 
-            EmployeeGameInterest employeeGameInterest1 = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
-                    (id, gameType.getId());
+            EmployeeGameInterest pInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id(pId, type.getId());
+            pInterest.setPlayedInCurrentCycle(pInterest.getPlayedInCurrentCycle() + 1);
+            employeeGameInterestRepository.save(pInterest);
 
-            employeeGameInterest1.setPlayedInCurrentCycle(employeeGameInterest1.getPlayedInCurrentCycle() + 1);
-            employeeGameInterestRepository.save(employeeGameInterest1);
-
-            notificationService.createNotification(id
-                    ,"Slot Confirmed!"
-                    ,  "You have been promoted to your requested slot => " + gameType.getGameName()
-                            + " : " + requestedSlotStartTime + " => " + employee.getEmployeeEmail() + " book this sloat."
-            );
-
-            emails.add(employee1.getEmployeeEmail());
-
+            notificationService.createNotification(pId, "Slot Confirmed!", "Joined " + type.getGameName() + " hosted by " + host.getEmployeeEmail());
+            emails.add(p.getEmployeeEmail());
         }
 
-        emailService.sendEmail(emails,"Slot Confirmed! "
-                ,"You Booking is conform for slot => " + gameType.getGameName()
-                        + " : " + requestedSlotStartTime + " by your friend : "
-                        + employee.getEmployeeEmail() );
-
-
+        emailService.sendEmail(emails, "Slot Confirmed!", "Booking confirmed for " + type.getGameName() + " at " + start);
         return "Booking confirmed!";
     }
 
@@ -250,18 +190,23 @@ public class GameBookingServiceImpl implements GameBookingService {
     //update game booking status to cancel (after get sloat I require cancel booking so this method do that)
     @Override
     @Transactional
-    public void updateGameBookingStatus(Long pkGameBookingId,Long fkGameStatusId){
+    public void updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId) {
         GameBooking gameBooking = gameBookingRepository.findGameBookingById(pkGameBookingId);
-        if(gameBooking.getFkGameBookingStatus().getId() == 2)
+        if (gameBooking.getFkGameBookingStatus().getId() == 2)
             throw new RuntimeException("played booking cannot be cancel.");
-        else if(gameBooking.getFkGameBookingStatus().getId() == 3)
+        else if (gameBooking.getFkGameBookingStatus().getId() == 3)
             throw new RuntimeException("your status already canceled.");
 
         GameBookingStatus gameBookingStatus = gameBookingStatusRepository.findGameBookingStatusById(fkGameStatusId);
         gameBooking.setFkGameBookingStatus(gameBookingStatus);
         gameBookingRepository.save(gameBooking);
 
-        if(fkGameStatusId == 3) {
+        List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findByFkGameBooking_Id(pkGameBookingId);
+        for(BookingParticipant bookingParticipant : bookingParticipants){
+            bookingParticipantRepository.delete(bookingParticipant);
+        }
+
+        if (fkGameStatusId == 3) {
             updateWaitingList(gameBooking.getFkGameType(), gameBooking.getGameBookingStartTime());
         }
 
@@ -277,7 +222,7 @@ public class GameBookingServiceImpl implements GameBookingService {
         if (!expiredBookingWaitingLists.isEmpty()) {
             for (BookingWaitingList bookingWaitingList : expiredBookingWaitingLists) {
                 List<BookingParticipantResponse> bookingParticipants = bookingParticipantRepository.findAllByBookingWaitingListId(bookingWaitingList.getId());
-                for(BookingParticipantResponse res : bookingParticipants){
+                for (BookingParticipantResponse res : bookingParticipants) {
                     bookingParticipantRepository.removeBookingParticipantById(res.getId());
                 }
                 waitlistRepository.removeBookingWaitingListById(bookingWaitingList.getId());
@@ -305,28 +250,28 @@ public class GameBookingServiceImpl implements GameBookingService {
         LocalDateTime targetSlot = LocalDateTime.now().plusMinutes(31);
 
         List<GameBooking> upcomingBooking = gameBookingRepository.findAllByGameBookingStartTimeBetween(now, targetSlot);
-        if(upcomingBooking == null || upcomingBooking.isEmpty()){
+        if (upcomingBooking == null || upcomingBooking.isEmpty()) {
             return;
         }
-        for(GameBooking gameBooking: upcomingBooking){
+        for (GameBooking gameBooking : upcomingBooking) {
             notificationService.createNotification(gameBooking.getFkHostEmployee().getId()
-                    ,"Game Booking Alert!"
-                    ,  "You " + gameBooking.getFkGameType().getGameName()
+                    , "Game Booking Alert!"
+                    , "You " + gameBooking.getFkGameType().getGameName()
                             + " Game is Start after half hour."
             );
         }
 
         List<BookingWaitingList> upComingSlots = waitlistRepository.findAllByTargetSlotDatetimeBetween(now, targetSlot);
-        if(upComingSlots == null || upComingSlots.isEmpty()){
+        if (upComingSlots == null || upComingSlots.isEmpty()) {
             return;
         }
-        for(BookingWaitingList bookingWaitingList: upComingSlots){
+        for (BookingWaitingList bookingWaitingList : upComingSlots) {
             LocalDateTime targetTime = bookingWaitingList.getTargetSlotDatetime();
             GameType gameType = bookingWaitingList.getFkGameType();
 
             boolean isSloatEmpty = gameBookingRepository.existsByFkGameTypeAndGameBookingStartTimeAndFkGameBookingStatus_Id(
                     gameType, targetTime, 1);
-            if(!isSloatEmpty){
+            if (!isSloatEmpty) {
                 updateWaitingList(gameType, targetTime);
             }
         }
@@ -334,11 +279,11 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     @Override
     @Transactional
-    public void updateWaitingList(GameType gameType, LocalDateTime targetedSloatTime){
+    public void updateWaitingList(GameType gameType, LocalDateTime targetedSloatTime) {
 
         List<BookingWaitingList> bookingWaitingList = waitlistRepository.findMatchingBookings(gameType.getId(), targetedSloatTime);
 
-        if(bookingWaitingList != null && !bookingWaitingList.isEmpty()) {
+        if (bookingWaitingList != null && !bookingWaitingList.isEmpty()) {
 
             LocalDateTime now = LocalDateTime.now();
             long minutesDiff = Duration.between(now, targetedSloatTime).toMinutes();
@@ -351,7 +296,7 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Transactional
-    public void addInGameBookingWithNotification(BookingWaitingList bookingWaitingList){
+    public void addInGameBookingWithNotification(BookingWaitingList bookingWaitingList) {
 
         LocalDateTime startTime = bookingWaitingList.getTargetSlotDatetime();
         LocalDateTime endTime = startTime.plusMinutes(bookingWaitingList.getFkGameType().getGameSlotDuration());
@@ -376,45 +321,38 @@ public class GameBookingServiceImpl implements GameBookingService {
             EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
                     (bookingParticipant.getFkEmployee().getId(), bookingWaitingList.getFkGameType().getId());
 
-            if(employeeGameInterest != null) {
+            if (employeeGameInterest != null) {
                 employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() + 1);
                 employeeGameInterestRepository.save(employeeGameInterest);
-            }else{
-                    EmployeeGameInterest employeeGameInterest2 = new EmployeeGameInterest();
-                    employeeGameInterest2.setFkGameType(bookingWaitingList.getFkGameType());
-                    employeeGameInterest2.setFkEmployee(bookingParticipant.getFkEmployee());
-                    employeeGameInterest2.setPlayedInCurrentCycle(1);
-                    employeeGameInterestRepository.save(employeeGameInterest2);
-                }
+            }
 
             notificationService.createNotification(bookingWaitingList.getFkHostEmployee().getId()
-                    ,"Slot Confirmed!"
-                    ,  "You have been promoted to your requested slot => " + bookingWaitingList.getFkGameType().getGameName()
+                    , "Slot Confirmed!"
+                    , "You have been promoted to your requested slot => " + bookingWaitingList.getFkGameType().getGameName()
                             + " : " + startTime + " => " + bookingWaitingList.getFkHostEmployee().getEmployeeEmail() + " book this sloat."
             );
         }
 
         EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
                 (bookingWaitingList.getFkHostEmployee().getId(), bookingWaitingList.getFkGameType().getId());
-        employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle()+1);
+        employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() + 1);
         employeeGameInterestRepository.save(employeeGameInterest);
 
         waitlistRepository.delete(bookingWaitingList);
 
         notificationService.createNotification(bookingWaitingList.getFkHostEmployee().getId()
-                ,"Slot Confirmed!"
-                ,  "You have been promoted to your requested slot => " + bookingWaitingList.getFkGameType().getGameName()
-                    + " : " + startTime
+                , "Slot Confirmed!"
+                , "You have been promoted to your requested slot => " + bookingWaitingList.getFkGameType().getGameName()
+                        + " : " + startTime
         );
 
     }
 
     @Override
-    public List<GameBookingResponse> findAllGameBooking(){
+    public List<GameBookingResponse> findAllGameBooking() {
         List<GameBooking> gameBookings = gameBookingRepository.findAll();
         List<GameBookingResponse> gameBookingResponses = new ArrayList<>();
-        for(GameBooking gameBooking :gameBookings)
-        {
+        for (GameBooking gameBooking : gameBookings) {
             GameBookingResponse gameBookingResponse = modelMapper.map(gameBooking,
                     GameBookingResponse.class);
 
@@ -429,11 +367,10 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public List<GameBookingResponse> findUpcommingBooking(){
+    public List<GameBookingResponse> findUpcommingBooking() {
         List<GameBooking> gameBookings = gameBookingRepository.findAllByGameBookingStartTimeBetween(LocalDateTime.now().minusHours(2), LocalDateTime.now().plusHours(2));
         List<GameBookingResponse> gameBookingResponses = new ArrayList<>();
-        for(GameBooking gameBooking :gameBookings)
-        {
+        for (GameBooking gameBooking : gameBookings) {
             GameBookingResponse gameBookingResponse = modelMapper.map(gameBooking,
                     GameBookingResponse.class);
 
@@ -448,10 +385,10 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public List<BookingWaitingListResponse> findWaitList(){
+    public List<BookingWaitingListResponse> findWaitList() {
         List<BookingWaitingListResponse> bookingWaitingListResponses = new ArrayList<>();
         List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findAll();
-        for(BookingWaitingList bookingWaitingList : bookingWaitingLists){
+        for (BookingWaitingList bookingWaitingList : bookingWaitingLists) {
             BookingWaitingListResponse response = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
 
             List<BookingParticipantResponse> bookingParticipantResponses =
@@ -465,10 +402,10 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId){
+    public List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId) {
         List<BookingWaitingListResponse> bookingWaitingListResponses = new ArrayList<>();
         List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByFkHostEmployee(employeeRepository.findEmployeeById(empId));
-        for(BookingWaitingList bookingWaitingList : bookingWaitingLists){
+        for (BookingWaitingList bookingWaitingList : bookingWaitingLists) {
             BookingWaitingListResponse response = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
 
             List<BookingParticipantResponse> bookingParticipantResponses =
@@ -481,10 +418,9 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findBookingParticipantByFkEmployee(employeeRepository.findEmployeeById(empId));
 
-        for(BookingParticipant bookingParticipant : bookingParticipants)
-        {
-            if(bookingParticipant.getFkBookingWaitingList() != null){
-                BookingWaitingListResponse bookingWaitingListResponse = modelMapper.map(bookingParticipant.getFkBookingWaitingList(),BookingWaitingListResponse.class);
+        for (BookingParticipant bookingParticipant : bookingParticipants) {
+            if (bookingParticipant.getFkBookingWaitingList() != null) {
+                BookingWaitingListResponse bookingWaitingListResponse = modelMapper.map(bookingParticipant.getFkBookingWaitingList(), BookingWaitingListResponse.class);
 
                 List<BookingParticipantResponse> bookingParticipantResponses =
                         bookingParticipantRepository.findAllByBookingWaitingListId(bookingParticipant.getFkBookingWaitingList().getId());
@@ -499,7 +435,7 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public BookingWaitingListResponse findWaitListById(Long waitId){
+    public BookingWaitingListResponse findWaitListById(Long waitId) {
         BookingWaitingList bookingWaitingList = waitlistRepository.findBookingWaitingListsById(waitId);
         BookingWaitingListResponse response = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
 
@@ -513,23 +449,23 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     @Transactional
     @Override
-    public void deleteWaitListById(Long waitId){
+    public void deleteWaitListById(Long waitId) {
         List<BookingParticipantResponse> bookingParticipants = bookingParticipantRepository.findAllByBookingWaitingListId(waitId);
-        for(BookingParticipantResponse res : bookingParticipants){
+        for (BookingParticipantResponse res : bookingParticipants) {
             bookingParticipantRepository.removeBookingParticipantById(res.getId());
         }
         waitlistRepository.removeBookingWaitingListById(waitId);
     }
 
     @Override
-    public List<BookingWaitingListResponse> findWaitListSeqByGameTypeAndSloat(Long waitId){
+    public List<BookingWaitingListResponse> findWaitListSeqByGameTypeAndSloat(Long waitId) {
         BookingWaitingList bookingWaitingList = waitlistRepository.findBookingWaitingListsById(waitId);
         List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findMatchingBookings(bookingWaitingList.getFkGameType().getId(),
                 bookingWaitingList.getTargetSlotDatetime());
         List<BookingWaitingListResponse> bookingWaitingListResponses = new ArrayList<>();
 
-        for(BookingWaitingList list : bookingWaitingLists){
-            BookingWaitingListResponse bookingWaitingListResponse = modelMapper.map(list,BookingWaitingListResponse.class);
+        for (BookingWaitingList list : bookingWaitingLists) {
+            BookingWaitingListResponse bookingWaitingListResponse = modelMapper.map(list, BookingWaitingListResponse.class);
 
             List<BookingParticipantResponse> bookingParticipantResponses =
                     bookingParticipantRepository.findAllByBookingWaitingListId(list.getId());
@@ -559,7 +495,7 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public void updateGame(Long gameTypeId, GameType gameType){
+    public void updateGame(Long gameTypeId, GameType gameType) {
         GameType gameType1 = gameTypeRepository.findGameTypeById(gameTypeId);
         gameType1.setGameName(gameType.getGameName());
         gameType1.setGameSlotDuration(gameType.getGameSlotDuration());
@@ -582,12 +518,12 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public void addGameInterest(Long empId, Long gameTypeId){
+    public void addGameInterest(Long empId, Long gameTypeId) {
         EmployeeGameInterest existingInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id(empId, gameTypeId);
-        if(existingInterest !=null){
+        if (existingInterest != null) {
             existingInterest.setInterestDeleted(false);
             employeeGameInterestRepository.save(existingInterest);
-        }else {
+        } else {
             Employee employee = employeeRepository.findEmployeeById(empId);
             GameType gameType = gameTypeRepository.findGameTypeById(gameTypeId);
             EmployeeGameInterest employeeGameInterest = new EmployeeGameInterest();
@@ -598,17 +534,16 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public void removeGameInterest(Long gameInterestId){
+    public void removeGameInterest(Long gameInterestId) {
         employeeGameInterestRepository.removeEmployeeGameInterestById(gameInterestId);
     }
 
     @Override
-    public List<EmployeeGameInterestResponse> findGameInterestByEmp(Long empId){
+    public List<EmployeeGameInterestResponse> findGameInterestByEmp(Long empId) {
 
         List<EmployeeGameInterest> employeeGameInterests = employeeGameInterestRepository.getEmployeeGameInterestByFkEmployee_Id(empId);
-        List<EmployeeGameInterestResponse> employeeGameInterestResponses =new ArrayList<>();
-        for(EmployeeGameInterest employeeGameInterest : employeeGameInterests)
-        {
+        List<EmployeeGameInterestResponse> employeeGameInterestResponses = new ArrayList<>();
+        for (EmployeeGameInterest employeeGameInterest : employeeGameInterests) {
             EmployeeGameInterestResponse employeeGameInterestResponse = modelMapper.map(
                     employeeGameInterest, EmployeeGameInterestResponse.class
             );
@@ -619,7 +554,7 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     @Transactional
     @Override
-    public void updateGameBooking(Long bookingId, GameBookingRequest gameBookingRequest){
+    public void updateGameBooking(Long bookingId, GameBookingRequest gameBookingRequest) {
 
         List<Long> existingEmployeesId = bookingParticipantRepository.findEmployeeIdByGameBookingId(bookingId);
 
@@ -633,10 +568,10 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         List<String> emails = new ArrayList<>();
 
-        for(Long id : newEmpId){
+        for (Long id : newEmpId) {
             Employee employee = employeeRepository.findEmployeeById(id);
 
-            if(!existingEmployeesId.contains(id)) {
+            if (!existingEmployeesId.contains(id)) {
 
                 BookingParticipant bookingParticipant = new BookingParticipant();
 
@@ -652,11 +587,11 @@ public class GameBookingServiceImpl implements GameBookingService {
             }
         }
 
-        for(Long id : existingEmployeesId){
+        for (Long id : existingEmployeesId) {
 
-            if(!newEmpId.contains(id)) {
+            if (!newEmpId.contains(id)) {
                 BookingParticipant bookingParticipant = bookingParticipantRepository.findBookingParticipantByEmployeeIdAndGameBookingId(id, bookingId);
-                if(bookingParticipant != null) {
+                if (bookingParticipant != null) {
                     bookingParticipantRepository.removeBookingParticipantById(bookingParticipant.getId());
                     Employee employee = employeeRepository.findEmployeeById(id);
                     List<String> emails1 = new ArrayList<>();
@@ -667,8 +602,8 @@ public class GameBookingServiceImpl implements GameBookingService {
             }
         }
 
-        if(!emails.isEmpty()){
-            emailService.sendEmail(emails, "Game Booking complete","You are added in Game booking by your friend at :" + Instant.now());
+        if (!emails.isEmpty()) {
+            emailService.sendEmail(emails, "Game Booking complete", "You are added in Game booking by your friend at :" + Instant.now());
         }
     }
 
@@ -707,11 +642,13 @@ public class GameBookingServiceImpl implements GameBookingService {
                     return (isHost || isParticipant) && overlaps;
                 });
 
+                boolean isOnTrip = travelPlanRepository.findAllByTravelStartTimeBetween(employeeId, date, date);
+
                 boolean isWaiting = dayWaiting.stream().anyMatch(w ->
                         (slotStart.isBefore(w.getTargetSlotEndDatetime()) && slotEnd.isAfter(w.getTargetSlotDatetime())));
 
                 if (isFull) status = "FULL";
-                else if (isUserInBooking) status = "BUSY";
+                else if (isUserInBooking || isOnTrip) status = "BUSY";
                 else if (isWaiting) status = "WAIT";
 
                 response.add(new SlotAvailabilityResponse(timeStr, status));

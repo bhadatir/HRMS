@@ -60,18 +60,23 @@ public interface EmployeeTravelPlanRepository extends JpaRepository<EmployeeTrav
             "and e.fkTravelPlan.id = :travelPlanId ")
     boolean isEmployeeTravelPlanByEmployeeIdAndTravelPlanIdExist(@Param("empId") Long empId, @Param("travelPlanId") Long travelPlanId);
 
-    @Query("SELECT DISTINCT etp FROM EmployeeTravelPlan etp " +
-            "WHERE (etp.fkEmployee.id = :empId " +
-            "OR etp.fkEmployee.fkManagerEmployee.id = :empId " +
-            "OR etp.fkTravelPlan.fkTravelPlanHREmployee.id = :empId) " +
-            "AND (lower(etp.fkTravelPlan.travelPlanName) LIKE lower(concat(:searchTerm, '%')) " +
-            "OR lower(etp.fkTravelPlan.travelPlanDetails) LIKE lower(concat(:searchTerm, '%')) " +
-            "OR lower(etp.fkTravelPlan.travelPlanFrom) LIKE lower(concat(:searchTerm, '%')) " +
-            "OR CAST(etp.fkTravelPlan.travelPlanStartDate AS string) LIKE (concat(:searchTerm, '%')) " +
-            "OR CAST(etp.fkTravelPlan.travelPlanEndDate AS string) LIKE (concat(:searchTerm, '%')) " +
-            "OR lower(etp.fkTravelPlan.travelPlanTo) LIKE lower(concat(:searchTerm, '%')) " +
-            "OR lower(etp.fkTravelPlan.fkTravelPlanHREmployee.employeeEmail) LIKE lower(concat(:searchTerm, '%'))) " +
-            "ORDER BY etp.employeeTravelPlanCreatedAt DESC")
-    Page<EmployeeTravelPlan> findEmployeeTravelPlanByFkEmployee_Id(Long empId, String searchTerm, Pageable pageable);
+    @Query(value = "select count(e) > 0 " +
+            "from EmployeeTravelPlan e " +
+            "where e.fkEmployee.fkManagerEmployee.id = :empId " +
+            "and e.fkTravelPlan.id = :travelPlanId ")
+    boolean isEmployeeTravelPlanByManagerEmployeeIdAndTravelPlanIdExist(@Param("empId") Long empId, @Param("travelPlanId") Long travelPlanId);
 
+    @Query("SELECT DISTINCT tp FROM TravelPlan tp " +
+            "LEFT JOIN EmployeeTravelPlan etp ON etp.fkTravelPlan.id = tp.id " +
+            "WHERE (tp.fkTravelPlanHREmployee.id = :empId " +
+            "OR etp.fkEmployee.id = :empId " +
+            "OR etp.fkEmployee.fkManagerEmployee.id = :empId) " +
+            "AND (lower(tp.travelPlanName) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR lower(tp.travelPlanDetails) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR lower(tp.travelPlanFrom) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR lower(tp.travelPlanTo) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR CAST(tp.travelPlanStartDate AS string) LIKE concat(:searchTerm, '%') " +
+            "OR CAST(tp.travelPlanEndDate AS string) LIKE concat(:searchTerm, '%')) " +
+            "ORDER BY tp.travelPlanCreatedAt DESC")
+    Page<TravelPlan> findTravelPlanByFkEmployee_Id(Long empId, String searchTerm, Pageable pageable);
 }

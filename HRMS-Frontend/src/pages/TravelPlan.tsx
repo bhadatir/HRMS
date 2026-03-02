@@ -255,7 +255,7 @@ export default function TravelPlan() {
                       (user?.roleName === "MANAGER" && plan.employeeTravelPlanResponses.some((resp: any) => 
                           resp.employeeEmail === user.employeeEmail)) ? (
                       <div className="mt-2 flex justify-between gap-2">
-                        { new Date(plan.travelPlanEndDate) > new Date() 
+                        { new Date(plan.travelPlanStartDate) > new Date() 
                           && (user?.id === plan.employeeId || 
                               plan?.employeeTravelPlanResponses.some((resp: any) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false))
                           && !plan.travelPlanIsDeleted ? (

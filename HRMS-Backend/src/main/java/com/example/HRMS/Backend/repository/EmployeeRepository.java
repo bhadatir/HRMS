@@ -48,46 +48,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             "or lower(e.employeeEmail) like lower(concat(:query,'%')) ")
     Page<EmployeeSearch> searchEmployeeByName(@Param("query") String query, Pageable pageable);
 
-    @Query(value = """
-            SELECT
-             e.pk_employee_id, e.employee_first_name, e.employee_last_name,
-             e.employee_email, e.fk_role_id, e.fk_position_id,
-             e.fk_department_id
-             FROM employee e
-             join employee_game_interest egi ON egi.fk_employee_id = e.pk_employee_id
-             WHERE lower(e.employee_first_name) like lower(concat(:query,'%'))
-             or lower(e.employee_last_name) like lower(concat(:query,'%'))
-             or lower(e.employee_email) like lower(concat(:query,'%'))
-             AND egi.fk_game_type_id = :gameTypeId
-             AND egi.is_interest_deleted = 0
-             AND e.pk_employee_id NOT IN
-             (
-             SELECT b.fk_host_employee_id FROM game_booking b
-             WHERE b.game_booking_is_deleted = 0 AND b.fk_game_booking_status_id = 1
-             AND ( :start < b.game_booking_end_time AND :end > b.game_booking_start_time)
-             UNION
-             SELECT bp.fk_employee_id FROM game_booking b2
-             join booking_participants bp on bp.fk_game_booking_id = b2.pk_game_booking_id
-             WHERE b2.game_booking_is_deleted = 0 AND b2.fk_game_booking_status_id = 1
-             AND ( :start < b2.game_booking_end_time AND :end > b2.game_booking_start_time)
-             UNION
-             SELECT w.fk_host_employee_id FROM booking_waiting_list w
-             WHERE w.waiting_status_is_active = 1
-             AND ( :start < w.target_slot_end_datetime AND :end > w.target_slot_datetime)
-             UNION
-             SELECT wp.fk_employee_id FROM booking_waiting_list w2
-             join booking_participants wp on wp.fk_booking_waiting_list_id = w2.pk_waiting_id
-             WHERE w2.waiting_status_is_active = 1
-             AND ( :start < w2.target_slot_end_datetime AND :end > w2.target_slot_datetime)
-             )
-            """,
-            nativeQuery = true)
-    Page<ParticipantsSearch> searchAvailableParticipants1(@Param("query") String query,
-                                                         @Param("start") LocalDateTime start,
-                                                         @Param("end") LocalDateTime end,
-                                                         @Param("gameTypeId") Long gameTypeId,
-                                                         Pageable pageable );
-
     @Query(value =
             "SELECT NEW com.example.HRMS.Backend.dto.EmployeeSearch( " +
                     "e.id, e.employeeFirstName, e.employeeLastName, " +
@@ -114,6 +74,15 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
                     "    WHERE w.waitingStatusIsActive = true " +
                     "    AND (:start < w.targetSlotEndDatetime AND :end > w.targetSlotDatetime) " +
                     "    AND (w.fkHostEmployee.id = e.id OR wp.fkEmployee.id = e.id) " +
+                    ")" +
+                    "AND NOT EXISTS ( " +
+                    "    SELECT etp FROM EmployeeTravelPlan etp " +
+                    "    WHERE etp.fkTravelPlan.travelPlanIsDeleted = false " +
+                    "    AND etp.employeeIsDeletedFromTravel = false " +
+                    "    AND (etp.fkEmployee.id = e.id " +
+                    "    OR etp.fkTravelPlan.fkTravelPlanHREmployee.id = e.id) " +
+                    "    AND (CAST(:start AS LocalDate) <= etp.fkTravelPlan.travelPlanEndDate " +
+                    "    AND CAST(:end AS LocalDate) >= etp.fkTravelPlan.travelPlanStartDate) " +
                     ")")
     Page<EmployeeSearch> searchAvailableParticipants(
             @Param("query") String query,
@@ -122,7 +91,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             @Param("gameTypeId") Long gameTypeId,
             Pageable pageable
     );
-
-
 }
 

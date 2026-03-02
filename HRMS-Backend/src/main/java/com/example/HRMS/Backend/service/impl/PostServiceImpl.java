@@ -72,13 +72,7 @@ public class PostServiceImpl implements PostService {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Post> postPage ;
-
-        if (searchTerm != null && !searchTerm.isEmpty()) {
-            postPage = postRepository.searchPosts(searchTerm, pageable);
-        } else {
-            postPage = postRepository.findByPostIsDeletedFalse(pageable);
-        }
+        Page<Post> postPage = postRepository.searchPosts(searchTerm, pageable);
 
         return postPage.map(post -> {
 
