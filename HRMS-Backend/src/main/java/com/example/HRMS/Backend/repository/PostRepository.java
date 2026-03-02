@@ -20,6 +20,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
         OR p.fkPostEmployee.employeeFirstName LIKE %:query%
         OR p.fkPostEmployee.employeeEmail LIKE %:query%
         OR p.fkPostVisibility.postVisibilityName LIKE %:query%
+        OR CAST(p.postCreatedAt as string) LIKE %:query%
         OR p.postContent LIKE %:query%)
         AND p.postIsDeleted = false
         """)

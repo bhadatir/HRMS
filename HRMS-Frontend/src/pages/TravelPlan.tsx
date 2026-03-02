@@ -8,7 +8,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, MapPin, Calendar, Edit, ImagePlus, Bell, Search, Trash2 } from "lucide-react";
+import { Plus, X, MapPin, Calendar, Edit, ImagePlus, Bell, Search, Trash2, ArrowRight, ArrowLeft } from "lucide-react";
 import TravelPlanForm from "../components/TravelPlanForm";
 import AddExpenseForm from "../components/AddExpenseForm";
 import AddTravelDocumentForm from "../components/AddTravelDocumentForm";
@@ -24,21 +24,16 @@ export default function TravelPlan() {
   const [fullTravelDetails, setFullTravelDetails] = useState<number | null>(null);
   const [editTravelPlanId, setEditTravelPlanId] = useState<number | null>(null);
   const [activeExpenseId, setActiveExpenseId] = useState<number | null>(null);
+  const [travelPlanType, setTravelPlanType] = useState<number>(0);
   const [selectedTravelId, setSelectedTravelId] = useState<number | null>(null);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(0);
+  const [size] = useState(12);
 
-  const { data: allPlans, isLoading } = useQuery({
-    queryKey: ["allTravelPlans"],
-    queryFn: () => travelService.getAllTravelPlans(token || ""),
-    enabled: !!token,
-  });
-
-  const { data: searchFilter, isLoading: isSearchLoading } = useQuery({
-    queryKey: ["travelPlanSearch", searchTerm],
-    queryFn: () => travelService.searchTravelPlan(searchTerm, token || ""),
-    enabled: searchTerm.length >= 1,
+  const { data: travelPlanByEmpId, isLoading } = useQuery({
+    queryKey: ["travelPlanByEmpId", user?.id, page, size, searchTerm],
+    queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id, searchTerm, page, size, token || ""),
+    enabled: !!token && !!user?.id,
   });
 
   const deleteTravelPlanMutation = useMutation({
@@ -51,45 +46,21 @@ export default function TravelPlan() {
   });
 
   const filteredPlans = useMemo(() => {
-    if (!allPlans || !user) return [];
-    if (user.roleName === "EMPLOYEE" && !isSearchLoading && searchFilter) {
-      return allPlans.filter((plan: any) =>
-        plan.employeeTravelPlanResponses.some((resp: any) => {
-          return ( resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false
-          && searchFilter?.includes(resp.travelPlanId))
-        })
-      );
-    }
-    if (user.roleName === "EMPLOYEE" && !isSearchLoading && !searchFilter) {
-      return allPlans.filter((plan: any) =>
-        plan.employeeTravelPlanResponses.some((resp: any) => {
-          return ( resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false)
-        })
-      );
-    }
-  
-    if(user?.roleName === "MANAGER" && !isSearchLoading && searchFilter) {
-      return allPlans.filter((plan: any) => 
-        plan.employeeTravelPlanResponses.some((resp: any) => {
-          return resp.employeeFkManagerEmployeeId === user.id;
-        }) || plan.employeeTravelPlanResponses.some((resp: any) => {
-          return resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false;
-        })
-        && searchFilter.includes(plan.id)
-      );
-    }
-
-    if(user?.roleName === "MANAGER" && !isSearchLoading && !searchFilter) {
-      return allPlans.filter((plan: any) => 
-        plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeFkManagerEmployeeId === user.id)
-      || (plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeEmail === user.employeeEmail && resp.employeeIsDeletedFromTravel === false)));
-    }
+    if (!travelPlanByEmpId || !user) return [];
+    return travelPlanByEmpId?.content.filter((plan: any) => {
+        if(travelPlanType === 0) return true;
+        if(travelPlanType === 1) return plan.travelPlanIsDeleted === false;
+        if(travelPlanType === 2) return plan.travelPlanIsDeleted === true;
+        if(travelPlanType === 3) return plan.employeeTravelPlanResponses
+          .some((resp: any) => resp.employeeIsDeletedFromTravel === true && resp.employeeId === user.id);
+        if(travelPlanType === 4) return plan.travelPlanIsReturn === true;
+        if(travelPlanType === 5) return plan.travelPlanIsReturn === false;
+        return false;
+      }) || [];
 
     // if role hr so hr add exp only on that in which hr is going in travel is remaining
 
-    if (!searchFilter) return allPlans;
-    return allPlans.filter((plan: any) => searchFilter.includes(plan.id));
-  }, [allPlans, user, searchFilter, isSearchLoading]);
+  }, [user, travelPlanByEmpId, travelPlanType, searchTerm]);
 
   const handleDelete = (travelPlanId: number) => {
     const reason = window.prompt("Please enter reason for deleting this travel plan:", "")?.trim();
@@ -108,11 +79,22 @@ export default function TravelPlan() {
           <div className="flex items-center gap-2">
             {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Travel Management</h3>
-            {searchFilter && searchFilter.length > 0 ?(
-              <Badge variant="outline">{searchFilter.length} results</Badge>
-            ) : (<Badge variant="outline">No filter applied</Badge>)
+            {searchTerm && searchTerm.length > 0 ?(
+              <Badge variant="outline">{filteredPlans.length} results</Badge>
+            ) : (<Badge variant="outline">No filter</Badge>)
             }
           </div>
+          <div className="flex items-center gap-2">
+            <select className="border rounded-md px-2 py-1 text-sm" 
+              value={travelPlanType} onChange={(e) => setTravelPlanType(Number(e.target.value))}>
+                <option value="0">All Travel Plan</option>
+                <option value="1">Active</option>
+                <option value="2">Deleted Plan</option>
+                <option value="3">Removed By Hr</option>
+                <option value="4">Return</option>
+                <option value="5">One-Way</option>
+            </select>
+            </div>
 
           <div className="relative max-w-sm w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
@@ -183,13 +165,9 @@ export default function TravelPlan() {
               <div className="bg-white rounded-xl max-w-lg w-full relative">
                 <Button title="Close Expense Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setActiveExpenseId(null);
-                  setStartDate("");
-                  setEndDate("");
                 }}><X /></Button>
                 <AddExpenseForm travelPlanId={activeExpenseId} onSuccess={() => {
                   setActiveExpenseId(null);
-                  setStartDate("");
-                  setEndDate("");
                 }} />
               </div>
             </div>
@@ -202,14 +180,10 @@ export default function TravelPlan() {
                 <Button title="Close Document Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setSelectedTravelId(null);
                   setEditTravelPlanId(null);
-                  setStartDate("");
-                  setEndDate("");
                 }}><X /></Button>
                 <AddTravelDocumentForm travelPlanId={selectedTravelId}  onSuccess={() => {
                   setSelectedTravelId(null);
                   setEditTravelPlanId(null);
-                  setStartDate("");
-                  setEndDate("");
                 }} />
               </div>
             </div>
@@ -237,7 +211,7 @@ export default function TravelPlan() {
                                                       - new Date(a.travelPlanStartDate).getTime())
               .map((plan: any) => 
                 (
-                <Card key={plan.id} 
+                <Card key={plan.id}
                   onClick={() => setFullTravelDetails(plan.id)}
                   className="hover:shadow-md transition-shadow border-slate-200 cursor-pointer">
                   <CardHeader>
@@ -314,8 +288,6 @@ export default function TravelPlan() {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setActiveExpenseId(plan.id);
-                                setStartDate(plan.travelPlanStartDate);
-                                setEndDate(plan.travelPlanEndDate);
                               }}
                               className="text-gray-600 mt-2"
                             >
@@ -374,6 +346,31 @@ export default function TravelPlan() {
               <div className="col-span-full py-20 text-center text-slate-400">No travel plans found.</div>
             )}
           </div>
+          {travelPlanByEmpId?.totalPages > 0  ? (
+            <div className="flex justify-center gap-4 mt-6">
+              <Button 
+              className="text-gray-700"
+              disabled={page === 0}
+              onClick={() => setPage(old => Math.max(old - 1, 0))}
+              >
+              <ArrowLeft size={16} className="mr-2" />Previous
+              </Button>
+              <span className="text-sm text-gray-600 mt-2">
+              Page {page + 1} of {travelPlanByEmpId?.totalPages ?? 1}
+              </span>
+              <Button
+              className="text-gray-700"
+              disabled={page + 1 >= (travelPlanByEmpId?.totalPages ?? 1)}
+              onClick={() => {
+                  if (page + 1 < (travelPlanByEmpId?.totalPages ?? 1)) {
+                  setPage(old => old + 1);
+                  }
+              }}
+              >
+              Next <ArrowRight size={16} className="ml-2" />
+              </Button>
+            </div>
+          ):null}
         </main>
       </SidebarInset>
     </SidebarProvider>

@@ -200,6 +200,9 @@ export default function GameManagement() {
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />
                                 )))
                         }
+                        {upcomingBookings.length === 0 && (
+                            <p className="text-slate-500 italic">No upcoming bookings.</p>
+                        )}
                     </div>
 
                     

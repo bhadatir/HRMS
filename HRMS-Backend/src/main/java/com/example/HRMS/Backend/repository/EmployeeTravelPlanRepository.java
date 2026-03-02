@@ -3,6 +3,8 @@ package com.example.HRMS.Backend.repository;
 import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.EmployeeTravelPlan;
 import com.example.HRMS.Backend.model.TravelPlan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -57,5 +59,19 @@ public interface EmployeeTravelPlanRepository extends JpaRepository<EmployeeTrav
             "where e.fkEmployee.id = :empId " +
             "and e.fkTravelPlan.id = :travelPlanId ")
     boolean isEmployeeTravelPlanByEmployeeIdAndTravelPlanIdExist(@Param("empId") Long empId, @Param("travelPlanId") Long travelPlanId);
+
+    @Query("SELECT DISTINCT etp FROM EmployeeTravelPlan etp " +
+            "WHERE (etp.fkEmployee.id = :empId " +
+            "OR etp.fkEmployee.fkManagerEmployee.id = :empId " +
+            "OR etp.fkTravelPlan.fkTravelPlanHREmployee.id = :empId) " +
+            "AND (lower(etp.fkTravelPlan.travelPlanName) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR lower(etp.fkTravelPlan.travelPlanDetails) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR lower(etp.fkTravelPlan.travelPlanFrom) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR CAST(etp.fkTravelPlan.travelPlanStartDate AS string) LIKE (concat(:searchTerm, '%')) " +
+            "OR CAST(etp.fkTravelPlan.travelPlanEndDate AS string) LIKE (concat(:searchTerm, '%')) " +
+            "OR lower(etp.fkTravelPlan.travelPlanTo) LIKE lower(concat(:searchTerm, '%')) " +
+            "OR lower(etp.fkTravelPlan.fkTravelPlanHREmployee.employeeEmail) LIKE lower(concat(:searchTerm, '%'))) " +
+            "ORDER BY etp.employeeTravelPlanCreatedAt DESC")
+    Page<EmployeeTravelPlan> findEmployeeTravelPlanByFkEmployee_Id(Long empId, String searchTerm, Pageable pageable);
 
 }

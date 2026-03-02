@@ -6,6 +6,7 @@ import com.example.HRMS.Backend.dto.TravelPlanResponse;
 import com.example.HRMS.Backend.model.TravelDocsType;
 import com.example.HRMS.Backend.model.TravelPlan;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface TravelPlanService {
-    TravelPlan findTravelPlanByHREmployeeId(Long hrEmployeeId);
 
     void addTravelPlan(TravelPlanRequest travelPlanRequest);
 
@@ -45,4 +45,7 @@ public interface TravelPlanService {
     List<TravelDocsType> getAllDocTypes();
 
     boolean isEmpAvailable(Long id, LocalDate startDate, LocalDate endDate);
+
+    Page<TravelPlanResponse> findTravelPlanByEmployeeId(Long empId, String searchTerm, int page, int size);
+
 }

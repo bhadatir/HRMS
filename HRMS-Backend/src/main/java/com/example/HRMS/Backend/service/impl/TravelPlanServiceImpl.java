@@ -12,6 +12,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,11 +55,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     private final NotificationService notificationService;
 
     private final NotificationRepository notificationRepository;
-
-    @Override
-    public TravelPlan findTravelPlanByHREmployeeId(Long hrEmployeeId){
-        return travelPlanRepository.findTravelPlanByFkTravelPlanHREmployee_Id(hrEmployeeId);
-    }
 
     @Transactional
     @Override
@@ -288,6 +286,27 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             travelPlanResponses.add(travelPlanResponse);
         }
         return travelPlanResponses;
+    }
+
+
+    @Override
+    public Page<TravelPlanResponse> findTravelPlanByEmployeeId(Long empId, String searchTerm, int page, int size){
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<EmployeeTravelPlan> employeeTravelPlans = employeeTravelPlanRepository.findEmployeeTravelPlanByFkEmployee_Id(empId, searchTerm, pageable);
+
+        return employeeTravelPlans.map(employeeTravelPlan1 -> {
+            TravelPlanResponse travelPlanResponse = modelMapper.map(employeeTravelPlan1.getFkTravelPlan(),TravelPlanResponse.class);
+
+            List<EmployeeTravelPlanResponse> employeeTravelPlanResponses = new ArrayList<>();
+            for(EmployeeTravelPlan employeeTravelPlan:employeeTravelPlanRepository.findEmployeeTravelPlanByFkTravelPlan_Id(employeeTravelPlan1.getFkTravelPlan().getId()))
+            {
+                EmployeeTravelPlanResponse employeeTravelPlanResponse = modelMapper.map(employeeTravelPlan, EmployeeTravelPlanResponse.class);
+                employeeTravelPlanResponses.add(employeeTravelPlanResponse);
+            }
+            travelPlanResponse.setEmployeeTravelPlanResponses(employeeTravelPlanResponses);
+            return travelPlanResponse;
+        });
     }
 
     @Value("${img.path}")

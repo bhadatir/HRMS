@@ -6,6 +6,7 @@ import com.example.HRMS.Backend.service.ExpenseService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,9 +32,12 @@ public class TravelPlanController {
         return ResponseEntity.ok(travelPlanService.showTravelPlanById(id));
     }
 
-    @GetMapping("/hrId/{hrEmpId}")
-    public ResponseEntity<TravelPlan> findTravelPlanByHrEmployeeId(@PathVariable Long hrEmpId){
-        return ResponseEntity.ok(travelPlanService.findTravelPlanByHREmployeeId(hrEmpId));
+    @GetMapping("/empId/{empId}")
+    public ResponseEntity<Page<TravelPlanResponse>> findTravelPlanByEmployeeId(@PathVariable Long empId,
+                                                                               @RequestParam String searchTerm,
+                                                                               @RequestParam(defaultValue = "0") int page,
+                                                                               @RequestParam(defaultValue = "10") int size){
+        return ResponseEntity.ok(travelPlanService.findTravelPlanByEmployeeId(empId, searchTerm, page, size));
     }
 
     @PostMapping("/expense")
