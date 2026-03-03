@@ -91,5 +91,15 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             @Param("gameTypeId") Long gameTypeId,
             Pageable pageable
     );
+
+    @Query(value = "SELECT e " +
+            "FROM Employee e " +
+            "WHERE lower(e.employeeFirstName) like lower(concat(:searchTerm,'%')) " +
+            "or lower(e.employeeLastName) like lower(concat(:searchTerm,'%')) " +
+            "or lower(e.fkRole.roleName) like lower(concat(:searchTerm,'%')) " +
+            "or lower(e.fkPosition.positionName) like lower(concat(:searchTerm,'%')) " +
+            "or lower(e.fkDepartment.departmentName) like lower(concat(:searchTerm,'%')) " +
+            "or lower(e.employeeEmail) like lower(concat(:searchTerm,'%')) ")
+    List<Employee> findAllBySearchTerm(String searchTerm);
 }
 

@@ -56,8 +56,8 @@ export const apiService = {
     return res.data;
   },
 
-  getAllEmployees: async (token: string) => {
-    const res = await api.get("/user/", authHeader(token));
+  getAllEmployees: async (searchTerm:string, token: string) => {
+    const res = await api.get(`/admin/?searchTerm=${searchTerm}`, authHeader(token));
     return res.data;
   },
 

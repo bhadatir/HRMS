@@ -23,11 +23,6 @@ public class UserController {
 
     private final AuthService authService;
 
-    @GetMapping("/")
-    public ResponseEntity<List<EmployeeResponse>> getAllEmployees() {
-        return ResponseEntity.ok(authService.getAllEmployees());
-    }
-
     @GetMapping("/email")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) {
         return ResponseEntity.ok(authService.getEmployeeByEmail(email));

@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.controller;
 
 
+import com.example.HRMS.Backend.dto.EmployeeResponse;
 import com.example.HRMS.Backend.dto.RegisterRequest;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.dto.TravelPlanResponse;
@@ -47,6 +48,11 @@ public class AdminController {
     @GetMapping("/allDepartments")
     public ResponseEntity<List<Department>> showAllDepartments() {
         return ResponseEntity.ok(authService.showAllDepartments());
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<EmployeeResponse>> getAllEmployees(@RequestParam String searchTerm) {
+        return ResponseEntity.ok(authService.getAllEmployees(searchTerm));
     }
 
     @GetMapping("/allRoles")

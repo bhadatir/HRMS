@@ -180,8 +180,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<EmployeeResponse> getAllEmployees(){
-        List<Employee> employee = employeeRepository.findAll();
+    public List<EmployeeResponse> getAllEmployees(String searchTerm){
+        List<Employee> employee = employeeRepository.findAllBySearchTerm(searchTerm);
         return employee.stream().map(employee1 -> {
             return modelMapper.map(employee1,EmployeeResponse.class);
         }).toList();

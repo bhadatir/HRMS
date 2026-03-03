@@ -23,8 +23,8 @@ export default function JobManagement() {
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
 
   const { data: allEmp, isLoading } = useQuery({
-    queryKey: ["allEmployees"],
-    queryFn: () => apiService.getAllEmployees(token || ""),
+    queryKey: ["allEmployees", searchTerm],
+    queryFn: () => apiService.getAllEmployees(searchTerm, token || ""),
     enabled: !!token,
   });
   

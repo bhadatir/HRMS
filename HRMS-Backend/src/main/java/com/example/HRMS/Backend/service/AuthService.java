@@ -36,7 +36,7 @@ public interface AuthService {
 
     Page<EmployeeSearch> getAvailableParticipants(String query, int page, int size, LocalDateTime startDate1, Long gameTypeId);
 
-    List<EmployeeResponse> getAllEmployees();
+    List<EmployeeResponse> getAllEmployees(String searchTerm);
 
     void updateUser(@Valid RegisterRequest registerRequest, String userEmail);
 
