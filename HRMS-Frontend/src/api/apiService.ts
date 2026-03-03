@@ -16,6 +16,15 @@ const authHeader = (token: string) => ({
 
 export const apiService = {
 
+  updateProfileImage: async (empId: number, formData: FormData, token: string) => {
+    const res = await api.patch(`/user/profileImage/${empId}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  },
+
   login: async (data: any) => {
     const res = await api.post("/auth/login", data);
     return res.data;

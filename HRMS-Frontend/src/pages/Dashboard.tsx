@@ -1,9 +1,9 @@
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Calendar, Building, X, Bell, IndianRupee } from "lucide-react";
+import { Mail, Calendar, Building, X, Bell, IndianRupee, PenIcon, Pencil } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,12 +13,14 @@ import {
 import { AppSidebar } from "@/components/app-sidebar"
 import { Input } from "@/components/ui/input.tsx";
 import { apiService } from "@/api/apiService.ts";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Dashboard() {
   const { setIsFirstLogin, token, isFirstLogin, user, unreadNotifications } = useAuth();
   const [showNotification, setShowNotification] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
+  const [newPassword, setNewPassword] = useState(""); 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
   if (!user) {
     return (
@@ -27,6 +29,21 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  const profilePicMutation = useMutation({
+    mutationFn: async (file: File) => {
+    
+      const formData = new FormData();
+      formData.append("file", file);
+  
+      return apiService.updateProfileImage(user.id, formData, token || "");
+    },
+    onSuccess: () => {
+      alert("Profile picture updated!");
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (err: any) => alert(err.message)
+  });
 
   const updatePasswordMutation = useMutation({
     mutationFn: () => apiService.updatePassword(user.id, newPassword, token || ""),
@@ -90,25 +107,27 @@ export default function Dashboard() {
           </header>
           <main className="p-6 max-w-7xl mx-auto space-y-6 w-250">
             
-              {/* Notifications */}
-              {showNotification && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                  <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
-                    <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                      setShowNotification(false);
-                    }}><X /></Button>
-                    <Notifications />
-                  </div>
+            {/* Notifications */}
+            {showNotification && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
+                  <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                    setShowNotification(false);
+                  }}><X /></Button>
+                  <Notifications />
                 </div>
-              )}
+              </div>
+            )}
 
             <div className="rounded p-8 text-black">
               <div className="flex flex-col md:flex-row items-center gap-6">
-                <Avatar className="h-16 w-16">
+                <Avatar title="edit profile image" className="h-16 w-16 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                   <AvatarImage src={user.employeeProfileUrl} />
                   <AvatarFallback className="bg-blue-600 text-white">
                     {user.employeeFirstName.charAt(0)}{user.employeeLastName.charAt(0)}
                   </AvatarFallback>
+                  <Input type="file" className="hidden" onChange={(e) => e.target.files && profilePicMutation.mutate(e.target.files[0])} ref={fileInputRef} />
+                  <Pencil className="absolute bottom-0 right-0 bg-white rounded-full p-1 text-gray-600" />                  
                 </Avatar>
                 <div className="text-center md:text-left">
                   <h1 className="text-3xl font-bold">{user.employeeFirstName} {user.employeeLastName}</h1>
