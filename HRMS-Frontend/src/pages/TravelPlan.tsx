@@ -94,7 +94,7 @@ export default function TravelPlan() {
                 <option value="4">Return</option>
                 <option value="5">One-Way</option>
             </select>
-            </div>
+          </div>
 
           <div className="relative max-w-sm w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />

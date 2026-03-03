@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -36,6 +37,10 @@ public class EmployeeResponse {
 
         private Boolean employeeIsActive;
 
+        private Instant employeeCreatedAt;
+
+        private Instant lastLoginAt;
+
         private Long  departmentId;
         private String  departmentName;
 
@@ -47,6 +52,4 @@ public class EmployeeResponse {
 
         private Long  managerEmployeeId;
         private String  managerEmployeeEmail;
-
-
 }

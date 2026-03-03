@@ -7,13 +7,15 @@ import Stomp from "stompjs";
 
 type AuthContextType = {
   token: string | null;
+  isFirstLogin: string;
   user: any;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (token: string, email: string) => void;
+  login: (token: string, email: string, isFirstLogin: string) => void;
   logout: () => void;
   unreadNotifications: number;
   setUnreadNotifications: (count: number) => void;
+  setIsFirstLogin: (isFirst: string) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +24,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
   const [email, setEmail] = useState<string | null>(() => localStorage.getItem("email"));
+  const [isFirstLogin, setIsFirstLogin] = useState<string>(() => {
+    const isFirstLogin = localStorage.getItem("isFirstLogin");
+    return isFirstLogin==="yes" ? "yes" : "no";
+  });
+
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
 
   const queryClient = useQueryClient();
@@ -70,16 +77,19 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [isError]);
 
-  const login = (newToken: string, newEmail: string) => {
+  const login = (newToken: string, newEmail: string, isFirstLogin: string) => {
     localStorage.setItem("token", newToken);
     localStorage.setItem("email", newEmail);
+    localStorage.setItem("isFirstLogin", isFirstLogin);
     setToken(newToken);
     setEmail(newEmail);
+    setIsFirstLogin(isFirstLogin);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
+    localStorage.removeItem("isFirstLogin");
     setToken(null);
     setEmail(null);
     setUnreadNotifications(0);
@@ -90,6 +100,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider 
       value={{ 
         token, 
+        setIsFirstLogin,
+        isFirstLogin,
         user: userData || null, 
         isAuthenticated: !!token, 
         isLoading,

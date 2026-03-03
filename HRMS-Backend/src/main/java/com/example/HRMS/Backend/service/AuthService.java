@@ -2,7 +2,11 @@ package com.example.HRMS.Backend.service;
 
 
 import com.example.HRMS.Backend.dto.*;
+import com.example.HRMS.Backend.model.Department;
 import com.example.HRMS.Backend.model.Employee;
+import com.example.HRMS.Backend.model.Position;
+import com.example.HRMS.Backend.model.Role;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +24,7 @@ public interface AuthService {
 
     void initiateForgotPassword(String email);
 
-    EmployeeResponse getEmployeeByEmail(String email) throws IOException;
+    EmployeeResponse getEmployeeByEmail(String email);
 
     void addProfileImage(Long empId, MultipartFile file) throws IOException;
 
@@ -31,4 +35,18 @@ public interface AuthService {
     Page<EmployeeSearch> getAvailableEmployeeForTravel(String query, int page, int size, LocalDate startDate, LocalDate endDate);
 
     Page<EmployeeSearch> getAvailableParticipants(String query, int page, int size, LocalDateTime startDate1, Long gameTypeId);
+
+    List<EmployeeResponse> getAllEmployees();
+
+    void updateUser(@Valid RegisterRequest registerRequest, String userEmail);
+
+    List<Position> showAllPosition();
+
+    List<Department> showAllDepartments();
+
+    List<Role> showAllRoles();
+
+    void inActiveUserById(Long userId, String reason);
+
+    void updatePassword(Long empId, String newPassword);
 }

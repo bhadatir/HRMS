@@ -7,6 +7,7 @@ import com.example.HRMS.Backend.service.AuthService;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import com.example.HRMS.Backend.util.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,19 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtil.generateJwtToken(authentication);
 
-        return new AuthResponse(jwt);
+        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(authentication.getName()).orElseThrow(
+                () -> new RuntimeException("employee email not valid")
+        );
+
+        String isFirstLogin = "no";
+        if(employee.getLastLoginAt() == null){
+            isFirstLogin="yes";
+        }
+
+        employee.setLastLoginAt(Instant.now());
+        employeeRepository.save(employee);
+
+        return new AuthResponse(jwt, isFirstLogin);
     }
 
     @Override
@@ -105,6 +118,15 @@ public class AuthServiceImpl implements AuthService {
         employee.setFkRole(role);
 
         employeeRepository.save(employee);
+
+        List<String> emails1 = new ArrayList<>();
+        emails1.add(request.getEmail());
+        emailService.sendEmail(emails1,"Congratulation you are added in ROIMA as : " + role.getRoleName()
+                ,"Please update your password using given detail in ROIMA HRMS : email - "
+                + request.getEmail() + " pass - " + request.getPassword()
+        );
+
+
     }
 
     @Override
@@ -138,33 +160,31 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public EmployeeResponse getEmployeeByEmail(String email) throws IOException {
+    public void updatePassword(Long empId, String newPassword){
+        Employee employee = employeeRepository.findEmployeeById(empId);
+        employee.setEmployeePassword(passwordEncoder.encode(newPassword));
+        employeeRepository.save(employee);
+
+        List<String> emails1 = new ArrayList<>();
+        emails1.add(employee.getEmployeeEmail());
+        emailService.sendEmail(emails1,"your password updated at : " + Instant.now()
+                ,"Please verify your password updation and if any problem so contact us immediately."
+        );
+    }
+
+    @Override
+    public EmployeeResponse getEmployeeByEmail(String email) {
         Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
                 .orElseThrow( () -> new RuntimeException("employee not found"));
-        EmployeeResponse employeeResponse = new EmployeeResponse();
-        employeeResponse.setEmployeeDob(employee.getEmployeeDob());
-        employeeResponse.setEmployeeGender(employee.getEmployeeGender());
-        employeeResponse.setEmployeeEmail(employee.getEmployeeEmail());
-        employeeResponse.setEmployeeSalary(employee.getEmployeeSalary());
-        employeeResponse.setEmployeeIsActive(employee.getEmployeeIsActive());
-        employeeResponse.setId(employee.getId());
-        employeeResponse.setEmployeeFirstName(employee.getEmployeeFirstName());
-        employeeResponse.setEmployeeLastName(employee.getEmployeeLastName());
-        employeeResponse.setEmployeeHireDate(employee.getEmployeeHireDate());
-        employeeResponse.setDepartmentId(employee.getFkDepartment().getId());
-        employeeResponse.setDepartmentName(employee.getFkDepartment().getDepartmentName());
-        employeeResponse.setPositionId(employee.getFkPosition().getId());
-        employeeResponse.setPositionName(employee.getFkPosition().getPositionName());
-        employeeResponse.setRoleId(employee.getFkRole().getId());
-        employeeResponse.setRoleName(employee.getFkRole().getRoleName());
+        return modelMapper.map(employee,EmployeeResponse.class);
+    }
 
-        if(employee.getFkManagerEmployee() != null) {
-            employeeResponse.setManagerEmployeeEmail(employee.getFkManagerEmployee().getEmployeeEmail());
-            employeeResponse.setManagerEmployeeId(employee.getFkManagerEmployee().getId());
-        }
-        employeeResponse.setEmployeeProfileUrl(employee.getEmployeeProfileUrl());
-
-        return employeeResponse;
+    @Override
+    public List<EmployeeResponse> getAllEmployees(){
+        List<Employee> employee = employeeRepository.findAll();
+        return employee.stream().map(employee1 -> {
+            return modelMapper.map(employee1,EmployeeResponse.class);
+        }).toList();
     }
 
     @Value("${img.path}")
@@ -226,5 +246,75 @@ public class AuthServiceImpl implements AuthService {
         String email = authentication.getName();
         return employeeRepository.findEmployeeByEmployeeEmail(email)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
+
+    @Transactional
+    @Override
+    public void updateUser(@Valid RegisterRequest request, String userEmail){
+        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(userEmail).orElseThrow(
+                () -> new RuntimeException("employ email not found.")
+        );
+        if(Boolean.FALSE.equals(employee.getEmployeeIsActive())){
+            throw new RuntimeException("can not edit inactive user.");
+        }
+        employee.setEmployeeFirstName(request.getFirstName());
+        employee.setEmployeeLastName(request.getLastName());
+        employee.setEmployeeEmail(request.getEmail());
+        employee.setEmployeeDob(request.getDob());
+        employee.setEmployeeGender(request.getGender());
+        employee.setEmployeeHireDate(request.getHireDate());
+        employee.setEmployeeSalary(request.getSalary());
+
+        Department department = departmentRepository.findById(Long.valueOf(request.getDepartmentId()))
+                .orElseThrow(() -> new RuntimeException("Department not found"));
+        employee.setFkDepartment(department);
+
+        Position position = positionRepository.findById(Long.valueOf(request.getPositionId()))
+                .orElseThrow(() -> new RuntimeException("Position not found"));
+        employee.setFkPosition(position);
+
+        Role role = roleRepository.findById(Long.valueOf(request.getRoleId()))
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        employee.setFkRole(role);
+
+        employeeRepository.save(employee);
+
+        List<String> emails1 = new ArrayList<>();
+        emails1.add(request.getEmail());
+        emailService.sendEmail(emails1,"your details is updated at : " + Instant.now()
+                ,"Please verify your details and if any problem so contact us immediately."
+        );
+    }
+
+    @Override
+    public List<Position> showAllPosition(){
+        return positionRepository.findAll();
+    }
+
+    @Override
+    public List<Department> showAllDepartments(){
+        return departmentRepository.findAll();
+    }
+
+    @Override
+    public List<Role> showAllRoles(){
+        return roleRepository.findAll();
+    }
+
+    @Override
+    public void inActiveUserById(Long userId, String reason){
+        Employee employee = employeeRepository.findEmployeeById(userId);
+        if(Boolean.FALSE.equals(employee.getEmployeeIsActive())){
+            throw new RuntimeException("can not make inactive who is already inactive user.");
+        }
+        employee.setEmployeeIsActive(false);
+        employee.setReasonForInActive(reason);
+        employeeRepository.save(employee);
+
+        List<String> emails1 = new ArrayList<>();
+        emails1.add(employee.getEmployeeEmail());
+        emailService.sendEmail(emails1,"your Status is inactivated at : " + Instant.now()
+                ,"Reason for Inactivation : " + reason
+        );
     }
 }

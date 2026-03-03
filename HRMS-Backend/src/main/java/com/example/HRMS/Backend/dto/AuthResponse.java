@@ -10,8 +10,11 @@ import lombok.NoArgsConstructor;
 public class AuthResponse {
     private String accessToken;
     private String tokenType = "Bearer";
+    private String isFirstLogin;
 
-    public AuthResponse(String accessToken) {
+    public AuthResponse(String accessToken, String isFirstLogin) {
         this.accessToken = accessToken;
+        this.isFirstLogin = isFirstLogin;
+        System.out.println(isFirstLogin);
     }
 }

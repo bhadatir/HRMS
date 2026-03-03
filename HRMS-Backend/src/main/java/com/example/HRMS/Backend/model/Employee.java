@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -67,11 +68,20 @@ public class Employee {
     @Column(name = "employee_is_active")
     private Boolean employeeIsActive = true;
 
+    @Column(name = "reason_for_inActive")
+    private String  reasonForInActive;
+
     @Column(name = "employee_pass_resetToken")
     private String resetToken;
 
     @Column(name = "employee_resetToken_expiry")
     private LocalDateTime resetTokenExpiry;
+
+    @Column(name = "employee_created_at")
+    private Instant employeeCreatedAt = Instant.now();
+
+    @Column(name = "last_login_at")
+    private Instant lastLoginAt;
 
     @NotNull(message = "Employee department id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

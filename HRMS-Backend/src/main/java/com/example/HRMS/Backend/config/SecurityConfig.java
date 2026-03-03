@@ -45,7 +45,7 @@ public class SecurityConfig implements WebMvcConfigurer {
             .requestMatchers("/v3/api-docs/**").permitAll()
                      .requestMatchers("/ws-notifications/**").permitAll()
             .requestMatchers("/api/admin/**")
-                     .hasAnyAuthority("ROLE_ADMIN")
+                     .hasAnyAuthority("ROLE_ADMIN", "ROLE_HR")
             .requestMatchers("/api/hr/**")
                      .hasAnyAuthority("ROLE_HR", "ROLE_ADMIN")
             .requestMatchers("/api/org-chart/**", "/api/gameType/**", "/api/travel/**",

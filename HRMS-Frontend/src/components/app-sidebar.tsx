@@ -21,6 +21,8 @@ export function AppSidebar() {
     { title: "Post Management", icon: Mail, url: "/post-management" },
     { title: "Game Management", icon: Building, url: "/game-management" },
     ...(user?.roleName === "MANAGER" ? [{ title: "Team Member Data", icon: Building2, url: "/team-member-data" }] : []),
+    ...((user?.roleName === "ADMIN" || user?.roleName === "HR" ) ? [{ title: "User Management", icon: Building2, url: "/users-management" }] : []),
+  
   ]
 
   return (

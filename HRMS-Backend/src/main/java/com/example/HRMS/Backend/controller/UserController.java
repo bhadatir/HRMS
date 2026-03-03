@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -22,8 +23,13 @@ public class UserController {
 
     private final AuthService authService;
 
+    @GetMapping("/")
+    public ResponseEntity<List<EmployeeResponse>> getAllEmployees() {
+        return ResponseEntity.ok(authService.getAllEmployees());
+    }
+
     @GetMapping("/email")
-    public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) throws IOException {
+    public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) {
         return ResponseEntity.ok(authService.getEmployeeByEmail(email));
     }
 
@@ -63,4 +69,12 @@ public class UserController {
         authService.addProfileImage(empId,file);
         return ResponseEntity.ok("Profile Image set successfully");
     }
+
+    @PatchMapping("/update-password")
+    public ResponseEntity<Object> updatePassword(@RequestParam Long empId, @RequestParam String newPassword) {
+        authService.updatePassword(empId, newPassword);
+        return ResponseEntity.ok("Password updated successfully.");
+    }
+
+
 }

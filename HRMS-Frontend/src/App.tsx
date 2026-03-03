@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AuthProvider from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import ResetPassword from "./pages/ResetPassword";
 import OrganizationChart from "./pages/OrganizationChart";
@@ -11,6 +10,7 @@ import JobManagement from "./pages/JobManagement";
 import PostManagement from "./pages/PostManagement";
 import GameManagement from "./pages/GameManagement";
 import TeamMemberData from "./pages/TeamMembersData";
+import UsersManagement from "./pages/UsersManagement";
 
 export default function App() {
   return (
@@ -18,7 +18,6 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           
           <Route element={<ProtectedRoute />}>
@@ -28,7 +27,8 @@ export default function App() {
             <Route path="/job-management" element={<JobManagement />} />
             <Route path="/post-management" element={<PostManagement />} />
             <Route path="/game-management" element={<GameManagement />} />
-            <Route path="/team-member-data" element={<TeamMemberData />} />
+            <Route path="/team-member-data" element={<TeamMemberData />} />    
+            <Route path="/users-management" element={<UsersManagement />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" />} />

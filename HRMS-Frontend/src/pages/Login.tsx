@@ -4,27 +4,28 @@ import { useAuth } from "../context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useLogin } from "../hooks/hook";
+import { apiService } from "@/api/apiService";
+import { useMutation } from "@tanstack/react-query";
 
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({ email: "", password: "" });
 
-  const loginMutation = useLogin();
+  const loginMutation = useMutation({
+    mutationFn: (data: any) => apiService.login(data),
+    onSuccess: (data) => {
+      login(data.accessToken, formData.email, data.isFirstLogin);
+      navigate("/dashboard");
+    },
+    onError: (error: any) => {
+      alert("Login Error: " + (error.response?.data || error.message));
+    }
+  });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    loginMutation.mutate(formData, {
-      onSuccess: (data) => {
-        login(data.accessToken, formData.email);
-        navigate("/dashboard");
-      },
-      onError: (error: any) => {
-        alert("Login Error: " + (error.response?.data || error.message));
-      }
-    });
+    loginMutation.mutate(formData);
   };
 
   return (
@@ -73,7 +74,7 @@ export default function Login() {
                  Forgot Password?
                </Link>
                
-               <div className="relative">
+               {/* <div className="relative">
                   <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-white px-2 text-muted-foreground font-semibold">Or</span>
@@ -85,7 +86,7 @@ export default function Login() {
                  <Link to="/signup" className="text-blue-600 font-bold hover:underline">
                    Sign Up
                  </Link>
-               </p>
+               </p> */}
             </div>
           </form>
         </CardContent>

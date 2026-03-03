@@ -23,12 +23,6 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(authRequest));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<Object> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        authService.register(registerRequest);
-        return ResponseEntity.ok("User registered successfully");
-    }
-
     @PostMapping("/forgot-password")
     public ResponseEntity<Object> forgotPassword(@RequestParam String email) {
         authService.initiateForgotPassword(email);
@@ -40,4 +34,5 @@ public class AuthController {
         authService.resetPassword(token, newPassword);
         return ResponseEntity.ok("Password updated successfully.");
     }
+
 }

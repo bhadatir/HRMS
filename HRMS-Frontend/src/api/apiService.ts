@@ -21,8 +21,13 @@ export const apiService = {
     return res.data;
   },
 
-  register: async (data: any) => {
-    const res = await api.post("/auth/register", data);
+  register: async (data: any, token: string) => {
+    const res = await api.post("/admin/register", data, authHeader(token));
+    return res.data;
+  },
+
+  updateUserByEmail: async (userEmail: string, data: any, token: string) => {
+    const res = await api.put(`/admin/user/${userEmail}`, data, authHeader(token));
     return res.data;
   },
 
@@ -36,8 +41,38 @@ export const apiService = {
     return res.data;
   },
 
+  updatePassword: async (empId: string, newPassword: string, token: string) => {
+    const res = await api.patch(`/user/update-password?empId=${empId}&newPassword=${newPassword}`, null, authHeader(token));
+    return res.data;
+  },
+
+  inActiveUserByID: async (userId: number, reason: string, token: string) => {
+    const res = await api.patch(`/admin/inActiveUser/${userId}?reason=${reason}`, null, authHeader(token));
+    return res.data;
+  },
+
   getUserByEmail: async (email: string, token: string) => {
     const res = await api.get(`/user/email?email=${email}`, authHeader(token));
+    return res.data;
+  },
+
+  getAllEmployees: async (token: string) => {
+    const res = await api.get("/user/", authHeader(token));
+    return res.data;
+  },
+
+  getAllRoles: async (token: string) => {
+    const res = await api.get("/admin/allRoles", authHeader(token));
+    return res.data;
+  },
+
+  getAllDepartments: async (token: string) => {
+    const res = await api.get("/admin/allDepartments", authHeader(token));
+    return res.data;
+  },
+
+  getAllPositions: async (token: string) => {
+    const res = await api.get("/admin/allPositions", authHeader(token));
     return res.data;
   },
 
