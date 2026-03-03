@@ -2,6 +2,7 @@ package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
+import com.example.HRMS.Backend.repository.TravelPlanRepository;
 import com.example.HRMS.Backend.service.ExpenseService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -20,6 +22,7 @@ import java.util.List;
 public class TravelPlanController {
 
     private final TravelPlanService travelPlanService;
+    private final TravelPlanRepository travelPlanRepository;
     private final ExpenseService expenseService;
 
     @GetMapping("/allTravelPlans")

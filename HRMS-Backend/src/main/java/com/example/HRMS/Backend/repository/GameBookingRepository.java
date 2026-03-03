@@ -33,6 +33,12 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
                                                       @Param("searchTerm") String searchTerm,
                                                       Pageable pageable);
 
+    @Query("SELECT DISTINCT b FROM GameBooking b " +
+            "LEFT JOIN BookingParticipant bp ON bp.fkGameBooking.id = b.id " +
+            "WHERE (b.fkHostEmployee.id = :empId OR bp.fkEmployee.id = :empId) " +
+            "AND b.gameBookingIsDeleted = false ")
+    List<GameBooking> findBookingsByUser(@Param("empId") Long empId);
+
     GameBooking findGameBookingById(Long pkGameBookingId);
 
     @Query("SELECT COUNT(gameBooking) > 0 FROM GameBooking gameBooking WHERE gameBooking.fkHostEmployee.id = :empId " +
@@ -73,15 +79,15 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
                                      @Param("start") LocalDate start,
                                      @Param("end") LocalDate end);
 
-        @Query("SELECT DISTINCT b FROM GameBooking b " +
-                "JOIN BookingParticipant bp on bp.fkGameBooking = b " +
-                "WHERE b.gameBookingIsDeleted = false " +
-                "AND (b.fkHostEmployee.id IN :empIds OR bp.fkEmployee.id IN :empIds) " +
-                "AND (CAST(b.gameBookingStartTime AS LocalDate) <= :endDate " +
-                "AND CAST(b.gameBookingEndTime AS LocalDate) >= :startDate)")
-        List<GameBooking> findOverlappingBookings(@Param("empIds") List<Long> empIds,
-                                                  @Param("startDate") LocalDate startDate,
-                                                  @Param("endDate") LocalDate endDate);
+    @Query("SELECT DISTINCT b FROM GameBooking b " +
+            "JOIN BookingParticipant bp on bp.fkGameBooking = b " +
+            "WHERE b.gameBookingIsDeleted = false " +
+            "AND (b.fkHostEmployee.id IN :empIds OR bp.fkEmployee.id IN :empIds) " +
+            "AND (CAST(b.gameBookingStartTime AS LocalDate) <= :endDate " +
+            "AND CAST(b.gameBookingEndTime AS LocalDate) >= :startDate)")
+    List<GameBooking> findOverlappingBookings(@Param("empIds") List<Long> empIds,
+                                              @Param("startDate") LocalDate startDate,
+                                              @Param("endDate") LocalDate endDate);
 
     @Query("SELECT b FROM GameBooking b WHERE b.gameBookingIsDeleted = false " +
             "AND b.fkGameBookingStatus.id = 1 " +

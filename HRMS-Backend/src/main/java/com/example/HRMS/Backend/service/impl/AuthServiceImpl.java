@@ -63,6 +63,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final EmailService emailService;
 
+    private final TravelPlanService travelPlanService;
+
+    private final GameBookingRepository gameBookingRepository;
+
+    private final WaitlistRepository waitlistRepository;
+
 
     @Override
     public AuthResponse login(AuthRequest authRequest) {
@@ -310,6 +316,22 @@ public class AuthServiceImpl implements AuthService {
         employee.setEmployeeIsActive(false);
         employee.setReasonForInActive(reason);
         employeeRepository.save(employee);
+
+        List<GameBooking> gameBookings = gameBookingRepository.findBookingsByUser(employee.getId());
+        travelPlanService.removeConflictGameBookings(gameBookings, employee.getEmployeeEmail() + " status is inActive so your Bookings no more.");
+
+        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByUser(employee.getId());
+        travelPlanService.removeConflictWaitingListBookings(bookingWaitingLists, employee.getEmployeeEmail() + " status is inActive so your waiting list entry no more.");
+
+        List<Long> travelPlansId = travelPlanRepository.findAllTravelPlanByEmployeeId(employee.getId());
+
+        for(Long travelPlanId: travelPlansId){
+            travelPlanService.markEmployeeTravelPlanAsDelete(employee.getId(), travelPlanId);
+
+//            List<String> emails1 = new ArrayList<>();
+//            emails1.add(employee.getEmployeeEmail());
+//            emailService.sendEmail(emails1,"Removed from Travel Plan at :" + Instant.now(),"Because your status is inactive so if any problem in this so contact us.");
+        }
 
         List<String> emails1 = new ArrayList<>();
         emails1.add(employee.getEmployeeEmail());

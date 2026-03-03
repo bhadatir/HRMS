@@ -3,6 +3,8 @@ package com.example.HRMS.Backend.service;
 import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.dto.TravelPlanResponse;
+import com.example.HRMS.Backend.model.BookingWaitingList;
+import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.TravelDocsType;
 import com.example.HRMS.Backend.model.TravelPlan;
 import jakarta.validation.Valid;
@@ -48,4 +50,6 @@ public interface TravelPlanService {
 
     Page<TravelPlanResponse> findTravelPlanByEmployeeId(Long empId, String searchTerm, int page, int size);
 
+    void removeConflictGameBookings(List<GameBooking> conflicts, String details);
+    void removeConflictWaitingListBookings(List<BookingWaitingList> conflicts, String details);
 }

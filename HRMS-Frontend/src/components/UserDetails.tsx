@@ -98,7 +98,7 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
                     <Button title="Inactivate User"
                         onClick={handleInactivate} className="gap-2 text-gray-600">
                         <Trash size={18} />
-                        Inactivate User
+                        {inactivateMutation.isPending ? "Inactiving..." : "Inactivate User"}
                     </Button>
                 </div>}
              </div>

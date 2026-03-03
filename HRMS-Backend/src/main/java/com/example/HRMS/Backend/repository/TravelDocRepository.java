@@ -63,4 +63,19 @@ public interface TravelDocRepository extends JpaRepository<TravelDoc, Long> {
             @Param("searchTerm") String searchTerm
     );
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE TravelDoc td " +
+            "SET td.docIsDeletedFromTravel = false " +
+            "WHERE td.fkEmployee = :fkEmployee " +
+            "and td.fkTravelPlan = :fkTravelPlan " )
+    void findByFkEmployeeAndFkTravelPlanAndReAddIt(Employee fkEmployee, TravelPlan fkTravelPlan);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE TravelDoc td " +
+            "SET td.docIsDeletedFromTravel = false " +
+            "WHERE td.fkEmployee = :fkEmployee " +
+            "and td.fkEmployeeTravelPlan = :fkEmployeeTravelPlan " )
+    void findByFkEmployeeAndFkEmployeeTravelPlanAndReAddIt(Employee fkEmployee, EmployeeTravelPlan fkEmployeeTravelPlan);
 }

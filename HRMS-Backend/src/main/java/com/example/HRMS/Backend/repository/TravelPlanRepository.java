@@ -20,6 +20,11 @@ public interface TravelPlanRepository extends JpaRepository<TravelPlan, Long> {
 
     TravelPlan findTravelPlanById(Long id);
 
+    @Query(value = "select t.id from TravelPlan t " +
+            "join EmployeeTravelPlan e on e.fkTravelPlan.id = t.id " +
+            "where e.fkEmployee.id = :empId ")
+    List<Long> findAllTravelPlanByEmployeeId(Long empId);
+
     @Query(value = "select e.id " +
             "from EmployeeTravelPlan e " +
             "where e.fkEmployee = :empId " +

@@ -75,6 +75,12 @@ public interface WaitlistRepository extends JpaRepository<BookingWaitingList,Lon
 
     List<BookingWaitingList> findBookingWaitingListsByFkHostEmployee(Employee employeeById);
 
+    @Query("SELECT DISTINCT bwl FROM BookingWaitingList bwl " +
+            "LEFT JOIN BookingParticipant bp ON bp.fkBookingWaitingList.id = bwl.id " +
+            "WHERE (bwl.fkHostEmployee.id = :empId OR bp.fkEmployee.id = :empId) " +
+            "AND bwl.waitingStatusIsActive = true ")
+    List<BookingWaitingList> findBookingWaitingListsByUser(@Param("empId") Long empId);
+
     @Query("SELECT w FROM BookingWaitingList w LEFT JOIN BookingParticipant wp ON wp.fkBookingWaitingList.id = w.id " +
             "WHERE w.waitingStatusIsActive = true " +
             "AND CAST(w.targetSlotDatetime AS LocalDate) = :date " +

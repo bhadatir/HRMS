@@ -83,10 +83,18 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         for (Long id : allInvolved) {
             validateNoConflicts(id, startTime, endTime);
-        }
 
-        if (startTime.isBefore(tomorrowStart) && gameBookingRepository.hasActiveBookingInCycle(empId, gameTypeId)) {
-            return "Only one active booking allowed per game per day.";
+            if (startTime.isBefore(tomorrowStart) && gameBookingRepository.hasActiveBookingInCycle(id, gameTypeId)) {
+                return "Only one active booking allowed per game per day.";
+            }
+
+            boolean isSecondTime = gameBookingRepository.hasPlayedInCycle(id, gameTypeId)
+                    || waitlistRepository.hasAppliedInCycle(id, gameTypeId);
+
+            if (isSecondTime && Duration.between(now, startTime).toMinutes() > 30) {
+                addToWaitlist(empId, gameTypeId, startTime, endTime, false, participantIds);
+                return "Slot is reserved for first-timers. You have been added to the Priority Waitlist.";
+            }
         }
 
         boolean isSecondTime = gameBookingRepository.hasPlayedInCycle(empId, gameTypeId)
@@ -94,11 +102,6 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         boolean isSlotFull = gameBookingRepository.findGameBookingByFkGameType_Id(gameTypeId).stream()
                 .anyMatch(b -> b.getGameBookingStartTime().isEqual(startTime) && b.getFkGameBookingStatus().getId() == 1);
-
-        if (isSecondTime && Duration.between(now, startTime).toMinutes() > 30) {
-            addToWaitlist(empId, gameTypeId, startTime, endTime, false, participantIds);
-            return "Slot is reserved for first-timers. You have been added to the Priority Waitlist.";
-        }
 
         if (isSlotFull) {
             addToWaitlist(empId, gameTypeId, startTime, endTime, !isSecondTime, participantIds);
@@ -403,35 +406,11 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     @Override
     public List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId) {
-        List<BookingWaitingListResponse> bookingWaitingListResponses = new ArrayList<>();
-        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByFkHostEmployee(employeeRepository.findEmployeeById(empId));
-        for (BookingWaitingList bookingWaitingList : bookingWaitingLists) {
-            BookingWaitingListResponse response = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
+        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByUser(employeeRepository.findEmployeeById(empId).getId());
 
-            List<BookingParticipantResponse> bookingParticipantResponses =
-                    bookingParticipantRepository.findAllByBookingWaitingListId(bookingWaitingList.getId());
-
-            response.setBookingParticipantResponses(bookingParticipantResponses);
-
-            bookingWaitingListResponses.add(response);
-        }
-
-        List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findBookingParticipantByFkEmployee(employeeRepository.findEmployeeById(empId));
-
-        for (BookingParticipant bookingParticipant : bookingParticipants) {
-            if (bookingParticipant.getFkBookingWaitingList() != null) {
-                BookingWaitingListResponse bookingWaitingListResponse = modelMapper.map(bookingParticipant.getFkBookingWaitingList(), BookingWaitingListResponse.class);
-
-                List<BookingParticipantResponse> bookingParticipantResponses =
-                        bookingParticipantRepository.findAllByBookingWaitingListId(bookingParticipant.getFkBookingWaitingList().getId());
-
-                bookingWaitingListResponse.setBookingParticipantResponses(bookingParticipantResponses);
-
-                bookingWaitingListResponses.add(bookingWaitingListResponse);
-            }
-        }
-
-        return bookingWaitingListResponses;
+        return bookingWaitingLists.stream().map(bookingWaitingList -> {
+            return modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
+        }).toList();
     }
 
     @Override

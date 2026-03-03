@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,8 +43,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
     private final ExpenseStatusRepository expenseStatusRepository;
 
-    private final AuthService authService;
-
     private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
 
     private final EmployeeRepository employeeRepository;
@@ -67,6 +67,12 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
     private final GameBookingService gameBookingService;
 
+    public Employee getLoginUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return employeeRepository.findEmployeeByEmployeeEmail(email)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
 
     @Transactional
     @Override
@@ -83,78 +89,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         LocalDate end = travelPlanRequest.getTravelPlanEndDate();
 
         List<GameBooking> conflicts = gameBookingRepository.findOverlappingBookings(empId, start, end);
-        for (GameBooking booking : conflicts) {
-
-            List<String> emails = new ArrayList<>();
-            emails.add(booking.getFkHostEmployee().getEmployeeEmail());
-
-            GameBookingStatus gameBookingStatus = gameBookingStatusRepository.findGameBookingStatusById(3);
-            booking.setFkGameBookingStatus(gameBookingStatus);
-
-            List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findByFkGameBooking_Id(booking.getId());
-            for(BookingParticipant bookingParticipant : bookingParticipants){
-
-                EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
-                        (bookingParticipant.getFkEmployee().getId(), booking.getFkGameType().getId());
-
-                if (employeeGameInterest != null) {
-                    employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() - 1);
-                    employeeGameInterestRepository.save(employeeGameInterest);
-                }
-
-                emails.add(bookingParticipant.getFkEmployee().getEmployeeEmail());
-                notificationService.createNotification(bookingParticipant.getFkEmployee().getId()
-                        ,"your game booking is removed because you are added in Travel Plan by Hr at :" + Instant.now()
-                        ," date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" travel details : " + travelPlanRequest.getTravelPlanDetails());
-                bookingParticipantRepository.delete(bookingParticipant);
-            }
-
-            EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
-                    (booking.getFkHostEmployee().getId(), booking.getFkGameType().getId());
-
-            if (employeeGameInterest != null) {
-                employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() - 1);
-                employeeGameInterestRepository.save(employeeGameInterest);
-            }
-
-            if (booking.getFkGameBookingStatus().getId() == 1 ) {
-                gameBookingService.updateWaitingList(booking.getFkGameType(), booking.getGameBookingStartTime());
-            }
-
-            notificationService.createNotification(booking.getFkHostEmployee().getId()
-                    ,"your game booking is removed because you are added in Travel Plan by Hr at :" + Instant.now()
-                    ," date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" travel details : " + travelPlanRequest.getTravelPlanDetails());
-            emailService.sendEmail(emails,"your game booking is removed because you are added in Travel Plan by Hr at :" + Instant.now()
-                    , " date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" travel details : " + travelPlanRequest.getTravelPlanDetails());
-
-        }
-
-        gameBookingRepository.saveAll(conflicts);
-
+        removeConflictGameBookings(conflicts, travelPlanRequest.getTravelPlanDetails());
 
         List<BookingWaitingList> waitConflicts = waitlistRepository.findOverlappingWaitlists(empId, start, end);
-        for (BookingWaitingList wait : waitConflicts) {
-
-            List<String> emails = new ArrayList<>();
-            emails.add(wait.getFkHostEmployee().getEmployeeEmail());
-
-            List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findByFkBookingWaitingList_Id(wait.getId());
-            for(BookingParticipant bookingParticipant : bookingParticipants){
-                emails.add(bookingParticipant.getFkEmployee().getEmployeeEmail());
-                notificationService.createNotification(bookingParticipant.getFkEmployee().getId()
-                        ,"your game booking waiting list entry is removed because you are added in Travel Plan by Hr at :" + Instant.now()
-                        ," date : " + wait.getTargetSlotDatetime() + " game type : "+ wait.getFkGameType().getGameName() +" travel details : " + travelPlanRequest.getTravelPlanDetails());
-            }
-            bookingParticipantRepository.deleteAll(bookingParticipants);
-            waitlistRepository.delete(wait);
-
-            notificationService.createNotification(wait.getFkHostEmployee().getId()
-                    ,"your game booking waiting list entry is removed because you are added in Travel Plan by Hr at :" + Instant.now()
-                    ," date : " + wait.getTargetSlotDatetime() + " game type : "+ wait.getFkGameType().getGameName() +" travel details : " + travelPlanRequest.getTravelPlanDetails());
-
-            emailService.sendEmail(emails,"your game booking waiting list entry is removed because you are added in Travel Plan by Hr at :" + Instant.now()
-                    , " date : " + wait.getTargetSlotDatetime() + " game type : "+ wait.getFkGameType().getGameName() +" travel details : " + travelPlanRequest.getTravelPlanDetails());
-        }
+        removeConflictWaitingListBookings(waitConflicts, travelPlanRequest.getTravelPlanDetails());
 
         List<String> emails = new ArrayList<>();
 
@@ -180,6 +118,83 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         emailService.sendEmail(emails,"Travel Plan",travelPlanRequest.getTravelPlanDetails());
     }
 
+    @Override
+    public void removeConflictWaitingListBookings(List<BookingWaitingList> conflicts, String details){
+        for (BookingWaitingList wait : conflicts) {
+
+            List<String> emails = new ArrayList<>();
+            emails.add(wait.getFkHostEmployee().getEmployeeEmail());
+
+            List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findByFkBookingWaitingList_Id(wait.getId());
+            for(BookingParticipant bookingParticipant : bookingParticipants){
+                emails.add(bookingParticipant.getFkEmployee().getEmployeeEmail());
+                notificationService.createNotification(bookingParticipant.getFkEmployee().getId()
+                        ,"your game booking waiting list entry is removed at :" + Instant.now()
+                        ," date : " + wait.getTargetSlotDatetime() + " game type : "+ wait.getFkGameType().getGameName() +" details : " + details);
+            }
+            bookingParticipantRepository.deleteAll(bookingParticipants);
+            waitlistRepository.delete(wait);
+
+            notificationService.createNotification(wait.getFkHostEmployee().getId()
+                    ,"your game booking waiting list entry is removed at :" + Instant.now()
+                    ," date : " + wait.getTargetSlotDatetime() + " game type : "+ wait.getFkGameType().getGameName() +" details : " + details);
+
+            emailService.sendEmail(emails,"your game booking waiting list entry is at :" + Instant.now()
+                    , " date : " + wait.getTargetSlotDatetime() + " game type : "+ wait.getFkGameType().getGameName() +" details : " + details);
+        }
+    }
+
+    @Override
+    public void removeConflictGameBookings(List<GameBooking> conflicts, String details){
+        for (GameBooking booking : conflicts) {
+
+            List<String> emails = new ArrayList<>();
+            emails.add(booking.getFkHostEmployee().getEmployeeEmail());
+
+            GameBookingStatus gameBookingStatus = gameBookingStatusRepository.findGameBookingStatusById(3);
+            booking.setFkGameBookingStatus(gameBookingStatus);
+
+            List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findByFkGameBooking_Id(booking.getId());
+            for(BookingParticipant bookingParticipant : bookingParticipants){
+
+                EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
+                        (bookingParticipant.getFkEmployee().getId(), booking.getFkGameType().getId());
+
+                if (employeeGameInterest != null) {
+                    employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() - 1);
+                    employeeGameInterestRepository.save(employeeGameInterest);
+                }
+
+                emails.add(bookingParticipant.getFkEmployee().getEmployeeEmail());
+                notificationService.createNotification(bookingParticipant.getFkEmployee().getId()
+                        ,"your game booking is removed at :" + Instant.now()
+                        ," date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" details : " + details);
+                bookingParticipantRepository.delete(bookingParticipant);
+            }
+
+            EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
+                    (booking.getFkHostEmployee().getId(), booking.getFkGameType().getId());
+
+            if (employeeGameInterest != null) {
+                employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() - 1);
+                employeeGameInterestRepository.save(employeeGameInterest);
+            }
+
+            if (booking.getFkGameBookingStatus().getId() == 1 ) {
+                gameBookingService.updateWaitingList(booking.getFkGameType(), booking.getGameBookingStartTime());
+            }
+
+            notificationService.createNotification(booking.getFkHostEmployee().getId()
+                    ,"your game booking is removed at :" + Instant.now()
+                    ," date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" details : " + details);
+            emailService.sendEmail(emails,"your game booking is removed at :" + Instant.now()
+                    , " date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" details : " + details);
+
+        }
+
+        gameBookingRepository.saveAll(conflicts);
+    }
+
     @Transactional
     @Override
     public void updateTravelPlan(@Valid TravelPlanRequest travelPlanRequest, Long travelPlanId){
@@ -192,7 +207,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             throw new RuntimeException("only edit travel plan before it start.");
         }
 
-        Employee user = authService.getLoginUser();
+        Employee user = getLoginUser();
         Long hrEmpId = travelPlanRequest.getFkTravelPlanHREmployeeId();
         if(user != employeeRepository.findEmployeeById(hrEmpId)){
             throw new RuntimeException("travel plan owner only update travel plan.");
@@ -207,6 +222,15 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         TravelPlan savedTravelplan = travelPlanRepository.save(travelPlan);
 
         List<Long> newEmpId = travelPlanRequest.getEmployeesInTravelPlanId();
+        LocalDate start = travelPlanRequest.getTravelPlanStartDate();
+        LocalDate end = travelPlanRequest.getTravelPlanEndDate();
+
+        List<GameBooking> conflicts = gameBookingRepository.findOverlappingBookings(newEmpId, start, end);
+        removeConflictGameBookings(conflicts, travelPlanRequest.getTravelPlanDetails());
+
+        List<BookingWaitingList> waitConflicts = waitlistRepository.findOverlappingWaitlists(newEmpId, start, end);
+        removeConflictWaitingListBookings(waitConflicts, travelPlanRequest.getTravelPlanDetails());
+
 
         List<String> emails = new ArrayList<>();
 
@@ -227,9 +251,9 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
                     employeeTravelPlanRepository.save(employeeTravelPlan1);
 
-                    travelDocRepository.findByFkEmployeeAndFkTravelPlanAndRemoveIt(employee, travelPlan);
+                    travelDocRepository.findByFkEmployeeAndFkTravelPlanAndReAddIt(employee, travelPlan);
 
-                    travelDocRepository.findByFkEmployeeAndFkEmployeeTravelPlanAndRemoveIt(employee, employeeTravelPlan1);
+                    travelDocRepository.findByFkEmployeeAndFkEmployeeTravelPlanAndReAddIt(employee, employeeTravelPlan1);
 
                     List<String> emails1 = new ArrayList<>();
                     emails1.add(employee.getEmployeeEmail());
@@ -291,7 +315,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         travelDocRepository.findByFkEmployeeAndFkEmployeeTravelPlanAndRemoveIt(employee, employeeTravelPlan);
 
-
     }
 
     @Transactional
@@ -308,7 +331,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
 
-        Employee user = authService.getLoginUser();
+        Employee user = getLoginUser();
         if(user != travelPlan.getFkTravelPlanHREmployee()){
             throw new RuntimeException("travel plan owner only delete travel plan.");
         }
@@ -459,7 +482,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             throw new RuntimeException("only add docs before travel plan start.");
         }
 
-        Employee user = authService.getLoginUser();
+        Employee user = getLoginUser();
 
         if(user != travelPlan.getFkTravelPlanHREmployee() && !employeeTravelPlanRepository.isEmployeeTravelPlanByEmployeeIdAndTravelPlanIdExist(user.getId(), travelPlanId)){
                 throw new RuntimeException("you are not in this travel plan member or not an owner so you cannot add docs.");
