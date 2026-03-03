@@ -23,12 +23,33 @@ export default function Notifications() {
     },
   });
 
+  const markAllReadMutation = useMutation({
+    mutationFn: () => apiService.markAllNotificationsRead(user?.id || 0, token || ""),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  const handleMarkAllRead = () => {
+    window.confirm("Are you sure you want to mark all notifications as read?") &&
+    markAllReadMutation.mutate();
+  };
   if(isLoading) return <div className="p-10">Loading Notifications...</div>;
 
 return (
     <main className="p-4 w-full">
       <div className="space-y-4">
-        <h3 className="font-bold text-lg">Notifications</h3>
+        <div className="flex justify-between items-center">
+          <h3 className="font-bold text-lg">Notifications</h3>
+          <Button 
+            className="mr-16"
+            variant="outline" 
+            size="sm"
+            onClick={handleMarkAllRead}
+          >
+            Mark all as read
+          </Button>
+        </div>
         {notifications?.length > 0 && notifications.filter((n: any) => !n.read).length > 0 ? (
           notifications.map((notif: any) => ( !notif.read && (
             <Card key={notif.id} className={`shadow-none border ${!notif.read ? 'bg-blue-50/30' : ''}`}>

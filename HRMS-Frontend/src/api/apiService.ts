@@ -69,6 +69,11 @@ export const apiService = {
   markNotificationRead: async (notifId: number, token: string) => {
     const res = await api.post(`/notification/markAsSeen/notifId/${notifId}`, {}, authHeader(token));
     return res.data;
+  },
+
+  markAllNotificationsRead: async (empId: number, token: string) => {
+    const res = await api.post(`/notification/markAsSeen/empId/${empId}`, {}, authHeader(token));
+    return res.data;
   }
 
 };
