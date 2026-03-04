@@ -1,21 +1,31 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { travelService } from "../api/travelService";
 import { useAuth } from "../context/AuthContext";
-import { UploadCloud } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { UploadCloud, X } from "lucide-react";
+
+type ProofEntry = {
+  file: File;
+  typeId: string;
+};
 
 export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlanId: number, onSuccess: () => void }) {
   const { token, user } = useAuth();
-
+  const queryClient = useQueryClient();
+  
   const { data: employeeTravelPlan, isLoading, isError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
     queryFn: () => travelService.findEmployeeTravelPlans(user?.id, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
+  });
+
+  const { data: expenseTypes } = useQuery({
+    queryKey: ["expenseTypes"],
+    queryFn: () => travelService.getAllExpenseTypes(token || ""),
+    enabled: !!token,
   });
 
   const [form, setForm] = useState({
@@ -23,30 +33,49 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
     expenseDate: "",
     expenseRemark: "",
     fkExpenseExpenseStatusId: 1,
-    fkEmployeeTravelPlanId: employeeTravelPlan,
+    fkEmployeeTravelPlanId: null,
   });
+
+  const [proofs, setProofs] = useState<ProofEntry[]>([]);
 
   useEffect(() => {
     if (employeeTravelPlan) {
-      setForm(form => ({ ...form, fkEmployeeTravelPlanId: employeeTravelPlan }));
+      setForm(prev => ({ ...prev, fkEmployeeTravelPlanId: employeeTravelPlan }));
     }
   }, [employeeTravelPlan]);
 
-  const [proofFiles, setProofFiles] = useState<File[]>([]);
-  const [proofTypeIds, setProofTypeIds] = useState<string>("");
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files).map(file => ({
+        file,
+        typeId: ""
+      }));
+      setProofs([...proofs, ...newFiles]);
+    }
+  };
+
+  const updateProofType = (index: number, typeId: string) => {
+    const updated = [...proofs];
+    updated[index].typeId = typeId;
+    setProofs(updated);
+  };
+
+  const removeProof = (index: number) => {
+    setProofs(proofs.filter((_, i) => i !== index));
+  };
 
   const expenseMutation = useMutation({
     mutationFn: async () => {
+      if (!employeeTravelPlan) throw new Error("Employee travel plan not found");
       
-      if (!employeeTravelPlan) {
-        throw new Error("Employee travel plan not found");
-      }
-
       const formData = new FormData();
+      
       const jsonBlob = new Blob([JSON.stringify(form)], { type: "application/json" });
       formData.append("expenseRequest", jsonBlob);
-      proofFiles.forEach(file => formData.append("files", file));
-      const idsArray = proofTypeIds.split(",").map(id => Number(id.trim()));
+      
+      proofs.forEach(p => formData.append("files", p.file));
+      
+      const idsArray = proofs.map(p => Number(p.typeId));
       const idsBlob = new Blob([JSON.stringify(idsArray)], { type: "application/json" });
       formData.append("proofTypes", idsBlob);
   
@@ -54,6 +83,8 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
     },
     onSuccess: () => {
       alert("Expense submitted!");
+      queryClient.invalidateQueries({ queryKey: ["travelPlanByEmpId", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["travelPlan", travelPlanId] });
       onSuccess();
     },
     onError: (err: any) => alert(err.message)
@@ -68,29 +99,45 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <Input type="number" placeholder="Amount" onChange={(e) => setForm({...form, expenseAmount: Number(e.target.value)})} />
-          
-          <div className="space-y-2 flex">
-            <label className="text-sm font-medium text-gray-500 w-30 mt-2">Expense Date :</label>
-            <Input type="date" placeholder="Select expense Date"
-            max={new Date().toISOString().split("T")[0]}
-            onChange={(e) => setForm({...form, expenseDate: e.target.value})} />
-          </div>
+          <Input type="date" max={new Date().toISOString().split("T")[0]} onChange={(e) => setForm({...form, expenseDate: e.target.value})} />
         </div>
         <Input placeholder="Remark" onChange={(e) => setForm({...form, expenseRemark: e.target.value})} />
         
-        <div className="border-2 border-dashed rounded-lg p-6 text-center space-y-2 border-slate-200">
-          <UploadCloud className="mx-auto text-slate-400" size={32} />
-          <Input type="file" multiple className="cursor-pointer" onChange={(e) => e.target.files && setProofFiles(Array.from(e.target.files))} />
-          <p className="text-xs text-slate-400">Upload receipts or proof of travel</p>
+        <div className="border-2 border-dashed rounded-lg p-4 text-center border-slate-200">
+          <label className="cursor-pointer block">
+            <UploadCloud className="mx-auto text-slate-400" size={32} />
+            <span className="text-sm text-slate-500">Click to upload receipts</span>
+            <input type="file" multiple className="hidden" onChange={handleFileChange} />
+          </label>
         </div>
 
-        <Input placeholder="Proof Type IDs (e.g. 1, 2)" value={proofTypeIds} onChange={(e) => setProofTypeIds(e.target.value)} />
+        <div className="space-y-3">
+          {proofs.map((entry, index) => (
+            <div key={index} className="flex items-center gap-2 p-2 border rounded-md bg-slate-50">
+              <span className="text-xs truncate flex-1 font-medium">{entry.file.name}</span>
+              
+              <select 
+                className="text-sm border rounded p-1 bg-white"
+                value={entry.typeId}
+                onChange={(e) => updateProofType(index, e.target.value)}
+              >
+                <option value="">Select Type</option>
+                {expenseTypes?.map((type: any) => (
+                  <option key={type.id} value={type.id}>{type.expenseProofTypeName}</option>
+                ))}
+              </select>
+
+              <Button variant="ghost" size="icon" onClick={() => removeProof(index)} className="h-8 w-8">
+                <X size={16} />
+              </Button>
+            </div>
+          ))}
+        </div>
         
         <Button 
-          title="Submit Claim"
-          className="w-full text-black" 
+          className="w-full text-gray-700" 
           onClick={() => expenseMutation.mutate()} 
-          disabled={expenseMutation.isPending || proofFiles.length === 0}
+          disabled={expenseMutation.isPending || proofs.length === 0 || proofs.some(p => !p.typeId)}
         >
           {expenseMutation.isPending ? "Uploading..." : "Submit Claim"}
         </Button>
@@ -98,4 +145,3 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
     </Card>
   );
 }
-

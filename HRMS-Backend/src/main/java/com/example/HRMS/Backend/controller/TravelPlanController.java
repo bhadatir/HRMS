@@ -30,6 +30,11 @@ public class TravelPlanController {
         return ResponseEntity.ok(travelPlanService.showAllTravelPlan());
     }
 
+    @GetMapping("/allExpenseTypes")
+    public ResponseEntity<List<ExpenseProofType>> showAllExpenseTypes() {
+        return ResponseEntity.ok(travelPlanService.showAllExpenseTypes());
+    }
+
     @GetMapping("/travelPlanId/{id}")
     public ResponseEntity<TravelPlanResponse> showTravelPlanById(@PathVariable Long id) {
         return ResponseEntity.ok(travelPlanService.showTravelPlanById(id));

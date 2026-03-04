@@ -3,10 +3,7 @@ package com.example.HRMS.Backend.service;
 import com.example.HRMS.Backend.dto.TravelDocResponse;
 import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.dto.TravelPlanResponse;
-import com.example.HRMS.Backend.model.BookingWaitingList;
-import com.example.HRMS.Backend.model.GameBooking;
-import com.example.HRMS.Backend.model.TravelDocsType;
-import com.example.HRMS.Backend.model.TravelPlan;
+import com.example.HRMS.Backend.model.*;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,4 +49,6 @@ public interface TravelPlanService {
 
     void removeConflictGameBookings(List<GameBooking> conflicts, String details);
     void removeConflictWaitingListBookings(List<BookingWaitingList> conflicts, String details);
+
+    List<ExpenseProofType> showAllExpenseTypes();
 }

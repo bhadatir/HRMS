@@ -21,12 +21,23 @@ export default function JobManagement() {
   const [showAddUserForm, setShowAddUserForm] = useState(false);
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
+  const [employeeType, setEmployeeType] = useState(0);
 
   const { data: allEmp, isLoading } = useQuery({
     queryKey: ["allEmployees", searchTerm],
     queryFn: () => apiService.getAllEmployees(searchTerm, token || ""),
     enabled: !!token,
   });
+
+  const filterEmp = useMemo(() => {
+    if (!allEmp || !user) return [];
+    return allEmp?.filter((emp: any) => {
+        if(employeeType === 0) return true;
+        if(employeeType === 1) return emp.employeeIsActive === true;
+        if(employeeType === 2) return emp.employeeIsActive === false;
+        return false;
+      }) || [];
+    }, [allEmp, employeeType, user]);
   
   return (
     <SidebarProvider>
@@ -38,6 +49,15 @@ export default function JobManagement() {
             <h3 className="text-lg font-bold text-slate-800">User Management</h3>
           </div>
   
+          <div className="flex items-center gap-2">
+            <select className="border rounded-md px-2 py-1 text-sm" 
+              value={employeeType} onChange={(e) => setEmployeeType(Number(e.target.value))}>
+                <option value="0">All Employees</option>
+                <option value="1">Active</option>
+                <option value="2">InActive</option>
+            </select>
+          </div>
+
           <div className="relative max-w-sm w-full mx-4">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input
@@ -131,8 +151,8 @@ export default function JobManagement() {
                         <TableRow>
                             <TableCell colSpan={5} className="text-center p-4">Loading...</TableCell>
                         </TableRow>
-                    ) : allEmp?.length > 0 ? (
-                        allEmp.map((emp: any, index: number) => (
+                    ) : filterEmp?.length > 0 ? (
+                        filterEmp.map((emp: any, index: number) => (
                             <TableRow key={emp.id} 
                               title = {emp.employeeIsActive ? "Active User" : "Inactive User"}
                               className={cn(

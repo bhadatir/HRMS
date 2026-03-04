@@ -20,6 +20,11 @@ export const travelService = {
     return res.data;
   },
 
+  getAllExpenseTypes: async (token: string) => {
+    const res = await api.get("/travel/allExpenseTypes", authHeader(token));
+    return res.data;
+  },
+
   getAllTravelDocTypes: async (token: string) => {
     const res = await api.get("/travel/docTypes", authHeader(token));
     return res.data;

@@ -45,6 +45,8 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
     private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
 
+    private final ExpenseProofTypeRepository expenseProofTypeRepository;
+
     private final EmployeeRepository employeeRepository;
 
     private final BookingParticipantRepository bookingParticipantRepository;
@@ -616,4 +618,8 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         );
     }
 
+    @Override
+    public List<ExpenseProofType> showAllExpenseTypes(){
+        return expenseProofTypeRepository.findAll();
+    }
 }
