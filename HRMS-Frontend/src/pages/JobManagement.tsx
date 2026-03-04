@@ -25,6 +25,7 @@ export default function JobManagement() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [referJobId, setReferJobId] = useState<number | null>(null);
   const queryClient = useQueryClient();
+  const [jobType, setJobType] = useState(0);
 
   const { data: allJobs, isLoading, isError: allJobsOnError } = useQuery({
     queryKey: ["allJobs"],
@@ -38,10 +39,16 @@ export default function JobManagement() {
 
   const filteredJobs = useMemo(() => {
     if (!allJobs) return [];
-    return allJobs.filter((job: any) =>
-      job.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  }, [allJobs, searchTerm]);
+    return allJobs.filter((job: any) => {
+      const matchesSearch = job.jobTitle.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!matchesSearch) return false;
+      if(jobType === 0) return true;
+      if(jobType === 1) return job.jobIsActive === true;
+      if(jobType === 2) return job.jobIsActive === false;
+      if(jobType === 3) return job.employeeId === user?.id;
+      return false;
+    });
+  }, [allJobs, searchTerm, jobType]);
 
   const jobStatusmutation = useMutation({
     mutationFn: ({ jobId, reason }: { jobId: number; reason: string }) => jobService.updateJobStatus(jobId, reason, token || ""),
@@ -68,6 +75,20 @@ export default function JobManagement() {
           <div className="flex items-center gap-2">
             {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Job Board</h3>
+             {searchTerm && searchTerm.length > 0 ?(
+              <Badge variant="outline">{filteredJobs.length} results</Badge>
+            ) : (<Badge variant="outline">No filter</Badge>)
+            }
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select className="border rounded-md px-2 py-1 text-sm" 
+              value={jobType} onChange={(e) => setJobType(Number(e.target.value))}>
+                <option value="0">All Job</option>
+                <option value="1">Open</option>
+                <option value="2">Closed</option>
+                {user?.roleName === "HR" && <option value="3">My Jobs</option>}
+            </select>
           </div>
 
           <div className="relative max-w-sm w-full mx-4">
@@ -106,7 +127,7 @@ export default function JobManagement() {
           {/* Notifications */}
           {showNotification && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
+              <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowNotification(false);

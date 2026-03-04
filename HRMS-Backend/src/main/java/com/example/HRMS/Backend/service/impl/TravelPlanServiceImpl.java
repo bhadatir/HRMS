@@ -106,6 +106,11 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 throw new RuntimeException("emp is not available at this travel period");
             }
 
+            if(Objects.equals(id, travelPlanRequest.getFkTravelPlanHREmployeeId()))
+            {
+                throw new RuntimeException("owner can not add it self in travel members.");
+            }
+
             EmployeeTravelPlan employeeTravelPlan = new EmployeeTravelPlan();
             employeeTravelPlan.setFkEmployee(employee);
             employeeTravelPlan.setEmployeeTravelPlanCreatedAt(Instant.now());

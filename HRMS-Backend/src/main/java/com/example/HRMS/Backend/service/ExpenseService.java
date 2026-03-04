@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ExpenseService {
@@ -22,4 +23,6 @@ public interface ExpenseService {
     List<ExpenseResponse> getExpenseById(Long employeeId, Long travelPlanId);
 
     List<ExpenseProofResponse> getExpenseProofById(Long expenseId);
+
+    Integer getTotalExpenseByDate(Long travelPlanId, Long empId, LocalDate date);
 }

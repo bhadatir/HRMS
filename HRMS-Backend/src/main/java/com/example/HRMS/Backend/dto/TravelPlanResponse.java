@@ -33,6 +33,8 @@ public class TravelPlanResponse {
 
     private LocalDate travelPlanEndDate;
 
+    private Integer travelMaxExpenseAmountPerDay;
+
     private Instant travelPlanCreatedAt;
 
     private Long employeeId;

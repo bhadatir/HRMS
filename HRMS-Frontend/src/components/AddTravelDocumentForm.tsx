@@ -16,9 +16,9 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
   const [docFile, setDocFile] = useState<File>(null as any);
   const [docType, setDocType] = useState<number>(1);
 
-  const { data: employeeTravelPlan, isError: employeeTravelPlanError } = useQuery({
+  const { data: employeeTravelPlanId, isError: employeeTravelPlanError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
-    queryFn: () => travelService.findEmployeeTravelPlans(user?.id, travelPlanId, token || ""),
+    queryFn: () => travelService.findEmployeeTravelPlanId(user?.id, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
@@ -37,10 +37,10 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
       if(user?.roleName === "HR"  ) {
           return travelService.addTravelPlanDocByHr(user?.id || 0, travelPlanId, docType, formData, token || "");
       } else if(user?.roleName === "EMPLOYEE") {
-            if (!employeeTravelPlan) {
+            if (!employeeTravelPlanId) {
                 throw new Error("Employee travel plan not found");
             }
-          return travelService.addTravelPlanDocByEmployee(user?.id || 0, employeeTravelPlan, docType, formData, token || "");
+          return travelService.addTravelPlanDocByEmployee(user?.id || 0, employeeTravelPlanId, docType, formData, token || "");
       }
     },
     onSuccess: async () => {

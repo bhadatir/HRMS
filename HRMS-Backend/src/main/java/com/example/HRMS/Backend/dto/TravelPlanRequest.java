@@ -33,6 +33,9 @@ public class TravelPlanRequest {
     @NotNull(message = "travel plan ending date is required")
     private LocalDate travelPlanEndDate;
 
+    @NotNull(message = "Travel Plan Max Expense Amount Per Day is required")
+    private Integer travelMaxExpenseAmountPerDay;
+
     @NotNull(message = "HR Employee id is required who create this travel plan")
     private Long fkTravelPlanHREmployeeId;
 

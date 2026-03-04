@@ -215,6 +215,18 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
 
+        Integer dailyLimit = employeeTravelPlan.getFkTravelPlan().getTravelMaxExpenseAmountPerDay();
+
+        Integer alreadySpent = getTotalExpenseByDate(employeeTravelPlan.getFkTravelPlan().getId(),
+                employeeTravelPlan.getFkEmployee().getId(),
+                expenseRequest.getExpenseDate());
+
+        Integer remainingAllowance = dailyLimit - alreadySpent - expenseRequest.getExpenseAmount();
+
+        if(remainingAllowance < 0){
+            throw new RuntimeException("expense daily limit reached.");
+        }
+
         if(employeeTravelPlan == null || employeeTravelPlan.getEmployeeIsDeletedFromTravel() ){
             throw new RuntimeException("employee travel plan not found or you are deleted from this travel.");
         }
@@ -271,6 +283,11 @@ public class ExpenseServiceImpl implements ExpenseService {
                 + employeeTravelPlan.getFkTravelPlan().getTravelPlanName() + " travel plan"
         );
 
+    }
+
+    @Override
+    public Integer getTotalExpenseByDate(Long travelPlanId, Long empId, LocalDate date){
+        return expenseRepository.getTotalSpentByDate(travelPlanId, empId, date);
     }
 
 }

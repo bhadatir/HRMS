@@ -100,7 +100,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
   const handleUpdateCvStatus = (referId: number, statusId: number) => {
     if(statusId === 5) {
       const confirm = window.confirm("Are you sure you want to approve this cv?");
-      if (confirm) updateCvStatusMutation.mutate({ referId, statusId, reason: "Approved by HR" });
+      if (confirm) updateCvStatusMutation.mutate({ referId, statusId, reason: `Approved by ${user?.employeeEmail} at ${new Date().toLocaleString()}` });
     } else {
       const reason = window.prompt("Please enter reason for approval:", "")?.trim();
       if (reason) {
@@ -220,7 +220,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                   <TableHead className="text-center">CV</TableHead>
                   <TableHead className="text-center">Status</TableHead>
                   {((user?.id === job.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive && <TableHead className="text-center">Actions</TableHead>}
-                  {<TableHead className="text-center">Reason</TableHead>}
+                  {<TableHead className="text-left">Reason</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -246,7 +246,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                     </TableCell>
                     {((user?.id === job.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive && (
                       <TableCell className="text-right space-x-2">
-                        {ref.cvStatusTypeName === "PENDING" &&
+                        {ref.cvStatusTypeName === "PENDING" ? (
                         <>
                             <Button 
                             size="sm" variant="outline" className="text-green-600 border-green-200"
@@ -261,7 +261,11 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                             <XCircle size={14} />
                             </Button>
                         </>
-                        }
+                        ) : (
+                          <span className="text-green-600 flex items-center gap-2 ml-8">
+                            <CheckCircle size={16} /> Done
+                          </span>
+                        )}
                       </TableCell>
                     )}                    
                     <TableCell>{ref.reasonForCvStatusChange || "-"}</TableCell>

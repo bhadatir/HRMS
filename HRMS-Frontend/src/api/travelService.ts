@@ -30,6 +30,11 @@ export const travelService = {
     return res.data;
   },
 
+  getTotalSpentByDate: async (travelPlanId: number, employeeId: number, date: string, token: string) => {
+    const res = await api.get(`/travel/totalExpenseByDate/${travelPlanId}/${employeeId}?date=${date}`, authHeader(token));
+    return res.data;
+  },
+
   getTravelPlanById: async (travelPlanId: number, token: string) => {
     const res = await api.get(`/travel/travelPlanId/${travelPlanId}`, authHeader(token));
     return res.data;
@@ -84,7 +89,7 @@ export const travelService = {
     return res.data;
   },
 
-  findEmployeeTravelPlans: async (empId: number, travelId: number, token: string) => {
+  findEmployeeTravelPlanId: async (empId: number, travelId: number, token: string) => {
     const res = await api.get(`/travel/employeeTravelPlan/${empId}/${travelId}`, authHeader(token));
     return res.data;
   },

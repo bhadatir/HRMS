@@ -50,7 +50,8 @@ export default function GameManagement() {
 
     const { data: WaitingListByEmpId = [], isError: waitingListByEmpIdOnError } = useQuery({ 
         queryKey: ["WaitingList", user?.id], 
-        queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, token!) });
+        queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, token!) 
+    });
 
     const { data: bookingsByEmpId, isLoading, isError: bookingsByEmpIdOnError } = useQuery({
         queryKey: ["Bookings", user?.id, page, bookingSearchTerm],
@@ -136,7 +137,7 @@ export default function GameManagement() {
                     {/* Notifications */}
                     {showNotification && (
                       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
+                        <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                           <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                             onClick={() => {
                             setShowNotification(false);
@@ -297,10 +298,7 @@ export default function GameManagement() {
                     <div className="my-5">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {filteredWaitingList.length > 0 ? (
-                                filteredWaitingList.map((wait: any) => ((
-                                    wait.hostEmployeeId === user?.id || wait.bookingParticipantResponses.some((p: any) => p.employeeId === user?.id)
-                                    )
-                                    && (
+                                filteredWaitingList.map((wait: any) => (
                                     <Card key={wait.id} className="hover:shadow-md transition-shadow border-slate-200 cursor-pointer"
                                         onClick={() => {
                                             setWaitingListId(wait.id);
@@ -328,9 +326,9 @@ export default function GameManagement() {
                                         <div className="pt-2 border-t flex justify-between items-center">
                                             <div className="space-y-1">
                                                 <div className="text-[10px] text-slate-400">Host: {wait.hostEmployeeEmail}</div>
-                                                {wait.bookingParticipantResponses.length > 0 && (
+                                                {wait?.bookingParticipantResponses?.length > 0 && (
                                                     <div className="text-[10px] text-slate-400 ">
-                                                        Participants: {wait.bookingParticipantResponses.map((p: any) => p.employeeEmail).join(", ")}
+                                                        Participants: {wait?.bookingParticipantResponses?.map((p: any) => p.employeeEmail).join(", ")}
                                                     </div>
                                                 )}
                                             </div>
@@ -361,9 +359,9 @@ export default function GameManagement() {
                                     </Card>
                                     )
                                 )
-                        )) : (
-                            <p className="text-slate-500 italic">No one is on the waiting list.</p>
-                        )}
+                            ) : (
+                                <p className="text-slate-500 italic">You are not on any waiting list.</p>
+                            )}
                         </div>
                     </div>
                     )}

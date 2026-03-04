@@ -20,6 +20,7 @@ type TravelPlanFormInputs = {
   travelPlanStartDate: string;
   travelPlanEndDate: string;
   fkTravelPlanHREmployeeId: number;
+  travelMaxExpenseAmountPerDay: number;
   employeesInTravelPlanId: number[];
 }
 
@@ -82,6 +83,7 @@ const getMutation = useMutation({
       travelPlanStartDate: data.travelPlanStartDate.split("T")[0],
       travelPlanEndDate: data.travelPlanEndDate.split("T")[0],
       fkTravelPlanHREmployeeId: data.employeeId,
+      travelMaxExpenseAmountPerDay: data.travelMaxExpenseAmountPerDay,
       employeesInTravelPlanId: existingEmps.map((e: any) => e.id)
     });
   },
@@ -191,6 +193,13 @@ const getMutation = useMutation({
           </select>
           {errors.travelPlanIsReturn && <p className="text-red-500 text-xs">{errors.travelPlanIsReturn.message}</p>}
         </div>
+            
+        <div className="gap-5 flex">
+          <Input type="number" placeholder="Max Expense Amount Per Day" min={0} step={0.01}
+            {...register("travelMaxExpenseAmountPerDay", { required: "Max expense amount per day is required", valueAsNumber: true })} />
+            {errors.travelMaxExpenseAmountPerDay && <p className="text-red-500 text-xs">{errors.travelMaxExpenseAmountPerDay.message}</p>}
+        </div>  
+        
         <Textarea className="md:col-span-2" placeholder="Details" 
           {...register("travelPlanDetails", { required: "Travel plan details are required" })} />
           {errors.travelPlanDetails && <p className="text-red-500 text-xs">{errors.travelPlanDetails.message}</p>}
@@ -217,7 +226,7 @@ const getMutation = useMutation({
               <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-40 overflow-y-auto">
                 {suggestions.map((emp: any) => {
 
-                  if (emp.id === hrOwnerId || selectedEmployees.find(e => e.id === emp.id)) return null;
+                  if (emp.id === hrOwnerId || emp.id === user?.id || selectedEmployees.find(e => e.id === emp.id)) return null;
 
                   return (
                   <button

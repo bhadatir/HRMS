@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +93,13 @@ public class TravelPlanController {
     @GetMapping("/search")
     public ResponseEntity<List<Long>> getTravelplan(@RequestParam String query) throws IOException {
         return ResponseEntity.ok(travelPlanService.getTravelPlan(query));
+    }
+
+    @GetMapping("/totalExpenseByDate/{travelPlanId}/{empId}")
+    public ResponseEntity<Integer> getTotalExpenseByDate(@PathVariable Long travelPlanId, @PathVariable Long empId, @RequestParam String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date1 = LocalDate.parse(date, formatter);
+        return ResponseEntity.ok(expenseService.getTotalExpenseByDate(travelPlanId, empId, date1));
     }
 
     @GetMapping("/travelDoc/{empId}/{travelPlanId}")

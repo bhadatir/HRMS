@@ -1,9 +1,11 @@
 import { useAuth } from "../context/AuthContext";
+import { Calendar } from "@/components/ui/calendar";
+import { isSameDay, parseISO } from "date-fns";
 import { useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Calendar, Building, X, Bell, IndianRupee, PenIcon, Pencil } from "lucide-react";
+import { Mail, Building, X, Bell, IndianRupee, PenIcon, Pencil } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +15,11 @@ import {
 import { AppSidebar } from "@/components/app-sidebar"
 import { Input } from "@/components/ui/input.tsx";
 import { apiService } from "@/api/apiService.ts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { travelService } from "@/api/travelService.ts";
+import { gameService } from "@/api/gameService.ts";
+import { se } from "date-fns/locale";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const { setIsFirstLogin, token, isFirstLogin, user, unreadNotifications } = useAuth();
@@ -21,6 +27,8 @@ export default function Dashboard() {
   const [newPassword, setNewPassword] = useState(""); 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const navigate = useNavigate();
 
   if (!user) {
     return (
@@ -45,6 +53,58 @@ export default function Dashboard() {
     onError: (error: any) => {
       alert("Failed to update profile picture: " + (error.response?.data || error.message)); }
   });
+  
+  const { data: travelPlans, isError: travelPlansError } = useQuery({
+    queryKey: ["travelPlanByEmpId", user?.id],
+    queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id, "", 0, 100, token || ""),
+    enabled: !!token && !!user?.id,
+  });
+
+  const { data: gameBookings, isError: gameBookingsError } = useQuery({
+    queryKey: ["gameBookings", user?.id],
+    queryFn: () => gameService.findGameBookingByUserId(user.id, "", 0, 100, token || ""), 
+    enabled: !!token && !!user?.id,
+  });
+
+  const { data: WaitingList, isError: waitingListError } = useQuery({ 
+      queryKey: ["WaitingList", user?.id], 
+      queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, token!) 
+  });
+
+  const modifiers = {
+    travel: (date: Date) => travelPlans?.content?.some((p: any) => 
+      (isSameDay(parseISO(p.travelPlanStartDate), date) || 
+      (date >= parseISO(p.travelPlanStartDate) && date <= parseISO(p.travelPlanEndDate)))
+      && p.travelPlanIsDeleted === false
+    ),
+    game: (date: Date) => gameBookings?.content?.some((b: any) => 
+      isSameDay(parseISO(b.gameBookingStartTime), date) && !b.gameBookingIsDeleted
+    ),
+    wait: (date: Date) => WaitingList?.some((w: any) => 
+      isSameDay(parseISO(w.targetSlotDatetime), date)
+    ),
+  };
+
+  const modifiersStyles = {
+    travel: { border: "1px solid #1e40af", borderRadius: "4px" },
+    game: { border: "1px solid #22c55e",borderRadius: "4px" },
+    wait: { border: "1px solid #f59e0b", borderRadius: "4px" },
+    selected: { border: "2px solid #000000", borderRadius: "4px", text: "black" },
+  };
+
+  const getEventsForDay = (date: Date | undefined) => {
+    if (!date) return null;
+    const dayTravel = travelPlans?.content?.filter((p: any) => 
+       (isSameDay(parseISO(p.travelPlanStartDate), date) || (date >= parseISO(p.travelPlanStartDate) && date <= parseISO(p.travelPlanEndDate))) 
+        && p.travelPlanIsDeleted === false
+    );
+    const dayGames = gameBookings?.content?.filter((b: any) => isSameDay(parseISO(b.gameBookingStartTime), date) && !b.gameBookingIsDeleted);
+    const dayWaiting = WaitingList?.filter((w: any) => isSameDay(parseISO(w.targetSlotDatetime), date));
+    
+    return { dayTravel, dayGames, dayWaiting };
+  };
+
+  const dayEvents = getEventsForDay(selectedDate);
 
   const updatePasswordMutation = useMutation({
     mutationFn: () => apiService.updatePassword(user.id, newPassword, token || ""),
@@ -56,6 +116,10 @@ export default function Dashboard() {
       alert("Failed to update password: " + (error.response?.data || error.message));
     }
   });
+
+  if(travelPlansError || gameBookingsError || waitingListError) {
+    alert("Failed to load events: " + (travelPlansError || gameBookingsError || waitingListError));
+  }
 
   return (
     isFirstLogin === "yes" ? (
@@ -111,7 +175,7 @@ export default function Dashboard() {
             {/* Notifications */}
             {showNotification && (
               <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
+                <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                   <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
                     setShowNotification(false);
                   }}><X /></Button>
@@ -193,7 +257,6 @@ export default function Dashboard() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-blue-600" />
                   Employment Timeline
                 </CardTitle>
               </CardHeader>
@@ -215,10 +278,89 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
+            <Card className="col-span-1 md:col-span-3 lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  Schedule Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col md:flex-row gap-8">
+                
+                <div className="border rounded-md p-2 bg-white">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    modifiers={modifiers}
+                    modifiersStyles={modifiersStyles}
+                    className="rounded-md"
+                  />
+                  <div className="mt-4 flex gap-4 text-xs p-2 border-t">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 border-1 border-blue-400 rounded" /> Travel
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 border-1 border-green-500 rounded" /> Game
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 border-1 border-yellow-500 rounded" /> Waiting List
+                    </div>
+                  </div>
+                </div>
+
+                {/* Details Panel for Selected Date */}
+                <div className="flex-1 space-y-4">
+                  <h4 className="font-bold text-slate-700 border-b pb-2">
+                    Details: {selectedDate?.toLocaleDateString()}
+                  </h4>
+                  
+                  {dayEvents?.dayTravel?.length > 0 ? (
+                    dayEvents?.dayTravel.map((p: any) => (
+                      <div key={p.id} 
+                        onClick={() => navigate(`/travel-plan`)}
+                        className="p-3 bg-blue-50 border-l-4 border-blue-500 rounded text-sm cursor-pointer">
+                        <p className="font-bold text-blue-800">✈️ {p.travelPlanName}</p>
+                        <p className="text-blue-600 text-xs">{p.travelPlanFrom} → {p.travelPlanTo}</p>
+                      </div>
+                    ))
+                  ) : null}
+
+                  {dayEvents?.dayGames?.length > 0 ? (
+                    dayEvents?.dayGames.map((g: any) => (
+                      <div key={g.id} 
+                        onClick={() => navigate(`/game-management/${g.id}`)}
+                        className="p-3 bg-green-50 border-l-4 border-green-500 rounded text-sm cursor-pointer">
+                        <p className="font-bold text-green-800">🎮 {g.gameTypeName}</p>
+                        <p className="text-green-600 text-xs">
+                            {new Date(g.gameBookingStartTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </p>
+                      </div>
+                    ))
+                  ) : null}
+
+                  {dayEvents?.dayWaiting?.length > 0 ? (
+                    dayEvents?.dayWaiting.map((w: any) => (
+                      <div key={w.id}
+                        className="p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded text-sm cursor-pointer"
+                        onClick={() => navigate(`/game-management`)}>
+                        <p className="font-bold text-yellow-800">⏳ {w.gameTypeName}</p>
+                        <p className="text-yellow-600 text-xs">
+                            {new Date(w.targetSlotDatetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </p>
+                      </div>
+                    ))
+                  ) : null}
+
+                  {!dayEvents?.dayTravel?.length && !dayEvents?.dayGames?.length && !dayEvents?.dayWaiting?.length && (
+                    <p className="text-slate-400 italic text-sm">No events scheduled for this day.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
           </main>
         </SidebarInset>
       </SidebarProvider>
     )
   );
 }
-

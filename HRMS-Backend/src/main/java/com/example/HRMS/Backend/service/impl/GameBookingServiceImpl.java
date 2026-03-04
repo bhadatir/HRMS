@@ -409,7 +409,12 @@ public class GameBookingServiceImpl implements GameBookingService {
         List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByUser(employeeRepository.findEmployeeById(empId).getId());
 
         return bookingWaitingLists.stream().map(bookingWaitingList -> {
-            return modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
+            BookingWaitingListResponse bookingWaitingListResponse = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
+            List<BookingParticipantResponse> bookingParticipantResponses =
+                    bookingParticipantRepository.findAllByBookingWaitingListId(bookingWaitingList.getId());
+
+            bookingWaitingListResponse.setBookingParticipantResponses(bookingParticipantResponses);
+            return bookingWaitingListResponse;
         }).toList();
     }
 

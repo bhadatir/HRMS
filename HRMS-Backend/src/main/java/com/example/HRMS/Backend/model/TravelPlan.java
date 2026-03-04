@@ -60,6 +60,10 @@ public class TravelPlan {
     @Column(name = "travel_plan_end_date", nullable = false)
     private LocalDate travelPlanEndDate;
 
+    @NotNull(message = "Travel Plan Max Expense Amount Per Day is required")
+    @Column(name = "travel_max_expense_amount_per_day", nullable = false)
+    private Integer travelMaxExpenseAmountPerDay;
+
     @Column(name = "travel_plan_created_at")
     private Instant travelPlanCreatedAt = Instant.now();
 

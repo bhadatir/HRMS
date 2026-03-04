@@ -39,7 +39,7 @@ export default function TravelPlan() {
   const { data: allTravelPlans, isError: allTravelPlansError } = useQuery({
     queryKey: ["allTravelPlans"],
     queryFn: () => travelService.getAllTravelPlans(token || ""),
-    enabled: !!token && user?.roleName === "ADMIN",
+    enabled: !!token,
   });
 
   const deleteTravelPlanMutation = useMutation({
@@ -53,11 +53,15 @@ export default function TravelPlan() {
   });
 
   const filteredPlans = useMemo(() => {
-    if (!travelPlanByEmpId || !user) return [];
-    if(user.roleName === "ADMIN") return allTravelPlans?.filter((plan: any) => {
-      return plan.travelPlanName.toLowerCase().includes(searchTerm?.toLowerCase());
-    }) || [];
-    return travelPlanByEmpId?.content.filter((plan: any) => {
+    if (!user) return [];
+    if(user?.roleName === "ADMIN") {
+      if (!allTravelPlans) return [];
+      return allTravelPlans.filter((plan: any) =>
+        plan.travelPlanName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    if (!travelPlanByEmpId || !travelPlanByEmpId.content) return [];
+    return travelPlanByEmpId.content.filter((plan: any) => {
         if(travelPlanType === 0) return true;
         if(travelPlanType === 1) return plan.travelPlanIsDeleted === false;
         if(travelPlanType === 2) return plan.travelPlanIsDeleted === true;
@@ -68,7 +72,7 @@ export default function TravelPlan() {
         return false;
       }) || [];
 
-  }, [user, travelPlanByEmpId, travelPlanType, searchTerm]);
+  }, [user, travelPlanByEmpId, allTravelPlans, travelPlanType, searchTerm]);
 
   const handleDelete = (travelPlanId: number) => {
     const reason = window.prompt("Please enter reason for deleting this travel plan:", "")?.trim();
@@ -148,7 +152,7 @@ export default function TravelPlan() {
           {/* Notifications */}
           {showNotification && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-lg w-full relative h-150 overflow-y-auto">
+              <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowNotification(false);

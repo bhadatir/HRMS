@@ -98,7 +98,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                 {plan?.travelPlanIsReturn ? "Return Trip" : "One Way"}
               </Badge>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+            <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-4">
               <div className="flex items-center gap-3">
                 <MapPin className="text-blue-500" />
                 <div>
@@ -110,7 +110,8 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                 <Calendar className="text-blue-500" />
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase">Duration</p>
-                  <p className="font-semibold">{plan?.travelPlanStartDate} to {plan?.travelPlanEndDate}</p>
+                  <p className="font-semibold">{plan?.travelPlanStartDate} to </p>
+                  <p className="font-semibold">{plan?.travelPlanEndDate}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -118,6 +119,12 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase">Created At</p>
                   <p className="font-semibold">{plan?.travelPlanCreatedAt.split("T")[0]}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div>
+                  <p className="text-xs text-slate-500 font-bold uppercase">Expense Limit Per Day</p>
+                  <p className="font-semibold">{plan?.travelMaxExpenseAmountPerDay}</p>
                 </div>
               </div>
               <div className="col-span-1 md:col-span-3">
@@ -190,7 +197,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                         <TableHead className="text-center">Proofs</TableHead>
                         <TableHead className="text-center">Status</TableHead>
                         {((user?.roleName === "HR" && plan.employeeId === user?.id) || user?.roleName === "ADMIN") && !plan?.travelPlanIsDeleted && <TableHead className="text-center">Actions</TableHead>}
-                        {<TableHead className="text-center">Reason</TableHead>}
+                        {<TableHead className="text-left">Reason</TableHead>}
                       </>
                     ) : (
                       <>
