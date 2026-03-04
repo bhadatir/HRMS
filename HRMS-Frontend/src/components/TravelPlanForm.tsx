@@ -48,7 +48,8 @@ const endDate = watch("travelPlanEndDate");
     data: infiniteData,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage
+    isFetchingNextPage,
+    isError: employeeSearchError
   } = useInfiniteQuery({
     queryKey: ["employeeSearchInfinite", searchTerm, startDate, endDate],
     queryFn: ({ pageParam = 0 }) => 
@@ -83,7 +84,9 @@ const getMutation = useMutation({
       fkTravelPlanHREmployeeId: data.employeeId,
       employeesInTravelPlanId: existingEmps.map((e: any) => e.id)
     });
-  }
+  },
+  onError: (error: any) => {
+      alert("Failed to get travel plan details: " + (error.response?.data || error.message)); }
 });
 
   useEffect(() => {
@@ -134,8 +137,11 @@ const getMutation = useMutation({
       setShowDropdown(false);
       onSuccess();
     },
-    onError: (err: any) => alert("Error: " + err.message)
+    onError: (error: any) => {
+      alert("Failed to create/update travel plan: " + (error.response?.data || error.message)); }
   });
+
+  if (employeeSearchError) alert("Failed to search employees: " + employeeSearchError);
 
   return (
     <Card className="border-none shadow-none">

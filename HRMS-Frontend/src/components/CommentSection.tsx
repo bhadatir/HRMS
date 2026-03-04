@@ -14,7 +14,7 @@ export default function CommentSection({ postId }: { postId: number }) {
   const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(null);
   const commentref = useRef<HTMLInputElement>(null);
 
-  const { data: comments = [] } = useQuery({
+  const { data: comments = [], isError: commentsError } = useQuery({
     queryKey: ["postComments", postId],
     queryFn: () => postService.getCommentsById(postId, token || ""),
     enabled: !!postId,
@@ -35,7 +35,9 @@ export default function CommentSection({ postId }: { postId: number }) {
       setReplyTo(null);
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
-    }
+    },
+    onError: (error: any) => {
+      alert("Failed to add comment: " + (error.response?.data || error.message)); }
   });
 
   const removeCommentMutation = useMutation({
@@ -49,7 +51,9 @@ export default function CommentSection({ postId }: { postId: number }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
-    }
+    },
+    onError: (error: any) => {
+      alert("Failed to delete comment: " + (error.response?.data || error.message)); }
   });
 
   const handleReplyClick = (comment: any) => {
@@ -63,6 +67,8 @@ export default function CommentSection({ postId }: { postId: number }) {
       removeCommentMutation.mutate({ commentId, reason });
     }
   };
+
+  if (commentsError) alert("Failed to load comments: " + commentsError);
 
   return (
     <div className="mt-4 space-y-4 pt-4 border-t">

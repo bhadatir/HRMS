@@ -23,11 +23,11 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
 
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
 
-    const { data: gameTypes = [] } = useQuery({ 
+    const { data: gameTypes = [], isError: gameTypesError } = useQuery({ 
         queryKey: ["allGameTypes"], 
         queryFn: () => gameService.getAllGames(token!) });
 
-    const { data: myInterests = [] } = useQuery({
+    const { data: myInterests = [], isError: myInterestsError } = useQuery({
         queryKey: ["myInterests", user?.id],
         queryFn: () => gameService.getEmployeeGameInterests(user?.id!, token!),
         enabled: !!user?.id
@@ -36,7 +36,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     const gameTypeId = Number(watch("gameTypeId"));
     const date = watch("date");
 
-    const { data: slots = [] } = useQuery({
+    const { data: slots = [], isError: slotsError } = useQuery({
         queryKey: ["availableSlots", gameTypeId, date],
         queryFn: () => gameService.getAvalaibleSlots(gameTypeId, user?.id!, date, token!),
         enabled: !!gameTypeId && !!date
@@ -54,8 +54,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
             onSuccess();
         },
         onError: (error: any) => {
-        alert(error.response?.data?.message || "Booking failed");
-    }
+            alert("Failed booking: " + (error.response?.data || error.message)); }
     });
 
     const filteredGames = useMemo(() => {
@@ -73,7 +72,8 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         data: infiniteData,
         fetchNextPage,
         hasNextPage,
-        isFetchingNextPage
+        isFetchingNextPage,
+        isError: employeeSearchError
     } = useInfiniteQuery({
         queryKey: ["employeeSearchInfinite", searchTerm, slotStartDateTime, selectedGameId],
         queryFn: ({ pageParam = 0 }) => 
@@ -113,6 +113,10 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         };
         mutation.mutate(payload);
     };
+
+    if (gameTypesError || myInterestsError || slotsError || employeeSearchError) {
+        alert("Failed to load data: " + (gameTypesError || myInterestsError || slotsError || employeeSearchError));
+    }
 
     return (
         <Card className="border-none shadow-none">

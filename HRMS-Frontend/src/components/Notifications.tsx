@@ -10,17 +10,23 @@ export default function Notifications() {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: notifications, isLoading } = useQuery({
+  const { data: notifications, isLoading, isError: notificationsError } = useQuery({
     queryKey: ["notifications"],
     queryFn: () => apiService.getUserNotifications(user?.id, token || ""),
     enabled: !!token && !!user?.id,
   });
+
+  if (notificationsError) {
+    alert("Failed to load notifications: " + notificationsError);
+  }
 
   const markReadMutation = useMutation({
     mutationFn: (id: number) => apiService.markNotificationRead(id, token || ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
+    onError: (error: any) => {
+      alert("Failed to mark notification as read: " + (error.response?.data || error.message)); }
   });
 
   const markAllReadMutation = useMutation({
@@ -28,6 +34,8 @@ export default function Notifications() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
+    onError: (error: any) => {
+      alert("Failed to mark all notifications as read: " + (error.response?.data || error.message)); }
   });
 
   const handleMarkAllRead = () => {

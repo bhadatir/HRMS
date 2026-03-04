@@ -18,11 +18,15 @@ export default function TeamMemberData() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: orgData } = useQuery({
+  const { data: orgData, isError: orgDataError } = useQuery({
     queryKey: ["orgChart", user?.id],
     queryFn: () => apiService.fetchOrgChart(user?.id || 0, token || ""),
     enabled: !!user?.id,
   });
+
+  if (orgDataError) {
+    alert("Failed to load organization data: " + orgDataError);
+  }
 
   return (
     <SidebarProvider>

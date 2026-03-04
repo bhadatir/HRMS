@@ -11,13 +11,13 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
   const queryClient = useQueryClient();
   const [showTagInput, setShowTagInput] = useState(false);
 
-  const { data: tags = [] } = useQuery({
+  const { data: tags = [], isError: tagsError } = useQuery({
     queryKey: ["postTags", postId],
     queryFn: () => postService.getPostTagsById(postId, token || ""),
     enabled: !!postId,
   });
 
-  const { data: allTagTypes = [] } = useQuery({
+  const { data: allTagTypes = [], isError: allTagTypesError } = useQuery({
     queryKey: ["allTagTypes"],
     queryFn: () => postService.getAllTagTypes(token || ""),
     enabled: !!token,
@@ -29,14 +29,20 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
       queryClient.invalidateQueries({ queryKey: ["postTags", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
       setShowTagInput(false);
-    }
+    },
+    onError: (error: any) => {
+      alert("Failed to add tag: " + (error.response?.data || error.message)); }
   });
 
   const removeTagMutation = useMutation({
     mutationFn: (tagId: number) => postService.removePostTagFromPost(postId, tagId, token || ""),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["postTags", postId] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["postTags", postId] }),
+    onError: (error: any) => {
+      alert("Failed to remove tag: " + (error.response?.data || error.message)); }
   });
 
+  if (tagsError || allTagTypesError) alert("Failed to load tags: " + (tagsError || allTagTypesError));
+  
   return (
     <div className="flex flex-wrap gap-2 items-center mt-2">
       <TagIcon size={14} className="text-slate-400" />

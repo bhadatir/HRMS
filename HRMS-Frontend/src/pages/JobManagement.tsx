@@ -26,11 +26,15 @@ export default function JobManagement() {
   const [referJobId, setReferJobId] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: allJobs, isLoading } = useQuery({
+  const { data: allJobs, isLoading, isError: allJobsOnError } = useQuery({
     queryKey: ["allJobs"],
     queryFn: () => jobService.getAllJobs(token || ""),
     enabled: !!token,
   });
+
+  if (allJobsOnError) {
+    alert("Failed to load jobs: " + allJobsOnError);
+  }
 
   const filteredJobs = useMemo(() => {
     if (!allJobs) return [];
@@ -44,7 +48,9 @@ export default function JobManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allJobs"] });
       queryClient.invalidateQueries({ queryKey: ["jobDetail"] });
-    }
+    },
+    onError: (error: any) => {
+      alert("Failed to update job status: " + (error.response?.data || error.message)); }
    });
 
   const handleDelete = (id: number) => {

@@ -18,7 +18,7 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
   const queryClient = useQueryClient();
   const [showEditUserForm, setShowEditUserForm] = useState(false); 
     
-  const { data: userData, isLoading } = useQuery({
+  const { data: userData, isLoading, isError } = useQuery({
     queryKey: ["user", userEmail],
     queryFn: () => apiService.getUserByEmail(userEmail!, token!),
     enabled: !!token && !!userEmail,
@@ -43,6 +43,7 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
   };
 
   if (isLoading) return <div className="p-10 text-center text-slate-500">Loading User Data...</div>;
+  if (isError) alert("Failed to load user data: " + isError);
 
   return (
     <div>

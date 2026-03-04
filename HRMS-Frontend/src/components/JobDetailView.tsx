@@ -46,17 +46,19 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
   });
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
     
-  const { data: job, isLoading: jobLoading } = useQuery({
+  const { data: job, isLoading: jobLoading, isError: jobError } = useQuery({
     queryKey: ["jobDetail", jobId],
     queryFn: () => jobService.getJobById(jobId!, token || ""),
     enabled: !!jobId && !!token,
   });
 
-  const { data: referrals = [], isLoading: referralsLoading } = useQuery({
+  const { data: referrals = [], isLoading: referralsLoading, isError: referralsError } = useQuery({
     queryKey: ["jobReferrals", jobId],
     queryFn: () => jobService.getReferDataByJobId(jobId!, token || ""),
     enabled: !!jobId && !!token && viewMode === "REFERRALS",
   });
+
+  if(jobError || referralsError) alert("Failed to load job data");
 
   const filteredReferrals = referrals.filter((ref: any) => 
     ref.referFriendName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,7 +74,8 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
       queryClient.invalidateQueries({ queryKey: ["jobReferrals", jobId] });
       alert("CV Status updated successfully");
     },
-    onError: (err: any) => alert(err.message)
+    onError: (error: any) => {
+      alert("Failed to update CV status: " + (error.response?.data || error.message)); }
   });
 
   const addReviewerMutation = useMutation({
@@ -83,7 +86,8 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
       setSearchTerm("");
       alert("Reviewer added successfully");
     },
-    onError: (err: any) => alert(err.message)
+    onError: (error: any) => {
+      alert("Failed to add reviewer: " + (error.response?.data || error.message)); }
   });
 
   const handleSelectUser = (id: number) => {

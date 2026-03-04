@@ -16,7 +16,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
   const [expenseSearchTerm, setExpenseSearchTerm] = useState("");
   const [docSearchTerm, setDocSearchTerm] = useState("");
 
-  const { data: plan, isLoading: planLoading } = useQuery({
+  const { data: plan, isLoading: planLoading, isError: planError } = useQuery({
     queryKey: ["travelPlan", travelPlan],
     queryFn: () => travelService.getTravelPlanById(travelPlan!, token || ""),
     enabled: !!travelPlan && !!token,
@@ -30,7 +30,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
     }))
   });
 
-  const {data: allDocs = [], isLoading: docsLoading} = useQuery({
+  const {data: allDocs = [], isLoading: docsLoading, isError: docsError} = useQuery({
     queryKey: ["travelPlanDocs", travelPlan, docSearchTerm],
     queryFn: () => travelService.findTravelDocByPlanId(travelPlan!, user?.id || 0, docSearchTerm, token || ""),
     enabled: !!token && !!travelPlan && viewMode === "DOCUMENTS",
@@ -66,9 +66,11 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
       alert("Status updated successfully");
       // onSuccess();
     },
-    onError: (err: any) => alert(err.message)
+    onError: (error: any) => {
+      alert("Failed to update expense status: " + (error.response?.data || error.message)); }
   });
 
+  if (planError || docsError) alert("Failed to load travel plan details: " + (planError || docsError));
   if (isLoadingData) return <div className="p-10">Loading Details...</div>;
 
   const handleExpenseApproval = (expenseId: number, statusId: number) => {

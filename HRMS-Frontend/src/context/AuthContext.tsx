@@ -33,13 +33,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   const queryClient = useQueryClient();
 
-  const { data: userData, isLoading, isError } = useQuery({
+  const { data: userData, isLoading, isError: userError } = useQuery({
     queryKey: ["user", email],
     queryFn: () => apiService.getUserByEmail(email!, token!),
     enabled: !!token && !!email,
   });
 
-  const { data: notifications } = useQuery({
+  const { data: notifications, isError: notificationsError } = useQuery({
     queryKey: ["notifications"],
     queryFn: () => apiService.getUserNotifications(userData?.id, token || ""),
     enabled: !!token && !!userData,
@@ -72,10 +72,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }, [userData?.id, token, queryClient]);
 
   useEffect(() => {
-    if (isError) {
+    if (userError || notificationsError) {
+      alert("Session expired or failed to load user data. Please log in again.");
       logout(); 
     }
-  }, [isError]);
+  }, [userError, notificationsError]);
 
   const login = (newToken: string, newEmail: string, isFirstLogin: string) => {
     localStorage.setItem("token", newToken);

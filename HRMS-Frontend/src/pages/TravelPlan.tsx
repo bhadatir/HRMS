@@ -30,13 +30,13 @@ export default function TravelPlan() {
   const [page, setPage] = useState(0);
   const [size] = useState(12);
 
-  const { data: travelPlanByEmpId, isLoading } = useQuery({
+  const { data: travelPlanByEmpId, isLoading, isError: travelPlanByEmpIdError } = useQuery({
     queryKey: ["travelPlanByEmpId", user?.id, page, size, searchTerm],
     queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id, searchTerm, page, size, token || ""),
     enabled: !!token && !!user?.id,
   });
 
-  const { data: allTravelPlans } = useQuery({
+  const { data: allTravelPlans, isError: allTravelPlansError } = useQuery({
     queryKey: ["allTravelPlans"],
     queryFn: () => travelService.getAllTravelPlans(token || ""),
     enabled: !!token && user?.roleName === "ADMIN",
@@ -48,7 +48,8 @@ export default function TravelPlan() {
       queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
       alert("Travel plan deleted successfully");
     },
-    onError: (err: any) => alert("Error: " + err.message)
+    onError: (error: any) => {
+      alert("Failed to delete travel plan: " + (error.response?.data || error.message)); }
   });
 
   const filteredPlans = useMemo(() => {
@@ -77,6 +78,10 @@ export default function TravelPlan() {
       alert("Deletion reason is required");
     }
   };
+
+  if (travelPlanByEmpIdError || allTravelPlansError) {
+    alert("Failed to load travel plans: " + (travelPlanByEmpIdError || allTravelPlansError));
+  }
 
   return (
     <SidebarProvider>

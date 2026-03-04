@@ -21,7 +21,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
   const queryClient = useQueryClient();
   const [createdAt, setCreatedAt] = useState("");
 
-  const { data: allJobTypes = [] } = useQuery({
+  const { data: allJobTypes = [], isError: allJobTypesError } = useQuery({
     queryKey: ["allJobTypes"],
     queryFn: () => jobService.getAllJobTypes(token || ""),
     enabled: !!token,
@@ -47,7 +47,8 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
         fkJobOwnerEmployeeId: data.employeeId
       });
     },
-    onError: (err: any) => alert("Error loading job: " + err.message)
+    onError: (error: any) => {
+      alert("Failed to load job details: " + (error.response?.data || error.message)); }
   });
 
   useEffect(() => {
@@ -77,8 +78,11 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
       alert(editJobId ? "Job updated successfully!" : "Job created successfully!");
       onSuccess();
     },
-    onError: (err: any) => alert(err.message)
+    onError: (error: any) => {
+      alert("Failed to " + (editJobId ? "update job" : "create job") + ": " + (error.response?.data || error.message)); }
   });
+
+  if (allJobTypesError) alert("Failed to load job categories: " + allJobTypesError);
 
   return (
     <Card className="border-none shadow-none">

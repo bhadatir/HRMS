@@ -40,7 +40,8 @@ export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSucces
       alert("Job shared successfully!");
       onSuccess();
     },
-    onError: (err: any) => alert("Error sharing job: " + err.message)
+    onError: (error: any) => {
+      alert("Failed to share job: " + (error.response?.data || error.message)); }
   });
 
   return (

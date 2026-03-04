@@ -13,10 +13,12 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
     const { user, token } = useAuth();
 
-    const { data: gameBookingStatusOptions = [] } = useQuery({
+    const { data: gameBookingStatusOptions = [], isError: gameBookingStatusOptionsError } = useQuery({
         queryKey: ["gameBookingStatusOptions"],
         queryFn: () => gameService.getAllGameBookingStatus(token!)
     });
+
+    if (gameBookingStatusOptionsError) alert("Failed to load booking status options: " + gameBookingStatusOptionsError);
 
     return (
         <>

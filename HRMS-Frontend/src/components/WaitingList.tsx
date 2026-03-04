@@ -12,13 +12,13 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
   const { token } = useAuth();
   const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
 
-  const { data: waitingList } = useQuery({
+  const { data: waitingList,isError: waitingListError } = useQuery({
     queryKey: ["waitingList", waitingListId],
     queryFn: () => gameService.getWaitingListById(waitingListId, token || ""),
     enabled: !!waitingListId && !!token,
   });
 
-  const { data: waitingListSeq } = useQuery({
+  const { data: waitingListSeq, isError: waitingListSeqError } = useQuery({
     queryKey: ["waitingListSeq", waitingListId],
     queryFn: () => gameService.getWaitingListSeqById(waitingListId, token || ""),
     enabled: !!waitingListId && !!token,
@@ -29,6 +29,10 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
     wls.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(waitingListSearchTerm.toLowerCase())) ||
     wls.waitingListCreatedAt.toLowerCase().includes(waitingListSearchTerm.toLowerCase())
   );
+
+  if(waitingListError || waitingListSeqError) {
+    alert("Failed to load waiting list data: " + (waitingListError || waitingListSeqError));
+  }
 
   return (
         <>
@@ -106,7 +110,6 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
               </Table>
             </CardContent>
         </Card>
-
         </>
   );
 }

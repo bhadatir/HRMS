@@ -9,12 +9,12 @@ export default function GameInterestToggle() {
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
 
-    const { data: allGames = [] } = useQuery({ 
+    const { data: allGames = [], isError: allGamesError } = useQuery({ 
         queryKey: ["gameTypes"], 
         queryFn: () => gameService.getAllGames(token!) 
     });
 
-    const { data: myInterests = [] } = useQuery({
+    const { data: myInterests = [], isError: myInterestsError } = useQuery({
         queryKey: ["myInterests", user?.id],
         queryFn: () => gameService.getEmployeeGameInterests(user?.id!, token!),
         enabled: !!user?.id
@@ -29,11 +29,14 @@ export default function GameInterestToggle() {
                 return gameService.addEmployeeGameInterest(user?.id!, gameTypeId, token!);
             }
         }, 
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["myInterests", user?.id]})
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["myInterests", user?.id]}),
+        onError: (error: any) => {
+            alert("Failed to update game interest: " + (error.response?.data || error.message)); }
     });
    
     const isInterested = (gameId: number) => myInterests.some((i: any) => (Number(i.gameTypeId) === Number(gameId) && i.interestDeleted === false));
 
+    if(allGamesError || myInterestsError) alert("Failed to load data: " + (allGamesError || myInterestsError));
     return (
         <Card className="bg-slate-50 border-dashed">
             <CardContent className="p-4">

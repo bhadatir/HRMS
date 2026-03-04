@@ -26,7 +26,8 @@ export default function OrganizationChart() {
     data: infiniteData,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage
+    isFetchingNextPage,
+    isError: searchError
   } = useInfiniteQuery({
     queryKey: ["employeeSearchInfinite", searchTerm],
     queryFn: ({ pageParam = 0 }) => 
@@ -38,7 +39,7 @@ export default function OrganizationChart() {
   });
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
-  const { data: orgData, isLoading, isError } = useQuery({
+  const { data: orgData, isLoading, isError: orgDataError } = useQuery({
     queryKey: ["orgChart", selectedId],
     queryFn: () => apiService.fetchOrgChart(selectedId, token || ""),
     enabled: !!selectedId,
@@ -49,6 +50,10 @@ export default function OrganizationChart() {
     setSearchTerm(""); 
     setShowDropdown(false);
   };
+
+  if(searchError || orgDataError) {
+    alert("Failed to load organization data: " + (searchError || orgDataError));
+  }
 
   return (
     <SidebarProvider className="w-full">
@@ -122,7 +127,7 @@ export default function OrganizationChart() {
         <div className="p-6 max-w-6xl mx-auto space-y-8 w-250">
           {isLoading ? (
             <div className="p-10 text-center text-slate-500 font-medium">Loading employee data...</div>
-          ) : isError ? (
+          ) : orgDataError ? (
             <div className="p-10 text-center text-red-500 font-medium">Employee data could not be retrieved.</div>
           ) : (
             <>

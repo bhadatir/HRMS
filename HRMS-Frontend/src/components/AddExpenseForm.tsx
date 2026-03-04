@@ -16,13 +16,13 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   
-  const { data: employeeTravelPlan, isLoading, isError } = useQuery({
+  const { data: employeeTravelPlan, isLoading, isError: employeeTravelPlanError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
     queryFn: () => travelService.findEmployeeTravelPlans(user?.id, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
-  const { data: expenseTypes } = useQuery({
+  const { data: expenseTypes, isError: expenseTypesError } = useQuery({
     queryKey: ["expenseTypes"],
     queryFn: () => travelService.getAllExpenseTypes(token || ""),
     enabled: !!token,
@@ -87,11 +87,11 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
       queryClient.invalidateQueries({ queryKey: ["travelPlan", travelPlanId] });
       onSuccess();
     },
-    onError: (err: any) => alert(err.message)
+    onError: (err: any) => alert("Failed to submit expense: " + (err.response?.data || err.message))
   });
 
   if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error loading travel plan data.</div>;
+  if (employeeTravelPlanError || expenseTypesError) alert("Failed to load data: " + (employeeTravelPlanError || expenseTypesError));
 
   return (
     <Card className="border-none shadow-none">

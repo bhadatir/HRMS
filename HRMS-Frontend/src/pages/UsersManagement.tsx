@@ -23,11 +23,15 @@ export default function JobManagement() {
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
   const [employeeType, setEmployeeType] = useState(0);
 
-  const { data: allEmp, isLoading } = useQuery({
+  const { data: allEmp, isLoading, isError: allEmpError } = useQuery({
     queryKey: ["allEmployees", searchTerm],
     queryFn: () => apiService.getAllEmployees(searchTerm, token || ""),
     enabled: !!token,
   });
+
+  if (allEmpError) {
+    alert("Failed to load employees: " + allEmpError);
+  }
 
   const filterEmp = useMemo(() => {
     if (!allEmp || !user) return [];

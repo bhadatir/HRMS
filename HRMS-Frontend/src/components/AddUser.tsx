@@ -41,19 +41,19 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
     }
   });
 
-  const { data: allRoles } = useQuery({
+  const { data: allRoles, isError: allRolesError } = useQuery({
     queryKey: ["allRoles"],
     queryFn: () => apiService.getAllRoles(token || ""),
     enabled: !!token,
   });
 
-  const { data: allDepartments } = useQuery({
+  const { data: allDepartments, isError: allDepartmentsError } = useQuery({
     queryKey: ["allDepartments"],
     queryFn: () => apiService.getAllDepartments(token || ""),
     enabled: !!token,
   });
 
-  const { data: allPositions } = useQuery({
+  const { data: allPositions, isError: allPositionsError } = useQuery({
     queryKey: ["allPositions"],
     queryFn: () => apiService.getAllPositions(token || ""),
     enabled: !!token,
@@ -76,6 +76,9 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
         positionId: data.positionId,
         roleId: data.roleId
       });
+    },
+    onError: (error: any) => {
+      alert("Failed to get user details: " + (error.response?.data || error.message));
     }
   });
   
@@ -101,6 +104,8 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
         alert("Registration failed: " + (error.response?.data || error.message));
     }
   });
+
+  if (allRolesError || allDepartmentsError || allPositionsError) alert("Failed to load data: " + (allRolesError || allDepartmentsError || allPositionsError));
 
   return (
     <Card className="border-none shadow-none">

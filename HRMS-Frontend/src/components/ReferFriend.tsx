@@ -53,7 +53,8 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
       alert("Referral submitted successfully!");
       onSuccess();
     },
-    onError: (err: any) => alert("Referral Error: " + err.message)
+    onError: (error: any) => {
+      alert("Failed to submit referral: " + (error.response?.data || error.message)); }
   });
 
   return (

@@ -20,11 +20,15 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   
-  const { data: allVisibilities = [] } = useQuery({
+  const { data: allVisibilities = [], isError: allVisibilitiesError } = useQuery({
     queryKey: ["allVisibilities"],
     queryFn: () => postService.getAllVisibilities(token || ""),
     enabled: !!token,
   });
+
+  if (allVisibilitiesError) {
+    alert("Failed to load visibilities: " + allVisibilitiesError);
+  }
   
   const {register, handleSubmit, reset, watch, formState: { errors }} = useForm<PostFormInputs>({
     defaultValues: {
@@ -45,7 +49,8 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
         fkPostVisibilityId: data.postVisibilityId
       });
     },
-    onError: (err: any) => alert("Error loading post: " + err.message)
+    onError: (error: any) => {
+      alert("Failed to load post details: " + (error.response?.data || error.message)); }
   });
 
   useEffect(() => {
@@ -85,7 +90,8 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
       alert(editPostId ? "Post updated!" : "Post shared to feed!");
       onSuccess();
     },
-    onError: (err: any) => alert(err.message)
+    onError: (error: any) => {
+      alert("Failed to " + (editPostId ? "update post" : "create post") + ": " + (error.response?.data || error.message)); }
   });
 
   return (

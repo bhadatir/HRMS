@@ -33,26 +33,26 @@ export default function GameManagement() {
     const [page, setPage] = useState(0);
     const [size] = useState(10);
 
-    const { data: gameTypes = [] } = useQuery({
+    const { data: gameTypes = [], isError: gameTypesOnError } = useQuery({
         queryKey: ["gameTypes"],
         queryFn: () => gameService.getAllGames(token!)
     });
 
-    const { data: gameBookingStatusOptions = [] } = useQuery({
+    const { data: gameBookingStatusOptions = [], isError: gameBookingStatusOptionsOnError } = useQuery({
         queryKey: ["gameBookingStatusOptions"],
         queryFn: () => gameService.getAllGameBookingStatus(token!)
     });
 
-    const { data: upcomingBookings = [] } = useQuery({
+    const { data: upcomingBookings = [], isError: upcomingBookingsOnError } = useQuery({
         queryKey: ["upcomingBookings"],
         queryFn: () => gameService.upcommingBookings(token!)
     });
 
-    const { data: WaitingListByEmpId = [] } = useQuery({ 
+    const { data: WaitingListByEmpId = [], isError: waitingListByEmpIdOnError } = useQuery({ 
         queryKey: ["WaitingList", user?.id], 
         queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, token!) });
 
-    const { data: bookingsByEmpId, isLoading } = useQuery({
+    const { data: bookingsByEmpId, isLoading, isError: bookingsByEmpIdOnError } = useQuery({
         queryKey: ["Bookings", user?.id, page, bookingSearchTerm],
         queryFn: () => gameService.findGameBookingByUserId(user?.id, bookingSearchTerm, page, size, token!),
         enabled: !!user?.id,
@@ -60,17 +60,24 @@ export default function GameManagement() {
     });
 
     const filteredBookings = bookingsByEmpId?.content || [];   
-      
+
+    if(gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError) {
+        alert("Failed to load data: " + (gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError));
+    }
 
     const statusMutation = useMutation({
         mutationFn: ({ id, status }: { id: number, status: number }) => 
             gameService.updateBookingStatus(id, status, token!),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings", user?.id] })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings", user?.id] }),
+        onError: (error: any) => {
+            alert("Failed to update booking status: " + (error.response?.data || error.message)); }
     });
 
     const removeWaitingListMutation = useMutation({
         mutationFn: (id: number) => gameService.deleteWaitingList(id, token!),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] }),
+        onError: (error: any) => {
+            alert("Failed to remove waiting list item: " + (error.response?.data || error.message)); }
     });
 
     const filteredWaitingList = WaitingListByEmpId.filter((w: any) => {

@@ -42,7 +42,8 @@ export default function Dashboard() {
       alert("Profile picture updated!");
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
-    onError: (err: any) => alert(err.message)
+    onError: (error: any) => {
+      alert("Failed to update profile picture: " + (error.response?.data || error.message)); }
   });
 
   const updatePasswordMutation = useMutation({

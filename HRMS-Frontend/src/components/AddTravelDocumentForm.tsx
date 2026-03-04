@@ -16,13 +16,13 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
   const [docFile, setDocFile] = useState<File>(null as any);
   const [docType, setDocType] = useState<number>(1);
 
-  const { data: employeeTravelPlan} = useQuery({
+  const { data: employeeTravelPlan, isError: employeeTravelPlanError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
     queryFn: () => travelService.findEmployeeTravelPlans(user?.id, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
-  const { data: allTagTypes = [] } = useQuery({
+  const { data: allTagTypes = [], isError: allTagTypesError } = useQuery({
     queryKey: ["allTravelDocTypes"],
     queryFn: () => travelService.getAllTravelDocTypes(token || ""),
     enabled: !!token,
@@ -49,8 +49,11 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
       alert("Travel document submitted!");
       onSuccess();
     },
-    onError: (err: any) => alert(err.message)
+    onError: (error: any) => {
+      alert("Failed to submit travel document: " + (error.response?.data || error.message)); }
   });
+
+  if (employeeTravelPlanError || allTagTypesError) alert("Failed to load data: " + (employeeTravelPlanError || allTagTypesError));
 
   return (
     <Card className="border-none shadow-none">

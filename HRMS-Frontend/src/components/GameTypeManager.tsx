@@ -13,12 +13,12 @@ export default function GameTypeManager() {
     const [showForm, setShowForm] = useState(false);
     const [editGameTypeId, setEditGameTypeId] = useState<number | null>(null);
 
-    const { data: games = [] } = useQuery({
+    const { data: games = [], isError: gamesError } = useQuery({
         queryKey: ["allGameTypes"],
         queryFn: () => gameService.getAllGames(token!)
     });
 
-
+    if(gamesError) alert("Failed to load game types: " + gamesError);
     return (
     <main className="p-2 max-w-5xl mx-auto w-full">
 

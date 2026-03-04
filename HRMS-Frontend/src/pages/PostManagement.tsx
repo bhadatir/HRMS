@@ -41,7 +41,7 @@ export default function PostManagement() {
     [user?.departmentName as string]: true
   };
 
-  const { data: allPosts, isLoading } = useQuery({
+  const { data: allPosts, isLoading, isError: allPostsError } = useQuery({
     queryKey: ["allPosts", page, searchTerm], 
     queryFn: () => postService.showAllPosts(searchTerm, page, size, token || ""),
     enabled: !!token,
@@ -58,7 +58,9 @@ export default function PostManagement() {
         return postService.removePostByEmp(postId, reason, token || "");
       }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allPosts"] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allPosts"] }),
+    onError: (error: any) => {
+      alert("Failed to delete post: " + (error.response?.data || error.message)); }
   });
 
   const handleDelete = (postId: number) => {
@@ -68,7 +70,9 @@ export default function PostManagement() {
     }
   };
   
-  
+  if (allPostsError) {
+    alert("Failed to load posts: " + allPostsError);
+  }  
 
   return (
     <SidebarProvider>

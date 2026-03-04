@@ -7,12 +7,16 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: likes = [] } = useQuery({
+  const { data: likes = [], isError: likesError } = useQuery({
     queryKey: commentId ? ["commentLikes", commentId] : ["postLikes", postId],
     queryFn: () => commentId ? postService.getLikeByCommentId(commentId, token || "") 
                                 : postService.getLikeByPostId(postId, token || ""),
     enabled: !!postId,
   });
+
+  if (likesError) {
+    alert("Failed to load likes for post/comment: " + likesError);
+  }
 
   const isLiked = likes.some((l: any) => l.employeeId === user?.id);
 
@@ -40,7 +44,9 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: commentId ? ["commentLikes", commentId] : ["postLikes", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
-    }
+    },
+    onError: (error: any) => {
+      alert("Failed to update like status: " + (error.response?.data || error.message)); }
   });
 
   return (
