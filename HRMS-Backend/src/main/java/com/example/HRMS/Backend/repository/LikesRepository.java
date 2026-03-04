@@ -5,6 +5,7 @@ import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.Like;
 import com.example.HRMS.Backend.model.Post;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -46,4 +47,8 @@ public interface LikesRepository extends JpaRepository<Like,Long> {
         SELECT pl FROM Like pl WHERE pl.fkPost.id = :postId ORDER BY pl.likeCreatedAt DESC
         """)
     List<Like> findRecentLikes(@Param("postId") Long postId, Pageable pageable);
+
+    Like findLikeByFkPost_IdAndFkLikeEmployee_Id(Long fkPostId, Long fkLikeEmployeeId);
+
+    Like findLikeByFkComment_IdAndFkLikeEmployee_Id(Long fkCommentId, @NotNull(message = "employee id require woh make like") Long fkLikeEmployeeId);
 }

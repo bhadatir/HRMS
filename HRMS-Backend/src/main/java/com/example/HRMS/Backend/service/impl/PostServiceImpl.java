@@ -233,24 +233,24 @@ public class PostServiceImpl implements PostService {
     @Override
     public void addLike(LikeRequest likeRequest){
 
-        if(likeRequest.getFkPostId()!=null && postRepository.findPostsById(likeRequest.getFkPostId()) == null){
-            Comment comment = commentsRepository.findCommentById(likeRequest.getFkCommentId());
-            if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
-                throw new RuntimeException("deleted parent comment cannot be add like.");
-            }
-        }
         if(likeRequest.getFkPostId() == null && likeRequest.getFkCommentId() != null){
             Comment comment = commentsRepository.findCommentById(likeRequest.getFkCommentId());
             if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
-                throw new RuntimeException("deleted parent comment cannot be add like.");
+                throw new RuntimeException("deleted comment cannot be add like.");
             }
         }
-
 
         if(likeRequest.getFkPostId()!=null && postRepository.findPostsById(likeRequest.getFkPostId()) != null && Boolean.TRUE.equals(postRepository.findPostsById(likeRequest.getFkPostId()).getPostIsDeleted())){
             throw new RuntimeException("deleted post cannot be add like.");
         }
 
+        if(likeRequest.getFkPostId() != null && likesRepository.findLikeByFkPost_IdAndFkLikeEmployee_Id(likeRequest.getFkPostId(), likeRequest.getFkLikeEmployeeId()) != null){
+            throw new RuntimeException("only one like per post by one employee.");
+        }
+
+        if(likeRequest.getFkCommentId() != null && likesRepository.findLikeByFkComment_IdAndFkLikeEmployee_Id(likeRequest.getFkCommentId(), likeRequest.getFkLikeEmployeeId()) != null){
+            throw new RuntimeException("only one like per comment by one employee.");
+        }
 
         Like like =new Like();
 
