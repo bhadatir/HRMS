@@ -211,7 +211,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         Employee user = getLoginUser();
         Long hrEmpId = travelPlanRequest.getFkTravelPlanHREmployeeId();
-        if(user != employeeRepository.findEmployeeById(hrEmpId)){
+        if(user != employeeRepository.findEmployeeById(hrEmpId) && user.getFkRole().getId() != 4){
             throw new RuntimeException("travel plan owner only update travel plan.");
         }
 
@@ -334,7 +334,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
 
         Employee user = getLoginUser();
-        if(user != travelPlan.getFkTravelPlanHREmployee()){
+        if(user != travelPlan.getFkTravelPlanHREmployee() && user.getFkRole().getId() != 4){
             throw new RuntimeException("travel plan owner only delete travel plan.");
         }
 

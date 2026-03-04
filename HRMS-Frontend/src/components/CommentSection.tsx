@@ -40,7 +40,7 @@ export default function CommentSection({ postId }: { postId: number }) {
 
   const removeCommentMutation = useMutation({
     mutationFn: ({ commentId, reason }: { commentId: number; reason: string }) => {
-      if (user?.roleName === "HR" && comments.find((c: any) => c.id === commentId)?.employeeId !== user.id) {
+      if ((user?.roleName === "HR" || user?.roleName === "ADMIN" ) && comments.find((c: any) => c.id === commentId)?.employeeId !== user.id) {
         return postService.removeCommentByHr(commentId, reason, token || "");
       } else {
         return postService.removeCommentByOwner(commentId, reason, token || "");
@@ -57,7 +57,7 @@ export default function CommentSection({ postId }: { postId: number }) {
     commentref.current?.focus();
   }
 
-    const handleDelete = (commentId: number) => {
+  const handleDelete = (commentId: number) => {
     const reason = window.prompt("Please enter reason for deleting this comment:", "")?.trim();
     if (reason) {
       removeCommentMutation.mutate({ commentId, reason });
@@ -92,7 +92,7 @@ export default function CommentSection({ postId }: { postId: number }) {
                     >
                       <Reply size={12} />
                 </button>
-                {(user?.roleName === "HR" || user?.id === comment.employeeId) && (
+                {(user?.roleName === "HR" || user?.roleName === "ADMIN" || user?.id === comment.employeeId) && (
                     <button
                     onClick={() => handleDelete(comment.id)}
                           className="flex opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"

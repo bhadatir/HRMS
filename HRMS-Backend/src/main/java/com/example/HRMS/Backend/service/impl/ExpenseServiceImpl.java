@@ -196,7 +196,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
         Employee user = authService.getLoginUser();
-        if(user != travelPlan.getFkTravelPlanHREmployee()){
+        if(user != travelPlan.getFkTravelPlanHREmployee() && user.getFkRole().getId() != 4){
             throw new RuntimeException("travel plan owner only update travel plan expense status.");
         }
 

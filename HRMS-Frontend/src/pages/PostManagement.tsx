@@ -52,7 +52,7 @@ export default function PostManagement() {
 
   const removePost = useMutation({
     mutationFn: ({ postId, reason }: { postId: number; reason: string }) => {
-      if (user?.roleName === "HR" && allPosts?.content.find((post: any) => post.id === postId)?.employeeId !== user.id) {
+      if ((user?.roleName === "HR" || user?.roleName === "ADMIN" ) && allPosts?.content.find((post: any) => post.id === postId)?.employeeId !== user.id) {
       return postService.removePostByHr(postId, reason, token || "");
       } else {
         return postService.removePostByEmp(postId, reason, token || "");
@@ -176,7 +176,7 @@ export default function PostManagement() {
                               </Button>
                             </div>
                           )}
-                          {(user?.roleName === "HR" || user?.id === post.employeeId) 
+                          {(user?.roleName === "HR" || user?.roleName === "ADMIN" || user?.id === post.employeeId) 
                             && (  
                             <Button variant="ghost" size="sm" className="ml-2" onClick={(e) => {
                               e.stopPropagation();

@@ -74,7 +74,7 @@ export default function JobManagement() {
             />
           </div>
 
-          {user?.roleName === "HR" && (
+          {( user?.roleName === "HR" || user?.roleName === "ADMIN" ) && (
             <Button title="Post New Job" onClick={() => setShowForm(true)} className="gap-2 text-gray-700">
               <Plus size={18} />
               Post New Job
@@ -182,7 +182,7 @@ export default function JobManagement() {
             {isLoading ? (
               <p>Loading jobs...</p>
             ) : filteredJobs.length > 0 ? (
-              filteredJobs.map((job: any) => ((job.jobIsActive || user?.roleName === "HR") && (
+              filteredJobs.map((job: any) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (
                 <Card 
                   key={job.id} 
                   className="border-slate-200 cursor-pointer group"
@@ -193,17 +193,13 @@ export default function JobManagement() {
                       <div className="flex items-center gap-2 justify-between">
                         <CardTitle className="text-lg font-bold">{job.jobTitle}</CardTitle>
                         <Badge variant="outline" 
-                          title="Change Job Status"
-                          onClick={(e) => {
-                            if (user?.roleName !== "HR") return;
-                          }}
                           className={job.jobIsActive ? "border-green-500 text-green-500" : "border-red-500 text-red-500"} >
                           {job.jobIsActive ? "Open" : "Closed"}
                         </Badge>
                       </div>
 
                       <div className="flex justify-between items-start">                     
-                        {user?.id === job.employeeId && user?.roleName === "HR" && job.jobIsActive && 
+                        {((user?.id === job.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job.jobIsActive && 
                           <div className="flex gap-2">
                             <Button 
                               title="Edit job"
@@ -255,7 +251,7 @@ export default function JobManagement() {
 
                     {user?.id != job.employeeId && <p className="text-xs text-slate-500 mt-1">Created by : {job.employeeEmail}</p>}
 
-                    {user?.id != job.employeeId && job.jobIsActive && (
+                    {user?.id != job.employeeId && job.jobIsActive && user?.roleName !== "ADMIN" && (
                     <div className="mt-2 flex justify-between gap-2">
                         <Button 
                         title="Share this job"

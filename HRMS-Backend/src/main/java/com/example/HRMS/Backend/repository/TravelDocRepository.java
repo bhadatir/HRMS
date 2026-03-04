@@ -43,7 +43,7 @@ public interface TravelDocRepository extends JpaRepository<TravelDoc, Long> {
             "LEFT JOIN td.fkEmployeeTravelPlan etp " +
             "WHERE (td.fkTravelPlan.id = :fkTravelPlanId OR etp.fkTravelPlan.id = :fkTravelPlanId) " +
             "AND (" +
-            "   :roleId = 3 " +
+            "   :roleId = 3 OR :roleId = 4 " +
             "   OR (:roleId = 2 AND (td.fkEmployee.id = :empId OR td.fkEmployee.fkManagerEmployee.id = :empId)) " +
             "   OR (:roleId = 1 AND EXISTS ( " +
             "       SELECT 1 FROM EmployeeTravelPlan memberCheck " +

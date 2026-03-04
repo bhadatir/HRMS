@@ -36,6 +36,12 @@ export default function TravelPlan() {
     enabled: !!token && !!user?.id,
   });
 
+  const { data: allTravelPlans } = useQuery({
+    queryKey: ["allTravelPlans"],
+    queryFn: () => travelService.getAllTravelPlans(token || ""),
+    enabled: !!token && user?.roleName === "ADMIN",
+  });
+
   const deleteTravelPlanMutation = useMutation({
     mutationFn: ({ travelPlanId, reason }: { travelPlanId: number; reason: string }) => travelService.deleteTravelPlan(travelPlanId, reason, token || ""),
     onSuccess: () => {
@@ -47,6 +53,9 @@ export default function TravelPlan() {
 
   const filteredPlans = useMemo(() => {
     if (!travelPlanByEmpId || !user) return [];
+    if(user.roleName === "ADMIN") return allTravelPlans?.filter((plan: any) => {
+      return plan.travelPlanName.toLowerCase().includes(searchTerm?.toLowerCase());
+    }) || [];
     return travelPlanByEmpId?.content.filter((plan: any) => {
         if(travelPlanType === 0) return true;
         if(travelPlanType === 1) return plan.travelPlanIsDeleted === false;
@@ -57,8 +66,6 @@ export default function TravelPlan() {
         if(travelPlanType === 5) return plan.travelPlanIsReturn === false;
         return false;
       }) || [];
-
-    // if role hr so hr add exp only on that in which hr is going in travel is remaining
 
   }, [user, travelPlanByEmpId, travelPlanType, searchTerm]);
 
@@ -84,7 +91,7 @@ export default function TravelPlan() {
             ) : (<Badge variant="outline">No filter</Badge>)
             }
           </div>
-          <div className="flex items-center gap-2">
+          {user?.roleName !== "ADMIN" && <div className="flex items-center gap-2">
             <select className="border rounded-md px-2 py-1 text-sm" 
               value={travelPlanType} onChange={(e) => setTravelPlanType(Number(e.target.value))}>
                 <option value="0">All Travel Plan</option>
@@ -94,7 +101,7 @@ export default function TravelPlan() {
                 <option value="4">Return</option>
                 <option value="5">One-Way</option>
             </select>
-          </div>
+          </div>}
 
           <div className="relative max-w-sm w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
@@ -248,14 +255,13 @@ export default function TravelPlan() {
                         ))}
                       </div>
                     </div>
-
-                    {/* manager also add doc so update this */}
                     
-                    {user?.roleName === "HR" || user?.roleName === "EMPLOYEE" || 
+                    {user?.roleName === "HR" || user?.roleName === "EMPLOYEE" || user?.roleName === "ADMIN" || 
                       (user?.roleName === "MANAGER" && plan.employeeTravelPlanResponses.some((resp: any) => 
                           resp.employeeEmail === user.employeeEmail)) ? (
                       <div className="mt-2 flex justify-between gap-2">
-                        { new Date(plan.travelPlanStartDate) > new Date() 
+                        { new Date(plan.travelPlanStartDate) > new Date()
+                          && user?.roleName !== "ADMIN" 
                           && (user?.id === plan.employeeId || 
                               plan?.employeeTravelPlanResponses.some((resp: any) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false))
                           && !plan.travelPlanIsDeleted ? (
@@ -275,6 +281,7 @@ export default function TravelPlan() {
                         { (user?.roleName !== "HR" || (user?.roleName === "HR" && user?.id !== plan.employeeId 
                             && plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false)
                          )) 
+                          && user?.roleName !== "ADMIN"
                           && !plan.travelPlanIsDeleted ? ((() => {
                           const now = new Date().getTime();
                           const planStartDate = new Date(plan.travelPlanStartDate).getTime();
@@ -306,7 +313,7 @@ export default function TravelPlan() {
                         // );
                         }))():null}
 
-                        {user?.roleName === "HR" && user?.id === plan.employeeId && !plan.travelPlanIsDeleted && new Date(plan.travelPlanStartDate) > new Date() ? (
+                        {((user?.roleName === "HR" && user?.id === plan.employeeId) || user?.roleName === "ADMIN") && !plan.travelPlanIsDeleted && new Date(plan.travelPlanStartDate) > new Date() ? (
                           <>
                           <Button 
                             disabled={plan.travelPlanIsDeleted}

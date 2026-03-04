@@ -7,7 +7,7 @@ import { useMutation, useQueries, useQueryClient, useInfiniteQuery } from "@tans
 import { travelService } from "../api/travelService";
 import { apiService } from "../api/apiService"; 
 import { useAuth } from "../context/AuthContext";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { Search, User, X, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -31,6 +31,7 @@ export default function TravelPlanForm({ editTravelPlanId, onSuccess }: { editTr
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedEmployees, setSelectedEmployees] = useState<{id: number, name: string}[]>([]);
   const [createdAt, setCreatedAt] = useState("");
+  const [hrOwnerId, setHrOwnerId] = useState<number | null>(null);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<TravelPlanFormInputs>({
     defaultValues: {
@@ -69,6 +70,7 @@ const getMutation = useMutation({
       .map((e: any) => ({ id: e.employeeId, name: `${e.employeeFirstName} ${e.employeeLastName}` }));
     
     setSelectedEmployees(existingEmps);
+    setHrOwnerId(data.employeeId);
     
     reset({
       travelPlanName: data.travelPlanName,
@@ -122,6 +124,7 @@ const getMutation = useMutation({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
+      queryClient.invalidateQueries({ queryKey: ["travelPlanByEmpId", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["travelPlan", editTravelPlanId] });
       queryClient.invalidateQueries({ queryKey: ["empTravelPlans", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["employeeSearch"] });
@@ -208,7 +211,7 @@ const getMutation = useMutation({
               <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-40 overflow-y-auto">
                 {suggestions.map((emp: any) => {
 
-                  if (emp.id === user?.id || selectedEmployees.find(e => e.id === emp.id)) return null;
+                  if (emp.id === hrOwnerId || selectedEmployees.find(e => e.id === emp.id)) return null;
 
                   return (
                   <button

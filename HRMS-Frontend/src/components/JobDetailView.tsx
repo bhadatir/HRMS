@@ -150,7 +150,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
               </div>
             ):(
               <>
-              {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive &&  (
+              {((user?.id === job.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive &&  (
                 <div className="relative max-w-sm w-full">                 
                   <Plus className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400"/>
                   <Input 
@@ -215,7 +215,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                   <TableHead className="text-center">Referred By</TableHead>
                   <TableHead className="text-center">CV</TableHead>
                   <TableHead className="text-center">Status</TableHead>
-                  {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive && <TableHead className="text-center">Actions</TableHead>}
+                  {((user?.id === job.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive && <TableHead className="text-center">Actions</TableHead>}
                   {<TableHead className="text-center">Reason</TableHead>}
                 </TableRow>
               </TableHeader>
@@ -240,7 +240,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                         {ref.cvStatusTypeName}
                       </Badge>
                     </TableCell>
-                    {user?.id === job.employeeId && user?.roleName === "HR" && job?.jobIsActive && (
+                    {((user?.id === job.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive && (
                       <TableCell className="text-right space-x-2">
                         {ref.cvStatusTypeName === "PENDING" &&
                         <>
@@ -265,7 +265,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                 ))}
                 {filteredReferrals.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={user?.roleName === "HR" ? 6 : 5} className="text-center py-10">
+                  <TableCell colSpan={user?.roleName === "HR" || user?.roleName === "ADMIN" ? 6 : 5} className="text-center py-10">
                     <div className="flex flex-col items-center gap-2">
                       <FileText size={32} className="text-slate-400" />
                       <p className="text-sm text-slate-400">No referrals added yet.</p>

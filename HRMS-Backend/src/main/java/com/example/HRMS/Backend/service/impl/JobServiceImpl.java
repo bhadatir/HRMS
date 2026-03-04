@@ -88,7 +88,7 @@ public class JobServiceImpl implements JobService {
 
         Employee user = authService.getLoginUser();
 
-        if(user != job.getFkJobOwnerEmployee()){
+        if(user != job.getFkJobOwnerEmployee() && user.getFkRole().getId() != 4){
             throw new RuntimeException("job owner can update job.");
         }
 
@@ -122,7 +122,7 @@ public class JobServiceImpl implements JobService {
         }
 
         Employee user = authService.getLoginUser();
-        if(user != job.getFkJobOwnerEmployee()){
+        if(user != job.getFkJobOwnerEmployee() && user.getFkRole().getId() != 4){
             throw new RuntimeException("job owner only add cv reviewer.");
         }
 
@@ -300,7 +300,7 @@ public class JobServiceImpl implements JobService {
         }
 
         Employee user = authService.getLoginUser();
-        if(user != job.getFkJobOwnerEmployee()){
+        if(user != job.getFkJobOwnerEmployee() && user.getFkRole().getId() != 4){
             throw new RuntimeException("job owner only update cv status.");
         }
 
@@ -347,7 +347,7 @@ public class JobServiceImpl implements JobService {
         }
 
         Employee user = authService.getLoginUser();
-        if(user != job.getFkJobOwnerEmployee()){
+        if(user != job.getFkJobOwnerEmployee() && user.getFkRole().getId() != 4){
             throw new RuntimeException("job owner only update status.");
         }
 
