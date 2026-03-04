@@ -285,8 +285,9 @@ export default function TravelPlan() {
                           && !plan.travelPlanIsDeleted ? ((() => {
                           const now = new Date().getTime();
                           const planStartDate = new Date(plan.travelPlanStartDate).getTime();
+                          const planEndDate = new Date(plan.travelPlanEndDate).getTime();
                           const tenDays = 10 * 24 * 60 * 60 * 1000;
-                          const expiryDate = planStartDate + tenDays;
+                          const expiryDate = planEndDate + tenDays;
                           const canClaim = now >= planStartDate && now <= expiryDate;
                           return canClaim && (  
                             <Button                             

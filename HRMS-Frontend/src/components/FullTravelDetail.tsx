@@ -74,7 +74,8 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
   const handleExpenseApproval = (expenseId: number, statusId: number) => {
     if(statusId === 2) {
       const confirm = window.confirm("Are you sure you want to approve this expense?");
-      if (confirm) approveMutation.mutate({ expenseId, statusId, reason: "Approved by HR" });
+      const reason = "Approved by : " + user?.employeeEmail + " at " + new Date().toLocaleString();
+      if (confirm) approveMutation.mutate({ expenseId, statusId, reason });
     } else {
       const reason = window.prompt("Please enter reason for approval:", "")?.trim();
       if (reason) {

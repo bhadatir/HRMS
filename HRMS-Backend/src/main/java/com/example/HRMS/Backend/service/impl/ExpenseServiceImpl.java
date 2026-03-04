@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,7 +59,8 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
         LocalDate travelStartDate = travelPlan.getTravelPlanStartDate();
-        LocalDate travelAddDeadLine = travelStartDate.plusDays(10);
+        LocalDate travelEndDate = travelPlan.getTravelPlanEndDate();
+        LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
 
         if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelStartDate)){
             throw new RuntimeException("only add expense between travel plan Start date and after ending travel plan 10 days duration.");
@@ -102,7 +102,6 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseResponse.setExpenseUploadedAt(expense.getExpenseUploadedAt());
             expenseResponse.setEmployeeEmail(employeeRepository.findEmployeeById(employeeId).getEmployeeEmail());
 
-            //it is correct??
             expenseResponse.setId(expense.getId());
 
             expenseResponse.setEmployeeTravelPlanId(expense.getFkEmployeeTravelPlan().getId());
@@ -110,9 +109,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseResponse.setExpenseExpenseStatusId(expense.getFkExpenseExpenseStatus().getId());
             expenseResponse.setExpenseExpenseStatusName(expense.getFkExpenseExpenseStatus().getExpenseStatusName());
 
-            if(expense.getFkExpenseExpenseStatus().getId() == 3){
-                expenseResponse.setReasonForRejectExpense(expense.getReasonForRejectExpense());
-            }
+            expenseResponse.setReasonForRejectExpense(expense.getReasonForRejectExpense());
             List<ExpenseProof> expenseProofs = expenseProofRepository.findExpenseProofByFkExpense_Id(expense.getId());
             List<ExpenseProofResponse> expenseProofResponses = new ArrayList<>();
             for(ExpenseProof expenseProof : expenseProofs){
@@ -200,7 +197,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             throw new RuntimeException("travel plan owner only update travel plan expense status.");
         }
 
-        if(statusId == 3)expense.setReasonForRejectExpense(reason);
+        if(!reason.isEmpty())expense.setReasonForRejectExpense(reason);
         expense.setFkExpenseExpenseStatus(expenseStatusRepository.findExpenseStatusById(statusId));
         expenseRepository.save(expense);
 
@@ -228,11 +225,12 @@ public class ExpenseServiceImpl implements ExpenseService {
             throw new RuntimeException("closed travel plan cannot be be add expenses.");
         }
 
-        LocalDate travelEndDate = travelPlan.getTravelPlanStartDate();
+        LocalDate travelStartDate = travelPlan.getTravelPlanStartDate();
+        LocalDate travelEndDate = travelPlan.getTravelPlanEndDate();
         LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
 
-        if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelEndDate)){
-            throw new RuntimeException("only add expense with proof between travel plan end date and after ending travel plan 10 days duration.");
+        if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelStartDate)){
+            throw new RuntimeException("only add expense with proof between travel plan start date and after ending travel plan 10 days duration.");
         }
 
         Instant time = Instant.now();
