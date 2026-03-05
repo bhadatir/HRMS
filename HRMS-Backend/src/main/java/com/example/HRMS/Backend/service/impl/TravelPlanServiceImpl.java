@@ -12,21 +12,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.hibernate.type.descriptor.java.CoercionHelper.toLong;
@@ -44,6 +40,8 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     private final ExpenseStatusRepository expenseStatusRepository;
 
     private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
+
+    private final AuditTravelPlanRepository auditTravelPlanRepository;
 
     private final ExpenseProofTypeRepository expenseProofTypeRepository;
 
@@ -238,7 +236,17 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         List<BookingWaitingList> waitConflicts = waitlistRepository.findOverlappingWaitlists(newEmpId, start, end);
         removeConflictWaitingListBookings(waitConflicts, travelPlanRequest.getTravelPlanDetails());
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
 
+        Employee hrOwner = employeeRepository.findEmployeeById(travelPlanRequest.getFkTravelPlanHREmployeeId());
+        AuditTravelPlan log = new AuditTravelPlan();
+        log.setAction("Edit");
+        log.setPerformedBy(email);
+        log.setOwnerEmail(hrOwner.getEmployeeEmail());
+
+        List<String> addedTravelMembers = new ArrayList<>();
+        List<String> removedTravelMembers = new ArrayList<>();
         List<String> emails = new ArrayList<>();
 
         for(Long id : newEmpId){
@@ -264,6 +272,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
                     List<String> emails1 = new ArrayList<>();
                     emails1.add(employee.getEmployeeEmail());
+                    addedTravelMembers.add(employee.getEmployeeEmail());
                     emailService.sendEmail(emails1,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
                     notificationService.createNotification(id,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
 
@@ -280,6 +289,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     employeeTravelPlanRepository.save(employeeTravelPlan);
 
                     emails.add(employee.getEmployeeEmail());
+                    addedTravelMembers.add(employee.getEmployeeEmail());
                     notificationService.createNotification(id,"New added in Travel Plan by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
 
                 }
@@ -295,6 +305,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 Employee employee = employeeRepository.findEmployeeById(id);
                 List<String> emails1 = new ArrayList<>();
                 emails1.add(employee.getEmployeeEmail());
+                removedTravelMembers.add(employee.getEmployeeEmail());
                 emailService.sendEmail(emails1,"Removed from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
                 notificationService.createNotification(id,"Removed from Travel Plan by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
 
@@ -304,6 +315,11 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         if(!emails.isEmpty()){
             emailService.sendEmail(emails,"Travel Plan",travelPlanRequest.getTravelPlanDetails());
         }
+
+        log.setAddedTravelMembers(addedTravelMembers);
+        log.setRemovedTravelMembers(removedTravelMembers);
+        auditTravelPlanRepository.save(log);
+
     }
 
     @Transactional

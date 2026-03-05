@@ -1,12 +1,11 @@
 package com.example.HRMS.Backend.config;
 
-import com.example.HRMS.Backend.dto.AuthResponse;
 import com.example.HRMS.Backend.dto.JobShareRequest;
 import com.example.HRMS.Backend.dto.ReferFriendRequest;
+import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,9 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Aspect
@@ -30,6 +27,7 @@ public class AuditLoggingAspect {
     private final ShareJobDataRepository shareJobDataRepository;
     private final EmployeeRepository employeeRepository;
     private final AuthAuditRepository authAuditRepository;
+    private final AuditTravelPlanRepository auditTravelPlanRepository;
 
     @AfterReturning(
             pointcut = "execution(* com.example.HRMS.Backend.service.JobService.updateStatus(..))"
@@ -125,4 +123,27 @@ public class AuditLoggingAspect {
         }
     }
 
+    @AfterReturning(
+            pointcut = "execution(* com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl.addTravelPlan(..))"
+    )
+    public void logCreateTravelPlan(JoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        if(args.length>0){
+            TravelPlanRequest travelPlan = (TravelPlanRequest) args[0];
+            Employee hrEmp = employeeRepository.findEmployeeById(travelPlan.getFkTravelPlanHREmployeeId());
+            AuditTravelPlan log = new AuditTravelPlan();
+            log.setAction("Create");
+            log.setPerformedBy(email);
+            log.setOwnerEmail(hrEmp.getEmployeeEmail());
+            List<Long> membersId = travelPlan.getEmployeesInTravelPlanId();
+            List<String> members = membersId.stream().map(memberId -> {
+                return employeeRepository.findEmployeeById(memberId).getEmployeeEmail();
+            }).toList();
+            log.setAddedTravelMembers(members);
+            auditTravelPlanRepository.save(log);
+        }
+    }
 }
