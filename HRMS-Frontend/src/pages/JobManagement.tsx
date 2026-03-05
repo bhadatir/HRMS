@@ -14,6 +14,7 @@ import { Plus, X, Calendar, Search, DollarSign, Share, UserPlus, Edit, Bell, Ind
 import JobForm from "../components/JobForm.tsx";
 import JobDetailView from "@/components/JobDetailView.tsx";
 import Notifications from "@/components/Notifications.tsx";
+import { useAppDebounce } from "../hooks/useAppDebounce";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -26,6 +27,7 @@ export default function JobManagement() {
   const [referJobId, setReferJobId] = useState<number | null>(null);
   const queryClient = useQueryClient();
   const [jobType, setJobType] = useState(0);
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   const { data: allJobs, isLoading, isError: allJobsOnError } = useQuery({
     queryKey: ["allJobs"],
@@ -40,7 +42,7 @@ export default function JobManagement() {
   const filteredJobs = useMemo(() => {
     if (!allJobs) return [];
     return allJobs.filter((job: any) => {
-      const matchesSearch = job.jobTitle.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = job.jobTitle.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       if (!matchesSearch) return false;
       if(jobType === 0) return true;
       if(jobType === 1) return job.jobIsActive === true;
@@ -48,7 +50,7 @@ export default function JobManagement() {
       if(jobType === 3) return job.employeeId === user?.id;
       return false;
     });
-  }, [allJobs, searchTerm, jobType]);
+  }, [allJobs, debouncedSearchTerm, jobType]);
 
   const jobStatusmutation = useMutation({
     mutationFn: ({ jobId, reason }: { jobId: number; reason: string }) => jobService.updateJobStatus(jobId, reason, token || ""),

@@ -10,6 +10,7 @@ import { useAuth } from "../context/AuthContext";
 import { set, useForm } from "react-hook-form";
 import { Search, User, X, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAppDebounce } from "../hooks/useAppDebounce";
 
 type TravelPlanFormInputs = {
   travelPlanName: string;
@@ -33,6 +34,7 @@ export default function TravelPlanForm({ editTravelPlanId, onSuccess }: { editTr
   const [selectedEmployees, setSelectedEmployees] = useState<{id: number, name: string}[]>([]);
   const [createdAt, setCreatedAt] = useState("");
   const [hrOwnerId, setHrOwnerId] = useState<number | null>(null);
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<TravelPlanFormInputs>({
     defaultValues: {
@@ -52,13 +54,13 @@ const endDate = watch("travelPlanEndDate");
     isFetchingNextPage,
     isError: employeeSearchError
   } = useInfiniteQuery({
-    queryKey: ["employeeSearchInfinite", searchTerm, startDate, endDate],
+    queryKey: ["employeeSearchInfinite", debouncedSearchTerm, startDate, endDate],
     queryFn: ({ pageParam = 0 }) => 
-      apiService.searchAvailableEmployeeForTravel(searchTerm, pageParam, 5, startDate, endDate, token || ""),
+      apiService.searchAvailableEmployeeForTravel(debouncedSearchTerm, pageParam, 5, startDate, endDate, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => 
       lastPage.last ? undefined : lastPage.number + 1,
-    enabled: searchTerm.length >= 1 && !!startDate && !!endDate,
+    enabled: debouncedSearchTerm.length >= 1 && !!startDate && !!endDate,
   });
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 

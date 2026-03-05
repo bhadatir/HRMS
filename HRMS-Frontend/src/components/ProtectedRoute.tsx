@@ -11,7 +11,6 @@ export default function ProtectedRoute() {
       </div>
     );
   }
-
   
   if (!isAuthenticated) {
     return <Navigate to="/login" />;

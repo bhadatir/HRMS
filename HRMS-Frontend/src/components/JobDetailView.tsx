@@ -21,6 +21,7 @@ import {
   Plus
 } from "lucide-react";
 import { apiService } from "@/api/apiService";
+import { useAppDebounce } from "../hooks/useAppDebounce";
 
 export default function JobDetailView({ jobId }: { jobId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
@@ -29,6 +30,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
   const [newReviewerId, setNewReviewerId] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
  
   const {
     data: infiniteData,
@@ -36,13 +38,13 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     hasNextPage,
     isFetchingNextPage
   } = useInfiniteQuery({
-    queryKey: ["employeeSearchInfinite", searchTerm],
+    queryKey: ["employeeSearchInfinite", debouncedSearchTerm],
     queryFn: ({ pageParam = 0 }) => 
-      apiService.searchEmployees(searchTerm, pageParam, 10, token || ""),
+      apiService.searchEmployees(debouncedSearchTerm, pageParam, 10, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => 
       lastPage.last ? undefined : lastPage.number + 1,
-    enabled: searchTerm.length >= 1,
+    enabled: debouncedSearchTerm.length >= 1,
   });
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
     
@@ -61,10 +63,10 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
   if(jobError || referralsError) alert("Failed to load job data");
 
   const filteredReferrals = referrals.filter((ref: any) => 
-    ref.referFriendName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ref.referFriendEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ref.employeeEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ref.cvStatusTypeName.toLowerCase().includes(searchTerm.toLowerCase()) 
+    ref.referFriendName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+    ref.referFriendEmail.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+    ref.employeeEmail.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+    ref.cvStatusTypeName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) 
   );
 
   const updateCvStatusMutation = useMutation({

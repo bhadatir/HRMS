@@ -15,6 +15,7 @@ import AddTravelDocumentForm from "../components/AddTravelDocumentForm";
 import FullTravelDetail from "../components/FullTravelDetail.tsx";
 import { Input } from "@/components/ui/input";
 import Notifications from "../components/Notifications.tsx";
+import { useAppDebounce } from "../hooks/useAppDebounce";
 
 export default function TravelPlan() {
   const { token, user, unreadNotifications } = useAuth(); 
@@ -29,10 +30,11 @@ export default function TravelPlan() {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
   const [size] = useState(12);
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   const { data: travelPlanByEmpId, isLoading, isError: travelPlanByEmpIdError } = useQuery({
-    queryKey: ["travelPlanByEmpId", user?.id, page, size, searchTerm],
-    queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id, searchTerm, page, size, token || ""),
+    queryKey: ["travelPlanByEmpId", user?.id, page, size, debouncedSearchTerm],
+    queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id, debouncedSearchTerm, page, size, token || ""),
     enabled: !!token && !!user?.id,
   });
 

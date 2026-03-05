@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Card, CardContent } from "@/components/ui/card";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
-import { X, Edit, Bell, Trash, Plus, Search } from "lucide-react";
+import { X, Bell, Plus, Search } from "lucide-react";
 import Notifications from "@/components/Notifications.tsx";
 import { apiService } from "@/api/apiService.ts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,6 +13,7 @@ import AddUser from "../components/AddUser";
 import { Input } from "@/components/ui/input";
 import UserDetails from "@/components/UserDetails";
 import { cn } from "@/lib/utils";
+import { useAppDebounce } from "../hooks/useAppDebounce";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -22,10 +23,11 @@ export default function JobManagement() {
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
   const [employeeType, setEmployeeType] = useState(0);
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   const { data: allEmp, isLoading, isError: allEmpError } = useQuery({
-    queryKey: ["allEmployees", searchTerm],
-    queryFn: () => apiService.getAllEmployees(searchTerm, token || ""),
+    queryKey: ["allEmployees", debouncedSearchTerm],
+    queryFn: () => apiService.getAllEmployees(debouncedSearchTerm, token || ""),
     enabled: !!token,
   });
 

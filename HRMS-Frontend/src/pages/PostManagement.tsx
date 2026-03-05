@@ -14,6 +14,7 @@ import LikeButton from "@/components/LikeButton";
 import CommentSection from "@/components/CommentSection";
 import Notifications from "@/components/Notifications";
 import PostTags from "@/components/PostTags";
+import { useAppDebounce } from "../hooks/useAppDebounce";
 
 export default function PostManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -25,6 +26,7 @@ export default function PostManagement() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const [size] = useState(20);
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -42,8 +44,8 @@ export default function PostManagement() {
   };
 
   const { data: allPosts, isLoading, isError: allPostsError } = useQuery({
-    queryKey: ["allPosts", page, searchTerm], 
-    queryFn: () => postService.showAllPosts(searchTerm, page, size, token || ""),
+    queryKey: ["allPosts", page, debouncedSearchTerm],
+    queryFn: () => postService.showAllPosts(debouncedSearchTerm, page, size, token || ""),
     enabled: !!token,
     placeholderData: (previousData) => previousData,
   });

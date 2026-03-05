@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plane, Calendar, MapPin, FileText, CheckCircle, XCircle, ExternalLink, IndianRupee, Search } from "lucide-react";
 import { Input } from "./ui/input";
+import { useAppDebounce } from "../hooks/useAppDebounce";
 
 export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan: number| null; onSuccess: () => void }) {
   const { token, user } = useAuth();
@@ -15,6 +16,8 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
   const [viewMode, setViewMode] = useState<"EXPENSES" | "DOCUMENTS">("EXPENSES");
   const [expenseSearchTerm, setExpenseSearchTerm] = useState("");
   const [docSearchTerm, setDocSearchTerm] = useState("");
+  const debouncedExpenseSearchTerm = useAppDebounce(expenseSearchTerm);
+  const debouncedDocSearchTerm = useAppDebounce(docSearchTerm);
 
   const { data: plan, isLoading: planLoading, isError: planError } = useQuery({
     queryKey: ["travelPlan", travelPlan],
@@ -31,18 +34,18 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
   });
 
   const {data: allDocs = [], isLoading: docsLoading, isError: docsError} = useQuery({
-    queryKey: ["travelPlanDocs", travelPlan, docSearchTerm],
-    queryFn: () => travelService.findTravelDocByPlanId(travelPlan!, user?.id || 0, docSearchTerm, token || ""),
+    queryKey: ["travelPlanDocs", travelPlan, debouncedDocSearchTerm],
+    queryFn: () => travelService.findTravelDocByPlanId(travelPlan!, user?.id || 0, debouncedDocSearchTerm, token || ""),
     enabled: !!token && !!travelPlan && viewMode === "DOCUMENTS",
   });
 
   const allExpenses = expenseResults.flatMap((result) => result.data || []);
   const filteredExpenses = allExpenses.filter((exp: any) =>
-    exp.expenseUploadedAt.toLowerCase().includes(expenseSearchTerm.toLowerCase()) ||
-    exp.expenseAmount.toString().includes(expenseSearchTerm) ||
-    exp.expenseDate.toLowerCase().includes(expenseSearchTerm.toLowerCase()) ||
-    exp.expenseExpenseStatusName.toLowerCase().includes(expenseSearchTerm.toLowerCase()) ||
-    exp.employeeEmail.toLowerCase().includes(expenseSearchTerm.toLowerCase())
+    exp.expenseUploadedAt.toLowerCase().includes(debouncedExpenseSearchTerm.toLowerCase()) ||
+    exp.expenseAmount.toString().includes(debouncedExpenseSearchTerm) ||
+    exp.expenseDate.toLowerCase().includes(debouncedExpenseSearchTerm.toLowerCase()) ||
+    exp.expenseExpenseStatusName.toLowerCase().includes(debouncedExpenseSearchTerm.toLowerCase()) ||
+    exp.employeeEmail.toLowerCase().includes(debouncedExpenseSearchTerm.toLowerCase())
   );
   const isLoadingData = planLoading || (viewMode === "EXPENSES" ? expenseResults.some(r => r.isLoading) : docsLoading);
 

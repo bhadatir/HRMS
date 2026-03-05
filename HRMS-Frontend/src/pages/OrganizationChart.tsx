@@ -14,6 +14,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Search, User, Bell, X } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
+import { useAppDebounce } from "../hooks/useAppDebounce";
 
 export default function OrganizationChart() {
   const { token, unreadNotifications } = useAuth(); 
@@ -22,6 +23,8 @@ export default function OrganizationChart() {
   const [showDropdown, setShowDropdown] = useState(false);  
   const [showNotification, setShowNotification] = useState(false);
   
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
+
   const {
     data: infiniteData,
     fetchNextPage,
@@ -29,13 +32,13 @@ export default function OrganizationChart() {
     isFetchingNextPage,
     isError: searchError
   } = useInfiniteQuery({
-    queryKey: ["employeeSearchInfinite", searchTerm],
+    queryKey: ["employeeSearchInfinite", debouncedSearchTerm],
     queryFn: ({ pageParam = 0 }) => 
-      apiService.searchEmployees(searchTerm, pageParam, 10, token || ""),
+      apiService.searchEmployees(debouncedSearchTerm, pageParam, 10, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => 
       lastPage.last ? undefined : lastPage.number + 1,
-    enabled: searchTerm.length >= 1,
+    enabled: debouncedSearchTerm.length >= 1,
   });
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
