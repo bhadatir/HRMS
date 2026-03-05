@@ -12,11 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
@@ -101,12 +103,12 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     () -> new RuntimeException("Employee not found"));
 
             if(isEmpAvailable(id, travelPlanRequest.getTravelPlanStartDate(), travelPlanRequest.getTravelPlanEndDate())) {
-                throw new RuntimeException("emp is not available at this travel period");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "emp is not available at this travel period");
             }
 
             if(Objects.equals(id, travelPlanRequest.getFkTravelPlanHREmployeeId()))
             {
-                throw new RuntimeException("owner can not add it self in travel members.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "owner can not add it self in travel members.");
             }
 
             EmployeeTravelPlan employeeTravelPlan = new EmployeeTravelPlan();
@@ -135,17 +137,17 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 emails.add(bookingParticipant.getFkEmployee().getEmployeeEmail());
                 notificationService.createNotification(bookingParticipant.getFkEmployee().getId()
                         ,"your game booking waiting list entry is removed at :" + Instant.now()
-                        ," date : " + wait.getTargetSlotDatetime() + " game type : "+ wait.getFkGameType().getGameName() +" details : " + details);
+                        ," date: " + wait.getTargetSlotDatetime() + " game type: "+ wait.getFkGameType().getGameName() +" details : " + details);
             }
             bookingParticipantRepository.deleteAll(bookingParticipants);
             waitlistRepository.delete(wait);
 
             notificationService.createNotification(wait.getFkHostEmployee().getId()
                     ,"your game booking waiting list entry is removed at :" + Instant.now()
-                    ," date : " + wait.getTargetSlotDatetime() + " game type : "+ wait.getFkGameType().getGameName() +" details : " + details);
+                    ," date: " + wait.getTargetSlotDatetime() + " game type: "+ wait.getFkGameType().getGameName() +" details : " + details);
 
             emailService.sendEmail(emails,"your game booking waiting list entry is at :" + Instant.now()
-                    , " date : " + wait.getTargetSlotDatetime() + " game type : "+ wait.getFkGameType().getGameName() +" details : " + details);
+                    , " date: " + wait.getTargetSlotDatetime() + " game type: "+ wait.getFkGameType().getGameName() +" details : " + details);
         }
     }
 
@@ -205,17 +207,17 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     public void updateTravelPlan(@Valid TravelPlanRequest travelPlanRequest, Long travelPlanId){
 
         if(Boolean.TRUE.equals(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanIsDeleted())){
-            throw new RuntimeException("closed travel plan cannot be edit.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed travel plan cannot be edit.");
         }
 
         if(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanStartDate().isBefore(LocalDate.now())){
-            throw new RuntimeException("only edit travel plan before it start.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only edit travel plan before it start.");
         }
 
         Employee user = getLoginUser();
         Long hrEmpId = travelPlanRequest.getFkTravelPlanHREmployeeId();
         if(user != employeeRepository.findEmployeeById(hrEmpId) && user.getFkRole().getId() != 4){
-            throw new RuntimeException("travel plan owner only update travel plan.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "travel plan owner only update travel plan.");
         }
 
         List<Long> existingEmployeesId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlanId);
@@ -259,7 +261,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     EmployeeTravelPlan employeeTravelPlan1 = employeeTravelPlanRepository.findEmployeeTravelPlanById(employeeTravelPlanId);
 
                     if(isEmpAvailable(id, travelPlanRequest.getTravelPlanStartDate(), travelPlanRequest.getTravelPlanEndDate())) {
-                        throw new RuntimeException("emp is not available at this travel period");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "emp is not available at this travel period");
                     }
 
                     employeeTravelPlan1.setEmployeeIsDeletedFromTravel(false);
@@ -279,7 +281,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 } else {
 
                     if(isEmpAvailable(id, travelPlanRequest.getTravelPlanStartDate(), travelPlanRequest.getTravelPlanEndDate())) {
-                        throw new RuntimeException("emp is not available at this travel period");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "emp is not available at this travel period");
                     }
 
                     EmployeeTravelPlan employeeTravelPlan = new EmployeeTravelPlan();
@@ -345,18 +347,18 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     public void markAsDeleted(Long travelPlanId, String reason){
 
         if(Boolean.TRUE.equals(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanIsDeleted())){
-            throw new RuntimeException("closed travel plan cannot be mark as deleted.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed travel plan cannot be mark as deleted.");
         }
 
         if(travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanStartDate().isBefore(LocalDate.now())){
-            throw new RuntimeException("only delete travel plan before it start.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only delete travel plan before it start.");
         }
 
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
 
         Employee user = getLoginUser();
         if(user != travelPlan.getFkTravelPlanHREmployee() && user.getFkRole().getId() != 4){
-            throw new RuntimeException("travel plan owner only delete travel plan.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "travel plan owner only delete travel plan.");
         }
 
         travelPlan.setTravelPlanIsDeleted(true);
@@ -451,7 +453,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     private String folderPath;
 
     @Value("${URL.path}")
-    private String URL;
+    private String url;
 
     @Override
     public void saveDocByEmployee(Long employeeTravelPlanId, MultipartFile file, Long docTypeId, Long employeeId) throws IOException {
@@ -465,17 +467,12 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
 
         if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
-            throw new RuntimeException("closed travel plan cannot be add docs.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed travel plan cannot be add docs.");
         }
 
         if(travelPlan.getTravelPlanStartDate().isBefore(LocalDate.now())){
-            throw new RuntimeException("only add docs before travel plan start.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only add docs before travel plan start.");
         }
-
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String email = authentication.getName();
-//        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
-//                .orElseThrow(() -> new RuntimeException("Employee not found"));
 
         Employee employee = employeeRepository.findEmployeeById(employeeId);
         Long empId = employee.getId();
@@ -489,7 +486,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         travelDoc.setFkEmployee(employeeRepository.findEmployeeById(empId));
 
         travelDoc.setFkEmployeeTravelPlan(employeeTravelPlan);
-        travelDoc.setTravelDocUrl(URL + filePath);
+        travelDoc.setTravelDocUrl(url + filePath);
         travelDoc.setTravelDocUploadedAt(Instant.now());
         travelDoc.setFkTravelDocsType(travelDocsTypeRepository.findTravelDocsTypeById(docTypeId));
 
@@ -502,25 +499,19 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         TravelPlan travelPlan = travelPlanRepository.findTravelPlanById(travelPlanId);
 
         if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
-            throw new RuntimeException("closed travel plan cannot be add docs.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed travel plan cannot be add docs.");
         }
 
         if(travelPlan.getTravelPlanStartDate().isBefore(LocalDate.now())){
-            throw new RuntimeException("only add docs before travel plan start.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only add docs before travel plan start.");
         }
 
         Employee user = getLoginUser();
 
         if(user != travelPlan.getFkTravelPlanHREmployee() && !employeeTravelPlanRepository.isEmployeeTravelPlanByEmployeeIdAndTravelPlanIdExist(user.getId(), travelPlanId)){
-                throw new RuntimeException("you are not in this travel plan member or not an owner so you cannot add docs.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "you are not in this travel plan member or not an owner so you cannot add docs.");
             }
-
-
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String email = authentication.getName();
-//        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
-//                .orElseThrow(() -> new RuntimeException("Employee not found"));
-
+        
         Employee employee = employeeRepository.findEmployeeById(employeeId);
         Long empId = employee.getId();
 
@@ -535,7 +526,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             throw new RemoteException("travel plan not found");
         }
         travelDoc.setFkTravelPlan(travelPlanRepository.findTravelPlanById(travelPlanId));
-        travelDoc.setTravelDocUrl(URL + filePath);
+        travelDoc.setTravelDocUrl(url + filePath);
         travelDoc.setTravelDocUploadedAt(Instant.now());
         travelDoc.setFkTravelDocsType(travelDocsTypeRepository.findTravelDocsTypeById(docTypeId));
 

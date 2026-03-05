@@ -14,9 +14,9 @@ public interface CvReviewerRepository extends JpaRepository<CvReviewer, Long> {
     List<CvReviewer> findCvReviewerByFkJob_Id(Long fkJobId);
 
     @Query("""
-       select count(c) > 0 
-       from CvReviewer c 
-       where c.fkCvReviewerEmployee.id = :empCvReviewerId 
+       select count(c) > 0
+       from CvReviewer c
+       where c.fkCvReviewerEmployee.id = :empCvReviewerId
        and c.fkJob.id = :jobId
        """)
     boolean findCvReviewerIsExist(Long empCvReviewerId, Long jobId);

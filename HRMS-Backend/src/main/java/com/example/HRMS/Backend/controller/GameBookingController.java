@@ -1,10 +1,7 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.*;
-import com.example.HRMS.Backend.model.BookingWaitingList;
-import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameBookingStatus;
-import com.example.HRMS.Backend.model.GameType;
 import com.example.HRMS.Backend.repository.GameBookingStatusRepository;
 import com.example.HRMS.Backend.repository.WaitlistRepository;
 import com.example.HRMS.Backend.service.GameBookingService;
@@ -15,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 

@@ -1,6 +1,5 @@
 package com.example.HRMS.Backend.repository;
 
-import com.example.HRMS.Backend.model.BookingParticipant;
 import com.example.HRMS.Backend.model.GameBooking;
 import com.example.HRMS.Backend.model.GameType;
 import org.springframework.data.domain.Page;

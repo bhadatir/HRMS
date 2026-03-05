@@ -1,7 +1,6 @@
 package com.example.HRMS.Backend.repository;
 
 import com.example.HRMS.Backend.model.Post;
-import com.example.HRMS.Backend.model.PostTag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

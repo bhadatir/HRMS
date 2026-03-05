@@ -37,9 +37,7 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        Claims body = Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
-        System.out.println("body : " + body);
-        return body;
+        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

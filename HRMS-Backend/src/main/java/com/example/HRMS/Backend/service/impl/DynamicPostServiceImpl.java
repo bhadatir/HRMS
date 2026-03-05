@@ -1,7 +1,6 @@
 package com.example.HRMS.Backend.service.impl;
 
 import com.example.HRMS.Backend.model.Employee;
-import com.example.HRMS.Backend.model.GameType;
 import com.example.HRMS.Backend.model.Post;
 import com.example.HRMS.Backend.model.PostTag;
 import com.example.HRMS.Backend.repository.*;
@@ -10,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service

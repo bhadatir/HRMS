@@ -1,12 +1,10 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.*;
-import com.example.HRMS.Backend.model.Comment;
 import com.example.HRMS.Backend.model.PostVisibility;
 import com.example.HRMS.Backend.model.TagType;
 import com.example.HRMS.Backend.repository.CommentsRepository;
 import com.example.HRMS.Backend.service.PostService;
-import com.example.HRMS.Backend.service.impl.OrgChartServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.beans.Visibility;
 import java.io.IOException;
 import java.util.List;
 

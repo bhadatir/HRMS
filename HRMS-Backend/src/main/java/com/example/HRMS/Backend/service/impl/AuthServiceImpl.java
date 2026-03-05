@@ -11,11 +11,11 @@ import com.example.HRMS.Backend.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -116,7 +117,7 @@ public class AuthServiceImpl implements AuthService {
     public void register(RegisterRequest request) {
 
         if (employeeRepository.existsByEmployeeEmail(request.getEmail())) {
-            throw new RuntimeException("Email already in use");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
         }
 
         Employee employee = new Employee();
@@ -175,7 +176,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("Invalid token"));
 
         if (employee.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token expired");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token expired");
         }
 
         employee.setEmployeePassword(passwordEncoder.encode(newPassword));
@@ -206,26 +207,13 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public List<EmployeeResponse> getAllEmployees(String searchTerm){
         List<Employee> employee = employeeRepository.findAllBySearchTerm(searchTerm);
-        return employee.stream().map(employee1 -> {
-            return modelMapper.map(employee1,EmployeeResponse.class);
-        }).toList();
+        return employee.stream().map(employee1 -> modelMapper.map(employee1,EmployeeResponse.class)).toList();
     }
-
-    @Value("${img.path}")
-    private String folderPath;
-
-    @Value("${URL.path}")
-    private String URL;
 
     @Override
     public void addProfileImage(Long empId, MultipartFile file) throws IOException {
         Employee employee = employeeRepository.findEmployeeById(empId);
 
-//        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
-//        String filePath = "Profile_Image/" + empId + originalFilePath;
-//        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
-//
-//        employee.setEmployeeProfileUrl(URL + filePath);
         String imageUrl = cloudinaryService.uploadFile(file, "employee_profiles");
 
         employee.setEmployeeProfileUrl(imageUrl);
@@ -249,10 +237,8 @@ public class AuthServiceImpl implements AuthService {
 
         List<EmployeeSearch> filteredList = employeeSearches.getContent()
                 .stream()
-                .filter(emp -> {
-                    return !travelPlanRepository.findAllByTravelStartTimeBetween(emp.getId(), startDate, endDate);
-                })
-                .collect(Collectors.toList());
+                .filter(emp -> !travelPlanRepository.findAllByTravelStartTimeBetween(emp.getId(), startDate, endDate))
+                .toList();
 
         return new PageImpl<>(filteredList, pageable, filteredList.size());
     }
@@ -282,7 +268,7 @@ public class AuthServiceImpl implements AuthService {
                 () -> new RuntimeException("employ email not found.")
         );
         if(Boolean.FALSE.equals(employee.getEmployeeIsActive())){
-            throw new RuntimeException("can not edit inactive user.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "can not edit inactive user.");
         }
         employee.setEmployeeFirstName(request.getFirstName());
         employee.setEmployeeLastName(request.getLastName());
@@ -332,7 +318,7 @@ public class AuthServiceImpl implements AuthService {
     public void inActiveUserById(Long userId, String reason){
         Employee employee = employeeRepository.findEmployeeById(userId);
         if(Boolean.FALSE.equals(employee.getEmployeeIsActive())){
-            throw new RuntimeException("can not make inactive who is already inactive user.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "can not make inactive who is already inactive user.");
         }
         employee.setEmployeeIsActive(false);
         employee.setReasonForInActive(reason);

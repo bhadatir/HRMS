@@ -1,11 +1,8 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.model.GameType;
-import com.example.HRMS.Backend.repository.EmployeeGameInterestRepository;
 import com.example.HRMS.Backend.repository.GameTypeRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,6 +1,5 @@
 package com.example.HRMS.Backend.dto;
 
-import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.time.Instant;

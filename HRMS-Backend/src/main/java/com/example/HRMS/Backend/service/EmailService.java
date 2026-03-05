@@ -6,5 +6,5 @@ public interface EmailService {
 
     void sendEmail(List<String> email, String sub, String content);
 
-    void sendEmailWithAttachement(List<String> to, String subject, String text, String path);
+    void sendEmailWithAttachment(List<String> to, String subject, String text, String path);
 }

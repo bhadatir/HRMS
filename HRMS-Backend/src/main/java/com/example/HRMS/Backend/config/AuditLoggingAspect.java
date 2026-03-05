@@ -139,9 +139,7 @@ public class AuditLoggingAspect {
             log.setPerformedBy(email);
             log.setOwnerEmail(hrEmp.getEmployeeEmail());
             List<Long> membersId = travelPlan.getEmployeesInTravelPlanId();
-            List<String> members = membersId.stream().map(memberId -> {
-                return employeeRepository.findEmployeeById(memberId).getEmployeeEmail();
-            }).toList();
+            List<String> members = membersId.stream().map(memberId -> employeeRepository.findEmployeeById(memberId).getEmployeeEmail()).toList();
             log.setAddedTravelMembers(members);
             auditTravelPlanRepository.save(log);
         }

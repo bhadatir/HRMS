@@ -1,7 +1,6 @@
 package com.example.HRMS.Backend.service;
 
 import com.example.HRMS.Backend.dto.NotificationResponse;
-import com.example.HRMS.Backend.model.Notification;
 
 import java.util.List;
 

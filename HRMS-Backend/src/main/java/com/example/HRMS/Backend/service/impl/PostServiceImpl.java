@@ -15,10 +15,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,22 +47,9 @@ public class PostServiceImpl implements PostService {
     private final NotificationService notificationService;
     private final CloudinaryService cloudinaryService;
 
-    @Value("${img.path}")
-    private String folderPath;
-
-    @Value("${URL.path}")
-    private String URL;
-
     @Override
     public void savePost(PostRequest postRequest, MultipartFile file) throws IOException {
         Post post = new Post();
-
-//        String time = Instant.now().toString().replace(":","-");
-//
-//        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
-//        String filePath = "post_content/" + time +"_" + postRequest.getFkPostEmployeeId() + "_" + originalFilePath;
-//
-//        file.transferTo(new File(System.getProperty("user.dir") + "/" +folderPath + filePath));
 
         String imageUrl = cloudinaryService.uploadFile(file, "post");
 
@@ -100,7 +89,7 @@ public class PostServiceImpl implements PostService {
 
             List<String> likerNames = recentLikes.stream()
                     .map(like -> like.getFkLikeEmployee().getEmployeeFirstName() + " " + like.getFkLikeEmployee().getEmployeeLastName())
-                    .collect(Collectors.toList());
+                    .toList();
 
             postResponse.setRecentLikerNames(likerNames);
 
@@ -127,7 +116,7 @@ public class PostServiceImpl implements PostService {
 
         List<String> likerNames = recentLikes.stream()
                 .map(like -> like.getFkLikeEmployee().getEmployeeFirstName() + " " + like.getFkLikeEmployee().getEmployeeLastName())
-                .collect(Collectors.toList());
+                .toList();
 
         postResponse.setRecentLikerNames(likerNames);
         return postResponse;
@@ -137,7 +126,7 @@ public class PostServiceImpl implements PostService {
     public void addTagOnPost(Long postId, Long tagTypeId){
 
         if(Boolean.TRUE.equals(postRepository.findPostsById(postId).getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be add tags.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be add tags.");
         }
 
         PostTag postTag = new PostTag();
@@ -168,18 +157,11 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findPostsById(postId);
 
         if(Boolean.TRUE.equals(post.getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be edit it.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be edit it.");
         }
 
         if(file != null && !file.isEmpty()){
-//            String time = Instant.now().toString().replace(":","-");
-//
-//            String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
-//            String filePath = "post_content/" + postRequest.getFkPostEmployeeId()
-//                                + "_" + time + "_" + originalFilePath;
-//            file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
             String imageUrl = cloudinaryService.uploadFile(file, "post");
-
             post.setPostContentUrl(imageUrl);
         }
 
@@ -194,13 +176,13 @@ public class PostServiceImpl implements PostService {
     public void addComment(CommentRequest commentRequest){
 
         if(commentRequest.getFkPostId()!=null &&  Boolean.TRUE.equals(postRepository.findPostsById(commentRequest.getFkPostId()).getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be add comments.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be add comments.");
         }
 
         if(commentRequest.getParentCommentId()!=null && commentsRepository.findCommentById(commentRequest.getParentCommentId()) != null) {
             Comment parentComment = commentsRepository.findCommentById(commentRequest.getParentCommentId());
             if (Boolean.TRUE.equals(parentComment.getFkPost().getPostIsDeleted())) {
-                throw new RuntimeException("deleted parent comment cannot be add sub comments.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted parent comment cannot be add sub comments.");
             }
         }
 
@@ -244,20 +226,20 @@ public class PostServiceImpl implements PostService {
         if(likeRequest.getFkPostId() == null && likeRequest.getFkCommentId() != null){
             Comment comment = commentsRepository.findCommentById(likeRequest.getFkCommentId());
             if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
-                throw new RuntimeException("deleted comment cannot be add like.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted comment cannot be add like.");
             }
         }
 
         if(likeRequest.getFkPostId()!=null && postRepository.findPostsById(likeRequest.getFkPostId()) != null && Boolean.TRUE.equals(postRepository.findPostsById(likeRequest.getFkPostId()).getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be add like.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be add like.");
         }
 
         if(likeRequest.getFkPostId() != null && likesRepository.findLikeByFkPost_IdAndFkLikeEmployee_Id(likeRequest.getFkPostId(), likeRequest.getFkLikeEmployeeId()) != null){
-            throw new RuntimeException("only one like per post by one employee.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only one like per post by one employee.");
         }
 
         if(likeRequest.getFkCommentId() != null && likesRepository.findLikeByFkComment_IdAndFkLikeEmployee_Id(likeRequest.getFkCommentId(), likeRequest.getFkLikeEmployeeId()) != null){
-            throw new RuntimeException("only one like per comment by one employee.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only one like per comment by one employee.");
         }
 
         Like like =new Like();
@@ -311,11 +293,11 @@ public class PostServiceImpl implements PostService {
         Comment comment = commentsRepository.findCommentById(commentId);
 
         if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be remove comments.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be remove comments.");
         }
 
         if(comment.getParentComment()!=null && comment.getParentComment().getFkPost() != null && Boolean.TRUE.equals(comment.getParentComment().getFkPost().getPostIsDeleted())){
-            throw new RuntimeException("deleted parent comment cannot be remove sub comments.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted parent comment cannot be remove sub comments.");
         }
 
         commentsRepository.makeCommentIdDeleted(commentId);
@@ -343,7 +325,7 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findPostsById(postId);
 
         if(Boolean.TRUE.equals(post.getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be remove again.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be remove again.");
         }
 
         post.setPostIsDeleted(true);
@@ -385,11 +367,11 @@ public class PostServiceImpl implements PostService {
         Comment comment = commentsRepository.findCommentById(commentId);
 
         if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be remove comments.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be remove comments.");
         }
 
         if(comment.getParentComment()!=null && comment.getParentComment().getFkPost() != null && Boolean.TRUE.equals(comment.getParentComment().getFkPost().getPostIsDeleted())){
-            throw new RuntimeException("deleted parent comment cannot be remove sub comments.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted parent comment cannot be remove sub comments.");
         }
 
         commentsRepository.makeCommentIdDeleted(commentId);
@@ -407,7 +389,7 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findPostsById(postId);
 
         if(Boolean.TRUE.equals(post.getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be remove again.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be remove again.");
         }
 
         post.setPostIsDeleted(true);
@@ -433,11 +415,11 @@ public class PostServiceImpl implements PostService {
         Comment comment = commentsRepository.findCommentById(commentId);
 
         if(comment.getFkPost() != null && Boolean.TRUE.equals(comment.getFkPost().getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be remove likes.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be remove likes.");
         }
 
         if(comment.getParentComment()!=null && comment.getParentComment().getFkPost() != null && Boolean.TRUE.equals(comment.getParentComment().getFkPost().getPostIsDeleted())){
-            throw new RuntimeException("deleted parent comment cannot be remove sub comments likes.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted parent comment cannot be remove sub comments likes.");
         }
 
         Employee employee = employeeRepository.findEmployeeById(employeeId);
@@ -450,7 +432,7 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findPostsById(postId);
 
         if(Boolean.TRUE.equals(post.getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be remove likes.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be remove likes.");
         }
 
         Employee employee = employeeRepository.findEmployeeById(employeeId);
@@ -473,7 +455,7 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findPostsById(postId);
 
         if(Boolean.TRUE.equals(post.getPostIsDeleted())){
-            throw new RuntimeException("deleted post cannot be remove tags.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted post cannot be remove tags.");
         }
 
         TagType tagType = tagTypesRepository.findTagTypeById(tagTypeId);

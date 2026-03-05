@@ -1,18 +1,9 @@
 package com.example.HRMS.Backend.dto;
 
-import com.example.HRMS.Backend.model.Department;
-import com.example.HRMS.Backend.model.Employee;
-import com.example.HRMS.Backend.model.Position;
-import com.example.HRMS.Backend.model.Role;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 public class EmployeeResponse {

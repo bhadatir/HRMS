@@ -3,7 +3,6 @@ package com.example.HRMS.Backend.service;
 import com.example.HRMS.Backend.dto.ExpenseProofResponse;
 import com.example.HRMS.Backend.dto.ExpenseRequest;
 import com.example.HRMS.Backend.dto.ExpenseResponse;
-import com.example.HRMS.Backend.model.Expense;
 import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 

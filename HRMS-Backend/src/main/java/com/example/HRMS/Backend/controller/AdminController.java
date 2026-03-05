@@ -3,8 +3,6 @@ package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.EmployeeResponse;
 import com.example.HRMS.Backend.dto.RegisterRequest;
-import com.example.HRMS.Backend.dto.TravelPlanRequest;
-import com.example.HRMS.Backend.dto.TravelPlanResponse;
 import com.example.HRMS.Backend.model.Department;
 import com.example.HRMS.Backend.model.Position;
 import com.example.HRMS.Backend.model.Role;

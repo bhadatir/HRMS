@@ -3,11 +3,9 @@ package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.AuthRequest;
 import com.example.HRMS.Backend.dto.AuthResponse;
-import com.example.HRMS.Backend.dto.RegisterRequest;
 import com.example.HRMS.Backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

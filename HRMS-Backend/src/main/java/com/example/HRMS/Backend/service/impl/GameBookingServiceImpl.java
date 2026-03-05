@@ -121,7 +121,7 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     private void validateNoConflicts(Long id, LocalDateTime start, LocalDateTime end) {
         if (travelPlanRepository.findAllByTravelStartTimeBetween(id, start.toLocalDate(), end.toLocalDate())) {
-            throw new RuntimeException("Employee " + id + " has a travel plan during this period.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee " + id + " has a travel plan during this period.");
         }
         if (gameBookingRepository.existsOverlappingBooking(id, start, end) ||
                 bookingParticipantRepository.existsOverlappingBookingParticipant(id, start, end) ||
@@ -196,9 +196,9 @@ public class GameBookingServiceImpl implements GameBookingService {
     public void updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId) {
         GameBooking gameBooking = gameBookingRepository.findGameBookingById(pkGameBookingId);
         if (gameBooking.getFkGameBookingStatus().getId() == 2)
-            throw new RuntimeException("played booking cannot be cancel.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "played booking cannot be cancel.");
         else if (gameBooking.getFkGameBookingStatus().getId() == 3)
-            throw new RuntimeException("your status already canceled.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "your status already canceled.");
 
         GameBookingStatus gameBookingStatus = gameBookingStatusRepository.findGameBookingStatusById(fkGameStatusId);
         gameBooking.setFkGameBookingStatus(gameBookingStatus);

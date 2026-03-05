@@ -13,10 +13,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,13 +53,13 @@ public class ExpenseServiceImpl implements ExpenseService {
         EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
 
         if(employeeTravelPlan == null || employeeTravelPlan.getEmployeeIsDeletedFromTravel() ){
-            throw new RuntimeException("employee travel plan not found or you are deleted from this travel.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employee travel plan not found or you are deleted from this travel.");
         }
 
         TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
 
         if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
-            throw new RuntimeException("closed travel plan cannot be add expenses.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed travel plan cannot be add expenses.");
         }
 
         LocalDate travelStartDate = travelPlan.getTravelPlanStartDate();
@@ -65,7 +67,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
 
         if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelStartDate)){
-            throw new RuntimeException("only add expense between travel plan Start date and after ending travel plan 10 days duration.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only add expense between travel plan Start date and after ending travel plan 10 days duration.");
         }
 
         ExpenseStatus expenseStatus = expenseStatusRepository.findExpenseStatusById(1L);
@@ -142,7 +144,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private String folderPath;
 
     @Value("${URL.path}")
-    private String URL;
+    private String url;
 
     @Override
     public void saveExpenseProof(Long proofTypeId, Long expenseId, MultipartFile file) throws IOException {
@@ -152,20 +154,20 @@ public class ExpenseServiceImpl implements ExpenseService {
         EmployeeTravelPlan employeeTravelPlan =  expense.getFkEmployeeTravelPlan();
 
         if(employeeTravelPlan == null || employeeTravelPlan.getEmployeeIsDeletedFromTravel() ){
-            throw new RuntimeException("employee travel plan not found or you are deleted from this travel.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employee travel plan not found or you are deleted from this travel.");
         }
 
         TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
 
         if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
-            throw new RuntimeException("closed travel plan cannot be add expense proof.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed travel plan cannot be add expense proof.");
         }
 
         LocalDate travelEndDate = travelPlan.getTravelPlanStartDate();
         LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
 
         if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelEndDate)){
-            throw new RuntimeException("only add expense proof between travel plan end date and after ending travel plan 10 days duration.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only add expense proof between travel plan end date and after ending travel plan 10 days duration.");
         }
 
         ExpenseProof expenseProof = new ExpenseProof();
@@ -191,12 +193,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
 
         if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
-            throw new RuntimeException("closed travel plan cannot be update expense status.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed travel plan cannot be update expense status.");
         }
 
         Employee user = authService.getLoginUser();
         if(user != travelPlan.getFkTravelPlanHREmployee() && user.getFkRole().getId() != 4){
-            throw new RuntimeException("travel plan owner only update travel plan expense status.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "travel plan owner only update travel plan expense status.");
         }
 
         if(!reason.isEmpty())expense.setReasonForRejectExpense(reason);
@@ -227,20 +229,20 @@ public class ExpenseServiceImpl implements ExpenseService {
                 employeeTravelPlan.getFkEmployee().getId(),
                 expenseRequest.getExpenseDate());
 
-        Integer remainingAllowance = dailyLimit - alreadySpent - expenseRequest.getExpenseAmount();
+        int remainingAllowance = dailyLimit - alreadySpent - expenseRequest.getExpenseAmount();
 
         if(remainingAllowance < 0){
-            throw new RuntimeException("expense daily limit reached.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "expense daily limit reached.");
         }
 
-        if(employeeTravelPlan == null || employeeTravelPlan.getEmployeeIsDeletedFromTravel() ){
-            throw new RuntimeException("employee travel plan not found or you are deleted from this travel.");
+        if(Boolean.TRUE.equals(employeeTravelPlan.getEmployeeIsDeletedFromTravel())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employee travel plan not found or you are deleted from this travel.");
         }
 
         TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
 
         if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
-            throw new RuntimeException("closed travel plan cannot be be add expenses.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed travel plan cannot be be add expenses.");
         }
 
         LocalDate travelStartDate = travelPlan.getTravelPlanStartDate();
@@ -248,7 +250,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
 
         if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelStartDate)){
-            throw new RuntimeException("only add expense with proof between travel plan start date and after ending travel plan 10 days duration.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only add expense with proof between travel plan start date and after ending travel plan 10 days duration.");
         }
 
         Instant time = Instant.now();
@@ -277,7 +279,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseProof.setFkExpense(expense);
             expenseProof.setFkExpenseProofType(expenseProofTypeRepository.findExpenseProofTypeById(id));
             expenseProof.setExpenseProofUploadedAt(Instant.now());
-            expenseProof.setExpenseProofUrl(URL + filePath);
+            expenseProof.setExpenseProofUrl(url + filePath);
 
             expenseProofRepository.save(expenseProof);
 

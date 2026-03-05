@@ -1,12 +1,8 @@
 package com.example.HRMS.Backend.repository;
 
-import com.example.HRMS.Backend.dto.ReferFriendResponse;
 import com.example.HRMS.Backend.model.Job;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository

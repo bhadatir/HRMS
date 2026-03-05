@@ -1,6 +1,5 @@
 package com.example.HRMS.Backend.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;

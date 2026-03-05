@@ -9,19 +9,15 @@ import com.example.HRMS.Backend.service.JobService;
 import com.example.HRMS.Backend.service.NotificationService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +48,7 @@ public class JobServiceImpl implements JobService {
     private String folderPath;
 
     @Value("${URL.path}")
-    private String URL;
+    private String url;
 
 
     @Override
@@ -72,7 +68,7 @@ public class JobServiceImpl implements JobService {
         job.setJobCreatedAt(Instant.now());
         job.setJobSalary(jobRequest.getJobSalary());
         job.setJobTitle(jobRequest.getJobTitle());
-        job.setJobDescriptionUrl(URL + filePath);
+        job.setJobDescriptionUrl(url + filePath);
         job.setFkJobType(jobType);
         job.setFkJobOwnerEmployee(employee);
         jobRepository.save(job);
@@ -83,13 +79,13 @@ public class JobServiceImpl implements JobService {
         Job job = jobRepository.findJobById(jobId);
 
         if(Boolean.FALSE.equals(job.getJobIsActive())){
-            throw new RuntimeException("closed job cannot be edit.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed job cannot be edit.");
         }
 
         Employee user = authService.getLoginUser();
 
         if(user != job.getFkJobOwnerEmployee() && user.getFkRole().getId() != 4){
-            throw new RuntimeException("job owner can update job.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job owner can update job.");
         }
 
         JobType jobType = jobTypeRepository.findJobTypesById(jobRequest.getFkJobTypeId());
@@ -102,7 +98,7 @@ public class JobServiceImpl implements JobService {
             String filePath = "job_description/" + jobRequest.getFkJobTypeId() +"_"
                     + jobRequest.getFkJobOwnerEmployeeId() + "_" + time + "_" + originalFilePath;
             file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
-            job.setJobDescriptionUrl(URL + filePath);
+            job.setJobDescriptionUrl(url + filePath);
         }
 
         job.setJobSalary(jobRequest.getJobSalary());
@@ -118,21 +114,21 @@ public class JobServiceImpl implements JobService {
 
         Job job = jobRepository.findJobById(jobId);
         if(Boolean.FALSE.equals(job.getJobIsActive())){
-            throw new RuntimeException("closed job cannot be add reviewer.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed job cannot be add reviewer.");
         }
 
         Employee user = authService.getLoginUser();
         if(user != job.getFkJobOwnerEmployee() && user.getFkRole().getId() != 4){
-            throw new RuntimeException("job owner only add cv reviewer.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job owner only add cv reviewer.");
         }
 
         if(user == employeeRepository.findEmployeeById(empCvReviewerId)){
-            throw new RuntimeException("job owner can not add it self in reviewer.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job owner can not add it self in reviewer.");
         }
 
         if(cvReviewerRepository.findCvReviewerIsExist(empCvReviewerId, jobId))
         {
-            throw new RuntimeException("Cv Reviewer already in this job");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cv Reviewer already in this job");
         }
 
         CvReviewer cvReviewer = new CvReviewer();
@@ -150,11 +146,11 @@ public class JobServiceImpl implements JobService {
         Job job = jobRepository.findJobById(jobShareRequest.getFkJobId());
 
         if(Boolean.FALSE.equals(job.getJobIsActive())){
-            throw new RuntimeException("closed job cannot be share.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed job cannot be share.");
         }
         Employee user = authService.getLoginUser();
         if(user == job.getFkJobOwnerEmployee()){
-            throw new RuntimeException("job owner cannot share job.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job owner cannot share job.");
         }
         jobShare.setFkJob(job);
         jobShare.setJobShareCreatedAt(Instant.now());
@@ -164,7 +160,7 @@ public class JobServiceImpl implements JobService {
 
         List<String> emails = jobShareRequest.getEmails();
 
-        emailService.sendEmailWithAttachement(emails,job.getJobTitle(),"job summary",job.getJobDescriptionUrl());
+        emailService.sendEmailWithAttachment(emails,job.getJobTitle(),"job summary",job.getJobDescriptionUrl());
 
         for(String email : emails){
             JobShareTo jobShareTo = new JobShareTo();
@@ -179,11 +175,11 @@ public class JobServiceImpl implements JobService {
     public void referFriend(ReferFriendRequest referFriendRequest, MultipartFile file) throws IOException{
         Job job = jobRepository.findJobById(referFriendRequest.getFkJobId());
         if(Boolean.FALSE.equals(job.getJobIsActive())){
-            throw new RuntimeException("closed job cannot be refer friends.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed job cannot be refer friends.");
         }
         Employee user = authService.getLoginUser();
         if(user == job.getFkJobOwnerEmployee()){
-            throw new RuntimeException("job owner cannot refer friends.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job owner cannot refer friends.");
         }
 
         ReferFriend referFriend = new ReferFriend();
@@ -202,7 +198,7 @@ public class JobServiceImpl implements JobService {
         ).orElseThrow(() -> new RuntimeException("cv status type not found"));
 
         referFriend.setReferFriendShortNote(referFriendRequest.getReferFriendShortNote());
-        referFriend.setReferFriendCvUrl(URL + filePath);
+        referFriend.setReferFriendCvUrl(url + filePath);
         referFriend.setFkCvStatusType(cvStatusType);
 
         Employee employee = employeeRepository.findEmployeeById(fkReferFriendEmployeeId);
@@ -238,13 +234,13 @@ public class JobServiceImpl implements JobService {
 
         File savedFile = new File(System.getProperty("user.dir") + "/" + folderPath + filePath);
         if(savedFile.exists() && savedFile.canRead()) {
-            emailService.sendEmailWithAttachement(emails,
+            emailService.sendEmailWithAttachment(emails,
                     job.getId() + " " + job.getJobTitle(),
                     "refer friend details : " + "\n"
                             + "email : " + referFriendRequest.getReferFriendEmail()
                             + "name : " + referFriendRequest.getReferFriendName()
                             + "employee detail : " + employee.getId() + " " + employee.getEmployeeEmail()
-                    , URL + filePath);
+                    , url + filePath);
         }
         else {
             throw new IOException("file not found at : "+savedFile.getAbsolutePath());
@@ -296,12 +292,12 @@ public class JobServiceImpl implements JobService {
 
         Job job = referFriend.getFkJob();
         if(Boolean.FALSE.equals(job.getJobIsActive())){
-            throw new RuntimeException("closed job cannot be update cv status.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed job cannot be update cv status.");
         }
 
         Employee user = authService.getLoginUser();
         if(user != job.getFkJobOwnerEmployee() && user.getFkRole().getId() != 4){
-            throw new RuntimeException("job owner only update cv status.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job owner only update cv status.");
         }
 
         referFriend.setFkCvStatusType(cvStatusTypeRepository.findById(statusId).orElseThrow(
@@ -343,12 +339,12 @@ public class JobServiceImpl implements JobService {
         Job job = jobRepository.findJobById(jobId);
 
         if(Boolean.FALSE.equals(job.getJobIsActive())){
-            throw new RuntimeException("closed job cannot be update status.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed job cannot be update status.");
         }
 
         Employee user = authService.getLoginUser();
         if(user != job.getFkJobOwnerEmployee() && user.getFkRole().getId() != 4){
-            throw new RuntimeException("job owner only update status.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "job owner only update status.");
         }
 
         job.setJobIsActive(false);

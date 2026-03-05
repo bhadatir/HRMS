@@ -1,7 +1,5 @@
 package com.example.HRMS.Backend.dto;
 
-import com.example.HRMS.Backend.model.GameBookingStatus;
-import com.example.HRMS.Backend.model.GameType;
 import lombok.Data;
 
 import java.time.Instant;

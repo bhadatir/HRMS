@@ -2,9 +2,7 @@ package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.OrgChart;
 import com.example.HRMS.Backend.service.OrgChartService;
-import com.example.HRMS.Backend.service.impl.OrgChartServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

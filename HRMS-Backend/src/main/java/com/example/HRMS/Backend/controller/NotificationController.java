@@ -1,7 +1,6 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.NotificationResponse;
-import com.example.HRMS.Backend.model.Notification;
 import com.example.HRMS.Backend.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

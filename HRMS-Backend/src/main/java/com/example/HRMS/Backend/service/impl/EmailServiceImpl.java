@@ -3,18 +3,13 @@ package com.example.HRMS.Backend.service.impl;
 import com.example.HRMS.Backend.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -28,21 +23,17 @@ public class EmailServiceImpl implements EmailService {
     private String sender;
 
     @Value("${URL.path}")
-    private String URL;
+    private String url;
 
     @Value("${img.path}")
     private String folderPath;
-
-    private boolean isValid(String email) {
-        return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
-    }
 
     @Override
     public void sendEmail(List<String> email, String sub, String content){
 
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             for (String email1 : email) {
-                if (!isValid(email1)) {
+                if (!isValidEmail(email1)) {
                     throw new IllegalArgumentException("Invalid email format: " + email1);
                 }
             }
@@ -57,11 +48,11 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendEmailWithAttachement(List<String> to, String subject, String text, String path) {
+    public void sendEmailWithAttachment(List<String> to, String subject, String text, String path) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             for (String email1 : to) {
-                if (!isValid(email1)) {
+                if (!isValidEmail(email1)) {
                     throw new IllegalArgumentException("Invalid email format: " + to);
                 }
             }
@@ -73,9 +64,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(subject);
             helper.setText(text);
 
-//          ClassPathResource image = new ClassPathResource("static/"+path.substring(22));
-
-            String relativePath = path.replace(URL, "");
+            String relativePath = path.replace(url, "");
             String fullPath = System.getProperty("user.dir") +"/"+ folderPath + relativePath;
             FileSystemResource fileToAttach = new FileSystemResource(fullPath);
             if (!fileToAttach.exists()) {
@@ -90,6 +79,10 @@ public class EmailServiceImpl implements EmailService {
         } catch (MessagingException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
     }
 }
 
