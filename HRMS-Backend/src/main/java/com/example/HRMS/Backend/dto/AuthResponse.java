@@ -15,6 +15,5 @@ public class AuthResponse {
     public AuthResponse(String accessToken, String isFirstLogin) {
         this.accessToken = accessToken;
         this.isFirstLogin = isFirstLogin;
-        System.out.println(isFirstLogin);
     }
 }

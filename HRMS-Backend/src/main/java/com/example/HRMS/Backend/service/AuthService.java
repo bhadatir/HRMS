@@ -8,6 +8,7 @@ import com.example.HRMS.Backend.model.Position;
 import com.example.HRMS.Backend.model.Role;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -49,4 +50,6 @@ public interface AuthService {
     void inActiveUserById(Long userId, String reason);
 
     void updatePassword(Long empId, String newPassword);
+
+    void logout();
 }

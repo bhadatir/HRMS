@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode, use } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
 import { io } from "socket.io-client";
 import SockJs from "sockjs-client";
@@ -44,8 +44,23 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: () => apiService.getUserNotifications(userData?.id, token || ""),
     enabled: !!token && !!userData,
   });
-  
 
+  const logoutMutation = useMutation({
+    mutationFn: () => apiService.logout(token || ""),
+    onSuccess: () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("email");
+      localStorage.removeItem("isFirstLogin");
+      setToken(null);
+      setEmail(null);
+      setUnreadNotifications(0);
+      queryClient.clear();
+    },
+    onError: (error: any) => {
+      alert("Failed to log out: " + (error.response?.data || error.message));
+    }
+  });
+  
   useEffect(() => {
     if(notifications) {
       const unreadCount = notifications.filter((n: any) => !n.read).length;
@@ -88,13 +103,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("email");
-    localStorage.removeItem("isFirstLogin");
-    setToken(null);
-    setEmail(null);
-    setUnreadNotifications(0);
-    queryClient.clear();
+    logoutMutation.mutate();
   };
 
   return (

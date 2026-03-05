@@ -30,6 +30,11 @@ export const apiService = {
     return res.data;
   },
 
+  logout : async (token: string) => {
+    const res = await api.post("/user/logout", null, authHeader(token));
+    return res.data;
+  },
+
   register: async (data: any, token: string) => {
     const res = await api.post("/admin/register", data, authHeader(token));
     return res.data;

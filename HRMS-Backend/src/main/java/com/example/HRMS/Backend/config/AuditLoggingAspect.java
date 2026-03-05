@@ -1,13 +1,10 @@
 package com.example.HRMS.Backend.config;
 
+import com.example.HRMS.Backend.dto.AuthResponse;
 import com.example.HRMS.Backend.dto.JobShareRequest;
 import com.example.HRMS.Backend.dto.ReferFriendRequest;
-import com.example.HRMS.Backend.model.AuditLog;
-import com.example.HRMS.Backend.model.CvStatusType;
-import com.example.HRMS.Backend.model.ShareJobData;
-import com.example.HRMS.Backend.repository.AuditLogRepository;
-import com.example.HRMS.Backend.repository.CvStatusTypeRepository;
-import com.example.HRMS.Backend.repository.ShareJobDataRepository;
+import com.example.HRMS.Backend.model.*;
+import com.example.HRMS.Backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -17,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +28,8 @@ public class AuditLoggingAspect {
     private final AuditLogRepository auditRepo;
     private final CvStatusTypeRepository cvStatusTypeRepository;
     private final ShareJobDataRepository shareJobDataRepository;
+    private final EmployeeRepository employeeRepository;
+    private final AuthAuditRepository authAuditRepository;
 
     @AfterReturning(
             pointcut = "execution(* com.example.HRMS.Backend.service.JobService.updateStatus(..))"
@@ -102,8 +102,27 @@ public class AuditLoggingAspect {
 
                 shareJobDataRepository.save(log);
             }
-
         }
-
     }
+
+    @AfterReturning(
+            pointcut = "execution(* com.example.HRMS.Backend.service.impl.AuthServiceImpl.login(..))"
+    )
+    public void loginAuthAction(JoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        if(args.length>0){
+            Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
+                    () -> new RuntimeException("employee not found")
+            );
+
+            AuthAudit log = new AuthAudit();
+            log.setUserEmail(employee.getEmployeeEmail());
+            log.setUserRoleName(employee.getFkRole().getRoleName());
+            authAuditRepository.save(log);
+        }
+    }
+
 }

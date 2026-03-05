@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,6 +65,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtUtil jwtUtil;
 
+    private final AuthAuditRepository authAuditRepository;
+
     private final EmailService emailService;
 
     private final TravelPlanService travelPlanService;
@@ -94,6 +97,22 @@ public class AuthServiceImpl implements AuthService {
         employeeRepository.save(employee);
 
         return new AuthResponse(jwt, isFirstLogin);
+    }
+
+    @Override
+    public void logout() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null) {
+            String email = auth.getName();
+            AuthAudit log = authAuditRepository.findAuditAuthByUserEmailAndLogoutTimestampIsNull(email);
+            log.setLogoutTimestamp(Instant.now());
+
+            log.setActiveMin((int) Duration.between(log.getLoginTimestamp(), Instant.now()).toSeconds());
+            authAuditRepository.save(log);
+
+            SecurityContextHolder.clearContext();
+        }
     }
 
     @Override
