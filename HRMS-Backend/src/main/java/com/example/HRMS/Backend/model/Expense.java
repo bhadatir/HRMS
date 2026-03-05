@@ -41,12 +41,18 @@ public class Expense {
     @JoinColumn(name = "fk_expense_expense_status_id", nullable = false)
     private ExpenseStatus fkExpenseExpenseStatus;
 
+    @Column(name = "reason_for_reject_expense")
+    private String reasonForRejectExpense;
+
+    @Column(name = "expense_status_change_by")
+    private String expenseStatusChangeBy;
+
+    @Column(name = "expense_status_change_at")
+    private Instant expenseStatusChangeAt;
+
     @NotNull(message = "Employee travel plan id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_employee_travel_plan_id", nullable = false)
     private EmployeeTravelPlan fkEmployeeTravelPlan;
-
-    @Column(name = "reason_for_reject_expense")
-    private String reasonForRejectExpense;
 
 }

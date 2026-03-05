@@ -71,6 +71,12 @@ public class Employee {
     @Column(name = "reason_for_inActive")
     private String  reasonForInActive;
 
+    @Column(name = "employee_deleted_by")
+    private String employeeDeletedBy;
+
+    @Column(name = "employee_deleted_at")
+    private Instant employeeDeletedAt;
+
     @Column(name = "employee_pass_resetToken")
     private String resetToken;
 

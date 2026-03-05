@@ -336,6 +336,10 @@ public class AuthServiceImpl implements AuthService {
         }
         employee.setEmployeeIsActive(false);
         employee.setReasonForInActive(reason);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        employee.setEmployeeDeletedBy(userEmail);
+        employee.setEmployeeDeletedAt(Instant.now());
         employeeRepository.save(employee);
 
         List<GameBooking> gameBookings = gameBookingRepository.findBookingsByUser(employee.getId());

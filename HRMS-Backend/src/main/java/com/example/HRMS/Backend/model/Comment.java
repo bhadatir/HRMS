@@ -49,5 +49,10 @@ public class Comment {
     @Column(name = "reason_for_delete_comment")
     private String reasonForDeleteComment;
 
+    @Column(name = "comment_deleted_by")
+    private String commentDeletedBy;
+
+    @Column(name = "comment_plan_deleted_at")
+    private Instant commentDeletedAt;
 
 }

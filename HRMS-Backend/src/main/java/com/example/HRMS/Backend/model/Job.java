@@ -44,6 +44,12 @@ public class Job {
     @Column(name = "reason_for_de_active_job")
     private String reasonForDeActiveJob;
 
+    @Column(name = "job_deleted_by")
+    private String jobDeletedBy;
+
+    @Column(name = "job_deleted_at")
+    private Instant jobDeletedAt;
+
     @NotNull(message = "job type id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_job_type_id", nullable = false)

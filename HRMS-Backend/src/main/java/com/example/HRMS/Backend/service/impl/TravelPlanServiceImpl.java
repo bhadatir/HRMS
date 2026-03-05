@@ -361,6 +361,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         travelPlan.setTravelPlanIsDeleted(true);
         travelPlan.setReasonForDeleteTravelPlan(reason);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        travelPlan.setTravelPlanDeletedBy(email);
+        travelPlan.setTravelPlanDeletedAt(Instant.now());
         travelPlanRepository.save(travelPlan);
 
         Long hrId = travelPlan.getFkTravelPlanHREmployee().getId();

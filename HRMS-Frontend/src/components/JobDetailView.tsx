@@ -100,7 +100,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
   const handleUpdateCvStatus = (referId: number, statusId: number) => {
     if(statusId === 5) {
       const confirm = window.confirm("Are you sure you want to approve this cv?");
-      if (confirm) updateCvStatusMutation.mutate({ referId, statusId, reason: `Approved by ${user?.employeeEmail} at ${new Date().toLocaleString()}` });
+      if (confirm) updateCvStatusMutation.mutate({ referId, statusId, reason: "-" });
     } else {
       const reason = window.prompt("Please enter reason for approval:", "")?.trim();
       if (reason) {

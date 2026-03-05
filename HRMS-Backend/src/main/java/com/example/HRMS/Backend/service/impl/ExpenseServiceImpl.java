@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -199,6 +201,10 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         if(!reason.isEmpty())expense.setReasonForRejectExpense(reason);
         expense.setFkExpenseExpenseStatus(expenseStatusRepository.findExpenseStatusById(statusId));
+        expense.setExpenseStatusChangeAt(Instant.now());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        expense.setExpenseStatusChangeBy(email);
         expenseRepository.save(expense);
 
         notificationService.createNotification(expense.getFkEmployeeTravelPlan().getFkEmployee().getId()

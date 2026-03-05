@@ -43,6 +43,12 @@ public class Post {
     @Column(name = "reason_for_delete_post")
     private String reasonForDeletePost;
 
+    @Column(name = "post_deleted_by")
+    private String postDeletedBy;
+
+    @Column(name = "post_deleted_at")
+    private Instant postDeletedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_post_employee_id")
     private Employee fkPostEmployee;

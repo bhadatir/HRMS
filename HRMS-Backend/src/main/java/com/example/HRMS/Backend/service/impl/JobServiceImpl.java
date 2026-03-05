@@ -353,6 +353,10 @@ public class JobServiceImpl implements JobService {
 
         job.setJobIsActive(false);
         job.setReasonForDeActiveJob(reason);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        job.setJobDeletedBy(email);
+        job.setJobDeletedAt(Instant.now());
         jobRepository.save(job);
     }
 }

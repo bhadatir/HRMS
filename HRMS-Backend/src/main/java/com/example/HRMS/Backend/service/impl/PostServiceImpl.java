@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -318,6 +320,10 @@ public class PostServiceImpl implements PostService {
 
         commentsRepository.makeCommentIdDeleted(commentId);
         commentsRepository.addReasonForDeletion(commentId, reason);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        comment.setCommentDeletedBy(userEmail);
+        comment.setCommentCreatedAt(Instant.now());
         likesRepository.removeLikesForDeletedComment(commentId);
 
         String email = comment.getFkCommentEmployee().getEmployeeEmail();
@@ -342,6 +348,10 @@ public class PostServiceImpl implements PostService {
 
         post.setPostIsDeleted(true);
         post.setReasonForDeletePost(reason);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        post.setPostDeletedBy(userEmail);
+        post.setPostDeletedAt(Instant.now());
         List<Comment> comments = commentsRepository.findCommentByFkPost_Id(postId);
 
         for(Comment comment : comments)
@@ -384,6 +394,10 @@ public class PostServiceImpl implements PostService {
 
         commentsRepository.makeCommentIdDeleted(commentId);
         commentsRepository.addReasonForDeletion(commentId, reason);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        comment.setCommentDeletedBy(userEmail);
+        comment.setCommentCreatedAt(Instant.now());
         likesRepository.removeLikesForDeletedComment(commentId);
     }
 
@@ -398,6 +412,10 @@ public class PostServiceImpl implements PostService {
 
         post.setPostIsDeleted(true);
         post.setReasonForDeletePost(reason);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        post.setPostDeletedBy(userEmail);
+        post.setPostDeletedAt(Instant.now());
         postRepository.save(post);
         List<Comment> comments = commentsRepository.findCommentByFkPost_Id(postId);
 
