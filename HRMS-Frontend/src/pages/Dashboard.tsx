@@ -191,7 +191,12 @@ export default function Dashboard() {
                   <AvatarFallback className="bg-blue-600 text-white">
                     {user.employeeFirstName.charAt(0)}{user.employeeLastName.charAt(0)}
                   </AvatarFallback>
-                  <Input type="file" className="hidden" onChange={(e) => e.target.files && profilePicMutation.mutate(e.target.files[0])} ref={fileInputRef} />
+                  <Input type="file" accept=".jpg,.jpeg,.png" className="hidden" onChange={(e) => e.target.files && profilePicMutation.mutate(e.target.files[0])} ref={fileInputRef} />
+                  {profilePicMutation.isPending && (
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded">
+                      <span className="text-white text-sm p-4">Uploading.</span>
+                    </div>
+                  )}
                   <Pencil className="absolute bottom-0 right-0 bg-white rounded-full p-1 text-gray-600" />                  
                 </Avatar>
                 <div className="text-center md:text-left">

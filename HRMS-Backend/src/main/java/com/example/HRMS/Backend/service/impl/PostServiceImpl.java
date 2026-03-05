@@ -3,6 +3,7 @@ package com.example.HRMS.Backend.service.impl;
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
+import com.example.HRMS.Backend.service.CloudinaryService;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.NotificationService;
 import com.example.HRMS.Backend.service.PostService;
@@ -40,6 +41,7 @@ public class PostServiceImpl implements PostService {
     private final EmailService emailService;
     private final PostVisibilityRepository postVisibilityRepository;
     private final NotificationService notificationService;
+    private final CloudinaryService cloudinaryService;
 
     @Value("${img.path}")
     private String folderPath;
@@ -51,17 +53,19 @@ public class PostServiceImpl implements PostService {
     public void savePost(PostRequest postRequest, MultipartFile file) throws IOException {
         Post post = new Post();
 
-        String time = Instant.now().toString().replace(":","-");
+//        String time = Instant.now().toString().replace(":","-");
+//
+//        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+//        String filePath = "post_content/" + time +"_" + postRequest.getFkPostEmployeeId() + "_" + originalFilePath;
+//
+//        file.transferTo(new File(System.getProperty("user.dir") + "/" +folderPath + filePath));
 
-        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
-        String filePath = "post_content/" + time +"_" + postRequest.getFkPostEmployeeId() + "_" + originalFilePath;
-
-        file.transferTo(new File(System.getProperty("user.dir") + "/" +folderPath + filePath));
+        String imageUrl = cloudinaryService.uploadFile(file, "post");
 
         post.setFkPostEmployee(employeeRepository.findEmployeeById(postRequest.getFkPostEmployeeId()));
         post.setPostContent(postRequest.getPostContent());
         post.setPostTitle(postRequest.getPostTitle());
-        post.setPostContentUrl(URL + filePath);
+        post.setPostContentUrl(imageUrl);
         post.setFkPostVisibility(postVisibilityRepository.findPostVisibilitiesById(postRequest.getFkPostVisibilityId()));
 
         postRepository.save(post);
@@ -166,13 +170,15 @@ public class PostServiceImpl implements PostService {
         }
 
         if(file != null && !file.isEmpty()){
-            String time = Instant.now().toString().replace(":","-");
+//            String time = Instant.now().toString().replace(":","-");
+//
+//            String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+//            String filePath = "post_content/" + postRequest.getFkPostEmployeeId()
+//                                + "_" + time + "_" + originalFilePath;
+//            file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+            String imageUrl = cloudinaryService.uploadFile(file, "post");
 
-            String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
-            String filePath = "post_content/" + postRequest.getFkPostEmployeeId()
-                                + "_" + time + "_" + originalFilePath;
-            file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
-            post.setPostContentUrl(URL + filePath);
+            post.setPostContentUrl(imageUrl);
         }
 
         post.setPostTitle(postRequest.getPostTitle());

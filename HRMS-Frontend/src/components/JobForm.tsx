@@ -132,7 +132,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
           <Input
             type="file"
             className="cursor-pointer"
-            accept=".pdf,.doc,.docx"
+            accept=".pdf"
               {...register("file", {required: !editJobId && "Job description is required for new jobs"})}
           />
           {errors.file && <p className="text-red-500 text-xs">{errors.file.message}</p>}

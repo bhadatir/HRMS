@@ -4,6 +4,7 @@ import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.AuthService;
+import com.example.HRMS.Backend.service.CloudinaryService;
 import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.TravelPlanService;
 import com.example.HRMS.Backend.util.JwtUtil;
@@ -44,6 +45,8 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
 
     private final EmployeeRepository employeeRepository;
+
+    private final CloudinaryService cloudinaryService;
 
     private final GameTypeRepository gameTypeRepository;
 
@@ -203,11 +206,14 @@ public class AuthServiceImpl implements AuthService {
     public void addProfileImage(Long empId, MultipartFile file) throws IOException {
         Employee employee = employeeRepository.findEmployeeById(empId);
 
-        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
-        String filePath = "Profile_Image/" + empId + originalFilePath;
-        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+//        String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
+//        String filePath = "Profile_Image/" + empId + originalFilePath;
+//        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+//
+//        employee.setEmployeeProfileUrl(URL + filePath);
+        String imageUrl = cloudinaryService.uploadFile(file, "employee_profiles");
 
-        employee.setEmployeeProfileUrl(URL + filePath);
+        employee.setEmployeeProfileUrl(imageUrl);
 
         employeeRepository.save(employee);
     }
