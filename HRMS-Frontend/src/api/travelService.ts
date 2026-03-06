@@ -15,8 +15,8 @@ const authHeader = (token: string) => ({
 
 export const travelService = {
     
-  getAllTravelPlans: async (token: string) => {
-    const res = await api.get("/travel/allTravelPlans", authHeader(token));
+  getAllTravelPlans: async (searchTerm: string, page: number, size: number, token: string) => {
+    const res = await api.get(`/travel/allTravelPlans?searchTerm=${searchTerm}&page=${page}&size=${size}`, authHeader(token));
     return res.data;
   },
 

@@ -1,21 +1,20 @@
 
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { useAppDebounce } from "../hooks/useAppDebounce";
 import { Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useInView } from "react-intersection-observer";
+import { useGetUserNotifications } from "@/hooks/useInfinite";
 
 export default function Notifications() {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   const {
     data: notificationsData,
@@ -23,14 +22,7 @@ export default function Notifications() {
     hasNextPage,
     isFetchingNextPage,
     isError: notificationsError,
-  } = useInfiniteQuery({
-    queryKey: ["employeeSearchInfinite", debouncedSearchTerm],
-    queryFn: ({ pageParam = 0 }) => 
-      apiService.getUserNotifications(user?.id, debouncedSearchTerm, pageParam, 5, token || ""),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
-  });
+  } = useGetUserNotifications(searchTerm, token || "");
   const notifications = notificationsData?.pages.flatMap(page => page.content) || [];
 
   const { ref, inView } = useInView();
@@ -72,7 +64,7 @@ return (
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="font-bold text-lg">Notifications</h3>
-          {debouncedSearchTerm && debouncedSearchTerm.length > 0 ?(
+            {searchTerm && searchTerm.length > 0 ?(
               <Badge variant="outline">{notifications?.length} results</Badge>
             ) : (<Badge variant="outline">No filter</Badge>)
           }

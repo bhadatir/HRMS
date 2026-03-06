@@ -410,22 +410,22 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     }
 
     @Override
-    public List<TravelPlanResponse> showAllTravelPlan(){
-        List<TravelPlanResponse> travelPlanResponses = new ArrayList<>();
-        for(TravelPlan travelPlan : travelPlanRepository.findAll()){
-            TravelPlanResponse travelPlanResponse = modelMapper.map(travelPlan,TravelPlanResponse.class);
+    public Page<TravelPlanResponse> showAllTravelPlan(String searchTerm, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<TravelPlan> travelPlans = travelPlanRepository.findTravelPlans(searchTerm, pageable);
+        return travelPlans.map(travelPlan -> {
+            TravelPlanResponse travelPlanResponse = modelMapper.map(travelPlan, TravelPlanResponse.class);
 
             List<EmployeeTravelPlanResponse> employeeTravelPlanResponses = new ArrayList<>();
-            for(EmployeeTravelPlan employeeTravelPlan:employeeTravelPlanRepository.findEmployeeTravelPlanByFkTravelPlan_Id(travelPlan.getId()))
-            {
+            for (EmployeeTravelPlan employeeTravelPlan : employeeTravelPlanRepository.findEmployeeTravelPlanByFkTravelPlan_Id(travelPlan.getId())) {
                 EmployeeTravelPlanResponse employeeTravelPlanResponse = modelMapper.map(employeeTravelPlan, EmployeeTravelPlanResponse.class);
                 employeeTravelPlanResponses.add(employeeTravelPlanResponse);
             }
             travelPlanResponse.setEmployeeTravelPlanResponses(employeeTravelPlanResponses);
 
-            travelPlanResponses.add(travelPlanResponse);
-        }
-        return travelPlanResponses;
+            return travelPlanResponse;
+        });
     }
 
 

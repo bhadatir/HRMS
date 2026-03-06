@@ -15,7 +15,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Search, User, Bell, X } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
 import { useInView } from "react-intersection-observer";
-import { useEmployeeSearch } from "../hooks/useEmployeeSearch";
+import { useEmployeeSearch } from "../hooks/useInfinite";
 
 export default function OrganizationChart() {
   const { token, unreadNotifications } = useAuth(); 

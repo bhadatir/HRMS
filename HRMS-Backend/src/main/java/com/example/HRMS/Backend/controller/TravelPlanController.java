@@ -27,8 +27,10 @@ public class TravelPlanController {
     private final ExpenseService expenseService;
 
     @GetMapping("/allTravelPlans")
-    public ResponseEntity<List<TravelPlanResponse>> showAllTravelPlans() {
-        return ResponseEntity.ok(travelPlanService.showAllTravelPlan());
+    public ResponseEntity<Page<TravelPlanResponse>> showAllTravelPlans(@RequestParam String searchTerm,
+                                                                       @RequestParam(defaultValue = "0") int page,
+                                                                       @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(travelPlanService.showAllTravelPlan(searchTerm, page, size));
     }
 
     @GetMapping("/allExpenseTypes")

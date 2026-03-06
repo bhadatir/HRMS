@@ -3,15 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMutation, useQueries, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { travelService } from "../api/travelService";
-import { apiService } from "../api/apiService"; 
 import { useAuth } from "../context/AuthContext";
 import { set, useForm } from "react-hook-form";
 import { Search, User, X, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useInView } from "react-intersection-observer";
+import { useSearchAvailableEmployeeForTravel } from "../hooks/useInfinite";
 
 type TravelPlanFormInputs = {
   travelPlanName: string;
@@ -35,7 +34,6 @@ export default function TravelPlanForm({ editTravelPlanId, onSuccess }: { editTr
   const [selectedEmployees, setSelectedEmployees] = useState<{id: number, name: string}[]>([]);
   const [createdAt, setCreatedAt] = useState("");
   const [hrOwnerId, setHrOwnerId] = useState<number | null>(null);
-  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<TravelPlanFormInputs>({
     defaultValues: {
@@ -54,15 +52,7 @@ const {
   hasNextPage,
   isFetchingNextPage,
   isError: employeeSearchError
-} = useInfiniteQuery({
-  queryKey: ["employeeSearchInfinite", debouncedSearchTerm, startDate, endDate],
-  queryFn: ({ pageParam = 0 }) => 
-    apiService.searchAvailableEmployeeForTravel(debouncedSearchTerm, pageParam, 5, startDate, endDate, token || ""),
-  initialPageParam: 0,
-  getNextPageParam: (lastPage) => 
-    lastPage.last ? undefined : lastPage.number + 1,
-  enabled: debouncedSearchTerm.length >= 1 && !!startDate && !!endDate,
-});
+} = useSearchAvailableEmployeeForTravel(searchTerm, token || "", startDate, endDate);
 const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
 const { ref, inView } = useInView();
@@ -234,11 +224,9 @@ const getMutation = useMutation({
 
             {showDropdown && suggestions.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-40 overflow-y-auto">
-                {suggestions.map((emp: any) => {
-
-                  if (emp.id === hrOwnerId || emp.id === user?.id || selectedEmployees.find(e => e.id === emp.id)) return null;
-
-                  return (
+                {suggestions.map((emp: any) => (                  
+                  !(emp.id === hrOwnerId || emp.id == user?.id || selectedEmployees.find(e => e.id === emp.id)) 
+                  && 
                   <button
                       key={emp.id}
                       className="w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors"                                 
@@ -249,12 +237,12 @@ const getMutation = useMutation({
                           <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
                       </div>
                   </button>
-                  );
-                })} 
+                ))} 
 
-                 <div ref={ref} className="h-10 flex justify-center items-center">
+                <div ref={ref} className="h-10 flex justify-center items-center">
                   {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
                 </div>
+
               </div>
             )}
 

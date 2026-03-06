@@ -20,7 +20,7 @@ import {
   Search,
   Plus
 } from "lucide-react";
-import { useEmployeeSearch } from "../hooks/useEmployeeSearch";
+import { useEmployeeSearch } from "../hooks/useInfinite";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useInView } from "react-intersection-observer";
 

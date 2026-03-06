@@ -1,20 +1,22 @@
-import { useState, useMemo } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useMemo, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { jobService } from "../api/jobService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ReferFriend from "../components/ReferFriend.tsx";
 import ShareJob from "../components/ShareJob.tsx";
-import { Plus, X, Calendar, Search, DollarSign, Share, UserPlus, Edit, Bell, IndianRupee, Forward, BookOpenIcon, Trash } from "lucide-react";
+import { Plus, X, Calendar, Search, Share, UserPlus, Edit, Bell, IndianRupee, BookOpenIcon, Trash } from "lucide-react";
 import JobForm from "../components/JobForm.tsx";
 import JobDetailView from "@/components/JobDetailView.tsx";
 import Notifications from "@/components/Notifications.tsx";
 import { useAppDebounce } from "../hooks/useAppDebounce";
+import { useGetAllJobs } from "../hooks/useInfinite";
+import { useInView } from "react-intersection-observer";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -29,11 +31,22 @@ export default function JobManagement() {
   const [jobType, setJobType] = useState(0);
   const debouncedSearchTerm = useAppDebounce(searchTerm);
 
-  const { data: allJobs, isLoading, isError: allJobsOnError } = useQuery({
-    queryKey: ["allJobs"],
-    queryFn: () => jobService.getAllJobs(token || ""),
-    enabled: !!token,
-  });
+  const {
+    data: allJobsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isError: allJobsOnError,
+  } = useGetAllJobs(searchTerm, token || "");
+  const allJobs = allJobsData?.pages.flatMap(page => page.content) || [];
+
+  const { ref, inView } = useInView();
+  
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage]);
 
   if (allJobsOnError) {
     alert("Failed to load jobs: " + allJobsOnError);
@@ -42,8 +55,6 @@ export default function JobManagement() {
   const filteredJobs = useMemo(() => {
     if (!allJobs) return [];
     return allJobs.filter((job: any) => {
-      const matchesSearch = job.jobTitle.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-      if (!matchesSearch) return false;
       if(jobType === 0) return true;
       if(jobType === 1) return job.jobIsActive === true;
       if(jobType === 2) return job.jobIsActive === false;
@@ -208,9 +219,7 @@ export default function JobManagement() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
-              <p>Loading jobs...</p>
-            ) : filteredJobs.length > 0 ? (
+            {filteredJobs.length > 0 ? (
               filteredJobs.map((job: any) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (
                 <Card 
                   key={job.id} 
@@ -314,6 +323,9 @@ export default function JobManagement() {
                 No jobs matching your criteria.
               </div>
             )}
+          </div>
+          <div ref={ref} className="h-10 flex justify-center items-center">
+            { isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
           </div>
         </main>
       </SidebarInset>

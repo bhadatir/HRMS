@@ -12,6 +12,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -248,17 +251,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobResponse> showAllJobs(){
-        List<JobResponse> jobResponses =new ArrayList<>();
+    public Page<JobResponse> showAllJobs(String searchTerm, int page, int size){
 
-        List<Job> jobs = jobRepository.findAll();
+        Pageable pageable = PageRequest.of(page, size);
 
-        for(Job job:jobs){
-            JobResponse jobResponse = modelMapper.map(job,JobResponse.class);
-            jobResponses.add(jobResponse);
-        }
-
-        return jobResponses;
+        Page<Job> jobs = jobRepository.findJobBySearchTeam(searchTerm, pageable);
+        return jobs.map(job -> modelMapper.map(job,JobResponse.class));
     }
 
     @Override

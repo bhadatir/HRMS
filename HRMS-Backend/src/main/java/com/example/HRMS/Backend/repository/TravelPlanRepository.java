@@ -4,6 +4,8 @@ import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.model.EmployeeTravelPlan;
 import com.example.HRMS.Backend.model.TravelPlan;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -58,5 +60,14 @@ public interface TravelPlanRepository extends JpaRepository<TravelPlan, Long> {
     """)
     boolean findAllByTravelStartTimeBetween(Long id,  LocalDate startDate, LocalDate endDate);
 
+    @Query("SELECT tp FROM TravelPlan tp " +
+            "WHERE (lower(tp.travelPlanName) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR lower(tp.travelPlanDetails) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR lower(tp.travelPlanFrom) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR lower(tp.travelPlanTo) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR CAST(tp.travelPlanStartDate AS string) LIKE concat('%', :searchTerm, '%') " +
+            "OR CAST(tp.travelPlanEndDate AS string) LIKE concat('%', :searchTerm, '%')) " +
+            "ORDER BY tp.travelPlanCreatedAt DESC")
+    Page<TravelPlan> findTravelPlans(String searchTerm, Pageable pageable);
 }
 

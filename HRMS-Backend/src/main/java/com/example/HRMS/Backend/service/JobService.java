@@ -3,6 +3,7 @@ package com.example.HRMS.Backend.service;
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.JobType;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public interface JobService {
 
     void referFriend(ReferFriendRequest referFriendRequest, MultipartFile file) throws IOException;
 
-    List<JobResponse> showAllJobs();
+    Page<JobResponse> showAllJobs(String searchTerm, int page, int size);
 
     JobResponse showJobByJobId(Long jobId);
 

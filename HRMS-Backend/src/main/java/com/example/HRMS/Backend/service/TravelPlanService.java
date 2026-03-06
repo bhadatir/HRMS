@@ -16,7 +16,7 @@ public interface TravelPlanService {
 
     void addTravelPlan(TravelPlanRequest travelPlanRequest);
 
-    List<TravelPlanResponse> showAllTravelPlan();
+    Page<TravelPlanResponse> showAllTravelPlan(String searchTerm, int page, int size);
 
     void saveDocByEmployee(Long employeeTravelPlanId, MultipartFile file, Long docTypeId, Long employeeId) throws IOException;
 

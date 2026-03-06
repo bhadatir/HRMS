@@ -1,6 +1,6 @@
 
-import { useState, useMemo } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useMemo, useEffect } from "react";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { travelService } from "../api/travelService";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,14 +8,15 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, MapPin, Calendar, Edit, ImagePlus, Bell, Search, Trash2, ArrowRight, ArrowLeft } from "lucide-react";
+import { Plus, X, MapPin, Calendar, Edit, ImagePlus, Bell, Search, Trash2 } from "lucide-react";
 import TravelPlanForm from "../components/TravelPlanForm";
 import AddExpenseForm from "../components/AddExpenseForm";
 import AddTravelDocumentForm from "../components/AddTravelDocumentForm";
 import FullTravelDetail from "../components/FullTravelDetail.tsx";
 import { Input } from "@/components/ui/input";
 import Notifications from "../components/Notifications.tsx";
-import { useAppDebounce } from "../hooks/useAppDebounce";
+import { useInView } from "react-intersection-observer";
+import { useFindTravelPlanByEmployeeId, useGetAllTravelPlans } from "../hooks/useInfinite";
 
 export default function TravelPlan() {
   const { token, user, unreadNotifications } = useAuth(); 
@@ -28,21 +29,38 @@ export default function TravelPlan() {
   const [travelPlanType, setTravelPlanType] = useState<number>(0);
   const [selectedTravelId, setSelectedTravelId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(0);
-  const [size] = useState(12);
-  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
-  const { data: travelPlanByEmpId, isLoading, isError: travelPlanByEmpIdError } = useQuery({
-    queryKey: ["travelPlanByEmpId", user?.id, page, size, debouncedSearchTerm],
-    queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id, debouncedSearchTerm, page, size, token || ""),
-    enabled: !!token && !!user?.id,
-  });
+    const {
+    data: allTravelPlansData,
+    fetchNextPage: fetchAllTravelPlansNextPage,
+    hasNextPage: hasAllTravelPlansNextPage,
+    isFetchingNextPage: isFetchingAllTravelPlansNextPage,
+    isError: allTravelPlansError,
+  } = useGetAllTravelPlans(searchTerm, token || "");
+  const allTravelPlans = allTravelPlansData?.pages.flatMap(page => page.content) || [];
 
-  const { data: allTravelPlans, isError: allTravelPlansError } = useQuery({
-    queryKey: ["allTravelPlans"],
-    queryFn: () => travelService.getAllTravelPlans(token || ""),
-    enabled: !!token,
-  });
+  const {
+    data: travelPlanDataByEmpId,
+    fetchNextPage: fetchTravelPlanByEmpIdNextPage,
+    hasNextPage: hasTravelPlanByEmpIdNextPage,
+    isFetchingNextPage: isFetchingTravelPlanByEmpIdNextPage,
+    isError: travelPlanByEmpIdError,
+  } = useFindTravelPlanByEmployeeId(searchTerm, token || "");
+  const travelPlanByEmpId = travelPlanDataByEmpId?.pages.flatMap(page => page.content) || [];
+
+  const { ref, inView } = useInView();
+  
+  useEffect(() => {
+    if (inView && hasAllTravelPlansNextPage && !isFetchingAllTravelPlansNextPage) {
+      fetchAllTravelPlansNextPage();
+    }
+  }, [inView, hasAllTravelPlansNextPage, isFetchingAllTravelPlansNextPage]);
+
+  useEffect(() => {
+    if (inView && hasTravelPlanByEmpIdNextPage && !isFetchingTravelPlanByEmpIdNextPage) {
+      fetchTravelPlanByEmpIdNextPage();
+    }
+  }, [inView, hasTravelPlanByEmpIdNextPage, isFetchingTravelPlanByEmpIdNextPage]);
 
   const deleteTravelPlanMutation = useMutation({
     mutationFn: ({ travelPlanId, reason }: { travelPlanId: number; reason: string }) => travelService.deleteTravelPlan(travelPlanId, reason, token || ""),
@@ -58,12 +76,10 @@ export default function TravelPlan() {
     if (!user) return [];
     if(user?.roleName === "ADMIN") {
       if (!allTravelPlans) return [];
-      return allTravelPlans.filter((plan: any) =>
-        plan.travelPlanName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      return allTravelPlans;
     }
-    if (!travelPlanByEmpId || !travelPlanByEmpId.content) return [];
-    return travelPlanByEmpId.content.filter((plan: any) => {
+    if (!travelPlanByEmpId) return [];
+    return travelPlanByEmpId.filter((plan: any) => {
         if(travelPlanType === 0) return true;
         if(travelPlanType === 1) return plan.travelPlanIsDeleted === false;
         if(travelPlanType === 2) return plan.travelPlanIsDeleted === true;
@@ -222,9 +238,7 @@ export default function TravelPlan() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
-               <p>Loading plans...</p>
-            ) : filteredPlans.length > 0 ? (
+            {filteredPlans.length > 0 ? (
               filteredPlans.sort((a: any, b: any) => new Date(b.travelPlanStartDate).getTime() 
                                                       - new Date(a.travelPlanStartDate).getTime())
               .map((plan: any) => 
@@ -313,16 +327,6 @@ export default function TravelPlan() {
                               <Plus size={14} /> Exp
                             </Button>
                             );
-                        //     : 
-                        //   new Date(plan.travelPlanStartDate) > new Date() ? (
-                        //   <Button disabled className="w-full text-gray-400 mt-2 cursor-not-allowed">
-                        //     Claim Expense Not Available Yet
-                        //   </Button>
-                        // ) : (
-                        //   <Button disabled className="w-full text-gray-400 mt-2 cursor-not-allowed">
-                        //     Claim Expense Expire
-                        //   </Button>
-                        // );
                         }))():null}
 
                         {((user?.roleName === "HR" && user?.id === plan.employeeId) || user?.roleName === "ADMIN") && !plan.travelPlanIsDeleted && new Date(plan.travelPlanStartDate) > new Date() ? (
@@ -365,31 +369,10 @@ export default function TravelPlan() {
               <div className="col-span-full py-20 text-center text-slate-400">No travel plans found.</div>
             )}
           </div>
-          {travelPlanByEmpId?.totalPages > 0  ? (
-            <div className="flex justify-center gap-4 mt-6">
-              <Button 
-              className="text-gray-700"
-              disabled={page === 0}
-              onClick={() => setPage(old => Math.max(old - 1, 0))}
-              >
-              <ArrowLeft size={16} className="mr-2" />Previous
-              </Button>
-              <span className="text-sm text-gray-600 mt-2">
-              Page {page + 1} of {travelPlanByEmpId?.totalPages ?? 1}
-              </span>
-              <Button
-              className="text-gray-700"
-              disabled={page + 1 >= (travelPlanByEmpId?.totalPages ?? 1)}
-              onClick={() => {
-                  if (page + 1 < (travelPlanByEmpId?.totalPages ?? 1)) {
-                  setPage(old => old + 1);
-                  }
-              }}
-              >
-              Next <ArrowRight size={16} className="ml-2" />
-              </Button>
-            </div>
-          ):null}
+          
+          <div ref={ref} className="h-10 flex justify-center items-center">
+            {( isFetchingAllTravelPlansNextPage || isFetchingTravelPlanByEmpIdNextPage )? <p className="text-xs">Loading more...</p> : null}
+          </div>
         </main>
       </SidebarInset>
     </SidebarProvider>

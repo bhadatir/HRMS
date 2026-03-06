@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { postService } from "../api/postService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,13 +8,14 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Plus, X, MessageSquare, Search, Eye, Edit, Bell, Trash, ArrowLeft, ArrowRight } from "lucide-react";
+import { Plus, X, MessageSquare, Search, Eye, Edit, Bell, Trash } from "lucide-react";
 import PostForm from "../components/PostForm";
 import LikeButton from "@/components/LikeButton";
 import CommentSection from "@/components/CommentSection";
 import Notifications from "@/components/Notifications";
 import PostTags from "@/components/PostTags";
-import { useAppDebounce } from "../hooks/useAppDebounce";
+import { useInView } from "react-intersection-observer";
+import { useShowAllPosts } from "@/hooks/useInfinite";
 
 export default function PostManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -24,9 +25,6 @@ export default function PostManagement() {
   const [editPostId, setEditPostId] = useState<number>(0);
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
-  const [page, setPage] = useState(0);
-  const [size] = useState(20);
-  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -43,17 +41,25 @@ export default function PostManagement() {
     [user?.departmentName as string]: true
   };
 
-  const { data: allPosts, isLoading, isError: allPostsError } = useQuery({
-    queryKey: ["allPosts", page, debouncedSearchTerm],
-    queryFn: () => postService.showAllPosts(debouncedSearchTerm, page, size, token || ""),
-    enabled: !!token,
-  });
+  const {
+    data: allPosts,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isError: allPostsError,
+  } = useShowAllPosts(searchTerm, token || "");
+  const filteredPosts = allPosts?.pages.flatMap(page => page.content) || [];
   
-  const filteredPosts = allPosts?.content || []; 
-
+  const [ref, inView] = useInView();
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage]);
+  
   const removePost = useMutation({
     mutationFn: ({ postId, reason }: { postId: number; reason: string }) => {
-      if ((user?.roleName === "HR" || user?.roleName === "ADMIN" ) && allPosts?.content.find((post: any) => post.id === postId)?.employeeId !== user.id) {
+      if ((user?.roleName === "HR" || user?.roleName === "ADMIN" ) && filteredPosts?.find((post: any) => post.id === postId)?.employeeId !== user.id) {
       return postService.removePostByHr(postId, reason, token || "");
       } else {
         return postService.removePostByEmp(postId, reason, token || "");
@@ -93,7 +99,6 @@ export default function PostManagement() {
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                setPage(0);
               }}
             />
           </div>
@@ -148,11 +153,7 @@ export default function PostManagement() {
           )}
 
           <div className="space-y-6">
-            {isLoading ? (
-              <p className="text-center text-slate-400">Loading feed...</p>
-            ) : 
-            (
-              filteredPosts.length > 0  ? (
+            {filteredPosts.length > 0  ? (
               filteredPosts.map((post: any) => (
                 ( (post.postVisibilityName in postVisibilityOptions || post?.employeeId === user?.id) ? (
                   <Card key={post.id} className="hover:shadow-md transition-shadow border-slate-200">
@@ -239,36 +240,11 @@ export default function PostManagement() {
             )
             ) : (
               <div className="text-center py-20 text-slate-400">No posts found.</div>
-            )
             )}
 
-            {allPosts?.totalPages > 0  ? (
-              <div className="flex justify-center gap-4 mt-6">
-                <Button 
-                  className="text-gray-700"
-                  disabled={page === 0}
-                  onClick={() => setPage(old => Math.max(old - 1, 0))}
-                >
-                  <ArrowLeft size={16} className="mr-2" />Previous
-                </Button>
-
-                <span className="text-sm text-gray-600 mt-2">
-                  Page {page + 1} of {allPosts?.totalPages ?? 1}
-                </span>
-
-                <Button
-                  className="text-gray-700"
-                  disabled={page + 1 >= (allPosts?.totalPages ?? 1)}
-                  onClick={() => {
-                    if (page + 1 < (allPosts?.totalPages ?? 1)) {
-                      setPage(old => old + 1);
-                    }
-                  }}
-                >
-                  Next <ArrowRight size={16} className="ml-2" />
-                </Button>
-              </div>
-            ):null}
+          </div>
+          <div ref={ref} className="h-10 flex justify-center items-center">
+            { isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
           </div>
         </main>
       </SidebarInset>
