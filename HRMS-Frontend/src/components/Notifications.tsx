@@ -1,20 +1,44 @@
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
+import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { useAppDebounce } from "../hooks/useAppDebounce";
+import { Search } from "lucide-react";
+import { Input } from "./ui/input";
+import { useInView } from "react-intersection-observer";
 
 export default function Notifications() {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
-  const { data: notifications, isLoading, isError: notificationsError } = useQuery({
-    queryKey: ["notifications"],
-    queryFn: () => apiService.getUserNotifications(user?.id, token || ""),
-    enabled: !!token && !!user?.id,
+  const {
+    data: notificationsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isError: notificationsError,
+  } = useInfiniteQuery({
+    queryKey: ["employeeSearchInfinite", debouncedSearchTerm],
+    queryFn: ({ pageParam = 0 }) => 
+      apiService.getUserNotifications(user?.id, debouncedSearchTerm, pageParam, 5, token || ""),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => 
+      lastPage.last ? undefined : lastPage.number + 1,
   });
+  const notifications = notificationsData?.pages.flatMap(page => page.content) || [];
+
+  const { ref, inView } = useInView();
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage]);
 
   if (notificationsError) {
     alert("Failed to load notifications: " + notificationsError);
@@ -42,13 +66,27 @@ export default function Notifications() {
     window.confirm("Are you sure you want to mark all notifications as read?") &&
     markAllReadMutation.mutate();
   };
-  if(isLoading) return <div className="p-10">Loading Notifications...</div>;
 
 return (
     <main className="p-4 w-full">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="font-bold text-lg">Notifications</h3>
+          {debouncedSearchTerm && debouncedSearchTerm.length > 0 ?(
+              <Badge variant="outline">{notifications?.length} results</Badge>
+            ) : (<Badge variant="outline">No filter</Badge>)
+          }
+          <div className="relative max-w-sm w-full mx-4">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+            <Input 
+              placeholder="Search posts..." 
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+              }}
+            />
+          </div>
           <Button 
             className="mr-16"
             variant="outline" 
@@ -58,8 +96,8 @@ return (
             Mark all as read
           </Button>
         </div>
-        {notifications?.length > 0 && notifications.filter((n: any) => !n.read).length > 0 ? (
-          notifications.map((notif: any) => ( !notif.read && (
+        {notifications?.length > 0 ? (
+          notifications?.map((notif: any) => (
             <Card key={notif.id} className={`shadow-none border ${!notif.read ? 'bg-blue-50/30' : ''}`}>
               <CardContent className="p-4 flex items-start gap-4">
                 <div className="flex-1 space-y-1">
@@ -68,23 +106,25 @@ return (
                       {notif.title}
                     </h4>
                   </div>
-                  <p className="text-sm text-gray-500">{notif.message}</p>
-                  {!notif.read && (
-                    <Button 
-                      variant="link" 
-                      className="text-xs text-blue-600"
-                      onClick={() => markReadMutation.mutate(notif.id)}
-                    >
-                      Mark as read
-                    </Button>
-                  )}
+                  <p className="text-sm text-gray-500">{notif.message}</p> 
+                  <Button 
+                    variant="link" 
+                    className="text-xs text-blue-600"
+                    onClick={() => markReadMutation.mutate(notif.id)}
+                  >
+                    Mark as read
+                  </Button>
                 </div>
               </CardContent>
             </Card>)
-          ))
+          )
         ) : (
           <div className="text-center py-10 text-gray-400 italic">No notifications.</div>
         )}
+        <div ref={ref} className="h-10 flex justify-center items-center">
+          {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+        </div>
+        
       </div>
     </main>
   );

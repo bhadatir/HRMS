@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { jobService } from "../api/jobService";
 import { useAuth } from "../context/AuthContext";
@@ -20,8 +20,9 @@ import {
   Search,
   Plus
 } from "lucide-react";
-import { apiService } from "@/api/apiService";
+import { useEmployeeSearch } from "../hooks/useEmployeeSearch";
 import { useAppDebounce } from "../hooks/useAppDebounce";
+import { useInView } from "react-intersection-observer";
 
 export default function JobDetailView({ jobId }: { jobId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
@@ -30,23 +31,23 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
   const [newReviewerId, setNewReviewerId] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-  const debouncedSearchTerm = useAppDebounce(searchTerm);
- 
-  const {
-    data: infiniteData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage
-  } = useInfiniteQuery({
-    queryKey: ["employeeSearchInfinite", debouncedSearchTerm],
-    queryFn: ({ pageParam = 0 }) => 
-      apiService.searchEmployees(debouncedSearchTerm, pageParam, 10, token || ""),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
-    enabled: debouncedSearchTerm.length >= 1,
-  });
+  const debouncedSearchTerm = useAppDebounce(searchTerm); 
+
+  const { 
+    data: infiniteData, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage,
+    isError: searchError 
+  } = useEmployeeSearch(searchTerm, token || "");
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
+  
+  const { ref, inView } = useInView();
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage]);
     
   const { data: job, isLoading: jobLoading, isError: jobError } = useQuery({
     queryKey: ["jobDetail", jobId],
@@ -60,7 +61,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     enabled: !!jobId && !!token && viewMode === "REFERRALS",
   });
 
-  if(jobError || referralsError) alert("Failed to load job data");
+  if(jobError || referralsError || searchError) alert("Error loading data: " + (jobError || referralsError || searchError));
 
   const filteredReferrals = referrals.filter((ref: any) => 
     ref.referFriendName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
@@ -190,16 +191,9 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                         );
                       })} 
 
-                      {hasNextPage && (
-                        <Button
-                          variant="ghost"
-                          className="w-full text-[10px] text-blue-600 h-8"
-                          onClick={() => fetchNextPage()}
-                          disabled={isFetchingNextPage}
-                        >
-                          {isFetchingNextPage ? "Loading more..." : "Show More Results"}
-                        </Button>
-                      )}
+                      <div ref={ref} className="h-10 flex justify-center items-center">
+                        {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+                      </div>
                     </div>
                   )}
                 </div>

@@ -18,7 +18,7 @@ public class Comment {
     @Column(name = "pk_comment_id", nullable = false)
     private Long id;
 
-    @NotNull(message = "Posi id is required")
+    @NotNull(message = "Post id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_post_id", nullable = false)
     private Post fkPost;

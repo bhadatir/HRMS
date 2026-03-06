@@ -42,9 +42,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             "e.fkPosition.positionName, e.fkDepartment.id, " +
             "e.fkDepartment.departmentName ) " +
             "FROM Employee e " +
-            "WHERE lower(e.employeeFirstName) like lower(concat(:query,'%')) " +
-            "or lower(e.employeeLastName) like lower(concat(:query,'%')) " +
-            "or lower(e.employeeEmail) like lower(concat(:query,'%')) ")
+            "WHERE lower(e.employeeFirstName) like lower(concat('%', :query,'%')) " +
+            "or lower(e.employeeLastName) like lower(concat('%', :query,'%')) " +
+            "or lower(e.employeeEmail) like lower(concat('%', :query,'%')) ")
     Page<EmployeeSearch> searchEmployeeByName(@Param("query") String query, Pageable pageable);
 
     @Query(value =
@@ -55,9 +55,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
                     "e.fkDepartment.departmentName ) " +
                     "FROM Employee e " +
                     "JOIN EmployeeGameInterest egi ON egi.fkEmployee.id = e.id " +
-                    "WHERE (lower(e.employeeFirstName) like lower(concat(:query,'%')) " +
-                    "or lower(e.employeeLastName) like lower(concat(:query,'%')) " +
-                    "or lower(e.employeeEmail) like lower(concat(:query,'%'))) " +
+                    "WHERE (lower(e.employeeFirstName) like lower(concat('%', :query,'%')) " +
+                    "or lower(e.employeeLastName) like lower(concat('%', :query,'%')) " +
+                    "or lower(e.employeeEmail) like lower(concat('%', :query,'%'))) " +
                     "AND egi.fkGameType.id = :gameTypeId " +
                     "AND egi.isInterestDeleted = false " +
                     "AND NOT EXISTS ( " +
@@ -93,12 +93,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     @Query(value = "SELECT e " +
             "FROM Employee e " +
-            "WHERE lower(e.employeeFirstName) like lower(concat(:searchTerm,'%')) " +
-            "or lower(e.employeeLastName) like lower(concat(:searchTerm,'%')) " +
-            "or lower(e.fkRole.roleName) like lower(concat(:searchTerm,'%')) " +
-            "or lower(e.fkPosition.positionName) like lower(concat(:searchTerm,'%')) " +
-            "or lower(e.fkDepartment.departmentName) like lower(concat(:searchTerm,'%')) " +
-            "or lower(e.employeeEmail) like lower(concat(:searchTerm,'%')) ")
+            "WHERE lower(e.employeeFirstName) like lower(concat('%', :searchTerm,'%')) " +
+            "or lower(e.employeeLastName) like lower(concat('%', :searchTerm,'%')) " +
+            "or lower(e.fkRole.roleName) like lower(concat('%', :searchTerm,'%')) " +
+            "or lower(e.fkPosition.positionName) like lower(concat('%', :searchTerm,'%')) " +
+            "or lower(e.fkDepartment.departmentName) like lower(concat('%', :searchTerm,'%')) " +
+            "or lower(e.employeeEmail) like lower(concat('%', :searchTerm,'%')) ")
     List<Employee> findAllBySearchTerm(String searchTerm);
 }
 

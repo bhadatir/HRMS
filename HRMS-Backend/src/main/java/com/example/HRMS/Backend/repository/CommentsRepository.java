@@ -22,26 +22,20 @@ public interface CommentsRepository extends JpaRepository<Comment,Long> {
     @Modifying
     @Transactional
     @Query(value = "WITH CommentChain AS ( " +
-            "SELECT pk_comment_id " +
-            "FROM comments " +
-            "WHERE pk_comment_id = :commentId " +
-            "UNION ALL " +
-            "SELECT c.pk_comment_id " +
-            "FROM comments c " +
-            "INNER JOIN CommentChain cc " +
-            "ON c.parent_comment_id = cc.pk_comment_id " +
-            ") " +
-            "update comments " +
-            "set comment_is_deleted = 1 " +
-            "where pk_comment_id in (select pk_comment_id from CommentChain ) ", nativeQuery = true)
+            "             SELECT pk_comment_id " +
+            "             FROM comments " +
+            "             WHERE pk_comment_id = :commentId " +
+            "             UNION ALL " +
+            "             SELECT c.pk_comment_id " +
+            "             FROM comments c " +
+            "             INNER JOIN CommentChain cc " +
+            "             ON c.parent_comment_id = cc.pk_comment_id " +
+            "            )" +
+            "            update comments " +
+            "            set comment_is_deleted = 1 " +
+            "            where comment_is_deleted = 0 " +
+            "            and pk_comment_id in (select pk_comment_id from CommentChain)", nativeQuery = true)
     void makeCommentIdDeleted(Long commentId);
-
-    @Modifying
-    @Transactional
-    @Query(value = "update Comment c " +
-            "set c.reasonForDeleteComment = :reason " +
-            "where c.id = :commentId ")
-    void addReasonForDeletion(Long commentId, String reason);
 
     @Query("""
     SELECT count(*) as total

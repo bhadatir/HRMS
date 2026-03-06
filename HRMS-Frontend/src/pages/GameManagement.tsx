@@ -15,6 +15,7 @@ import GameInterestToggle from "@/components/GameInterestToggle";
 import { Card, CardContent } from "@/components/ui/card";
 import WaitingList from "@/components/WaitingList";
 import { Input } from "@/components/ui/input";
+import { useAppDebounce } from "../hooks/useAppDebounce";
 
 export default function GameManagement() {
     const { token, user, unreadNotifications } = useAuth();
@@ -32,6 +33,8 @@ export default function GameManagement() {
     const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
     const [page, setPage] = useState(0);
     const [size] = useState(10);
+    const debouncedBookingSearchTerm = useAppDebounce(bookingSearchTerm);
+    const debouncedWaitingListSearchTerm = useAppDebounce(waitingListSearchTerm);
 
     const { data: gameTypes = [], isError: gameTypesOnError } = useQuery({
         queryKey: ["gameTypes"],
@@ -54,8 +57,8 @@ export default function GameManagement() {
     });
 
     const { data: bookingsByEmpId, isLoading, isError: bookingsByEmpIdOnError } = useQuery({
-        queryKey: ["Bookings", user?.id, page, bookingSearchTerm],
-        queryFn: () => gameService.findGameBookingByUserId(user?.id, bookingSearchTerm, page, size, token!),
+        queryKey: ["Bookings", user?.id, page, debouncedBookingSearchTerm],
+        queryFn: () => gameService.findGameBookingByUserId(user?.id, debouncedBookingSearchTerm, page, size, token!),
         enabled: !!user?.id,
         placeholderData: (previousData) => previousData,
     });
@@ -82,7 +85,7 @@ export default function GameManagement() {
     });
 
     const filteredWaitingList = WaitingListByEmpId.filter((w: any) => {
-        const searchTerm = waitingListSearchTerm?.toLowerCase();
+        const searchTerm = debouncedWaitingListSearchTerm?.toLowerCase();
         return w.gameTypeName.toLowerCase().includes(searchTerm) ||
             w.targetSlotDatetime.toLowerCase().includes(searchTerm) ||
             w.targetSlotEndDatetime.toLowerCase().includes(searchTerm) ||

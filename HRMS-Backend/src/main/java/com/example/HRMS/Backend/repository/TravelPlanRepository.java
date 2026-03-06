@@ -35,9 +35,9 @@ public interface TravelPlanRepository extends JpaRepository<TravelPlan, Long> {
 
     @Query(value = "SELECT t.id " +
             "FROM TravelPlan t " +
-            "WHERE lower(t.travelPlanName) like lower(concat(:query,'%')) " +
-            "or lower(t.travelPlanFrom) like lower(concat(:query,'%')) " +
-            "or lower(t.travelPlanTo) like lower(concat(:query,'%')) ")
+            "WHERE lower(t.travelPlanName) like lower(concat('%', :query,'%')) " +
+            "or lower(t.travelPlanFrom) like lower(concat('%', :query,'%')) " +
+            "or lower(t.travelPlanTo) like lower(concat('%', :query,'%')) ")
     List<Long> findTravelPlan(String query);
 
     @Query(value = "select TravelPlan " +

@@ -47,7 +47,6 @@ export default function PostManagement() {
     queryKey: ["allPosts", page, debouncedSearchTerm],
     queryFn: () => postService.showAllPosts(debouncedSearchTerm, page, size, token || ""),
     enabled: !!token,
-    placeholderData: (previousData) => previousData,
   });
   
   const filteredPosts = allPosts?.content || []; 

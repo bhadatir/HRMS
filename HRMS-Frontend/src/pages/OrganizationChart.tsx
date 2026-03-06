@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
@@ -14,7 +14,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Search, User, Bell, X } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
-import { useAppDebounce } from "../hooks/useAppDebounce";
+import { useInView } from "react-intersection-observer";
+import { useEmployeeSearch } from "../hooks/useEmployeeSearch";
 
 export default function OrganizationChart() {
   const { token, unreadNotifications } = useAuth(); 
@@ -23,23 +24,13 @@ export default function OrganizationChart() {
   const [showDropdown, setShowDropdown] = useState(false);  
   const [showNotification, setShowNotification] = useState(false);
   
-  const debouncedSearchTerm = useAppDebounce(searchTerm);
-
-  const {
-    data: infiniteData,
-    fetchNextPage,
-    hasNextPage,
+  const { 
+    data: infiniteData, 
+    fetchNextPage, 
+    hasNextPage, 
     isFetchingNextPage,
-    isError: searchError
-  } = useInfiniteQuery({
-    queryKey: ["employeeSearchInfinite", debouncedSearchTerm],
-    queryFn: ({ pageParam = 0 }) => 
-      apiService.searchEmployees(debouncedSearchTerm, pageParam, 10, token || ""),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
-    enabled: debouncedSearchTerm.length >= 1,
-  });
+    isError: searchError 
+  } = useEmployeeSearch(searchTerm, token || "");
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
   const { data: orgData, isLoading, isError: orgDataError } = useQuery({
@@ -47,6 +38,13 @@ export default function OrganizationChart() {
     queryFn: () => apiService.fetchOrgChart(selectedId, token || ""),
     enabled: !!selectedId,
   });
+
+  const { ref, inView } = useInView();
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage]);
 
   const handleSelectUser = (id: number) => {
     setSelectedId(id);
@@ -100,16 +98,9 @@ export default function OrganizationChart() {
                   </button>
                 ))}
 
-                {hasNextPage && (
-                  <Button
-                    variant="ghost"
-                    className="w-full text-[10px] text-blue-600 h-8"
-                    onClick={() => fetchNextPage()}
-                    disabled={isFetchingNextPage}
-                  >
-                    {isFetchingNextPage ? "Loading more..." : "Show More Results"}
-                  </Button>
-                )}
+                <div ref={ref} className="h-10 flex justify-center items-center">
+                  {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+                </div>
               </div>
             )}
           </div>

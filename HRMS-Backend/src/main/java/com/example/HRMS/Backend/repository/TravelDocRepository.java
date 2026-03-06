@@ -50,9 +50,10 @@ public interface TravelDocRepository extends JpaRepository<TravelDoc, Long> {
             "       AND memberCheck.employeeIsDeletedFromTravel = false" +
             "   ))" +
             ") " +
-            "AND (lower(td.fkEmployee.employeeEmail) LIKE lower(concat(:searchTerm, '%')) " +
-            "OR lower(td.fkTravelDocsType.travelDocsTypeName) LIKE lower(concat(:searchTerm, '%')) " +
-            "OR CAST(td.travelDocUploadedAt AS string) LIKE concat(:searchTerm, '%')) " +
+            "AND (lower(td.fkEmployee.employeeEmail) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR lower(td.fkEmployee.fkRole.roleName) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR lower(td.fkTravelDocsType.travelDocsTypeName) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR CAST(td.travelDocUploadedAt AS string) LIKE concat('%', :searchTerm, '%')) " +
             "ORDER BY td.travelDocUploadedAt DESC")
     List<TravelDoc> findTravelDocs(
             @Param("fkTravelPlanId") Long fkTravelPlanId,

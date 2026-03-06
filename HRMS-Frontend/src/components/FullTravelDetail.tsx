@@ -37,6 +37,7 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
     queryKey: ["travelPlanDocs", travelPlan, debouncedDocSearchTerm],
     queryFn: () => travelService.findTravelDocByPlanId(travelPlan!, user?.id || 0, debouncedDocSearchTerm, token || ""),
     enabled: !!token && !!travelPlan && viewMode === "DOCUMENTS",
+    placeholderData: (previousData) => previousData,
   });
 
   const allExpenses = expenseResults.flatMap((result) => result.data || []);

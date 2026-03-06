@@ -1,5 +1,7 @@
 package com.example.HRMS.Backend.service.impl;
 
+import com.example.HRMS.Backend.dto.BookingParticipantResponse;
+import com.example.HRMS.Backend.dto.GameBookingResponse;
 import com.example.HRMS.Backend.dto.NotificationResponse;
 import com.example.HRMS.Backend.model.Notification;
 import com.example.HRMS.Backend.repository.EmployeeRepository;
@@ -8,6 +10,9 @@ import com.example.HRMS.Backend.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -48,16 +53,10 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<NotificationResponse> showNotificationByEmployee(Long empId){
-        List<Notification> notifications = notificationRepo.findByFkEmployeeIdOrderByCreatedAtDesc(empId);
-        List<NotificationResponse> notificationResponses = new ArrayList<>();
-        for(Notification notification : notifications)
-        {
-            NotificationResponse notificationResponse = modelMapper.map(notification,NotificationResponse.class);
-            notificationResponses.add(notificationResponse);
-        }
-
-        return notificationResponses;
+    public Page<NotificationResponse> showNotificationByEmployee(Long empId, String search, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Notification> notifications = notificationRepo.findByFkEmployeeIdOrderByCreatedAtDesc(empId, search, pageable);
+        return notifications.map(notification -> modelMapper.map(notification,NotificationResponse.class));
     }
 
 

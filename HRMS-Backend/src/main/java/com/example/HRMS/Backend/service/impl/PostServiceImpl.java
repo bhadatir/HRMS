@@ -300,14 +300,17 @@ public class PostServiceImpl implements PostService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted parent comment cannot be remove sub comments.");
         }
 
-        commentsRepository.makeCommentIdDeleted(commentId);
-        commentsRepository.addReasonForDeletion(commentId, reason);
+        commentsRepository.makeCommentIdDeleted(comment.getId());
+        comment.setCommentIsDeleted(true);
+        comment.setReasonForDeleteComment(reason);
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
         comment.setCommentDeletedBy(userEmail);
-        comment.setCommentCreatedAt(Instant.now());
+        comment.setCommentDeletedAt(Instant.now());
         likesRepository.removeLikesForDeletedComment(commentId);
 
+        commentsRepository.save(comment);
         String email = comment.getFkCommentEmployee().getEmployeeEmail();
         List<String> emails = new ArrayList<>();
         emails.add(email);
@@ -374,13 +377,18 @@ public class PostServiceImpl implements PostService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "deleted parent comment cannot be remove sub comments.");
         }
 
-        commentsRepository.makeCommentIdDeleted(commentId);
-        commentsRepository.addReasonForDeletion(commentId, reason);
+        commentsRepository.makeCommentIdDeleted(comment.getId());
+        comment.setCommentIsDeleted(true);
+        comment.setReasonForDeleteComment(reason);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
+
         comment.setCommentDeletedBy(userEmail);
-        comment.setCommentCreatedAt(Instant.now());
+        comment.setCommentDeletedAt(Instant.now());
         likesRepository.removeLikesForDeletedComment(commentId);
+
+
+        commentsRepository.save(comment);
     }
 
     @Override

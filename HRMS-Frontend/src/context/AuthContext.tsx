@@ -41,7 +41,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   const { data: notifications, isError: notificationsError } = useQuery({
     queryKey: ["notifications"],
-    queryFn: () => apiService.getUserNotifications(userData?.id, token || ""),
+    queryFn: () => apiService.getUserNotifications(userData?.id, "", 0, 1000, token || ""),
     enabled: !!token && !!userData,
   });
 
@@ -63,7 +63,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   
   useEffect(() => {
     if(notifications) {
-      const unreadCount = notifications.filter((n: any) => !n.read).length;
+      const unreadCount = notifications.totalElements;
       setUnreadNotifications(unreadCount);
     }
   },[notifications]);

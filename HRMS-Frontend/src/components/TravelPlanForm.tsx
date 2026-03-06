@@ -11,6 +11,7 @@ import { set, useForm } from "react-hook-form";
 import { Search, User, X, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAppDebounce } from "../hooks/useAppDebounce";
+import { useInView } from "react-intersection-observer";
 
 type TravelPlanFormInputs = {
   travelPlanName: string;
@@ -47,22 +48,29 @@ export default function TravelPlanForm({ editTravelPlanId, onSuccess }: { editTr
 const startDate = watch("travelPlanStartDate");
 const endDate = watch("travelPlanEndDate");
 
-  const {
-    data: infiniteData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isError: employeeSearchError
-  } = useInfiniteQuery({
-    queryKey: ["employeeSearchInfinite", debouncedSearchTerm, startDate, endDate],
-    queryFn: ({ pageParam = 0 }) => 
-      apiService.searchAvailableEmployeeForTravel(debouncedSearchTerm, pageParam, 5, startDate, endDate, token || ""),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
-    enabled: debouncedSearchTerm.length >= 1 && !!startDate && !!endDate,
-  });
-  const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
+const {
+  data: infiniteData,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  isError: employeeSearchError
+} = useInfiniteQuery({
+  queryKey: ["employeeSearchInfinite", debouncedSearchTerm, startDate, endDate],
+  queryFn: ({ pageParam = 0 }) => 
+    apiService.searchAvailableEmployeeForTravel(debouncedSearchTerm, pageParam, 5, startDate, endDate, token || ""),
+  initialPageParam: 0,
+  getNextPageParam: (lastPage) => 
+    lastPage.last ? undefined : lastPage.number + 1,
+  enabled: debouncedSearchTerm.length >= 1 && !!startDate && !!endDate,
+});
+const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
+
+const { ref, inView } = useInView();
+useEffect(() => {
+  if (inView && hasNextPage && !isFetchingNextPage) {
+    fetchNextPage();
+  }
+}, [inView, hasNextPage, isFetchingNextPage]);
 
 const getMutation = useMutation({
   mutationFn: () => travelService.getTravelPlanById(editTravelPlanId!, token || ""),
@@ -244,16 +252,9 @@ const getMutation = useMutation({
                   );
                 })} 
 
-                {hasNextPage && (
-                  <Button
-                    variant="ghost"
-                    className="w-full text-[10px] text-blue-600 h-8"
-                    onClick={() => fetchNextPage()}
-                    disabled={isFetchingNextPage}
-                  >
-                    {isFetchingNextPage ? "Loading more..." : "Show More Results"}
-                  </Button>
-                )}
+                 <div ref={ref} className="h-10 flex justify-center items-center">
+                  {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+                </div>
               </div>
             )}
 

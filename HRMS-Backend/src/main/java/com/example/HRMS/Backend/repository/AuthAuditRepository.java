@@ -7,8 +7,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AuthAuditRepository extends JpaRepository<AuthAudit, Long> {
-    @Query(value = "select a from AuthAudit a " +
-            "where a.userEmail = :email " +
-            "and a.logoutTimestamp is null")
+    @Query("""
+        select a from AuthAudit a
+        where a.userEmail = :email
+        and a.logoutTimestamp is null""")
     AuthAudit findAuditAuthByUserEmailAndLogoutTimestampIsNull(String email);
 }

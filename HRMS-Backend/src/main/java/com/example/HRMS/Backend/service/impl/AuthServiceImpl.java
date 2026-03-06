@@ -75,6 +75,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(AuthRequest authRequest) {
+        if(authAuditRepository.findAuditAuthByUserEmailAndLogoutTimestampIsNull(authRequest.getEmail()) != null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "this account is already login by other");
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
 

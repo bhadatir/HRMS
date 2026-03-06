@@ -11,6 +11,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardTitle, CardHeader, CardContent } from "./ui/card";
 import { Search, User, X, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAppDebounce } from "../hooks/useAppDebounce";
+import { useInView } from "react-intersection-observer";
 
 export default function GameBookingForm({ editBookingId, onSuccess }: { editBookingId?: number | null; onSuccess: () => void }) {
     const { token, user } = useAuth();
@@ -20,6 +22,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     const [searchTerm, setSearchTerm] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedParticipants, setSelectedParticipants] = useState<{id: number, name: string}[]>([]);
+    const debouncedSearchTerm = useAppDebounce(searchTerm);
 
     const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
 
@@ -49,8 +52,9 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
             : gameService.addBooking(data, token!),
         onSuccess: (data) => {
             window.alert(typeof data === "string" ? data : "Booking saved!");
-            queryClient.invalidateQueries({ queryKey: ["allBookings"] });
-            queryClient.invalidateQueries({ queryKey: ["allWaitingList"] });
+            queryClient.invalidateQueries({ queryKey: ["Bookings", user?.id] });
+            queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] });
+            queryClient.invalidateQueries({ queryKey: ["upcomingBookings"] });
             onSuccess();
         },
         onError: (error: any) => {
@@ -75,15 +79,22 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         isFetchingNextPage,
         isError: employeeSearchError
     } = useInfiniteQuery({
-        queryKey: ["employeeSearchInfinite", searchTerm, slotStartDateTime, selectedGameId],
+        queryKey: ["employeeSearchInfinite", debouncedSearchTerm, slotStartDateTime, selectedGameId],
         queryFn: ({ pageParam = 0 }) => 
-        apiService.searchParticipants(searchTerm, pageParam, 10, slotStartDateTime || "", selectedGameId || 0, token || ""),
+        apiService.searchParticipants(debouncedSearchTerm, pageParam, 10, slotStartDateTime || "", selectedGameId || 0, token || ""),
         initialPageParam: 0,
         getNextPageParam: (lastPage) => 
         lastPage.last ? undefined : lastPage.number + 1,
-        enabled: searchTerm.length >= 1 && !!slotStartDateTime && !!selectedGameId,
+        enabled: debouncedSearchTerm.length >= 1 && !!slotStartDateTime && !!selectedGameId,
     });
     const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
+
+    const { ref, inView } = useInView();
+    useEffect(() => {
+        if (inView && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+        }
+    }, [inView, hasNextPage, isFetchingNextPage]);
 
     const handleAddParticipant = (emp: any) => {
         if(!selectedGame) {
@@ -226,16 +237,9 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                                 );
                                 })} 
 
-                                {hasNextPage && (
-                                <Button
-                                    variant="ghost"
-                                    className="w-full text-[10px] text-blue-600 h-8"
-                                    onClick={() => fetchNextPage()}
-                                    disabled={isFetchingNextPage}
-                                >
-                                    {isFetchingNextPage ? "Loading more..." : "Show More Results"}
-                                </Button>
-                                )}
+                                <div ref={ref} className="h-10 flex justify-center items-center">
+                                    {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+                                </div>
                             </div>
                         )}
                     </div>

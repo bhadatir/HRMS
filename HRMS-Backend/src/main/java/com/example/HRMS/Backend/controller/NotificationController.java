@@ -3,6 +3,7 @@ package com.example.HRMS.Backend.controller;
 import com.example.HRMS.Backend.dto.NotificationResponse;
 import com.example.HRMS.Backend.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +22,11 @@ public class NotificationController {
     }
 
     @GetMapping("/{empId}")
-    public ResponseEntity<List<NotificationResponse>> showNotificationByEmployee(@PathVariable Long empId) {
-        return ResponseEntity.ok(notificationService.showNotificationByEmployee(empId));
+    public ResponseEntity<Page<NotificationResponse>> showNotificationByEmployee(@PathVariable Long empId,
+                                                                                 @RequestParam String searchTerm,
+                                                                                 @RequestParam(defaultValue = "0") int page,
+                                                                                 @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(notificationService.showNotificationByEmployee(empId, searchTerm, page, size));
     }
 
     @PostMapping("/markAsSeen/empId/{empId}")

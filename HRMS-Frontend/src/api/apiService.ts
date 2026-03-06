@@ -110,8 +110,8 @@ export const apiService = {
     return res.data;
   },
 
-  getUserNotifications: async (empId: number, token: string) => {
-    const res = await api.get(`/notification/${empId}`, authHeader(token));
+  getUserNotifications: async (empId: number, searchTerm: string, page: number, size: number, token: string) => {
+    const res = await api.get(`/notification/${empId}?searchTerm=${searchTerm}&page=${page}&size=${size}`, authHeader(token));
     return res.data;
   },
 
