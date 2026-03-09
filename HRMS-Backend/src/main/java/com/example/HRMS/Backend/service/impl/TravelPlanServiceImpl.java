@@ -119,11 +119,13 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             employeeTravelPlanRepository.save(employeeTravelPlan);
 
             emails.add(employee.getEmployeeEmail());
+            String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
             String htmlMessage = "<html>" +
                     "<body>" +
                     "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
                     "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
                     "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                    "<a href=\"" + link + "\">View Travel Plan</a>" +
                     "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                     "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                     "</body>" +
@@ -323,11 +325,13 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     emails1.add(employee.getEmployeeEmail());
                     addedTravelMembers.add(employee.getEmployeeEmail());
                     emailService.sendEmail(emails1,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+                    String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
                     String htmlMessage = "<html>" +
                             "<body>" +
                             "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
                             "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
                             "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                            "<a href=\"" + link + "\">View Travel Plan</a>" +
                             "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                             "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                             "</body>" +
@@ -349,11 +353,13 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     employeeTravelPlanRepository.save(employeeTravelPlan);
 
                     emails.add(employee.getEmployeeEmail());
+                    String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
                     String htmlMessage = "<html>" +
                             "<body>" +
                             "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
                             "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
                             "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                            "<a href=\"" + link + "\">View Travel Plan</a>" +
                             "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                             "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                             "</body>" +
@@ -378,11 +384,13 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 emails1.add(employee.getEmployeeEmail());
                 removedTravelMembers.add(employee.getEmployeeEmail());
                 emailService.sendEmail(emails1,"Removed from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+                String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
                 String htmlMessage = "<html>" +
                         "<body>" +
                         "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
                         "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
                         "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                        "<a href=\"" + link + "\">View Travel Plan</a>" +
                         "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                         "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                         "</body>" +
@@ -465,11 +473,13 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             List<String> emails1 = new ArrayList<>();
             emails1.add(employee1.getEmployeeEmail());
             emailService.sendEmail(emails1,"Travel Plan id deleted by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+            String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlanId;
             String htmlMessage = "<html>" +
                     "<body>" +
                     "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
                     "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
                     "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                    "<a href=\"" + link + "\">View Travel Plan</a>" +
                     "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                     "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                     "</body>" +
@@ -481,17 +491,19 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         emailService.sendEmail(emails,"Travel Plan id deleted by You at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
 
+        String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlanId;
         String htmlMessage = "<html>" +
                 "<body>" +
                 "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
                 "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
                 "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                "<a href=\"" + link + "\">View Travel Plan</a>" +
                 "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                 "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                 "</body>" +
                 "</html>";
         notificationService.createNotification(hrId,
-                "Travel Plan id deleted by You",
+                "Travel Plan is deleted by You",
                 htmlMessage);
     }
 
@@ -716,6 +728,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             for(TravelPlan travelPlan : travelPlans) {
                 List<Long> employeeIdByTravelPlanId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlan.getId());
 
+                String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlan.getId();
                 for (Long id : employeeIdByTravelPlanId) {
                     String htmlMessage = "<html>" +
                             "<body>" +
@@ -723,6 +736,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                             "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
                             "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
                             "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                            "<a href=\"" + link + "\">View Travel Plan</a>" +
                             "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                             "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                             "</body>" +

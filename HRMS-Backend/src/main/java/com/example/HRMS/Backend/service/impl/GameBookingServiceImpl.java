@@ -19,10 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -141,7 +139,7 @@ public class GameBookingServiceImpl implements GameBookingService {
         booking.setGameBookingEndTime(end);
         booking.setGameBookingCreatedAt(Instant.now());
         booking.setFkGameBookingStatus(gameBookingStatusRepository.findGameBookingStatusById(1));
-        gameBookingRepository.save(booking);
+        GameBooking saveGame = gameBookingRepository.save(booking);
 
         hostInterest.setPlayedInCurrentCycle(hostInterest.getPlayedInCurrentCycle() + 1);
         employeeGameInterestRepository.save(hostInterest);
@@ -159,11 +157,14 @@ public class GameBookingServiceImpl implements GameBookingService {
             pInterest.setPlayedInCurrentCycle(pInterest.getPlayedInCurrentCycle() + 1);
             employeeGameInterestRepository.save(pInterest);
 
+            String url = "http://localhost:5173/game-management?gameBookingId=" + saveGame.getId();
+
             String htmlMessage = "<html>" +
                     "<body>" +
                     "<p><strong>Game Name:</strong> " + type.getGameName() + "</p>" +
                     "<p><strong>Host Email:</strong> " + host.getEmployeeEmail() + "</p>" +
                     "<p><strong>Slot Time:</strong> " + start.toLocalDate() + " : " + start.toLocalTime() + "</p>" +
+                    "<a href=\"" + url + "\">View Game Booking</a>" +
                     "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                     "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                     "</body>" +
@@ -268,10 +269,13 @@ public class GameBookingServiceImpl implements GameBookingService {
             return;
         }
         for (GameBooking gameBooking : upcomingBooking) {
+            String url = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
+
             String htmlMessage = "<html>" +
                     "<body>" +
                     "<p><strong>Message:</strong> your " + gameBooking.getFkGameType().getGameName() + " Game is start after half hour.</p>" +
                     "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
+                    "<a href=\"" + url + "\">View Game Booking</a>" +
                     "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                     "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                     "</body>" +
@@ -346,10 +350,13 @@ public class GameBookingServiceImpl implements GameBookingService {
                 employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() + 1);
                 employeeGameInterestRepository.save(employeeGameInterest);
             }
+            String url = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
+
             String htmlMessage = "<html>" +
                     "<body>" +
                     "<p><strong>Message:</strong> You have been promoted to your requested slot for " + bookingWaitingList.getFkGameType().getGameName() + "</p>" +
                     "<p><strong>Slot Time:</strong> " + bookingWaitingList.getTargetSlotDatetime().toLocalDate() + " : " + bookingWaitingList.getTargetSlotDatetime().toLocalTime() + "</p>" +
+                    "<a href=\"" + url + "\">View Game Booking</a>" +
                     "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                     "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                     "</body>" +
@@ -366,10 +373,13 @@ public class GameBookingServiceImpl implements GameBookingService {
         employeeGameInterestRepository.save(employeeGameInterest);
 
         waitlistRepository.delete(bookingWaitingList);
+        String url = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
+
         String htmlMessage = "<html>" +
                 "<body>" +
                 "<p><strong>Message:</strong> You have been promoted to your requested slot for " + bookingWaitingList.getFkGameType().getGameName() + "</p>" +
                 "<p><strong>Slot Time:</strong> " + bookingWaitingList.getTargetSlotDatetime().toLocalDate() + " : " + bookingWaitingList.getTargetSlotDatetime().toLocalTime() + "</p>" +
+                "<a href=\"" + url + "\">View Game Booking</a>" +
                 "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                 "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                 "</body>" +
@@ -596,11 +606,14 @@ public class GameBookingServiceImpl implements GameBookingService {
                 bookingParticipantRepository.save(bookingParticipant);
 
                 emails.add(employee.getEmployeeEmail());
+                String url = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
+
                 String htmlMessage = "<html>" +
                         "<body>" +
                         "<p><strong>Message:</strong> You are added in Game booking by your friend " + gameBooking.getFkHostEmployee().getEmployeeEmail() + " </p>" +
                         "<p><strong>Game Name:</strong> " + gameBooking.getFkGameType().getGameName() + "</p>" +
                         "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
+                        "<a href=\"" + url + "\">View Game Booking</a>" +
                         "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                         "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                         "</body>" +

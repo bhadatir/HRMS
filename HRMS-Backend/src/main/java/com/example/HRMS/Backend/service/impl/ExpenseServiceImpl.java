@@ -209,12 +209,14 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setExpenseStatusChangeBy(email);
         expenseRepository.save(expense);
 
+        String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlan.getId();
         String htmlMessage = "<html>" +
                 "<body>" +
                 "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
                 "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
                 "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
                 "<p><strong>Status:</strong> " + expenseStatusRepository.findExpenseStatusById(statusId).getExpenseStatusName() + "</p>" +
+                "<a href=\"" + link + "\">View Travel Plan</a>" +
                 "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                 "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                 "</body>" +
@@ -291,11 +293,13 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseProofRepository.save(expenseProof);
 
         }
+        String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlan.getId();
         String htmlMessage = "<html>" +
                 "<body>" +
                 "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
                 "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
                 "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                "<a href=\"" + link + "\">View Travel Plan</a>" +
                 "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                 "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                 "</body>" +

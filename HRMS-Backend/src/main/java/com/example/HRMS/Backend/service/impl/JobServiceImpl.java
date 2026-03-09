@@ -226,10 +226,12 @@ public class JobServiceImpl implements JobService {
 
 
         referFriendRepository.save(referFriend);
+        String link = "http://localhost:5173/job-management?jobId=" + referFriendRequest.getFkJobId();
         String htmlMessage = "<html>" +
                 "<body>" +
                 "<p><strong>By:</strong> " + employee.getEmployeeEmail() + "</p>" +
                 "<p><strong>For Job:</strong> " + job.getJobTitle() + "</p>" +
+                "<a href=\"" + link + "\">View Job</a>" +
                 "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                 "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                 "</body>" +
@@ -308,11 +310,13 @@ public class JobServiceImpl implements JobService {
         ));
         referFriend.setReasonForCvStatusChange(reason);
         referFriendRepository.save(referFriend);
+        String link = "http://localhost:5173/job-management?jobId=" + job.getId();
         String htmlMessage = "<html>" +
                 "<body>" +
                 "<p><strong>Status:</strong> " + cvStatusTypeRepository.findCvStatusTypeById(statusId).getCvStatusTypeName() + "</p>" +
                 "<p><strong>Updated by:</strong> " + referFriend.getFkJob().getFkJobOwnerEmployee().getEmployeeEmail() + "</p>" +
                 "<p><strong>Job:</strong> " + referFriend.getFkJob().getJobTitle() + "</p>" +
+                "<a href=\"" + link + "\">View Job</a>" +
                 "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
                 "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
                 "</body>" +
