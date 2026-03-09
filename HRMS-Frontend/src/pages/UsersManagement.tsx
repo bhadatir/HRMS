@@ -82,6 +82,7 @@ export default function JobManagement() {
               onChange={(e) => {
                 setSearchTerm(e.target.value);
               }}
+              autoFocus
             />
           </div>
           

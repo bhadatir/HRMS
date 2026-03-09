@@ -1,14 +1,16 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.*;
-import com.example.HRMS.Backend.repository.EmployeeRepository;
-import com.example.HRMS.Backend.repository.TravelPlanRepository;
+import com.example.HRMS.Backend.model.Employee;
+import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +29,9 @@ public class UserController {
     private final AuthService authService;
     private final EmployeeRepository employeeRepository;
     private final TravelPlanRepository travelPlanRepository;
+    private final JobRepository jobRepository;
+    private final PostRepository postRepository;
+    private final GameBookingRepository gameBookingRepository;
 
     @GetMapping("/email")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) {
@@ -81,13 +86,18 @@ public class UserController {
         authService.logout();
     }
 
-        @GetMapping("/global-search")
+    @GetMapping("/global-search")
     public ResponseEntity<GlobalSearchResponse> globalSearch(
             @RequestParam String searchTerm,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
+                () -> new RuntimeException("employee not found.")
+        );
 
         Page<GlobalSearchResult> employeePage = employeeRepository
                 .findAllBySearchTerm(searchTerm, pageable)
@@ -105,7 +115,31 @@ public class UserController {
                         t.getTravelPlanDetails(),
                         "TRAVEL_PLAN" ));
 
-        return ResponseEntity.ok(new GlobalSearchResponse(employeePage, travelPage));
+        Page<GlobalSearchResult> jobPage = jobRepository
+                .findJobBySearchTeam(searchTerm, pageable)
+                .map(j -> new GlobalSearchResult(
+                        j.getId(),
+                        j.getJobTitle(),
+                        j.getFkJobType().getJobTypeName(),
+                        "JOB" ));
+
+        Page<GlobalSearchResult> postPage = postRepository
+                .searchPosts(searchTerm, pageable)
+                .map(p -> new GlobalSearchResult(
+                        p.getId(),
+                        p.getPostTitle(),
+                        p.getPostContent(),
+                        "POST" ));
+
+        Page<GlobalSearchResult> gameBookingPage = gameBookingRepository
+                .findBookingsByUserAndSearch(employee.getId(), searchTerm, pageable)
+                .map(g -> new GlobalSearchResult(
+                        g.getId(),
+                        g.getFkGameType().getGameName(),
+                        g.getFkHostEmployee().getEmployeeEmail(),
+                        "GAME_BOOKING" ));
+
+        return ResponseEntity.ok(new GlobalSearchResponse(employeePage, travelPage, jobPage, postPage, gameBookingPage));
     }
 
 }

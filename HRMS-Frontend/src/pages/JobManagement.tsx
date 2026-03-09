@@ -32,6 +32,15 @@ export default function JobManagement() {
   const [jobType, setJobType] = useState(0);
   const debouncedSearchTerm = useAppDebounce(searchTerm);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const jobId = urlParams.get("jobId");
+    
+    if (jobId) {
+      setSearchTerm(jobId);
+    }
+  }, []);
+
   const {
     data: allJobsData,
     fetchNextPage,
@@ -112,6 +121,7 @@ export default function JobManagement() {
               className="pl-9"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              autoFocus
             />
           </div>
 

@@ -16,7 +16,8 @@ public interface JobRepository extends JpaRepository<Job,Long> {
     @NotNull(message = "which job you share? that job id is required") Job getJobById(Long id);
 
     @Query("SELECT j FROM Job j " +
-            "WHERE (lower(j.jobTitle) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "WHERE (CAST(j.id AS string) LIKE concat('%', :searchTerm, '%') " +
+            "OR lower(j.jobTitle) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR CAST(j.jobSalary AS string) LIKE concat('%', :searchTerm, '%') " +
             "OR lower(j.fkJobType.jobTypeName) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR CAST(j.jobCreatedAt AS string) LIKE concat('%', :searchTerm, '%') " +

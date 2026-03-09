@@ -66,6 +66,7 @@ public interface TravelPlanRepository extends JpaRepository<TravelPlan, Long> {
             "OR lower(tp.travelPlanDetails) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR lower(tp.travelPlanFrom) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR lower(tp.travelPlanTo) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR lower(tp.fkTravelPlanHREmployee.employeeEmail) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR CAST(tp.travelPlanStartDate AS string) LIKE concat('%', :searchTerm, '%') " +
             "OR CAST(tp.travelPlanEndDate AS string) LIKE concat('%', :searchTerm, '%')) " +
             "ORDER BY tp.travelPlanCreatedAt DESC")

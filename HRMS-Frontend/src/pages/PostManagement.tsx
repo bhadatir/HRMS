@@ -29,9 +29,9 @@ export default function PostManagement() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const employeeEmail = urlParams.get("employeeEmail");
-    if (employeeEmail) {
-      setSearchTerm(employeeEmail);
+    const postId = urlParams.get("postId");
+    if (postId) {
+      setSearchTerm(postId);
     }
   }, []);
   
@@ -101,6 +101,7 @@ export default function PostManagement() {
               onChange={(e) => {
                 setSearchTerm(e.target.value);
               }}
+              autoFocus
             />
           </div>
 

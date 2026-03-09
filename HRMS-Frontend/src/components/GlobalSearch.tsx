@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useGlobalSearch } from "@/hooks/useInfinite";
-import { User, Plane, Loader2, X } from "lucide-react"; 
+import { User, Plane, Loader2, X, Search } from "lucide-react"; 
 import { Button } from "./ui/button";
 
 export function GlobalSearch() {
@@ -43,6 +43,15 @@ export function GlobalSearch() {
     if(type == "TRAVEL_PLAN"){
         navigate(`/travel-plan?travelPlanId=${id}`)
     }
+    if(type == "JOB"){
+        navigate(`/job-management?jobId=${id}`)
+    }
+    if(type == "POST"){
+        navigate(`/post-management?postId=${id}`)
+    }
+    if(type == "GAME_BOOKING"){
+        navigate(`/game-management?gameBookingId=${id}`)
+    }
   };
 
   return (
@@ -53,17 +62,19 @@ export function GlobalSearch() {
         <div> 
           <DialogTitle>Global Search</DialogTitle>
           <DialogDescription>
-          Search for employees and travel plans across the organization.
+          Search for employees, travel plans, jobs, posts and game bookings across the organization.
           </DialogDescription>
         </div>
     
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center border-b px-3">
+              <Search className="h-4 w-4 text-slate-400" />
               <Command.Input 
               placeholder="Search..." 
               className="flex h-8 p-2 m-4 w-full rounded-md bg-transparent text-sm"
               value={search}
               onValueChange={setSearch} 
+              autoFocus
               />
           </div>
           {isFetching && <Loader2 className="ml-2 h-4 w-4 animate-spin text-slate-400" />}
@@ -92,47 +103,113 @@ export function GlobalSearch() {
             <Command.Empty>No results found for "{search}".</Command.Empty>
         )}
 
-        {latestResults?.employees?.content?.length > 0 && (
-          <Command.Group heading={
-            <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
-              <User size={14} /> <span>Employees</span>
-            </div>
-          }>
-            {latestResults?.employees?.content?.map((emp: any) => (
-              <Command.Item 
-                key={`emp-${emp.id}`} 
-                onSelect={() => handleSelect(emp.type, emp.id)}
-                className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-slate-100"
-              >
-                <div className="flex flex-col">
-                  <span className="font-medium">{emp.title}</span>
-                  <span className="text-[10px] text-slate-400">{emp.subtitle}</span>
-                </div>
-              </Command.Item>
-            ))}
-          </Command.Group>
-        )}
+        <div className="flex">
+          {latestResults?.employees?.content?.length > 0 && (
+            <Command.Group heading={
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
+                <User size={14} /> <span>Employees</span>
+              </div>
+            }>
+              {latestResults?.employees?.content?.map((emp: any) => (
+                <Command.Item 
+                  key={`emp-${emp.id}`} 
+                  onSelect={() => handleSelect(emp.type, emp.id)}
+                  className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-slate-100"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{emp.title}</span>
+                    <span className="text-[10px] text-slate-400">{emp.subtitle}</span>
+                  </div>
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
 
-        {latestResults?.travelPlans?.content?.length > 0 && (
-          <Command.Group heading={
-            <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-green-600">
-              <Plane size={14} /> <span>Travel Plans</span>
-            </div>
-          }>
-            {latestResults?.travelPlans?.content?.map((plan: any) => (
-              <Command.Item 
-                key={`plan-${plan.id}`} 
-                onSelect={() => handleSelect(plan.type, plan.id)}
-                className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-slate-100"
-              >
-                <div className="flex flex-col">
-                  <span className="font-medium">{plan.title}</span>
-                  <span className="text-[10px] text-slate-400">{plan.subtitle}</span>
-                </div>
-              </Command.Item>
-            ))}
-          </Command.Group>
-        )}
+          {latestResults?.travelPlans?.content?.length > 0 && (
+            <Command.Group heading={
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-green-600">
+                <Plane size={14} /> <span>Travel Plans</span>
+              </div>
+            }>
+              {latestResults?.travelPlans?.content?.map((plan: any) => (
+                <Command.Item 
+                  key={`plan-${plan.id}`} 
+                  onSelect={() => handleSelect(plan.type, plan.id)}
+                  className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-slate-100"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{plan.title}</span>
+                    <span className="text-[10px] text-slate-400">{plan.subtitle}</span>
+                  </div>
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
+
+          {latestResults?.job?.content?.length > 0 && (
+            <Command.Group heading={
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
+                <User size={14} /> <span>Jobs</span>
+              </div>
+            }>
+              {latestResults?.job?.content?.map((job: any) => (
+                <Command.Item 
+                  key={`job-${job.id}`} 
+                  onSelect={() => handleSelect(job.type, job.id)}
+                  className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-slate-100"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{job.title}</span>
+                    <span className="text-[10px] text-slate-400">{job.subtitle}</span>
+                  </div>
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
+
+          {latestResults?.post?.content?.length > 0 && (
+            <Command.Group heading={
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
+                <User size={14} /> <span>Posts</span>
+              </div>
+            }>
+              {latestResults?.post?.content?.map((post: any) => (
+                <Command.Item 
+                  key={`post-${post.id}`} 
+                  onSelect={() => handleSelect(post.type, post.id)}
+                  className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-slate-100"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{post.title}</span>
+                    <span className="text-[10px] text-slate-400">{post.subtitle}</span>
+                  </div>
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
+
+          {latestResults?.gameBooking?.content?.length > 0 && (
+            <Command.Group heading={
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
+                <User size={14} /> <span>Game Bookings</span>
+              </div>
+            }>
+              {latestResults?.gameBooking?.content?.map((gameBooking: any) => (
+                <Command.Item 
+                  key={`gameBooking-${gameBooking.id}`} 
+                  onSelect={() => handleSelect(gameBooking.type, gameBooking.id)}
+                  className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-slate-100"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{gameBooking.title}</span>
+                    <span className="text-[10px] text-slate-400">{gameBooking.subtitle}</span>
+                  </div>
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
+
+        </div>
       </Command.List>
     </Command.Dialog>
   );

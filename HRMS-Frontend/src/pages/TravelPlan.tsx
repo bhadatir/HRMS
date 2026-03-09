@@ -150,6 +150,7 @@ export default function TravelPlan() {
               onChange={(e) => {
                 setSearchTerm(e.target.value);
               }}
+              autoFocus
             />
           </div>
 

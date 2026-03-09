@@ -22,7 +22,8 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
                 "LEFT JOIN BookingParticipant bp ON bp.fkGameBooking.id = b.id " +
                 "WHERE (b.fkHostEmployee.id = :empId OR bp.fkEmployee.id = :empId) " +
                 "AND b.gameBookingIsDeleted = false " +
-                "AND (lower(b.fkGameType.gameName) LIKE lower(concat('%', :searchTerm, '%')) " +
+                "AND (CAST(b.id AS string) LIKE concat('%', :searchTerm, '%') " +
+                "OR lower(b.fkGameType.gameName) LIKE lower(concat('%', :searchTerm, '%')) " +
                 "OR CAST(b.gameBookingStartTime AS string) LIKE (concat('%', :searchTerm, '%')) " +
                 "OR CAST(b.gameBookingEndTime AS string) LIKE (concat('%', :searchTerm, '%')) " +
                 "OR CAST(b.gameBookingCreatedAt AS string) LIKE (concat('%', :searchTerm, '%')) " +

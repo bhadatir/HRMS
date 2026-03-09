@@ -87,6 +87,7 @@ export default function OrganizationChart() {
                   setShowDropdown(true);
                 }}
                 onFocus={() => setShowDropdown(true)}
+                autoFocus
               />
             </div>
 

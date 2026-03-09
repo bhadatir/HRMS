@@ -19,7 +19,8 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     LEFT JOIN PostTag pt ON pt.fkPost.id = p.id
     LEFT JOIN pt.fkTagType tt
     WHERE (
-        p.postTitle LIKE %:query%
+        CAST(p.id as string) LIKE %:query%
+        OR p.postTitle LIKE %:query%
         OR p.fkPostEmployee.employeeFirstName LIKE %:query%
         OR p.fkPostEmployee.employeeEmail LIKE %:query%
         OR p.fkPostVisibility.postVisibilityName LIKE %:query%

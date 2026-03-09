@@ -57,6 +57,7 @@ export default function TeamMemberData() {
               className="pl-9"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              autoFocus
             />
           </div>
           

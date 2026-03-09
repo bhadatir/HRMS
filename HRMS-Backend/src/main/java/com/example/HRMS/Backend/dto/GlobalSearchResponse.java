@@ -11,4 +11,7 @@ import org.springframework.data.domain.Page;
 public class GlobalSearchResponse {
     Page<GlobalSearchResult> employees;
     Page<GlobalSearchResult> travelPlans;
+    Page<GlobalSearchResult> job;
+    Page<GlobalSearchResult> post;
+    Page<GlobalSearchResult> gameBooking;
 }

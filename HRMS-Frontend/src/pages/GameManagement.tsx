@@ -36,6 +36,14 @@ export default function GameManagement() {
     const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
     const debouncedWaitingListSearchTerm = useAppDebounce(waitingListSearchTerm);
 
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const gameBookingId = urlParams.get("gameBookingId");
+        if (gameBookingId) {
+        setBookingSearchTerm(gameBookingId);
+        }
+    }, []);
+
     const { data: gameTypes = [], isError: gameTypesOnError } = useQuery({
         queryKey: ["gameTypes"],
         queryFn: () => gameService.getAllGames(token!)
@@ -245,6 +253,7 @@ export default function GameManagement() {
                                         setWaitingListSearchTerm(e.target.value);
                                     }
                                     }}
+                                    autoFocus
                                 />
                             </div>
                             {viewMode === "My Bookings" && <select className="border rounded-md px-2 py-1 text-sm" value={gameBookingStatusId || ""} 
