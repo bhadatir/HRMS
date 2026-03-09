@@ -136,7 +136,21 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
         }
 
-        emailService.sendEmail(emails,"Travel Plan",travelPlanRequest.getTravelPlanDetails());
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<h3>you are added in Travel Plan </h3>" +
+                "<p><strong>By:</strong> " + savedTravelplan.getFkTravelPlanHREmployee().getEmployeeEmail() + "</p>" +
+                "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
+                "<p><strong>Travel Plan End Date:</strong> " + travelPlanRequest.getTravelPlanEndDate() + "</p>" +
+                "<p><strong>Travel Plan From:</strong> " + travelPlanRequest.getTravelPlanFrom() +
+                " <strong>To:</strong> " + travelPlanRequest.getTravelPlanTo() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails,
+                "you are added in Travel Plan: " + travelPlanRequest.getTravelPlanName() ,htmlMessage);
     }
 
     @Override
@@ -178,8 +192,21 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     ,"your game booking waiting list entry is removed by HR"
                     ,htmlMessage);
 
-            emailService.sendEmail(emails,"your game booking waiting list entry is at :" + Instant.now()
-                    , " date: " + wait.getTargetSlotDatetime() + " game type: "+ wait.getFkGameType().getGameName() +" details : " + details);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String hrEmail = authentication.getName();
+            String htmlEmailMessage = "<html>" +
+                    "<body>" +
+                    "<h3>your " + wait.getFkGameType().getGameName() + " Game waiting list entry is removed </h3>" +
+                    "<p><strong>By:</strong> " + hrEmail + "</p>" +
+                    "<p><strong>Game Name:</strong> " + wait.getFkGameType().getGameName() + "</p>" +
+                    "<p><strong>Slot Time:</strong> " + wait.getTargetSlotDatetime() + "</p>" +
+                    "<p><strong>Game Details:</strong> " + details + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p>This is an automated notification mail.</p>" +
+                    "</body>" +
+                    "</html>";
+            emailService.sendEmail(emails,"Your " + wait.getFkGameType().getGameName() + " Game waiting list entry is removed by Hr",htmlEmailMessage);
+
         }
     }
 
@@ -243,9 +270,21 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             notificationService.createNotification(booking.getFkHostEmployee().getId()
                     ,"your game booking is removed by HR"
                     , htmlMessage);
-            emailService.sendEmail(emails,"your game booking is removed at :" + Instant.now()
-                    , " date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" details : " + details);
 
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String hrEmail = authentication.getName();
+            String htmlEmailMessage = "<html>" +
+                    "<body>" +
+                    "<h3>your " + booking.getFkGameType().getGameName() + " Game booking entry is removed </h3>" +
+                    "<p><strong>By:</strong> " + hrEmail + "</p>" +
+                    "<p><strong>Game Name:</strong> " + booking.getFkGameType().getGameName() + "</p>" +
+                    "<p><strong>Slot Time:</strong> " + booking.getGameBookingStartTime() + "</p>" +
+                    "<p><strong>Game Details:</strong> " + details + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p>This is an automated notification mail.</p>" +
+                    "</body>" +
+                    "</html>";
+            emailService.sendEmail(emails,"Your " + booking.getFkGameType().getGameName() + " Game Booking entry is removed by Hr",htmlEmailMessage);
         }
 
         gameBookingRepository.saveAll(conflicts);
@@ -324,7 +363,21 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     List<String> emails1 = new ArrayList<>();
                     emails1.add(employee.getEmployeeEmail());
                     addedTravelMembers.add(employee.getEmployeeEmail());
-                    emailService.sendEmail(emails1,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+                    String htmlEmailMessage = "<html>" +
+                            "<body>" +
+                            "<h3>you are readded in Travel Plan </h3>" +
+                            "<p><strong>By:</strong> " + savedTravelplan.getFkTravelPlanHREmployee().getEmployeeEmail() + "</p>" +
+                            "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                            "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
+                            "<p><strong>Travel Plan End Date:</strong> " + travelPlanRequest.getTravelPlanEndDate() + "</p>" +
+                            "<p><strong>Travel Plan From:</strong> " + travelPlanRequest.getTravelPlanFrom() +
+                            " <strong>To:</strong> " + travelPlanRequest.getTravelPlanTo() + "</p>" +
+                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                            "<p>This is an automated notification mail.</p>" +
+                            "</body>" +
+                            "</html>";
+                    emailService.sendEmail(emails1,"You are reAdded in Travel Plan " + travelPlanRequest.getTravelPlanName() + " by Hr",htmlEmailMessage);
+
                     String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
                     String htmlMessage = "<html>" +
                             "<body>" +
@@ -383,7 +436,22 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 List<String> emails1 = new ArrayList<>();
                 emails1.add(employee.getEmployeeEmail());
                 removedTravelMembers.add(employee.getEmployeeEmail());
-                emailService.sendEmail(emails1,"Removed from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+
+                String htmlEmailMessage = "<html>" +
+                        "<body>" +
+                        "<h3>you are removed from Travel Plan </h3>" +
+                        "<p><strong>By:</strong> " + savedTravelplan.getFkTravelPlanHREmployee().getEmployeeEmail() + "</p>" +
+                        "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                        "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
+                        "<p><strong>Travel Plan End Date:</strong> " + travelPlanRequest.getTravelPlanEndDate() + "</p>" +
+                        "<p><strong>Travel Plan From:</strong> " + travelPlanRequest.getTravelPlanFrom() +
+                        " <strong>To:</strong> " + travelPlanRequest.getTravelPlanTo() + "</p>" +
+                        "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                        "<p>This is an automated notification mail.</p>" +
+                        "</body>" +
+                        "</html>";
+                emailService.sendEmail(emails1,"You are Removed from Travel Plan " + travelPlanRequest.getTravelPlanName() + " by Hr",htmlEmailMessage);
+
                 String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
                 String htmlMessage = "<html>" +
                         "<body>" +
@@ -403,7 +471,21 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         }
 
         if(!emails.isEmpty()){
-            emailService.sendEmail(emails,"Travel Plan",travelPlanRequest.getTravelPlanDetails());
+            String htmlEmailMessage = "<html>" +
+                    "<body>" +
+                    "<h3>you are added in Travel Plan </h3>" +
+                    "<p><strong>By:</strong> " + savedTravelplan.getFkTravelPlanHREmployee().getEmployeeEmail() + "</p>" +
+                    "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                    "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
+                    "<p><strong>Travel Plan End Date:</strong> " + travelPlanRequest.getTravelPlanEndDate() + "</p>" +
+                    "<p><strong>Travel Plan From:</strong> " + travelPlanRequest.getTravelPlanFrom() +
+                    " <strong>To:</strong> " + travelPlanRequest.getTravelPlanTo() + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p>This is an automated notification mail.</p>" +
+                    "</body>" +
+                    "</html>";
+            emailService.sendEmail(emails,"You are added in Travel Plan " + travelPlanRequest.getTravelPlanName() + " by Hr",htmlEmailMessage);
+
         }
 
         log.setAddedTravelMembers(addedTravelMembers);
@@ -472,7 +554,22 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             Employee employee1 = employeeRepository.findEmployeeById(empId);
             List<String> emails1 = new ArrayList<>();
             emails1.add(employee1.getEmployeeEmail());
-            emailService.sendEmail(emails1,"Travel Plan id deleted by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+
+            String htmlEmailMessage = "<html>" +
+                    "<body>" +
+                    "<h3>Travel Plan is deleted </h3>" +
+                    "<p><strong>By:</strong> " + travelPlan.getFkTravelPlanHREmployee().getEmployeeEmail() + "</p>" +
+                    "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                    "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
+                    "<p><strong>Travel Plan End Date:</strong> " + travelPlan.getTravelPlanEndDate() + "</p>" +
+                    "<p><strong>Travel Plan From:</strong> " + travelPlan.getTravelPlanFrom() +
+                    " <strong>To:</strong> " + travelPlan.getTravelPlanTo() + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p>This is an automated notification mail.</p>" +
+                    "</body>" +
+                    "</html>";
+            emailService.sendEmail(emails1,"Travel Plan " + travelPlan.getTravelPlanName() + " is deleted by Hr",htmlEmailMessage);
+
             String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlanId;
             String htmlMessage = "<html>" +
                     "<body>" +
@@ -489,7 +586,20 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     htmlMessage);
         }
 
-        emailService.sendEmail(emails,"Travel Plan id deleted by You at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+        String htmlEmailMessage = "<html>" +
+                "<body>" +
+                "<h3>Travel Plan is deleted</h3>" +
+                "<p><strong>By You:</strong> " + travelPlan.getFkTravelPlanHREmployee().getEmployeeEmail() + "</p>" +
+                "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
+                "<p><strong>Travel Plan End Date:</strong> " + travelPlan.getTravelPlanEndDate() + "</p>" +
+                "<p><strong>Travel Plan From:</strong> " + travelPlan.getTravelPlanFrom() +
+                    " <strong>To:</strong> " + travelPlan.getTravelPlanTo() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails,"Travel Plan " + travelPlan.getTravelPlanName() + " is deleted by you",htmlEmailMessage);
 
         String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlanId;
         String htmlMessage = "<html>" +

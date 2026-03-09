@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ExpenseService {
-    void saveExpense(ExpenseRequest expenseRequest);
 
     void saveExpenseProof(Long proofTypeId, Long expenseId, MultipartFile file) throws IOException;
 

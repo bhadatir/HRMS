@@ -337,9 +337,8 @@ export default function TravelPlan() {
                         </Button>
                         ):(<></>)}
 
-                        { (user?.roleName !== "HR" || (user?.roleName === "HR" && user?.id !== plan.employeeId 
-                            && plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false)
-                         )) 
+                        { (user?.roleName !== "HR" || (user?.roleName === "HR" && user?.id !== plan.employeeId )) &&
+                          (plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false))
                           && user?.roleName !== "ADMIN"
                           && !plan.travelPlanIsDeleted ? ((() => {
                           const now = new Date().getTime();

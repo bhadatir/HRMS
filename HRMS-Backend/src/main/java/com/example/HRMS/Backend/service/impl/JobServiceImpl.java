@@ -163,7 +163,18 @@ public class JobServiceImpl implements JobService {
 
         List<String> emails = jobShareRequest.getEmails();
 
-        emailService.sendEmailWithAttachment(emails,job.getJobTitle(),"job summary",job.getJobDescriptionUrl());
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<h3>New Job Share Request Received</h3>" +
+                "<p><strong>By:</strong> " + employeeRepository.findEmployeeById(jobShareRequest.getFkJobShareEmployeeId()).getEmployeeEmail() + "</p>" +
+                "<p><strong>For Job:</strong> " + job.getJobTitle() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmailWithAttachment(emails,
+                "New Job Share Request: " + job.getJobTitle() ,htmlMessage,
+                job.getJobDescriptionUrl());
 
         for(String email : emails){
             JobShareTo jobShareTo = new JobShareTo();
@@ -244,13 +255,21 @@ public class JobServiceImpl implements JobService {
 
         File savedFile = new File(System.getProperty("user.dir") + "/" + folderPath + filePath);
         if(savedFile.exists() && savedFile.canRead()) {
+            String htmlEmailMessage = "<html>" +
+                    "<body>" +
+                    "<h3>New Refer Friend Request</h3>" +
+                    "<p><strong>By:</strong> " + employee.getEmployeeEmail() + "</p>" +
+                    "<p><strong>For Job:</strong> " + job.getJobTitle() + "</p>" +
+                    "<p><strong>Refer Friend Details:</strong></p>" +
+                    "<p><strong>Friend Name:</strong> " + referFriendRequest.getReferFriendName() + "</p>" +
+                    "<p><strong>Friend Email:</strong> " + referFriendRequest.getReferFriendEmail() + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p>This is an automated notification mail.</p>" +
+                    "</body>" +
+                    "</html>";
             emailService.sendEmailWithAttachment(emails,
-                    job.getId() + " " + job.getJobTitle(),
-                    "refer friend details : " + "\n"
-                            + "email : " + referFriendRequest.getReferFriendEmail()
-                            + "name : " + referFriendRequest.getReferFriendName()
-                            + "employee detail : " + employee.getId() + " " + employee.getEmployeeEmail()
-                    , url + filePath);
+                    "New Refer Friend Request For: " + job.getJobTitle() ,htmlEmailMessage,
+                    url + filePath);
         }
         else {
             throw new IOException("file not found at : "+savedFile.getAbsolutePath());

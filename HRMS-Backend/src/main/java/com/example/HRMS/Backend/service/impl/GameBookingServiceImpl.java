@@ -15,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -175,7 +177,17 @@ public class GameBookingServiceImpl implements GameBookingService {
             emails.add(p.getEmployeeEmail());
         }
 
-        emailService.sendEmail(emails, "Slot Confirmed!", "Booking confirmed for " + type.getGameName() + " at " + start);
+        String htmlEmailMessage = "<html>" +
+                "<body>" +
+                "<h3>your " + type.getGameName() + " Game Slot is conformed.</h3>" +
+                "<p><strong>Game Name:</strong> " + type.getGameName() + "</p>" +
+                "<p><strong>Host Email:</strong> " + host.getEmployeeEmail() + "</p>" +
+                "<p><strong>Slot Time:</strong> " + start.toLocalDate() + " : " + start.toLocalTime() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails,"Your " + type.getGameName() + " Game Slot is conformed !",htmlEmailMessage);
         return "Booking confirmed!";
     }
 
@@ -634,7 +646,18 @@ public class GameBookingServiceImpl implements GameBookingService {
                     Employee employee = employeeRepository.findEmployeeById(id);
                     List<String> emails1 = new ArrayList<>();
                     emails1.add(employee.getEmployeeEmail());
-                    emailService.sendEmail(emails1, "Remove from booking", "Removed from Game Booking by your friend at :" + Instant.now());
+
+                    String htmlEmailMessage = "<html>" +
+                            "<body>" +
+                            "<h3>your are removed from " + gameBooking.getFkGameType().getGameName() + " Game booking by your friend.</h3>" +
+                            "<p><strong>Game Name:</strong> " + gameBooking.getFkGameType().getGameName() + "</p>" +
+                            "<p><strong>Host Email:</strong> " + gameBooking.getFkHostEmployee().getEmployeeEmail() + "</p>" +
+                            "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
+                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                            "<p>This is an automated notification mail.</p>" +
+                            "</body>" +
+                            "</html>";
+                    emailService.sendEmail(emails1,"You are removed from " + gameBooking.getFkGameType().getGameName() + " Game Booking By your friend",htmlEmailMessage);
 
                     String htmlMessage = "<html>" +
                             "<body>" +
@@ -653,7 +676,17 @@ public class GameBookingServiceImpl implements GameBookingService {
         }
 
         if (!emails.isEmpty()) {
-            emailService.sendEmail(emails, "Game Booking complete", "You are added in Game booking by your friend at :" + Instant.now());
+            String htmlEmailMessage = "<html>" +
+                    "<body>" +
+                    "<h3>your are added in " + gameBooking.getFkGameType().getGameName() + " Game booking by your friend.</h3>" +
+                    "<p><strong>Game Name:</strong> " + gameBooking.getFkGameType().getGameName() + "</p>" +
+                    "<p><strong>Host Email:</strong> " + gameBooking.getFkHostEmployee().getEmployeeEmail() + "</p>" +
+                    "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p>This is an automated notification mail.</p>" +
+                    "</body>" +
+                    "</html>";
+            emailService.sendEmail(emails,"You are added in " + gameBooking.getFkGameType().getGameName() + " Game Booking By your friend",htmlEmailMessage);
         }
     }
 

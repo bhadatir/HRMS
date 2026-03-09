@@ -39,55 +39,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final ExpenseProofTypeRepository expenseProofTypeRepository;
     private final ExpenseProofRepository expenseProofRepository;
-    private final EmailService emailService;
     private final ModelMapper modelMapper;
-    private final TravelDocRepository travelDocRepository;
     private final NotificationService notificationService;
     private final AuthService authService;
-
-    @Override
-    public void saveExpense(ExpenseRequest expenseRequest){
-
-        Expense expense = new Expense();
-
-        EmployeeTravelPlan employeeTravelPlan = employeeTravelPlanRepository.findEmployeeTravelPlanById(expenseRequest.getFkEmployeeTravelPlanId());
-
-        if(employeeTravelPlan == null || employeeTravelPlan.getEmployeeIsDeletedFromTravel() ){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employee travel plan not found or you are deleted from this travel.");
-        }
-
-        TravelPlan travelPlan = employeeTravelPlan.getFkTravelPlan();
-
-        if(Boolean.TRUE.equals(travelPlan.getTravelPlanIsDeleted())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "closed travel plan cannot be add expenses.");
-        }
-
-        LocalDate travelStartDate = travelPlan.getTravelPlanStartDate();
-        LocalDate travelEndDate = travelPlan.getTravelPlanEndDate();
-        LocalDate travelAddDeadLine = travelEndDate.plusDays(10);
-
-        if(!LocalDate.now().isBefore(travelAddDeadLine) && !LocalDate.now().isAfter(travelStartDate)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only add expense between travel plan Start date and after ending travel plan 10 days duration.");
-        }
-
-        ExpenseStatus expenseStatus = expenseStatusRepository.findExpenseStatusById(1L);
-        expense.setExpenseAmount(expenseRequest.getExpenseAmount());
-        expense.setExpenseDate(expenseRequest.getExpenseDate());
-        expense.setExpenseRemark(expenseRequest.getExpenseRemark());
-        expense.setFkEmployeeTravelPlan(employeeTravelPlan);
-        expense.setFkExpenseExpenseStatus(expenseStatus);
-        expenseRepository.save(expense);
-
-        List<String> emails = new ArrayList<>();
-        Employee employee = travelPlan.getFkTravelPlanHREmployee();
-        emails.add(employee.getEmployeeEmail());
-
-        emailService.sendEmail(emails,
-                "Review Expense",
-                "Employee detail : " + employee.getId() +" "+ employee.getEmployeeEmail()
-                + "travel plan detail : " + travelPlan.getTravelPlanDetails() + " "
-                + travelPlan.getTravelPlanTo() + " - " + travelPlan.getTravelPlanFrom());
-    }
 
     @Override
     public List<ExpenseResponse> getExpenseById(Long employeeId, Long travelPlanId){

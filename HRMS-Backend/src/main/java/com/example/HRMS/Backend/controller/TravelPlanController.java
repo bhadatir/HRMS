@@ -51,12 +51,6 @@ public class TravelPlanController {
         return ResponseEntity.ok(travelPlanService.findTravelPlanByEmployeeId(empId, searchTerm, page, size));
     }
 
-    @PostMapping("/expense")
-    public ResponseEntity<String> addExpense(@Valid @RequestBody ExpenseRequest expenseRequest) {
-        expenseService.saveExpense(expenseRequest);
-        return ResponseEntity.ok("Expense add successfully");
-    }
-
     @GetMapping("/expense/{employeeId}/{travelPlanId}")
     public ResponseEntity<List<ExpenseResponse>> getExpenseById(@PathVariable Long travelPlanId
                                                                 , @PathVariable Long employeeId) {

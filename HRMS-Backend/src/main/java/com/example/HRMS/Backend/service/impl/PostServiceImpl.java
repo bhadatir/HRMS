@@ -322,7 +322,19 @@ public class PostServiceImpl implements PostService {
         String email = comment.getFkCommentEmployee().getEmployeeEmail();
         List<String> emails = new ArrayList<>();
         emails.add(email);
-        emailService.sendEmail(emails, "Warning mail", "Do not share this type of content second time :" + comment.getCommentContent());
+
+        String htmlEmailMessage = "<html>" +
+                "<body>" +
+                "<h3>Do not share this type of Comments second time</h3>" +
+                "<p><strong>Comment Content:</strong> " + comment.getCommentContent() + "</p>" +
+                "<p><strong>Post Title:</strong> " + comment.getFkPost().getPostTitle() + "</p>" +
+                "<p><strong>Post Content:</strong> " + comment.getFkPost().getPostContent() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails,"Warning mail !!! ",htmlEmailMessage);
+
         String htmlMessage = "<html>" +
                 "<body>" +
                 "<p><strong>Message:</strong>Do not share this type of comment second time</p>" +
@@ -366,7 +378,17 @@ public class PostServiceImpl implements PostService {
         String email = post.getFkPostEmployee().getEmployeeEmail();
         List<String> emails = new ArrayList<>();
         emails.add(email);
-        emailService.sendEmail(emails, "Warning mail", "Do not share this type of content second time :" + post.getPostContent());
+
+        String htmlEmailMessage = "<html>" +
+                "<body>" +
+                "<h3>Do not share this type of Post second time</h3>" +
+                "<p><strong>Post Title:</strong> " + post.getPostTitle() + "</p>" +
+                "<p><strong>Post Content:</strong> " + post.getPostContent() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails,"Warning mail !!! ",htmlEmailMessage);
 
         postRepository.save(post);
 
