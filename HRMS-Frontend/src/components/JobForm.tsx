@@ -82,6 +82,8 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
       alert("Failed to " + (editJobId ? "update job" : "create job") + ": " + (error.response?.data || error.message)); }
   });
 
+  
+
   if (allJobTypesError) alert("Failed to load job categories: " + allJobTypesError);
 
   return (

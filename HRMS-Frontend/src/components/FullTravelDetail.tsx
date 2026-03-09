@@ -80,12 +80,12 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
   const handleExpenseApproval = (expenseId: number, statusId: number) => {
     if(statusId === 2) {
       const confirm = window.confirm("Are you sure you want to approve this expense?");
-      const reason = "-";
+      const reason = `Approved by : ${user?.employeeEmail} at ${new Date().toLocaleString()}`;
       if (confirm) approveMutation.mutate({ expenseId, statusId, reason });
     } else {
       const reason = window.prompt("Please enter reason for approval:", "")?.trim();
       if (reason) {
-        approveMutation.mutate({ expenseId, statusId, reason });
+        approveMutation.mutate({ expenseId, statusId, reason: `${reason} (Rejected by : ${user?.employeeEmail} at ${new Date().toLocaleString()})` });
       }
     }
   };
@@ -175,10 +175,11 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                         setDocSearchTerm(e.target.value);
                       }
                     }}
+                    autoFocus
                   />
                 </div>
               
-                <div className="flex bg-gray-100 p-1 rounded-lg w-max right-10 absolute">
+                <div className="travel flex bg-gray-100 p-1 rounded-lg w-max right-10 absolute">
                   <Button className={viewMode === "EXPENSES" ? "rounded-md border text-gray-700" : "rounded-md text-gray-400"}
                     size="sm"
                     onClick={()=>setViewMode("EXPENSES")}>Expenses</Button>
@@ -277,7 +278,9 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                           </div>
                         </TableCell>
                       )}                      
-                      <TableCell>{exp.reasonForRejectExpense || "-"}</TableCell>
+                      <TableCell className="max-w-[120px] truncate" title={exp.reasonForRejectExpense || "-"}>
+                        {exp.reasonForRejectExpense || "-"}
+                      </TableCell>
                     </TableRow>
                   )
                 ):(

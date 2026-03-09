@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
@@ -60,6 +60,26 @@ export default function OrganizationChart() {
     setSearchTerm(""); 
     setShowDropdown(false);
   };
+
+  useEffect(() => {
+    setShowDropdown(false);
+  }, []);
+
+  useEffect(() => {
+    const clickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("div.relative")) {
+        setShowDropdown(false);
+        setShowNotification(false);
+      }
+    };
+    if (showDropdown || showNotification) {
+      document.addEventListener("click", clickOutside);
+    } else {
+      document.removeEventListener("click", clickOutside);
+    }
+    return () => document.removeEventListener("click", clickOutside);
+  }, [showDropdown, showNotification]);
 
   if(searchError || orgDataError) {
     alert("Failed to load organization data: " + (searchError || orgDataError));

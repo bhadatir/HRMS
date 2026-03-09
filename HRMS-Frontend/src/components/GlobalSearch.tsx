@@ -24,6 +24,21 @@ export function GlobalSearch() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
+  useEffect(() => {
+    const clickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".cmdk-content")) {
+        setOpen(false);
+      }
+    };
+    if (open) {
+      document.addEventListener("click", clickOutside);
+    } else {
+      document.removeEventListener("click", clickOutside);
+    }
+    return () => document.removeEventListener("click", clickOutside);
+  }, [open]);
+
   const {
     data: globalSearchResults,
     isFetching,

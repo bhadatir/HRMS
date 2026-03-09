@@ -143,6 +143,21 @@ const getMutation = useMutation({
       alert("Failed to create/update travel plan: " + (error.response?.data || error.message)); }
   });
 
+    useEffect(() => {
+      const clickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("div.travel")) {
+          setShowDropdown(false);
+      }
+      };
+      if (showDropdown) {
+      document.addEventListener("click", clickOutside);
+      } else {
+      document.removeEventListener("click", clickOutside);
+      }
+      return () => document.removeEventListener("click", clickOutside);
+    }, [showDropdown]);
+
   if (employeeSearchError) alert("Failed to search employees: " + employeeSearchError);
 
   return (
@@ -209,7 +224,7 @@ const getMutation = useMutation({
               <Users size={16} /> Assign Employees
             </label>
             
-            <div className="relative">
+            <div className="travel relative">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                 <Input 
@@ -226,17 +241,19 @@ const getMutation = useMutation({
               <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-40 overflow-y-auto">
                 {suggestions.map((emp: any) => (                  
                   !(emp.id === hrOwnerId || emp.id == user?.id || selectedEmployees.find(e => e.id === emp.id)) 
-                  && 
-                  <button
-                      key={emp.id}
-                      className="w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors"                                 
-                      onClick={() => handleSelectEmployee(emp)}
-                  >
-                      <User size={14} className="text-blue-600" />
-                      <div className="flex flex-col">
-                          <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
-                      </div>
-                  </button>
+                  &&
+                  <div className="travel"> 
+                    <button
+                        key={emp.id}
+                        className="w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors"                                 
+                        onClick={() => handleSelectEmployee(emp)}
+                    >
+                        <User size={14} className="text-blue-600" />
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
+                        </div>
+                    </button>
+                  </div>  
                 ))} 
 
                 <div ref={ref} className="h-10 flex justify-center items-center">
@@ -253,12 +270,14 @@ const getMutation = useMutation({
               {selectedEmployees.map((emp) => (
                 <Badge key={emp.id} variant="secondary" className="pl-2 pr-1 py-1 gap-1 bg-white border shadow-sm">
                   <span className="text-xs font-medium">{emp.name}</span>
-                  <button 
-                    type="button" 
-                    onClick={() => removeEmployee(emp.id)}
-                  >
-                    <X size={12} className="text-red-500" />
-                  </button>
+                  <div className="travel">
+                    <button 
+                      type="button" 
+                      onClick={() => removeEmployee(emp.id)}
+                    >
+                      <X size={12} className="text-red-500" />
+                    </button>
+                  </div>
                 </Badge>
               ))}
             </div>

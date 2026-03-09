@@ -83,6 +83,26 @@ export default function JobManagement() {
       alert("Failed to update job status: " + (error.response?.data || error.message)); }
    });
 
+  useEffect(() => {
+    const clickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("div.job")) {
+        setEditJobId(null);
+        setSelectedJobId(null);
+        setReferJobId(null);
+        setShareJobId(null);
+        setShowForm(false);
+        setShowNotification(false);
+      }
+    };
+    if (editJobId || referJobId || shareJobId || selectedJobId || showForm || showNotification) {
+      document.addEventListener("click", clickOutside);
+    } else {
+      document.removeEventListener("click", clickOutside);
+    }
+    return () => document.removeEventListener("click", clickOutside);
+  }, [editJobId, referJobId, shareJobId, selectedJobId, showForm, showNotification]);
+
   const handleDelete = (id: number) => {
     const reason = window.prompt("Please enter reason for change this job status:", "")?.trim();
     if (reason) {
@@ -114,7 +134,7 @@ export default function JobManagement() {
             </select>
           </div>
 
-          <div className="relative max-w-sm w-full mx-4">
+          <div className="job relative max-w-sm w-full mx-4">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search by title or department..." 
@@ -125,14 +145,16 @@ export default function JobManagement() {
             />
           </div>
 
-          {( user?.roleName === "HR" || user?.roleName === "ADMIN" ) && (
-            <Button title="Post New Job" onClick={() => setShowForm(true)} className="gap-2 text-gray-700">
-              <Plus size={18} />
-              Post New Job
-            </Button>
-          )}
+          <div className="job">
+            {( user?.roleName === "HR" || user?.roleName === "ADMIN" ) && (
+              <Button title="Post New Job" onClick={() => setShowForm(true)} className="gap-2 text-gray-700">
+                <Plus size={18} />
+                Post New Job
+              </Button>
+            )}
+          </div>
 
-          <div className="relative inline-block">
+          <div className="job relative inline-block">
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
@@ -151,7 +173,7 @@ export default function JobManagement() {
           {/* Notifications */}
           {showNotification && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
+              <div className="job bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowNotification(false);
@@ -164,7 +186,7 @@ export default function JobManagement() {
           {/* job details with reviewer and referral management */}
           {selectedJobId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
+              <div className="job bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => setSelectedJobId(null)}>
                   <X />
@@ -177,7 +199,7 @@ export default function JobManagement() {
           {/* Job Post Form Modal */}
           {showForm && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-lg w-full relative">
+              <div className="job bg-white rounded-xl max-w-lg w-full relative">
                 <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => setShowForm(false)}>
                   <X />
@@ -190,7 +212,7 @@ export default function JobManagement() {
           {/* share job */}
           {shareJobId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-2xl w-full relative p-6 overflow-y-auto">
+              <div className="job bg-white rounded-xl max-w-2xl w-full relative p-6 overflow-y-auto">
                 <Button title="Close" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setShareJobId(null);
                 }}><X /></Button>
@@ -204,7 +226,7 @@ export default function JobManagement() {
           {/* refer friend to job */}
           {referJobId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-2xl w-full relative p-6 overflow-y-auto">
+              <div className="job bg-white rounded-xl max-w-2xl w-full relative p-6 overflow-y-auto">
                 <Button title="Close" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setReferJobId(null);
                 }}><X /></Button>
@@ -218,7 +240,7 @@ export default function JobManagement() {
           {/* edit job */}
           {editJobId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-2xl w-full relative p-6 h-150 overflow-y-auto">
+              <div className="job bg-white rounded-xl max-w-2xl w-full relative p-6 h-150 overflow-y-auto">
                 <Button title="Close" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setEditJobId(null);
                 }}><X /></Button>
@@ -226,10 +248,10 @@ export default function JobManagement() {
                   setEditJobId(null);
                 }} />
               </div>
-          </div>
+            </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="job grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredJobs.length > 0 ? (
               filteredJobs.map((job: any) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (
                 <Card 

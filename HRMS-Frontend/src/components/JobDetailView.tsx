@@ -103,14 +103,29 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
   const handleUpdateCvStatus = (referId: number, statusId: number) => {
     if(statusId === 5) {
       const confirm = window.confirm("Are you sure you want to approve this cv?");
-      if (confirm) updateCvStatusMutation.mutate({ referId, statusId, reason: "-" });
+      if (confirm) updateCvStatusMutation.mutate({ referId, statusId, reason: `Approved By : ${user?.employeeEmail} at ${new Date().toLocaleString()}` });
     } else {
-      const reason = window.prompt("Please enter reason for approval:", "")?.trim();
+      const reason = window.prompt("Please enter reason for this action :", "")?.trim();
       if (reason) {
         updateCvStatusMutation.mutate({ referId, statusId, reason });
       }
     }
   };
+
+  useEffect(() => {
+    const clickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("div.sub")) {
+        setShowDropdown(false);
+      }
+    };
+    if (showDropdown) {
+      document.addEventListener("click", clickOutside);
+    } else {
+      document.removeEventListener("click", clickOutside);
+    }
+    return () => document.removeEventListener("click", clickOutside);
+  }, [showDropdown]);
 
   const isLoadingData = jobLoading || (viewMode === "REFERRALS" && referralsLoading);
 
@@ -144,7 +159,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                 onClick={()=>setViewMode("REFERRALS")}><Users size={18} /> Referrals</Button>
 
             {viewMode === "REFERRALS" ? (
-              <div className="relative max-w-sm w-full">
+              <div className="max-w-sm w-full">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                 <Input 
                   placeholder="Search refer data..." 
@@ -153,12 +168,13 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
                   }}
+                  autoFocus
                 />
               </div>
             ):(
               <>
               {((user?.id === job.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive &&  (
-                <div className="relative max-w-sm w-full">                 
+                <div className="sub relative max-w-sm w-full">                 
                   <Plus className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400"/>
                   <Input 
                     placeholder="Add Reviewer..." 
@@ -178,16 +194,18 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                         if (emp.id === user?.id || emp.roleName !== "EMPLOYEE" || job?.cvReviewerResponses?.some((rev: any) => rev.employeeId === emp.id)) return null;
 
                         return (
-                        <button
-                          key={emp.id}
-                          className="w-full text-left px-4 py-3 hover:bg-slate-100 flex items-center gap-3 border-b last:border-none"
-                          onClick={() => handleSelectUser(emp.id)}
-                        >
-                            <User size={14} className="text-blue-600" />
-                            <div>
-                            <p className="text-sm font-semibold text-slate-900">{emp.employeeFirstName} {emp.employeeLastName}</p>
-                            </div>
-                        </button>
+                        <div className="job">  
+                          <button
+                            key={emp.id}
+                            className="w-full text-left px-4 py-3 hover:bg-slate-100 flex items-center gap-3 border-b last:border-none"
+                            onClick={() => handleSelectUser(emp.id)}
+                          >
+                              <User size={14} className="text-blue-600" />
+                              <div>
+                              <p className="text-sm font-semibold text-slate-900">{emp.employeeFirstName} {emp.employeeLastName}</p>
+                              </div>
+                          </button>
+                        </div>  
                         );
                       })} 
 
@@ -244,18 +262,20 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                       <TableCell className="text-right space-x-2">
                         {ref.cvStatusTypeName === "PENDING" ? (
                         <>
-                            <Button 
-                            size="sm" variant="outline" className="text-green-600 border-green-200"
-                            onClick={() => handleUpdateCvStatus(ref.id, 5)}
-                            >
-                            <CheckCircle size={14} />
-                            </Button>
-                            <Button 
-                            size="sm" variant="outline" className="text-red-600 border-red-200"
-                            onClick={() => handleUpdateCvStatus(ref.id, 6)}
-                            >
-                            <XCircle size={14} />
-                            </Button>
+                            <div className="job">
+                              <Button 
+                              size="sm" variant="outline" className="text-green-600 border-green-200"
+                              onClick={() => handleUpdateCvStatus(ref.id, 5)}
+                              >
+                              <CheckCircle size={14} />
+                              </Button>
+                              <Button 
+                              size="sm" variant="outline" className="text-red-600 border-red-200"
+                              onClick={() => handleUpdateCvStatus(ref.id, 6)}
+                              >
+                              <XCircle size={14} />
+                              </Button>
+                            </div>  
                         </>
                         ) : (
                           <span className="text-green-600 flex items-center gap-2 ml-8">
@@ -264,7 +284,9 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                         )}
                       </TableCell>
                     )}                    
-                    <TableCell>{ref.reasonForCvStatusChange || "-"}</TableCell>
+                    <TableCell title={ref.reasonForCvStatusChange || "-"} className="max-w-[120px] truncate">
+                      {ref.reasonForCvStatusChange || "-"}
+                    </TableCell>
                   </TableRow>
                 ))}
                 {filteredReferrals.length === 0 && (

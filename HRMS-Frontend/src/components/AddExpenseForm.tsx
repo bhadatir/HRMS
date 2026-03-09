@@ -195,9 +195,11 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
                   ))}
                 </select>
 
-                <Button variant="ghost" size="icon" onClick={() => removeProof(index)} className="h-8 w-8">
-                  <X size={16} />
-                </Button>
+                <div className="travel">  
+                  <Button variant="ghost" size="icon" onClick={() => removeProof(index)} className="h-8 w-8">
+                    <X size={16} />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

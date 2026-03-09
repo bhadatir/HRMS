@@ -112,6 +112,25 @@ export default function TravelPlan() {
     }
   };
 
+  useEffect(() => {
+    const clickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("div.travel")) {
+        setFullTravelDetails(null);
+        setSelectedTravelId(null);
+        setActiveExpenseId(null);
+        setShowForm(false);
+        setShowNotification(false);
+      }
+    };
+    if (fullTravelDetails || selectedTravelId || activeExpenseId || showForm || showNotification) {
+      document.addEventListener("click", clickOutside);
+    } else {
+      document.removeEventListener("click", clickOutside);
+    }
+    return () => document.removeEventListener("click", clickOutside);
+  }, [fullTravelDetails, selectedTravelId, activeExpenseId, showForm, showNotification]);
+
   if (travelPlanByEmpIdError || allTravelPlansError) {
     alert("Failed to load travel plans: " + (travelPlanByEmpIdError || allTravelPlansError));
   }
@@ -129,7 +148,8 @@ export default function TravelPlan() {
             ) : (<Badge variant="outline">No filter</Badge>)
             }
           </div>
-          {user?.roleName !== "ADMIN" && <div className="flex items-center gap-2">
+          {user?.roleName !== "ADMIN" && 
+          <div className="flex items-center gap-2">
             <select className="border rounded-md px-2 py-1 text-sm" 
               value={travelPlanType} onChange={(e) => setTravelPlanType(Number(e.target.value))}>
                 <option value="0">All Travel Plan</option>
@@ -154,15 +174,17 @@ export default function TravelPlan() {
             />
           </div>
 
-          {user?.roleName === "HR" && (
-            <Button title="Create New Travel Plan"
-              onClick={() => setShowForm(true)} className="gap-2 text-gray-600">
-              <Plus size={18} />
-              New Plan
-            </Button>
-          )}
+          <div className="travel">
+            {user?.roleName === "HR" && (
+              <Button title="Create New Travel Plan"
+                onClick={() => setShowForm(true)} className="gap-2 text-gray-600">
+                <Plus size={18} />
+                New Plan
+              </Button>
+            )}
+          </div>
 
-          <div className="relative inline-block">
+          <div className="travel relative inline-block">
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
@@ -182,7 +204,7 @@ export default function TravelPlan() {
           {/* Notifications */}
           {showNotification && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
+              <div className="travel relative bg-white rounded-xl max-w-3xl w-full h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowNotification(false);
@@ -195,7 +217,7 @@ export default function TravelPlan() {
           {/* Create or edit travel plan form */}
           {showForm && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-lg w-full relative">
+              <div className="travel relative bg-white rounded-xl max-w-lg w-full">
                 <Button title="Close Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setShowForm(false);
                   setEditTravelPlanId(null);
@@ -208,7 +230,7 @@ export default function TravelPlan() {
           {/*Add travel expense by employee */}
           {activeExpenseId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-lg w-full relative">
+              <div className="travel relative bg-white rounded-xl max-w-lg w-full">
                 <Button title="Close Expense Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setActiveExpenseId(null);
                 }}><X /></Button>
@@ -222,7 +244,7 @@ export default function TravelPlan() {
           {/* Add travel doc by employee or HR */}
           {selectedTravelId && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-lg w-full relative">
+              <div className="travel relative bg-white rounded-xl max-w-lg w-full">
                 <Button title="Close Document Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setSelectedTravelId(null);
                   setEditTravelPlanId(null);
@@ -238,7 +260,7 @@ export default function TravelPlan() {
           {/* Full travel details modal */}
           {fullTravelDetails && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-4xl w-full relative p-6 h-150 overflow-y-auto">
+              <div className="travel relative bg-white rounded-xl max-w-4xl w-full p-6 h-150 overflow-y-auto">
                 <Button title="Close Travel Details" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setFullTravelDetails(null);
                 }}><X /></Button>
@@ -249,7 +271,7 @@ export default function TravelPlan() {
           </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="travel grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPlans.length > 0 ? (
               filteredPlans.sort((a: any, b: any) => new Date(b.travelPlanStartDate).getTime() 
                                                       - new Date(a.travelPlanStartDate).getTime())

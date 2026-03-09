@@ -125,6 +125,22 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         mutation.mutate(payload);
     };
 
+    useEffect(() => {
+        const clickOutside = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest("div.sub")) {
+            setShowDropdown(false);
+        }
+        };
+        if (showDropdown) {
+        document.addEventListener("click", clickOutside);
+        } else {
+        document.removeEventListener("click", clickOutside);
+        }
+        return () => document.removeEventListener("click", clickOutside);
+    }, [showDropdown]);
+
+
     if (gameTypesError || myInterestsError || slotsError || employeeSearchError) {
         alert("Failed to load data: " + (gameTypesError || myInterestsError || slotsError || employeeSearchError));
     }
@@ -208,7 +224,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                 <div className="space-y-3">
                     <label className="text-xs font-bold uppercase text-slate-500 flex items-center gap-2"><Users size={14}/> Participants</label>
                     {selectedGame && selectedParticipants.length < selectedGame.gameMaxPlayerPerSlot-1 ? 
-                    <div className="relative">
+                    <div className="sub relative">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                         <Input placeholder="Search participants..."
                             disabled={!selectedTime} 

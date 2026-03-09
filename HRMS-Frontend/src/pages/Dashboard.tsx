@@ -1,7 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { Calendar } from "@/components/ui/calendar";
 import { isSameDay, parseISO } from "date-fns";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -117,6 +117,21 @@ export default function Dashboard() {
       alert("Failed to update password: " + (error.response?.data || error.message));
     }
   });
+
+  useEffect(() => {
+      const clickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("div.relative")) {
+          setShowNotification(false);
+      }
+      };
+      if (showNotification) {
+      document.addEventListener("click", clickOutside);
+      } else {
+      document.removeEventListener("click", clickOutside);
+      }
+      return () => document.removeEventListener("click", clickOutside);
+  }, [showNotification]);
 
   if(travelPlansError || gameBookingsError || waitingListError) {
     alert("Failed to load events: " + (travelPlansError || gameBookingsError || waitingListError));
