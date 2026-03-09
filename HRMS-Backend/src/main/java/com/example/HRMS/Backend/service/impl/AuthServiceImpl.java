@@ -149,12 +149,17 @@ public class AuthServiceImpl implements AuthService {
 
         List<String> emails1 = new ArrayList<>();
         emails1.add(request.getEmail());
-        emailService.sendEmail(emails1,"Congratulation you are added in ROIMA as : " + role.getRoleName()
-                ,"Please update your password using given detail in ROIMA HRMS : email - "
-                + request.getEmail() + " pass - " + request.getPassword()
-        );
 
-
+        String htmlEmailMessage = "<html>" +
+                "<body>" +
+                "<h3>Please update your password in ROIMA HRMS portal using given detail</h3>" +
+                "<p><strong>Email:</strong> " + request.getEmail() + "</p>" +
+                "<p><strong>Password:</strong> " + request.getPassword() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails1,"Congratulation you are added in ROIMA as : " + role.getRoleName(),htmlEmailMessage);
     }
 
     @Override
@@ -170,7 +175,16 @@ public class AuthServiceImpl implements AuthService {
         List<String> emails = new ArrayList<>();
         emails.add(email);
 
-        emailService.sendEmail(emails, "Password Reset", "Your token is: " + token);
+        String htmlEmailMessage = "<html>" +
+                "<body>" +
+                "<h3>Please use this token to reset your password in ROIMA HRMS portal</h3>" +
+                "<p><strong>Token:</strong> " + token + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>Do not share this token to anyone.</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails,"Your Password Reset request found",htmlEmailMessage);
     }
 
     @Override
@@ -195,9 +209,15 @@ public class AuthServiceImpl implements AuthService {
 
         List<String> emails1 = new ArrayList<>();
         emails1.add(employee.getEmployeeEmail());
-        emailService.sendEmail(emails1,"your password updated at : " + Instant.now()
-                ,"Please verify your password updation and if any problem so contact us immediately."
-        );
+
+        String htmlEmailMessage = "<html>" +
+                "<body>" +
+                "<h3>Please verify your password updation and if any problem so contact us immediately.</h3>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails1,"Your ROIMA HRMS portal password is updated",htmlEmailMessage);
     }
 
     @Override
@@ -295,9 +315,15 @@ public class AuthServiceImpl implements AuthService {
 
         List<String> emails1 = new ArrayList<>();
         emails1.add(request.getEmail());
-        emailService.sendEmail(emails1,"your details is updated at : " + Instant.now()
-                ,"Please verify your details and if any problem so contact us immediately."
-        );
+
+        String htmlEmailMessage = "<html>" +
+                "<body>" +
+                "<h3>Please verify your details in HRMS portal and if any problem so contact us immediately.</h3>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails1,"your details is updated on ROIMA HRMS portal",htmlEmailMessage);
     }
 
     @Override
@@ -347,8 +373,15 @@ public class AuthServiceImpl implements AuthService {
 
         List<String> emails1 = new ArrayList<>();
         emails1.add(employee.getEmployeeEmail());
-        emailService.sendEmail(emails1,"your Status is inactivated at : " + Instant.now()
-                ,"Reason for Inactivation : " + reason
-        );
+
+        String htmlEmailMessage = "<html>" +
+                "<body>" +
+                "<h3>Please verify that your HRMS portal account is inactivated if any problem so contact us immediately.</h3>" +
+                "<p><strong>Reason for Inactivation:</strong> " + reason + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p>This is an automated notification mail.</p>" +
+                "</body>" +
+                "</html>";
+        emailService.sendEmail(emails1,"Your ROIMA HRMS portal account is inactivated",htmlEmailMessage);
     }
 }

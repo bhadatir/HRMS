@@ -173,7 +173,6 @@ export default function PostManagement() {
           <div className="post space-y-6">
             {filteredPosts.length > 0  ? (
               filteredPosts.map((post: any) => (
-                ( (post.postVisibilityName in postVisibilityOptions || post?.employeeId === user?.id) ? (
                   <Card key={post.id} className="hover:shadow-md transition-shadow border-slate-200">
                     <CardHeader>
                       <div className="flex justify-between items-start">
@@ -253,7 +252,6 @@ export default function PostManagement() {
                       {showComments && <CommentSection postId={post.id}/>}
                     </CardContent>
                   </Card>
-                ) : null)
               )
             )
             ) : (

@@ -89,37 +89,39 @@ return (
             Mark all as read
           </Button>
         </div>
-        {notifications?.length > 0 ? (
-          notifications?.map((notif: any) => (
-            <Card key={notif.id} className={`shadow-none border ${!notif.read ? 'bg-blue-50/30' : ''}`}>
-              <CardContent className="p-4 flex items-start gap-4">
-                <div className="flex-1 space-y-1">
-                  <div className="flex justify-between">
-                    <h4 className={`text-sm font-bold ${notif.read ? "text-gray-500" : "text-gray-900"}`}>
-                      {notif.title}
-                    </h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {notifications?.length > 0 ? (
+            notifications?.map((notif: any) => (
+              <Card key={notif.id} className={`shadow-none border ${!notif.read ? 'bg-blue-50/30' : ''}`}>
+                <CardContent className="p-4 flex items-start gap-4">
+                  <div className="flex-1 space-y-1">
+                    <div className="flex justify-between">
+                      <h4 className={`text-sm font-bold ${notif.read ? "text-gray-500" : "text-gray-900"}`}>
+                        {notif.title}
+                      </h4>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      <div dangerouslySetInnerHTML={{ __html: notif.message }} />
+                    </p>
+                    <Button 
+                      variant="link" 
+                      className="text-xs text-blue-600"
+                      onClick={() => markReadMutation.mutate(notif.id)}
+                    >
+                      Mark as read
+                    </Button>
                   </div>
-                  <p className="text-sm text-gray-500">
-                    <div dangerouslySetInnerHTML={{ __html: notif.message }} />
-                  </p>
-                  <Button 
-                    variant="link" 
-                    className="text-xs text-blue-600"
-                    onClick={() => markReadMutation.mutate(notif.id)}
-                  >
-                    Mark as read
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>)
-          )
-        ) : (
-          <div className="text-center py-10 text-gray-400 italic">No notifications.</div>
-        )}
+                </CardContent>
+              </Card>)
+            )
+          ) : (
+            <div className="text-center py-10 text-gray-400 italic">No notifications.</div>
+          )}
+        </div>
         <div ref={ref} className="h-10 flex justify-center items-center">
           {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
-        </div>
-        
+        </div>        
       </div>
     </main>
   );

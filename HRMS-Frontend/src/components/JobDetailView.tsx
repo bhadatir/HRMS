@@ -159,7 +159,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                 onClick={()=>setViewMode("REFERRALS")}><Users size={18} /> Referrals</Button>
 
             {viewMode === "REFERRALS" ? (
-              <div className="max-w-sm w-full">
+              <div className="relative max-w-sm w-full">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                 <Input 
                   placeholder="Search refer data..." 

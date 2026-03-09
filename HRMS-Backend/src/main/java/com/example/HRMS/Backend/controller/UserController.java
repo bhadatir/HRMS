@@ -28,7 +28,7 @@ public class UserController {
 
     private final AuthService authService;
     private final EmployeeRepository employeeRepository;
-    private final TravelPlanRepository travelPlanRepository;
+    private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
     private final JobRepository jobRepository;
     private final PostRepository postRepository;
     private final GameBookingRepository gameBookingRepository;
@@ -107,8 +107,8 @@ public class UserController {
                         e.getFkRole().getRoleName(),
                         "EMPLOYEE" ));
 
-        Page<GlobalSearchResult> travelPage = travelPlanRepository
-                .findTravelPlans(searchTerm, pageable)
+        Page<GlobalSearchResult> travelPage = employeeTravelPlanRepository
+                .findTravelPlanByFkEmployee_Id(employee.getId(), searchTerm, pageable)
                 .map(t -> new GlobalSearchResult(
                         t.getId(),
                         "Trip to " + t.getTravelPlanTo(),
@@ -123,8 +123,12 @@ public class UserController {
                         j.getFkJobType().getJobTypeName(),
                         "JOB" ));
 
+        String role = employee.getFkRole().getRoleName();
+        String position = employee.getFkPosition().getPositionName();
+        String department = employee.getFkDepartment().getDepartmentName();
+
         Page<GlobalSearchResult> postPage = postRepository
-                .searchPosts(searchTerm, pageable)
+                .searchPosts(employee.getId() ,searchTerm, role, position, department, pageable)
                 .map(p -> new GlobalSearchResult(
                         p.getId(),
                         p.getPostTitle(),

@@ -65,9 +65,18 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostResponse> showAllPosts(String searchTerm, int page, int size) {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Employee currentUser = employeeRepository.findEmployeeByEmployeeEmail(email)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        String role = currentUser.getFkRole().getRoleName();
+        String position = currentUser.getFkPosition().getPositionName();
+        String department = currentUser.getFkDepartment().getDepartmentName();
+
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Post> postPage = postRepository.searchPosts(searchTerm, pageable);
+        Page<Post> postPage = postRepository.searchPosts(currentUser.getId(), searchTerm, role, position, department, pageable);
 
         return postPage.map(post -> {
 

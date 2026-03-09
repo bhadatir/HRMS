@@ -118,7 +118,7 @@ export default function JobManagement() {
           <div className="flex items-center gap-2">
             {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Job Board</h3>
-             {searchTerm && searchTerm.length > 0 ?(
+            {(searchTerm && searchTerm.length > 0 ) || jobType ?(
               <Badge variant="outline">{filteredJobs.length} results</Badge>
             ) : (<Badge variant="outline">No filter</Badge>)
             }

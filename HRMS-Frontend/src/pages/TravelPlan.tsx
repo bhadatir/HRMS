@@ -143,7 +143,7 @@ export default function TravelPlan() {
           <div className="flex items-center gap-2">
             {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Travel Management</h3>
-            {searchTerm && searchTerm.length > 0 ?(
+            {(searchTerm && searchTerm.length > 0) || travelPlanType ?(
               <Badge variant="outline">{filteredPlans.length} results</Badge>
             ) : (<Badge variant="outline">No filter</Badge>)
             }

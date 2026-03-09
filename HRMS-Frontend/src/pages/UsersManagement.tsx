@@ -15,6 +15,7 @@ import { useEmployeeSearch } from "@/hooks/useInfinite";
 import { useInView } from "react-intersection-observer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { set } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -80,6 +81,10 @@ export default function JobManagement() {
           <div className="flex items-center gap-2">
             {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">User Management</h3>
+            {(searchTerm && searchTerm.length > 0 ) || employeeType ?(
+              <Badge variant="outline">{filterEmp.length} results</Badge>
+            ) : (<Badge variant="outline">No filter</Badge>)
+            }
           </div>
   
           <div className="flex items-center gap-2">

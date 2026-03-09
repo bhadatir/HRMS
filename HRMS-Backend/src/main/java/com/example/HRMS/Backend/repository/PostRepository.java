@@ -28,8 +28,13 @@ public interface PostRepository extends JpaRepository<Post,Long> {
         OR CAST(p.postCreatedAt as string) LIKE %:query%
         OR tt.tagTypeName LIKE %:query%
     )
+    AND (p.fkPostVisibility.postVisibilityName = 'EVERYONE'
+        OR p.fkPostVisibility.postVisibilityName = :role
+        OR p.fkPostVisibility.postVisibilityName = :position
+        OR p.fkPostVisibility.postVisibilityName = :department
+        OR p.fkPostEmployee.id = :empId)
     AND p.postIsDeleted = false
     ORDER BY p.postCreatedAt DESC
     """)
-    Page<Post> searchPosts(@Param("query") String query, Pageable pageable);
+    Page<Post> searchPosts(Long empId, @Param("query") String query, String  role, String position, String department, Pageable pageable);
 }
