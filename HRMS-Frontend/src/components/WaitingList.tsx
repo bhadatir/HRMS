@@ -108,6 +108,11 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
                       </TableCell>
                     </TableRow>
                     ))}
+                    {filteredWaitingListSeq && filteredWaitingListSeq.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-4">No entries found.</TableCell>
+                      </TableRow>
+                    )}
                 </TableBody>
               </Table>
             </CardContent>

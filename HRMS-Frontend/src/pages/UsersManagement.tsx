@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useEmployeeSearch } from "@/hooks/useInfinite";
 import { useInView } from "react-intersection-observer";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { set } from "date-fns";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -22,7 +23,7 @@ export default function JobManagement() {
   const [showAddUserForm, setShowAddUserForm] = useState(false);
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
-  const [employeeType, setEmployeeType] = useState(0);
+  const [employeeType, setEmployeeType] = useState(1);
 
   const { 
     data: allEmpData, 
@@ -39,6 +40,23 @@ export default function JobManagement() {
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage]);
+
+    useEffect(() => {
+    const clickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("div.user")) {
+        setShowUserDetails(false);
+        setShowAddUserForm(false);
+        setShowNotification(false);
+      }
+    };
+    if (showUserDetails || showAddUserForm || showNotification) {
+      document.addEventListener("click", clickOutside);
+    } else {
+      document.removeEventListener("click", clickOutside);
+    }
+    return () => document.removeEventListener("click", clickOutside);
+  }, [showUserDetails, showAddUserForm, showNotification]);
 
   if (allEmpError) {
     alert("Failed to load employees: " + allEmpError);
@@ -73,7 +91,7 @@ export default function JobManagement() {
             </select>
           </div>
 
-          <div className="relative max-w-sm w-full mx-4">
+          <div className="user relative max-w-sm w-full mx-4">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Search users..." 
@@ -86,7 +104,7 @@ export default function JobManagement() {
             />
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="user flex items-center gap-4">
             <Button title="Create New User"
                 onClick={() => setShowAddUserForm(true)} className="gap-2 text-gray-600">
                 <Plus size={18} />
@@ -94,16 +112,16 @@ export default function JobManagement() {
             </Button>
 
             <div className="relative inline-block">
-                <Bell 
-                size={25} 
-                onClick={() => setShowNotification(true)} 
-                className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
-                />
-                {unreadNotifications > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                    {unreadNotifications}
-                </span>
-                )}
+              <Bell 
+              size={25} 
+              onClick={() => setShowNotification(true)} 
+              className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+              />
+              {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                  {unreadNotifications}
+              </span>
+              )}
             </div>
           </div>
         </header>
@@ -113,7 +131,7 @@ export default function JobManagement() {
           {/* Notifications */}
           {showNotification && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
+              <div className="user bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowNotification(false);
@@ -126,7 +144,7 @@ export default function JobManagement() {
           {/* Add user */}
           {showAddUserForm && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-2xl w-full relative h-150 overflow-y-auto">
+              <div className="user bg-white rounded-xl max-w-2xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowAddUserForm(false);
@@ -139,7 +157,7 @@ export default function JobManagement() {
           {/* User Details */}
           {showUserDetails && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-2xl w-full relative h-150 overflow-y-auto">
+              <div className="userbg-white rounded-xl max-w-2xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowUserDetails(false);

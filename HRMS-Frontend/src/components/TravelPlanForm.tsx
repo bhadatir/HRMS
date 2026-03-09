@@ -277,7 +277,7 @@ const getMutation = useMutation({
                     >
                       <X size={12} className="text-red-500" />
                     </button>
-                  </div>
+                    </div>
                 </Badge>
               ))}
             </div>

@@ -108,6 +108,25 @@ export default function GameManagement() {
             w.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(searchTerm));
     });  
 
+    useEffect(() => {
+        const clickOutside = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest("div.game")) {
+            setShowGameIntrestForm(false);
+            setShowGameTypeForm(false);
+            setShowGameBookingForm(false);
+            setShowWaitingList(false);
+            setShowNotification(false);
+        }
+        };
+        if (showGameIntrestForm || showGameTypeForm || showGameBookingForm || showWaitingList || showNotification) {
+        document.addEventListener("click", clickOutside);
+        } else {
+        document.removeEventListener("click", clickOutside);
+        }
+        return () => document.removeEventListener("click", clickOutside);
+    }, [showGameIntrestForm, showGameTypeForm, showGameBookingForm, showWaitingList, showNotification]);
+
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -121,7 +140,7 @@ export default function GameManagement() {
                             {gameTypes.map((g: any) => <option key={g.id} value={g.id}>{g.gameName}</option>)}
                         </select>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="game flex items-center gap-4">
                         <Button onClick={() => setShowGameBookingForm(true)} className="gap-2 text-gray-600">
                             <Plus size={18}/> New Booking
                         </Button>
@@ -135,17 +154,17 @@ export default function GameManagement() {
                         </Button>
 
                         <div className="relative inline-block">
-                        <Bell 
-                        size={25} 
-                        onClick={() => setShowNotification(true)} 
-                        className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
-                        />
-                        {unreadNotifications > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                            {unreadNotifications}
-                        </span>
-                        )}
-                    </div>
+                            <Bell 
+                            size={25} 
+                            onClick={() => setShowNotification(true)} 
+                            className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+                            />
+                            {unreadNotifications > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                                {unreadNotifications}
+                            </span>
+                            )}
+                        </div>  
                     </div>
                 </header>
 
@@ -153,7 +172,7 @@ export default function GameManagement() {
                     {/* Notifications */}
                     {showNotification && (
                       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
+                        <div className="game bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                           <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                             onClick={() => {
                             setShowNotification(false);
@@ -166,7 +185,7 @@ export default function GameManagement() {
                     {/* Waiting List */}
                     {showWaitingList && (
                       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl max-w-3xl w-full relative h-100 overflow-y-auto">
+                        <div className="game bg-white rounded-xl max-w-3xl w-full relative h-100 overflow-y-auto">
                           <Button title="Close Waiting List" variant="ghost" className="absolute right-2 top-2" 
                             onClick={() => {
                             setShowWaitingList(false);
@@ -179,7 +198,7 @@ export default function GameManagement() {
                     {/* add game booking */}
                     {showGameBookingForm && (
                         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white rounded-xl w-full max-w-2xl relative h-150 overflow-y-auto">     
+                            <div className="game bg-white rounded-xl w-full max-w-2xl relative h-150 overflow-y-auto">     
                                 <Button variant="ghost" className="absolute top-2 right-2" 
                                 onClick={() => {
                                     setShowGameBookingForm(false);
@@ -192,7 +211,7 @@ export default function GameManagement() {
                     {/* add game type */}
                     {showGameTypeForm && (
                         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                            <div className="bg-white rounded-xl max-w-lg w-full relative h-120 overflow-y-auto">
+                            <div className="game bg-white rounded-xl max-w-lg w-full relative h-120 overflow-y-auto">
                                 <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
                                 onClick={() => setShowGameTypeForm(false)}>
                                 <X />
@@ -205,7 +224,7 @@ export default function GameManagement() {
                     {/* Game Interest */}
                     {showGameIntrestForm && (
                       <div className="absolute right-2 top-16 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl max-w-lg w-full relative h-max">
+                        <div className="game bg-white rounded-xl max-w-lg w-full relative h-max">
                           <Button title="Close Game Interests" variant="ghost" className="absolute right-2 top-2" 
                             onClick={() => {
                             setShowGameIntrestForm(false);
@@ -216,7 +235,7 @@ export default function GameManagement() {
                     )}
 
                     {/* upcomming games */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="game grid grid-cols-1 md:grid-cols-2 gap-4">
                         <h2 className="text-xl font-bold text-slate-900 col-span-full">Upcoming Bookings :</h2>
                         
                         {upcomingBookings.map((b: any) => (
@@ -230,7 +249,7 @@ export default function GameManagement() {
                     </div>
 
                     
-                    <div className="flex items-center justify-between gap-2 my-5">
+                    <div className="game flex items-center justify-between gap-2 my-5">
                         <div className="flex flex-row items-center gap-4">
                             <Button className={viewMode === "My Bookings" ? "rounded-md border text-gray-900" : "rounded-md text-gray-300"}
                                 size="sm"
@@ -267,7 +286,7 @@ export default function GameManagement() {
                     {/* my bookings  */}
                     {viewMode === "My Bookings" && (
                     <div className="mt-2">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
+                        <div className="game grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
                         {filteredBookings && filteredBookings.length > 0 ? (
                             <>                                
                                 {filteredBookings.filter((b: any) => (!gameType || b.gameTypeId === gameType) && (!gameBookingStatusId || b.gameBookingStatusId === gameBookingStatusId))
@@ -291,7 +310,7 @@ export default function GameManagement() {
                     {/* WaitingList */}
                     {viewMode === "Waiting List" && (
                     <div className="my-5">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="game grid grid-cols-1 md:grid-cols-2 gap-4">
                         {filteredWaitingList.length > 0 ? (
                                 filteredWaitingList.map((wait: any) => (
                                     <Card key={wait.id} className="hover:shadow-md transition-shadow border-slate-200 cursor-pointer"

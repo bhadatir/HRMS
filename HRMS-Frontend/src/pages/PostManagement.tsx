@@ -77,6 +77,22 @@ export default function PostManagement() {
       removePost.mutate({ postId, reason });
     }
   };
+
+  useEffect(() => {
+    const clickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("div.post")) {
+        setShowForm(false);
+        setShowNotification(false);
+      }
+    };
+    if (showForm || showNotification) {
+      document.addEventListener("click", clickOutside);
+    } else {
+      document.removeEventListener("click", clickOutside);
+    }
+    return () => document.removeEventListener("click", clickOutside);
+  }, [showForm, showNotification]);
   
   if (allPostsError) {
     alert("Failed to load posts: " + allPostsError);
@@ -92,7 +108,7 @@ export default function PostManagement() {
             <h3 className="text-lg font-bold text-slate-800">Company Feed</h3>
           </div>
 
-          <div className="relative max-w-sm w-full mx-4">
+          <div className="post relative max-w-sm w-full mx-4">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search posts..." 
@@ -104,12 +120,12 @@ export default function PostManagement() {
               autoFocus
             />
           </div>
-
-          <Button onClick={() => setShowForm(true)} className="gap-2 mr-2 text-black">
-            <Plus size={18} /> New Post
-          </Button>
-
-          <div className="relative inline-block">
+          <div className="post">
+            <Button onClick={() => setShowForm(true)} className="gap-2 mr-2 text-black">
+              <Plus size={18} /> New Post
+            </Button>
+          </div>
+          <div className="post relative inline-block">
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
@@ -128,7 +144,7 @@ export default function PostManagement() {
           {/* Notifications */}
           {showNotification && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
+              <div className="post bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowNotification(false);
@@ -141,7 +157,7 @@ export default function PostManagement() {
           {/* Post Form Modal */}
           {showForm && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-lg w-full relative">
+              <div className="post bg-white rounded-xl max-w-lg w-full relative">
                 <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setShowForm(false);
                   setEditPostId(0);
@@ -154,7 +170,7 @@ export default function PostManagement() {
             </div>
           )}
 
-          <div className="space-y-6">
+          <div className="post space-y-6">
             {filteredPosts.length > 0  ? (
               filteredPosts.map((post: any) => (
                 ( (post.postVisibilityName in postVisibilityOptions || post?.employeeId === user?.id) ? (

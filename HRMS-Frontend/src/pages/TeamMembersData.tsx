@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,6 +35,21 @@ export default function TeamMemberData() {
     org.positionName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
     org.departmentName.toLowerCase().includes(debouncedSearch.toLowerCase())
   );  
+    
+  useEffect(() => {
+    const clickOutside = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest("div.manager")) {
+        setShowNotification(false);
+    }
+    };
+    if (showNotification) {
+    document.addEventListener("click", clickOutside);
+    } else {
+    document.removeEventListener("click", clickOutside);
+    }
+    return () => document.removeEventListener("click", clickOutside);
+  }, [showNotification]);
 
   if (orgDataError) {
     alert("Failed to load organization data: " + orgDataError);
@@ -50,7 +65,7 @@ export default function TeamMemberData() {
             <h3 className="text-lg font-bold text-slate-800">Team Members Data</h3>
           </div>
 
-          <div className="relative max-w-sm w-full mx-4">
+          <div className="manager relative max-w-sm w-full mx-4">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search by title or department..." 
@@ -61,7 +76,7 @@ export default function TeamMemberData() {
             />
           </div>
           
-          <div className="relative inline-block">
+          <div className="manager relative inline-block">
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
@@ -80,7 +95,7 @@ export default function TeamMemberData() {
           {/* Notifications */}
           {showNotification && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
+              <div className="manager bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowNotification(false);

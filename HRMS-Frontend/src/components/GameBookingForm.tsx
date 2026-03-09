@@ -128,7 +128,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     useEffect(() => {
         const clickOutside = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
-        if (!target.closest("div.sub")) {
+        if (!target.closest("div.game")) {
             setShowDropdown(false);
         }
         };
@@ -224,7 +224,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                 <div className="space-y-3">
                     <label className="text-xs font-bold uppercase text-slate-500 flex items-center gap-2"><Users size={14}/> Participants</label>
                     {selectedGame && selectedParticipants.length < selectedGame.gameMaxPlayerPerSlot-1 ? 
-                    <div className="sub relative">
+                    <div className="game relative">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                         <Input placeholder="Search participants..."
                             disabled={!selectedTime} 
@@ -240,16 +240,18 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                                 if (emp.id === user?.id || selectedParticipants.find(e => e.id === emp.id)) return null;
 
                                 return (
-                                <button
-                                    key={emp.id}
-                                    className="w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors"
-                                    onClick={() => handleAddParticipant(emp)}
-                                >
-                                    <User size={14} className="text-blue-600" />
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
-                                    </div>
-                                </button>
+                                <div className="game">
+                                    <button
+                                        key={emp.id}
+                                        className="w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors"
+                                        onClick={() => handleAddParticipant(emp)}
+                                    >
+                                        <User size={14} className="text-blue-600" />
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
+                                        </div>
+                                    </button>
+                                </div>
                                 );
                                 })} 
 
@@ -274,12 +276,14 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                         {selectedParticipants.map((p) => (
                             <Badge key={p.id} variant="secondary" className="pl-2 pr-1 py-1 gap-1 bg-white border shadow-sm">
                                 <span className="text-xs font-medium">{p.name}</span>
-                                <button 
-                                type="button" 
-                                onClick={() => removeParticipant(p.id)}
-                            >
-                                <X size={12} className="text-red-500" />
-                            </button>
+                                <div className="game">
+                                    <button 
+                                    type="button" 
+                                    onClick={() => removeParticipant(p.id)}
+                                    >
+                                    <X size={12} className="text-red-500" />
+                                    </button>
+                                </div>
                             </Badge>
                         ))}
                         {errors.employeesInTravelPlanId && <p className="text-red-500 text-xs">At least one employee must be assigned.</p>}
