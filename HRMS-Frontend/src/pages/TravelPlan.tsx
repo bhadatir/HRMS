@@ -27,7 +27,7 @@ export default function TravelPlan() {
   const [fullTravelDetails, setFullTravelDetails] = useState<number | null>(null);
   const [editTravelPlanId, setEditTravelPlanId] = useState<number | null>(null);
   const [activeExpenseId, setActiveExpenseId] = useState<number | null>(null);
-  const [travelPlanType, setTravelPlanType] = useState<number>(0);
+  const [travelPlanType, setTravelPlanType] = useState<number>(1);
   const [selectedTravelId, setSelectedTravelId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 

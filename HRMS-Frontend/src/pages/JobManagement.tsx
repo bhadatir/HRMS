@@ -29,7 +29,7 @@ export default function JobManagement() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [referJobId, setReferJobId] = useState<number | null>(null);
   const queryClient = useQueryClient();
-  const [jobType, setJobType] = useState(0);
+  const [jobType, setJobType] = useState(1);
   const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   useEffect(() => {

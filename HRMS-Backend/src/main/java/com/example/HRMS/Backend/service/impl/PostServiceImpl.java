@@ -214,6 +214,14 @@ public class PostServiceImpl implements PostService {
                 Employee employee = comment1.getFkCommentEmployee();
                 commentResponse.setParentCommentEmployeeEmail(employee.getEmployeeEmail());
             }
+            PageRequest topFive = PageRequest.of(0, 2);
+            List<Like> recentLikes = likesRepository.findRecentLikesOnComments(comment.getId(), topFive);
+
+            List<String> likerNames = recentLikes.stream()
+                    .map(like -> like.getFkLikeEmployee().getEmployeeFirstName() + " " + like.getFkLikeEmployee().getEmployeeLastName())
+                    .toList();
+
+            commentResponse.setRecentLikerNames(likerNames);
             commentResponses.add(commentResponse);
         }
 

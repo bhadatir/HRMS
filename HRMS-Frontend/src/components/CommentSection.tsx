@@ -88,6 +88,12 @@ export default function CommentSection({ postId }: { postId: number }) {
 
                 <div className="flex items-center gap-4 mt-2">
                     <LikeButton postId={postId} commentId={comment.id} />
+                    {comment.recentLikerNames?.length > 0 && (
+                      <p className="text-[10px] text-slate-500">
+                        Liked by <span className="font-bold text-slate-700">{comment.recentLikerNames.join(", ")}</span>
+                        {comment.recentLikerNames.length > 2 && ` and ${comment.recentLikerNames.length - 2} others`}
+                      </p>
+                    )}
                     <span className="text-[10px] text-slate-400">{comment.commentCreatedAt?.split("T")[0]}</span>
                 </div>
               </div>

@@ -48,6 +48,11 @@ public interface LikesRepository extends JpaRepository<Like,Long> {
         """)
     List<Like> findRecentLikes(@Param("postId") Long postId, Pageable pageable);
 
+    @Query("""
+        SELECT cl FROM Like cl WHERE cl.fkComment.id = :commentId ORDER BY cl.likeCreatedAt DESC
+        """)
+    List<Like> findRecentLikesOnComments(@Param("commentId") Long commentId, Pageable pageable);
+
     Like findLikeByFkPost_IdAndFkLikeEmployee_Id(Long fkPostId, Long fkLikeEmployeeId);
 
     Like findLikeByFkComment_IdAndFkLikeEmployee_Id(Long fkCommentId, @NotNull(message = "employee id require woh make like") Long fkLikeEmployeeId);

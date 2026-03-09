@@ -26,7 +26,7 @@ export default function GameManagement() {
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
     const [showGameTypeForm, setShowGameTypeForm] = useState(false);
     const [gameType, setGameType] = useState<number | null>(null);
-    const [gameBookingStatusId, setgameBookingStatusId] = useState<number | null>(null);
+    const [gameBookingStatusId, setgameBookingStatusId] = useState<number>(0);
     const [showNotification, setShowNotification] = useState(false);
     const [showGameIntrestForm, setShowGameIntrestForm] = useState(false);
     const [showWaitingList, setShowWaitingList] = useState(false);
@@ -258,7 +258,7 @@ export default function GameManagement() {
                             </div>
                             {viewMode === "My Bookings" && <select className="border rounded-md px-2 py-1 text-sm" value={gameBookingStatusId || ""} 
                                 onChange={(e) => setgameBookingStatusId(Number(e.target.value))}>
-                                <option value="">All Statuses</option>
+                                <option value="0">All Statuses</option>
                                 {gameBookingStatusOptions.map((g: any) => <option key={g.id} value={g.id}>{g.gameBookingStatusName}</option>)}
                             </select>}
                         </div>
@@ -273,6 +273,9 @@ export default function GameManagement() {
                                 {filteredBookings.filter((b: any) => (!gameType || b.gameTypeId === gameType) && (!gameBookingStatusId || b.gameBookingStatusId === gameBookingStatusId))
                                     .map((b: any) => 
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />        
+                                )}
+                                {filteredBookings.filter((b: any) => (!gameType || b.gameTypeId === gameType) && (!gameBookingStatusId || b.gameBookingStatusId === gameBookingStatusId)).length === 0 && (
+                                    <p className="text-slate-500 italic">No bookings match the selected filters.</p>
                                 )}
                             </>
                         ) : (

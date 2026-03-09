@@ -2,6 +2,7 @@ package com.example.HRMS.Backend.dto;
 
 import lombok.Data;
 import java.time.Instant;
+import java.util.List;
 
 @Data
 public class CommentResponse {
@@ -25,5 +26,7 @@ public class CommentResponse {
     private Boolean commentIsDeleted;
 
     private String reasonForDeleteComment;
+
+    private List<String> recentLikerNames;
 
 }
