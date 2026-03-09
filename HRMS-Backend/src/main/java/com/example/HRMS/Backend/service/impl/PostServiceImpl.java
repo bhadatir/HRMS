@@ -323,10 +323,17 @@ public class PostServiceImpl implements PostService {
         List<String> emails = new ArrayList<>();
         emails.add(email);
         emailService.sendEmail(emails, "Warning mail", "Do not share this type of content second time :" + comment.getCommentContent());
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<p><strong>Message:</strong>Do not share this type of comment second time</p>" +
+                "<p><strong>Comment Content:</strong> " + comment.getCommentContent() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                "</body>" +
+                "</html>";
         notificationService.createNotification(comment.getFkCommentEmployee().getId()
-                ,"WARNING : comment is deleted by hr"
-                , " at :" + LocalDateTime.now() + " comment content : "
-                        + comment.getCommentContent()
+                ,"WARNING : comment is deleted by HR"
+                , htmlMessage
         );
     }
 
@@ -363,11 +370,18 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(post);
 
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<p><strong>Message:</strong>Do not share this type of post second time</p>" +
+                "<p><strong>Post Title:</strong> " + post.getPostTitle() + "</p>" +
+                "<p><strong>Post Content:</strong> " + post.getPostContent() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                "</body>" +
+                "</html>";
         notificationService.createNotification(post.getFkPostEmployee().getId()
-                ,"WARNING : post is deleted by hr"
-                , " at :" + LocalDateTime.now() + " post title : "
-                        + post.getPostTitle() + " post content : "
-                        + post.getPostContent()
+                ,"WARNING : post is deleted by HR"
+                , htmlMessage
         );
         }
     }

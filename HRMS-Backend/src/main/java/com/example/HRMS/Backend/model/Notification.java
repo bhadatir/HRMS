@@ -2,6 +2,7 @@ package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.Instant;
@@ -26,6 +27,7 @@ public class Notification {
     private String title;
 
     @NotNull(message = "notification message is required")
+    @Size(max = 8000, message = "Notification message must not exceed 8000 characters")
     @Column(name = "notification_message", nullable = false)
     private String message;
 

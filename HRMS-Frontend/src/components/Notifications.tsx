@@ -99,7 +99,9 @@ return (
                       {notif.title}
                     </h4>
                   </div>
-                  <p className="text-sm text-gray-500">{notif.message}</p> 
+                  <p className="text-sm text-gray-500">
+                    <div dangerouslySetInnerHTML={{ __html: notif.message }} />
+                  </p>
                   <Button 
                     variant="link" 
                     className="text-xs text-blue-600"

@@ -159,7 +159,18 @@ public class GameBookingServiceImpl implements GameBookingService {
             pInterest.setPlayedInCurrentCycle(pInterest.getPlayedInCurrentCycle() + 1);
             employeeGameInterestRepository.save(pInterest);
 
-            notificationService.createNotification(pId, "Slot Confirmed!", "Joined " + type.getGameName() + " hosted by " + host.getEmployeeEmail());
+            String htmlMessage = "<html>" +
+                    "<body>" +
+                    "<p><strong>Game Name:</strong> " + type.getGameName() + "</p>" +
+                    "<p><strong>Host Email:</strong> " + host.getEmployeeEmail() + "</p>" +
+                    "<p><strong>Slot Time:</strong> " + start.toLocalDate() + " : " + start.toLocalTime() + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                    "</body>" +
+                    "</html>";
+            notificationService.createNotification(pId,
+                    "Slot Confirmed !",
+                    htmlMessage);
             emails.add(p.getEmployeeEmail());
         }
 
@@ -257,10 +268,17 @@ public class GameBookingServiceImpl implements GameBookingService {
             return;
         }
         for (GameBooking gameBooking : upcomingBooking) {
+            String htmlMessage = "<html>" +
+                    "<body>" +
+                    "<p><strong>Message:</strong> your " + gameBooking.getFkGameType().getGameName() + " Game is start after half hour.</p>" +
+                    "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                    "</body>" +
+                    "</html>";
             notificationService.createNotification(gameBooking.getFkHostEmployee().getId()
                     , "Game Booking Alert!"
-                    , "You " + gameBooking.getFkGameType().getGameName()
-                            + " Game is Start after half hour."
+                    , htmlMessage
             );
         }
 
@@ -328,11 +346,17 @@ public class GameBookingServiceImpl implements GameBookingService {
                 employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() + 1);
                 employeeGameInterestRepository.save(employeeGameInterest);
             }
-
+            String htmlMessage = "<html>" +
+                    "<body>" +
+                    "<p><strong>Message:</strong> You have been promoted to your requested slot for " + bookingWaitingList.getFkGameType().getGameName() + "</p>" +
+                    "<p><strong>Slot Time:</strong> " + bookingWaitingList.getTargetSlotDatetime().toLocalDate() + " : " + bookingWaitingList.getTargetSlotDatetime().toLocalTime() + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                    "</body>" +
+                    "</html>";
             notificationService.createNotification(bookingWaitingList.getFkHostEmployee().getId()
                     , "Slot Confirmed!"
-                    , "You have been promoted to your requested slot => " + bookingWaitingList.getFkGameType().getGameName()
-                            + " : " + startTime + " => " + bookingWaitingList.getFkHostEmployee().getEmployeeEmail() + " book this sloat."
+                    , htmlMessage
             );
         }
 
@@ -342,11 +366,17 @@ public class GameBookingServiceImpl implements GameBookingService {
         employeeGameInterestRepository.save(employeeGameInterest);
 
         waitlistRepository.delete(bookingWaitingList);
-
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<p><strong>Message:</strong> You have been promoted to your requested slot for " + bookingWaitingList.getFkGameType().getGameName() + "</p>" +
+                "<p><strong>Slot Time:</strong> " + bookingWaitingList.getTargetSlotDatetime().toLocalDate() + " : " + bookingWaitingList.getTargetSlotDatetime().toLocalTime() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                "</body>" +
+                "</html>";
         notificationService.createNotification(bookingWaitingList.getFkHostEmployee().getId()
                 , "Slot Confirmed!"
-                , "You have been promoted to your requested slot => " + bookingWaitingList.getFkGameType().getGameName()
-                        + " : " + startTime
+                , htmlMessage
         );
 
     }
@@ -566,7 +596,18 @@ public class GameBookingServiceImpl implements GameBookingService {
                 bookingParticipantRepository.save(bookingParticipant);
 
                 emails.add(employee.getEmployeeEmail());
-                notificationService.createNotification(id, "Game Booking complete", "You are added in Game booking by your friend at :" + Instant.now());
+                String htmlMessage = "<html>" +
+                        "<body>" +
+                        "<p><strong>Message:</strong> You are added in Game booking by your friend " + gameBooking.getFkHostEmployee().getEmployeeEmail() + " </p>" +
+                        "<p><strong>Game Name:</strong> " + gameBooking.getFkGameType().getGameName() + "</p>" +
+                        "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
+                        "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                        "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                        "</body>" +
+                        "</html>";
+                notificationService.createNotification(id,
+                        "Game Booking complete",
+                        htmlMessage);
 
             }
         }
@@ -581,7 +622,19 @@ public class GameBookingServiceImpl implements GameBookingService {
                     List<String> emails1 = new ArrayList<>();
                     emails1.add(employee.getEmployeeEmail());
                     emailService.sendEmail(emails1, "Remove from booking", "Removed from Game Booking by your friend at :" + Instant.now());
-                    notificationService.createNotification(id, "Remove from booking", "Removed from Game Booking by your friend at :" + Instant.now());
+
+                    String htmlMessage = "<html>" +
+                            "<body>" +
+                            "<p><strong>Message:</strong> You are removed from Game booking by your friend " + gameBooking.getFkHostEmployee().getEmployeeEmail() + " </p>" +
+                            "<p><strong>Game Name:</strong> " + gameBooking.getFkGameType().getGameName() + "</p>" +
+                            "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
+                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                            "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                            "</body>" +
+                            "</html>";
+                    notificationService.createNotification(id,
+                            "Remove from booking",
+                            htmlMessage);
                 }
             }
         }

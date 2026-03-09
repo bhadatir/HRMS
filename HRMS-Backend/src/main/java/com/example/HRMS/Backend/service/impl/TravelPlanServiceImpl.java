@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.hibernate.type.descriptor.java.CoercionHelper.toLong;
@@ -118,7 +119,18 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             employeeTravelPlanRepository.save(employeeTravelPlan);
 
             emails.add(employee.getEmployeeEmail());
-            notificationService.createNotification(id,"you are added in Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+            String htmlMessage = "<html>" +
+                    "<body>" +
+                    "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
+                    "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
+                    "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                    "</body>" +
+                    "</html>";
+            notificationService.createNotification(id,
+                    "you are added in Travel Plan by Hr " + savedTravelplan.getFkTravelPlanHREmployee().getEmployeeEmail(),
+                    htmlMessage);
 
         }
 
@@ -135,16 +147,34 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findByFkBookingWaitingList_Id(wait.getId());
             for(BookingParticipant bookingParticipant : bookingParticipants){
                 emails.add(bookingParticipant.getFkEmployee().getEmployeeEmail());
+                String htmlMessage = "<html>" +
+                        "<body>" +
+                        "<p><strong>Game Name:</strong> " + wait.getFkGameType().getGameName() + "</p>" +
+                        "<p><strong>Slot Time:</strong> " + wait.getTargetSlotDatetime() + "</p>" +
+                        "<p><strong>Game Details:</strong> " + details + "</p>" +
+                        "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                        "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                        "</body>" +
+                        "</html>";
                 notificationService.createNotification(bookingParticipant.getFkEmployee().getId()
-                        ,"your game booking waiting list entry is removed at :" + Instant.now()
-                        ," date: " + wait.getTargetSlotDatetime() + " game type: "+ wait.getFkGameType().getGameName() +" details : " + details);
+                        ,"your game booking waiting list entry is removed by HR"
+                        ,htmlMessage);
             }
             bookingParticipantRepository.deleteAll(bookingParticipants);
             waitlistRepository.delete(wait);
 
+            String htmlMessage = "<html>" +
+                    "<body>" +
+                    "<p><strong>Game Name:</strong> " + wait.getFkGameType().getGameName() + "</p>" +
+                    "<p><strong>Slot Time:</strong> " + wait.getTargetSlotDatetime() + "</p>" +
+                    "<p><strong>Game Details:</strong> " + details + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                    "</body>" +
+                    "</html>";
             notificationService.createNotification(wait.getFkHostEmployee().getId()
-                    ,"your game booking waiting list entry is removed at :" + Instant.now()
-                    ," date: " + wait.getTargetSlotDatetime() + " game type: "+ wait.getFkGameType().getGameName() +" details : " + details);
+                    ,"your game booking waiting list entry is removed by HR"
+                    ,htmlMessage);
 
             emailService.sendEmail(emails,"your game booking waiting list entry is at :" + Instant.now()
                     , " date: " + wait.getTargetSlotDatetime() + " game type: "+ wait.getFkGameType().getGameName() +" details : " + details);
@@ -173,9 +203,18 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 }
 
                 emails.add(bookingParticipant.getFkEmployee().getEmployeeEmail());
+                String htmlMessage = "<html>" +
+                        "<body>" +
+                        "<p><strong>Game Name:</strong> " + booking.getFkGameType().getGameName() + "</p>" +
+                        "<p><strong>Slot Time:</strong> " + booking.getGameBookingStartTime() + "</p>" +
+                        "<p><strong>Game Details:</strong> " + details + "</p>" +
+                        "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                        "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                        "</body>" +
+                        "</html>";
                 notificationService.createNotification(bookingParticipant.getFkEmployee().getId()
-                        ,"your game booking is removed at :" + Instant.now()
-                        ," date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" details : " + details);
+                        ,"your game booking is removed by HR"
+                        ,htmlMessage);
                 bookingParticipantRepository.delete(bookingParticipant);
             }
 
@@ -190,10 +229,18 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             if (booking.getFkGameBookingStatus().getId() == 1 ) {
                 gameBookingService.updateWaitingList(booking.getFkGameType(), booking.getGameBookingStartTime());
             }
-
+            String htmlMessage = "<html>" +
+                    "<body>" +
+                    "<p><strong>Game Name:</strong> " + booking.getFkGameType().getGameName() + "</p>" +
+                    "<p><strong>Slot Time:</strong> " + booking.getGameBookingStartTime() + "</p>" +
+                    "<p><strong>Game Details:</strong> " + details + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                    "</body>" +
+                    "</html>";
             notificationService.createNotification(booking.getFkHostEmployee().getId()
-                    ,"your game booking is removed at :" + Instant.now()
-                    ," date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" details : " + details);
+                    ,"your game booking is removed by HR"
+                    , htmlMessage);
             emailService.sendEmail(emails,"your game booking is removed at :" + Instant.now()
                     , " date : " + booking.getGameBookingStartTime() + " game type : "+ booking.getFkGameType().getGameName() +" details : " + details);
 
@@ -276,7 +323,18 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     emails1.add(employee.getEmployeeEmail());
                     addedTravelMembers.add(employee.getEmployeeEmail());
                     emailService.sendEmail(emails1,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
-                    notificationService.createNotification(id,"ReAdded from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
+                    String htmlMessage = "<html>" +
+                            "<body>" +
+                            "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
+                            "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
+                            "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                            "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                            "</body>" +
+                            "</html>";
+                    notificationService.createNotification(id,
+                            "You are reAdded in Travel Plan by HR",
+                            htmlMessage);
 
                 } else {
 
@@ -291,8 +349,19 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     employeeTravelPlanRepository.save(employeeTravelPlan);
 
                     emails.add(employee.getEmployeeEmail());
+                    String htmlMessage = "<html>" +
+                            "<body>" +
+                            "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
+                            "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
+                            "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                            "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                            "</body>" +
+                            "</html>";
                     addedTravelMembers.add(employee.getEmployeeEmail());
-                    notificationService.createNotification(id,"New added in Travel Plan by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+                    notificationService.createNotification(id,
+                            "You are added in Travel Plan by Hr",
+                            htmlMessage);
 
                 }
             }
@@ -309,7 +378,18 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 emails1.add(employee.getEmployeeEmail());
                 removedTravelMembers.add(employee.getEmployeeEmail());
                 emailService.sendEmail(emails1,"Removed from Travel Plan by Hr at :" + Instant.now(),travelPlanRequest.getTravelPlanDetails());
-                notificationService.createNotification(id,"Removed from Travel Plan by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+                String htmlMessage = "<html>" +
+                        "<body>" +
+                        "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
+                        "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
+                        "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
+                        "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                        "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                        "</body>" +
+                        "</html>";
+                notificationService.createNotification(id,
+                        "You are Removed from Travel Plan by HR",
+                        htmlMessage);
 
             }
         }
@@ -385,11 +465,34 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             List<String> emails1 = new ArrayList<>();
             emails1.add(employee1.getEmployeeEmail());
             emailService.sendEmail(emails1,"Travel Plan id deleted by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
-            notificationService.createNotification(empId,"Travel Plan id deleted by Hr at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+            String htmlMessage = "<html>" +
+                    "<body>" +
+                    "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
+                    "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
+                    "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                    "</body>" +
+                    "</html>";
+            notificationService.createNotification(empId,
+                    "Travel Plan deleted by HR",
+                    htmlMessage);
         }
 
         emailService.sendEmail(emails,"Travel Plan id deleted by You at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
-        notificationService.createNotification(hrId,"Travel Plan id deleted by You at :" + Instant.now(),travelPlanRepository.findTravelPlanById(travelPlanId).getTravelPlanDetails());
+
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
+                "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
+                "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                "</body>" +
+                "</html>";
+        notificationService.createNotification(hrId,
+                "Travel Plan id deleted by You",
+                htmlMessage);
     }
 
 
@@ -614,11 +717,19 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 List<Long> employeeIdByTravelPlanId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlan.getId());
 
                 for (Long id : employeeIdByTravelPlanId) {
+                    String htmlMessage = "<html>" +
+                            "<body>" +
+                            "<p><strong>Message:</strong> You have now only 5 days remaining to add expense </p>" +
+                            "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
+                            "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
+                            "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                            "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                            "</body>" +
+                            "</html>";
                     notificationService.createNotification(id
                             , "Expense Upload reminder"
-                            , "For Travel Plan : "
-                                    + travelPlan.getTravelPlanName() +
-                                    " You have now only 5 days remaining to add expense "
+                            , htmlMessage
                     );
                 }
             }

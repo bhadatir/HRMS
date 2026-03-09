@@ -209,12 +209,19 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setExpenseStatusChangeBy(email);
         expenseRepository.save(expense);
 
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
+                "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
+                "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                "<p><strong>Status:</strong> " + expenseStatusRepository.findExpenseStatusById(statusId).getExpenseStatusName() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                "</body>" +
+                "</html>";
         notificationService.createNotification(expense.getFkEmployeeTravelPlan().getFkEmployee().getId()
-                ,"Expense Status Upgraded"
-                , "Status : " + expenseStatusRepository.findExpenseStatusById(statusId).getExpenseStatusName()
-                   + " at :" + LocalDateTime.now() + " by "
-                   + expense.getFkEmployeeTravelPlan().getFkTravelPlan().getFkTravelPlanHREmployee().getEmployeeEmail() + " for "
-                   + expense.getFkEmployeeTravelPlan().getFkTravelPlan().getTravelPlanName() + " travel plan"
+                ,"Expense Status Upgraded by " + expense.getFkEmployeeTravelPlan().getFkTravelPlan().getFkTravelPlanHREmployee().getEmployeeEmail()
+                , htmlMessage
         );
     }
 
@@ -284,11 +291,18 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseProofRepository.save(expenseProof);
 
         }
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
+                "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
+                "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                "</body>" +
+                "</html>";
         notificationService.createNotification(employeeTravelPlan.getFkTravelPlan().getFkTravelPlanHREmployee().getId()
-                ,"Expense Added"
-                , "at :" + LocalDateTime.now() + " by "
-                + employeeTravelPlan.getFkEmployee().getEmployeeEmail() + " for "
-                + employeeTravelPlan.getFkTravelPlan().getTravelPlanName() + " travel plan"
+                ,"Expense Added by " + employeeTravelPlan.getFkEmployee().getEmployeeEmail()
+                , htmlMessage
         );
 
     }

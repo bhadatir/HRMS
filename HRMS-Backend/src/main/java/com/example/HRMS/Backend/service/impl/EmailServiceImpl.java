@@ -62,7 +62,7 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setTo(emails);
             helper.setSubject(subject);
-            helper.setText(text);
+            helper.setText(text, true);
 
             String relativePath = path.replace(url, "");
             String fullPath = System.getProperty("user.dir") +"/"+ folderPath + relativePath;

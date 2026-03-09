@@ -226,13 +226,18 @@ public class JobServiceImpl implements JobService {
 
 
         referFriendRepository.save(referFriend);
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<p><strong>By:</strong> " + employee.getEmployeeEmail() + "</p>" +
+                "<p><strong>For Job:</strong> " + job.getJobTitle() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                "</body>" +
+                "</html>";
 
         notificationService.createNotification(job.getFkJobOwnerEmployee().getId()
                 ,"Refer Friend For Job"
-                , "by "
-                        + employee.getEmployeeEmail() + " for Job : "
-                        + job.getJobTitle()
-                        + " at :" + LocalDateTime.now()
+                , htmlMessage
         );
 
         File savedFile = new File(System.getProperty("user.dir") + "/" + folderPath + filePath);
@@ -303,12 +308,18 @@ public class JobServiceImpl implements JobService {
         ));
         referFriend.setReasonForCvStatusChange(reason);
         referFriendRepository.save(referFriend);
+        String htmlMessage = "<html>" +
+                "<body>" +
+                "<p><strong>Status:</strong> " + cvStatusTypeRepository.findCvStatusTypeById(statusId).getCvStatusTypeName() + "</p>" +
+                "<p><strong>Updated by:</strong> " + referFriend.getFkJob().getFkJobOwnerEmployee().getEmployeeEmail() + "</p>" +
+                "<p><strong>Job:</strong> " + referFriend.getFkJob().getJobTitle() + "</p>" +
+                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
+                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
+                "</body>" +
+                "</html>";
         notificationService.createNotification(referFriend.getFkReferFriendEmployee().getId()
                 ,"Status upgraded of your Refer Friend CV"
-                ,  "Status : " + cvStatusTypeRepository.findCvStatusTypeById(statusId).getCvStatusTypeName() + " by "
-                        + referFriend.getFkJob().getFkJobOwnerEmployee().getEmployeeEmail() + " for Job : "
-                        + referFriend.getFkJob().getJobTitle()
-                        + " at :" + LocalDateTime.now()
+                , htmlMessage
         );
     }
 
