@@ -70,7 +70,8 @@ public interface EmployeeTravelPlanRepository extends JpaRepository<EmployeeTrav
             "WHERE (tp.fkTravelPlanHREmployee.id = :empId " +
             "OR etp.fkEmployee.id = :empId " +
             "OR etp.fkEmployee.fkManagerEmployee.id = :empId) " +
-            "AND (lower(tp.travelPlanName) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "AND (CAST(tp.id AS string) LIKE concat('%', :searchTerm, '%') " +
+            "OR lower(tp.travelPlanName) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR lower(tp.travelPlanDetails) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR lower(tp.travelPlanFrom) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR lower(tp.travelPlanTo) LIKE lower(concat('%', :searchTerm, '%')) " +

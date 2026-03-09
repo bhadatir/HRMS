@@ -16,7 +16,27 @@ export function useEmployeeSearch(searchTerm: string, token: string) {
       apiService.searchEmployees(debouncedSearch, pageParam, 5, token),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
-    enabled: !!token && debouncedSearch.length >= 1,
+    enabled: !!token,
+    placeholderData: (previousData) => previousData,
+  });
+
+  return {
+    ...query,
+    debouncedSearch,
+  };
+} 
+
+export function useGlobalSearch(searchTerm: string, token: string) {
+  const debouncedSearch = useAppDebounce(searchTerm);
+
+  const query = useInfiniteQuery({
+    queryKey: ["globalSearch", debouncedSearch],
+    queryFn: ({ pageParam = 0 }) =>
+      apiService.globalSearch(debouncedSearch, pageParam, 10, token || ""),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
+    enabled: !!token,
+    placeholderData: (previousData) => previousData,
   });
 
   return {
@@ -34,8 +54,9 @@ export function useFindTravelPlanByEmployeeId(searchTerm: string, token: string)
     queryFn: ({ pageParam = 0 }) => 
       travelService.findTravelPlanByEmployeeId(user?.id, debouncedSearch, pageParam, 9, token || ""),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
+    enabled: !!token,
+    placeholderData: (previousData) => previousData,
   });  
 
   return {
@@ -52,8 +73,9 @@ export function useGetAllTravelPlans(searchTerm: string, token: string) {
     queryFn: ({ pageParam = 0 }) => 
       travelService.getAllTravelPlans(debouncedSearch, pageParam, 9, token || ""),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
+    enabled: !!token,
+    placeholderData: (previousData) => previousData,
   });
 
   return {
@@ -70,9 +92,9 @@ export function useSearchAvailableEmployeeForTravel(searchTerm: string, token: s
   queryFn: ({ pageParam = 0 }) => 
     apiService.searchAvailableEmployeeForTravel(debouncedSearch, pageParam, 5, startDate, endDate, token),
   initialPageParam: 0,
-  getNextPageParam: (lastPage) => 
-    lastPage.last ? undefined : lastPage.number + 1,
+  getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
   enabled: debouncedSearch.length >= 1 && !!startDate && !!endDate,
+  placeholderData: (previousData) => previousData,
 });
 
   return {
@@ -89,8 +111,9 @@ export function useGetAllJobs(searchTerm: string, token: string) {
     queryFn: ({ pageParam = 0 }) => 
       jobService.getAllJobs(debouncedSearch, pageParam, 3, token || ""),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
+    enabled: !!token,
+    placeholderData: (previousData) => previousData,
   });
 
   return {
@@ -107,8 +130,9 @@ export function useShowAllPosts(searchTerm: string, token: string) {
     queryFn: ({ pageParam = 0 }) => 
       postService.showAllPosts(debouncedSearch, pageParam, 2, token || ""),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
+    enabled: !!token,
+    placeholderData: (previousData) => previousData,
   });
 
   return {
@@ -126,8 +150,9 @@ export function useFindGameBookingByUserId(searchTerm: string, token: string) {
     queryFn: ({ pageParam = 0 }) => 
       gameService.findGameBookingByUserId(user?.id, debouncedSearch, pageParam, 4, token || ""),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
+    enabled: !!token,
+    placeholderData: (previousData) => previousData,
   });
 
   return {
@@ -145,8 +170,9 @@ export function useGetUserNotifications(searchTerm: string, token: string) {
     queryFn: ({ pageParam = 0 }) => 
       apiService.getUserNotifications(user?.id, debouncedSearch, pageParam, 4, token || ""),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => 
-      lastPage.last ? undefined : lastPage.number + 1,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
+    enabled: !!token,
+    placeholderData: (previousData) => previousData,
   });
 
   return {

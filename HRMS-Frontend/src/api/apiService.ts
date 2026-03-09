@@ -70,11 +70,6 @@ export const apiService = {
     return res.data;
   },
 
-  getAllEmployees: async (searchTerm:string, token: string) => {
-    const res = await api.get(`/admin/?searchTerm=${searchTerm}`, authHeader(token));
-    return res.data;
-  },
-
   getAllRoles: async (token: string) => {
     const res = await api.get("/admin/allRoles", authHeader(token));
     return res.data;
@@ -122,6 +117,11 @@ export const apiService = {
 
   markAllNotificationsRead: async (empId: number, token: string) => {
     const res = await api.post(`/notification/markAsSeen/empId/${empId}`, {}, authHeader(token));
+    return res.data;
+  },
+
+  globalSearch: async (searchTerm: string, page: number, size: number, token: string) => {
+    const res = await api.get(`/user/global-search?searchTerm=${searchTerm}&page=${page}&size=${size}`, authHeader(token));
     return res.data;
   }
 

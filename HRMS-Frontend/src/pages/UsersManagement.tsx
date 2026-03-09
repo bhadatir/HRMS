@@ -1,5 +1,4 @@
-import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -7,13 +6,14 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { X, Bell, Plus, Search } from "lucide-react";
 import Notifications from "@/components/Notifications.tsx";
-import { apiService } from "@/api/apiService.ts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import AddUser from "../components/AddUser";
 import { Input } from "@/components/ui/input";
 import UserDetails from "@/components/UserDetails";
 import { cn } from "@/lib/utils";
-import { useAppDebounce } from "../hooks/useAppDebounce";
+import { useEmployeeSearch } from "@/hooks/useInfinite";
+import { useInView } from "react-intersection-observer";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -23,13 +23,22 @@ export default function JobManagement() {
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
   const [employeeType, setEmployeeType] = useState(0);
-  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
-  const { data: allEmp, isLoading, isError: allEmpError } = useQuery({
-    queryKey: ["allEmployees", debouncedSearchTerm],
-    queryFn: () => apiService.getAllEmployees(debouncedSearchTerm, token || ""),
-    enabled: !!token,
-  });
+  const { 
+    data: allEmpData, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage,
+    isError: allEmpError 
+  } = useEmployeeSearch(searchTerm, token || "");
+  const allEmp = allEmpData?.pages.flatMap(page => page.content) || [];
+
+  const { ref, inView } = useInView();
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage]);
 
   if (allEmpError) {
     alert("Failed to load employees: " + allEmpError);
@@ -153,11 +162,7 @@ export default function JobManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {isLoading ? (
-                        <TableRow>
-                            <TableCell colSpan={5} className="text-center p-4">Loading...</TableCell>
-                        </TableRow>
-                    ) : filterEmp?.length > 0 ? (
+                    {filterEmp?.length > 0 ? (
                         filterEmp.map((emp: any, index: number) => (
                             <TableRow key={emp.id} 
                               title = {emp.employeeIsActive ? "Active User" : "Inactive User"}
@@ -183,8 +188,13 @@ export default function JobManagement() {
                     )}
                 </TableBody>
               </Table>
+              <div ref={ref} className="h-10 flex justify-center items-center">
+                {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+              </div>
             </CardContent>
           </Card>
+          
+          <ScrollToTop />
         </main>
       </SidebarInset>
     </SidebarProvider>

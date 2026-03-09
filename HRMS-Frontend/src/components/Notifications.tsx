@@ -10,6 +10,7 @@ import { Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useInView } from "react-intersection-observer";
 import { useGetUserNotifications } from "@/hooks/useInfinite";
+import { ScrollToTop } from "./ScrollToTop";
 
 export default function Notifications() {
   const { token, user } = useAuth();

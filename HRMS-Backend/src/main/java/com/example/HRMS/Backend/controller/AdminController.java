@@ -9,6 +9,7 @@ import com.example.HRMS.Backend.model.Role;
 import com.example.HRMS.Backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,11 +47,6 @@ public class AdminController {
     @GetMapping("/allDepartments")
     public ResponseEntity<List<Department>> showAllDepartments() {
         return ResponseEntity.ok(authService.showAllDepartments());
-    }
-
-    @GetMapping("/")
-    public ResponseEntity<List<EmployeeResponse>> getAllEmployees(@RequestParam String searchTerm) {
-        return ResponseEntity.ok(authService.getAllEmployees(searchTerm));
     }
 
     @GetMapping("/allRoles")

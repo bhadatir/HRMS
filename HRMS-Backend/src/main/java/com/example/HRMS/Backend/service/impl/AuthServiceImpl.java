@@ -208,12 +208,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<EmployeeResponse> getAllEmployees(String searchTerm){
-        List<Employee> employee = employeeRepository.findAllBySearchTerm(searchTerm);
-        return employee.stream().map(employee1 -> modelMapper.map(employee1,EmployeeResponse.class)).toList();
-    }
-
-    @Override
     public void addProfileImage(Long empId, MultipartFile file) throws IOException {
         Employee employee = employeeRepository.findEmployeeById(empId);
 
@@ -225,35 +219,39 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Page<EmployeeSearch> getEmployeeByName(String query, int page, int size){
+    public Page<EmployeeResponse> getEmployeeByName(String query, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
-        return employeeRepository.searchEmployeeByName(query, pageable);
+        Page<Employee> employees = employeeRepository.searchEmployeeByName(query, pageable);
+        return employees.map(employee -> modelMapper.map(employee, EmployeeResponse.class));
     }
 
     @Override
-    public Page<EmployeeSearch> getAvailableEmployeeForTravel(String query, int page, int size, LocalDate startDate, LocalDate endDate){
+    public Page<EmployeeResponse> getAvailableEmployeeForTravel(String query, int page, int size, LocalDate startDate, LocalDate endDate){
         Pageable pageable = PageRequest.of(page, size);
-        Page<EmployeeSearch> employeeSearches = employeeRepository.searchEmployeeByName(query, pageable);
-        if (employeeSearches == null || startDate == null || endDate == null) {
+        Page<Employee> employees = employeeRepository.searchEmployeeByName(query, pageable);
+
+        if (employees == null || startDate == null || endDate == null) {
             throw new IllegalArgumentException("Page and date must not be null");
         }
 
-        List<EmployeeSearch> filteredList = employeeSearches.getContent()
-                .stream()
-                .filter(emp -> !travelPlanRepository.findAllByTravelStartTimeBetween(emp.getId(), startDate, endDate))
+        List<EmployeeResponse> filteredEmployees = employees.stream()
+                .filter(emp -> !travelPlanRepository
+                        .findAllByTravelStartTimeBetween(emp.getId(), startDate, endDate))
+                .map(employee -> modelMapper.map(employee, EmployeeResponse.class))
                 .toList();
 
-        return new PageImpl<>(filteredList, pageable, filteredList.size());
+        return new PageImpl<>(filteredEmployees, pageable, filteredEmployees.size());
     }
 
     @Override
     public
-    Page<EmployeeSearch> getAvailableParticipants(String query, int page, int size,
+    Page<EmployeeResponse> getAvailableParticipants(String query, int page, int size,
                                                   LocalDateTime startDate1,
                                                   Long gameTypeId){
         Pageable pageable = PageRequest.of(page, size);
         LocalDateTime endDate1 = startDate1.plusMinutes(gameTypeRepository.findGameTypeById(gameTypeId).getGameSlotDuration());
-        return employeeRepository.searchAvailableParticipants(query, startDate1, endDate1, gameTypeId, pageable);
+        Page<Employee> employees = employeeRepository.searchAvailableParticipants(query, startDate1, endDate1, gameTypeId, pageable);
+        return employees.map(employee -> modelMapper.map(employee, EmployeeResponse.class));
     }
 
     @Override

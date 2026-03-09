@@ -61,7 +61,8 @@ public interface TravelPlanRepository extends JpaRepository<TravelPlan, Long> {
     boolean findAllByTravelStartTimeBetween(Long id,  LocalDate startDate, LocalDate endDate);
 
     @Query("SELECT tp FROM TravelPlan tp " +
-            "WHERE (lower(tp.travelPlanName) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "WHERE (CAST(tp.id AS string) LIKE concat('%', :searchTerm, '%') " +
+            "OR lower(tp.travelPlanName) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR lower(tp.travelPlanDetails) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR lower(tp.travelPlanFrom) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR lower(tp.travelPlanTo) LIKE lower(concat('%', :searchTerm, '%')) " +

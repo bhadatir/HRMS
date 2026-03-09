@@ -95,7 +95,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["user", editUserEmail] });
-        queryClient.invalidateQueries({ queryKey: ["allEmployees"] });
+        queryClient.invalidateQueries({ queryKey: ["searchEmployees"] });
         reset();
         alert(editUserEmail ? "User updated successfully!" : "User created successfully!");
         onSuccess();

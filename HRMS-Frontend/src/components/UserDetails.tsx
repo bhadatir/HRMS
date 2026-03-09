@@ -28,7 +28,7 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
     mutationFn: (reason: string) => apiService.inActiveUserByID(userData?.id, reason, token!),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", userEmail] });
-      queryClient.invalidateQueries({ queryKey: ["allEmployees"] });
+      queryClient.invalidateQueries({ queryKey: ["searchEmployees"] });
     },
     onError: (error: any) => {
       alert("Failed to inactivate user: " + (error.response?.data || error.message));

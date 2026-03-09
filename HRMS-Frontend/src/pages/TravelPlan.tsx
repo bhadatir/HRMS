@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import Notifications from "../components/Notifications.tsx";
 import { useInView } from "react-intersection-observer";
 import { useFindTravelPlanByEmployeeId, useGetAllTravelPlans } from "../hooks/useInfinite";
+import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 
 export default function TravelPlan() {
   const { token, user, unreadNotifications } = useAuth(); 
@@ -30,7 +31,17 @@ export default function TravelPlan() {
   const [selectedTravelId, setSelectedTravelId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-    const {
+  
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const travelPlanId = urlParams.get("travelPlanId");
+    
+    if (travelPlanId) {
+      setSearchTerm(travelPlanId);
+    }
+  }, []);
+
+  const {
     data: allTravelPlansData,
     fetchNextPage: fetchAllTravelPlansNextPage,
     hasNextPage: hasAllTravelPlansNextPage,
@@ -373,6 +384,8 @@ export default function TravelPlan() {
           <div ref={ref} className="h-10 flex justify-center items-center">
             {( isFetchingAllTravelPlansNextPage || isFetchingTravelPlanByEmpIdNextPage )? <p className="text-xs">Loading more...</p> : null}
           </div>
+          
+          <ScrollToTop />
         </main>
       </SidebarInset>
     </SidebarProvider>

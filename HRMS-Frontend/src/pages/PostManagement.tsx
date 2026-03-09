@@ -16,6 +16,7 @@ import Notifications from "@/components/Notifications";
 import PostTags from "@/components/PostTags";
 import { useInView } from "react-intersection-observer";
 import { useShowAllPosts } from "@/hooks/useInfinite";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 export default function PostManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -246,6 +247,8 @@ export default function PostManagement() {
           <div ref={ref} className="h-10 flex justify-center items-center">
             { isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
           </div>
+          
+          <ScrollToTop />
         </main>
       </SidebarInset>
     </SidebarProvider>

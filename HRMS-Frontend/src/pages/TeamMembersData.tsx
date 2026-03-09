@@ -11,18 +11,30 @@ import { apiService } from "@/api/apiService.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
+import { useAppDebounce } from "@/hooks/useAppDebounce";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 export default function TeamMemberData() {
   const { token, user, unreadNotifications } = useAuth();
   const [showNotification, setShowNotification] = useState(false);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useAppDebounce(searchTerm);
 
   const { data: orgData, isError: orgDataError } = useQuery({
     queryKey: ["orgChart", user?.id],
     queryFn: () => apiService.fetchOrgChart(user?.id || 0, token || ""),
     enabled: !!user?.id,
   });
+
+  const filteredData = orgData?.directReports.filter((org: any) =>
+    debouncedSearch === "" || 
+    org.firstName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    org.lastName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    org.employeeEmail.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    org.positionName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    org.departmentName.toLowerCase().includes(debouncedSearch.toLowerCase())
+  );  
 
   if (orgDataError) {
     alert("Failed to load organization data: " + orgDataError);
@@ -78,13 +90,7 @@ export default function TeamMemberData() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {orgData?.directReports.map((org: any) => (
-                searchTerm === "" || 
-                org.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                org.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                org.employeeEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                org.positionName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                org.departmentName.toLowerCase().includes(searchTerm.toLowerCase())) && (
+            {filteredData?.map((org: any) => (
                 <Card 
                   key={org.id} 
                   className="border-slate-200"
@@ -117,7 +123,14 @@ export default function TeamMemberData() {
                   </CardContent>
                 </Card>
             ))}
+            {filteredData?.length === 0 && (
+              <div className="col-span-full text-center text-gray-500">
+                No team members found matching "{debouncedSearch}"
+              </div>
+            )}
           </div>
+          
+          <ScrollToTop />
         </main>
       </SidebarInset>
     </SidebarProvider>

@@ -17,6 +17,7 @@ import Notifications from "@/components/Notifications.tsx";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useGetAllJobs } from "../hooks/useInfinite";
 import { useInView } from "react-intersection-observer";
+import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -327,6 +328,8 @@ export default function JobManagement() {
           <div ref={ref} className="h-10 flex justify-center items-center">
             { isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
           </div>
+          
+          <ScrollToTop />
         </main>
       </SidebarInset>
     </SidebarProvider>

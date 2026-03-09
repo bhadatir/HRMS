@@ -11,11 +11,13 @@ import PostManagement from "./pages/PostManagement";
 import GameManagement from "./pages/GameManagement";
 import TeamMemberData from "./pages/TeamMembersData";
 import UsersManagement from "./pages/UsersManagement";
+import { GlobalSearch } from "./components/GlobalSearch";
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <GlobalSearch />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />

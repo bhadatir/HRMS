@@ -7,10 +7,12 @@ import { gameService } from "@/api/gameService";
 import { Calendar, Clock, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useState } from "react";
+import { useAppDebounce } from "@/hooks/useAppDebounce";
 
 export default function WaitingList({waitingListId, onSuccess}: {waitingListId: number, onSuccess: () => void}) {
   const { token } = useAuth();
-  const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
+  const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");  
+  const debouncedSearch = useAppDebounce(waitingListSearchTerm);
 
   const { data: waitingList,isError: waitingListError } = useQuery({
     queryKey: ["waitingList", waitingListId],
@@ -25,9 +27,9 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
   });
 
   const filteredWaitingListSeq = waitingListSeq?.filter((wls: any) =>
-    wls.hostEmployeeEmail.toLowerCase().includes(waitingListSearchTerm.toLowerCase()) ||
-    wls.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(waitingListSearchTerm.toLowerCase())) ||
-    wls.waitingListCreatedAt.toLowerCase().includes(waitingListSearchTerm.toLowerCase())
+    wls.hostEmployeeEmail.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    wls.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
+    wls.waitingListCreatedAt.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
   if(waitingListError || waitingListSeqError) {

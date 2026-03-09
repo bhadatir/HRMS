@@ -18,8 +18,8 @@ import { apiService } from "@/api/apiService.ts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { travelService } from "@/api/travelService.ts";
 import { gameService } from "@/api/gameService.ts";
-import { se } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
+import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 
 export default function Dashboard() {
   const { setIsFirstLogin, token, isFirstLogin, user, unreadNotifications } = useAuth();
@@ -110,6 +110,7 @@ export default function Dashboard() {
     mutationFn: () => apiService.updatePassword(user.id, newPassword, token || ""),
     onSuccess: () => {
       alert("Password updated successfully!");
+      localStorage.setItem("isFirstLogin", "no");
       setIsFirstLogin("no");
     },
     onError: (error: any) => {
@@ -363,6 +364,8 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
+
+            <ScrollToTop />
           </main>
         </SidebarInset>
       </SidebarProvider>

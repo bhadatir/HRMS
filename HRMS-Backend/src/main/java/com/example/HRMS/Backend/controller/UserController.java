@@ -1,9 +1,13 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.*;
+import com.example.HRMS.Backend.repository.EmployeeRepository;
+import com.example.HRMS.Backend.repository.TravelPlanRepository;
 import com.example.HRMS.Backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +16,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -19,6 +25,8 @@ import java.time.format.DateTimeFormatter;
 public class UserController {
 
     private final AuthService authService;
+    private final EmployeeRepository employeeRepository;
+    private final TravelPlanRepository travelPlanRepository;
 
     @GetMapping("/email")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) {
@@ -26,14 +34,14 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<EmployeeSearch>> getEmployee(@RequestParam String query,
+    public ResponseEntity<Page<EmployeeResponse>> getEmployee(@RequestParam String query,
                                                             @RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(authService.getEmployeeByName(query, page, size));
     }
 
     @GetMapping("/travel/search")
-    public ResponseEntity<Page<EmployeeSearch>> getAvailableEmployeeForTravel(@RequestParam String query,
+    public ResponseEntity<Page<EmployeeResponse>> getAvailableEmployeeForTravel(@RequestParam String query,
                                                                      @RequestParam(defaultValue = "0") int page,
                                                                      @RequestParam(defaultValue = "10") int size,
                                                                      @RequestParam String startDate,
@@ -45,7 +53,7 @@ public class UserController {
     }
 
     @GetMapping("/participants/search")
-    public ResponseEntity<Page<EmployeeSearch>> getAvailableParticipants(@RequestParam String query,
+    public ResponseEntity<Page<EmployeeResponse>> getAvailableParticipants(@RequestParam String query,
                                                                              @RequestParam(defaultValue = "0") int page,
                                                                              @RequestParam(defaultValue = "10") int size,
                                                                              @RequestParam String startDate,
@@ -71,6 +79,33 @@ public class UserController {
     @PostMapping("/logout")
     public void logout() {
         authService.logout();
+    }
+
+        @GetMapping("/global-search")
+    public ResponseEntity<GlobalSearchResponse> globalSearch(
+            @RequestParam String searchTerm,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<GlobalSearchResult> employeePage = employeeRepository
+                .findAllBySearchTerm(searchTerm, pageable)
+                .map(e -> new GlobalSearchResult(
+                        e.getId(),
+                        e.getEmployeeFirstName() + " " + e.getEmployeeLastName(),
+                        e.getFkRole().getRoleName(),
+                        "EMPLOYEE" ));
+
+        Page<GlobalSearchResult> travelPage = travelPlanRepository
+                .findTravelPlans(searchTerm, pageable)
+                .map(t -> new GlobalSearchResult(
+                        t.getId(),
+                        "Trip to " + t.getTravelPlanTo(),
+                        t.getTravelPlanDetails(),
+                        "TRAVEL_PLAN" ));
+
+        return ResponseEntity.ok(new GlobalSearchResponse(employeePage, travelPage));
     }
 
 }

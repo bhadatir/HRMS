@@ -27,15 +27,13 @@ public interface AuthService {
 
     void addProfileImage(Long empId, MultipartFile file) throws IOException;
 
-    Page<EmployeeSearch> getEmployeeByName(String query, int page, int size);
+    Page<EmployeeResponse> getEmployeeByName(String query, int page, int size);
 
     Employee getLoginUser();
 
-    Page<EmployeeSearch> getAvailableEmployeeForTravel(String query, int page, int size, LocalDate startDate, LocalDate endDate);
+    Page<EmployeeResponse> getAvailableEmployeeForTravel(String query, int page, int size, LocalDate startDate, LocalDate endDate);
 
-    Page<EmployeeSearch> getAvailableParticipants(String query, int page, int size, LocalDateTime startDate1, Long gameTypeId);
-
-    List<EmployeeResponse> getAllEmployees(String searchTerm);
+    Page<EmployeeResponse> getAvailableParticipants(String query, int page, int size, LocalDateTime startDate1, Long gameTypeId);
 
     void updateUser(@Valid RegisterRequest registerRequest, String userEmail);
 

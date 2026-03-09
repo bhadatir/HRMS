@@ -16,6 +16,7 @@ import { Search, User, Bell, X } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
 import { useInView } from "react-intersection-observer";
 import { useEmployeeSearch } from "../hooks/useInfinite";
+import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 
 export default function OrganizationChart() {
   const { token, unreadNotifications } = useAuth(); 
@@ -38,6 +39,14 @@ export default function OrganizationChart() {
     queryFn: () => apiService.fetchOrgChart(selectedId, token || ""),
     enabled: !!selectedId,
   });
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const employeeId = urlParams.get("employeeId");
+    if (employeeId) {
+      setSelectedId(parseInt(employeeId));
+    }
+  }, []);
 
   const { ref, inView } = useInView();
   useEffect(() => {
@@ -210,6 +219,8 @@ export default function OrganizationChart() {
               </section>
             </>
           )}
+          
+          <ScrollToTop />
         </div>
       </SidebarInset>
     </SidebarProvider>

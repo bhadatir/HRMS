@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.HRMS.Backend.dto.EmployeeSearch;
 import com.example.HRMS.Backend.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,23 +35,15 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     //for pass reset
     Optional<Employee> findByResetToken(String resetToken);
 
-    @Query(value = "SELECT NEW com.example.HRMS.Backend.dto.EmployeeSearch( " +
-            "e.id, e.employeeFirstName, e.employeeLastName, " +
-            "e.employeeEmail, e.fkRole.id, e.fkRole.roleName, e.fkPosition.id, " +
-            "e.fkPosition.positionName, e.fkDepartment.id, " +
-            "e.fkDepartment.departmentName ) " +
+    @Query(value = "SELECT e " +
             "FROM Employee e " +
             "WHERE lower(e.employeeFirstName) like lower(concat('%', :query,'%')) " +
             "or lower(e.employeeLastName) like lower(concat('%', :query,'%')) " +
             "or lower(e.employeeEmail) like lower(concat('%', :query,'%')) ")
-    Page<EmployeeSearch> searchEmployeeByName(@Param("query") String query, Pageable pageable);
+    Page<Employee> searchEmployeeByName(@Param("query") String query, Pageable pageable);
 
     @Query(value =
-            "SELECT NEW com.example.HRMS.Backend.dto.EmployeeSearch( " +
-                    "e.id, e.employeeFirstName, e.employeeLastName, " +
-                    "e.employeeEmail, e.fkRole.id, e.fkRole.roleName, e.fkPosition.id, " +
-                    "e.fkPosition.positionName, e.fkDepartment.id, " +
-                    "e.fkDepartment.departmentName ) " +
+            "SELECT e " +
                     "FROM Employee e " +
                     "JOIN EmployeeGameInterest egi ON egi.fkEmployee.id = e.id " +
                     "WHERE (lower(e.employeeFirstName) like lower(concat('%', :query,'%')) " +
@@ -83,7 +74,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
                     "    AND (CAST(:start AS LocalDate) <= etp.fkTravelPlan.travelPlanEndDate " +
                     "    AND CAST(:end AS LocalDate) >= etp.fkTravelPlan.travelPlanStartDate) " +
                     ")")
-    Page<EmployeeSearch> searchAvailableParticipants(
+    Page<Employee> searchAvailableParticipants(
             @Param("query") String query,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
@@ -99,6 +90,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             "or lower(e.fkPosition.positionName) like lower(concat('%', :searchTerm,'%')) " +
             "or lower(e.fkDepartment.departmentName) like lower(concat('%', :searchTerm,'%')) " +
             "or lower(e.employeeEmail) like lower(concat('%', :searchTerm,'%')) ")
-    List<Employee> findAllBySearchTerm(String searchTerm);
+    Page<Employee> findAllBySearchTerm(String searchTerm, Pageable pageable);
 }
 
