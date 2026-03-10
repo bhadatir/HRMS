@@ -474,4 +474,9 @@ public class AuthServiceImpl implements AuthService {
 
         return new GlobalSearchResponse(employeePage, travelPage, jobPage, postPage, gameBookingPage, teamMemberPage);
     }
+
+    @Override
+    public Integer getActiveTimeByUserEmail(String email){
+        return authAuditRepository.activeTimeByUserEmail(email);
+    }
 }

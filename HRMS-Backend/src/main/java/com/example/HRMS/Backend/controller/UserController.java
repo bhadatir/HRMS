@@ -26,6 +26,11 @@ public class UserController {
         return ResponseEntity.ok(authService.getEmployeeByEmail(email));
     }
 
+    @GetMapping("/activeTime")
+    public ResponseEntity<Integer> getActiveTimeByUserEmail(@RequestParam String email) {
+        return ResponseEntity.ok(authService.getActiveTimeByUserEmail(email));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<Page<EmployeeResponse>> getEmployee(@RequestParam String query,
                                                               @RequestParam Long employeeType,

@@ -123,8 +123,13 @@ export const apiService = {
   globalSearch: async (searchTerm: string, page: number, size: number, token: string) => {
     const res = await api.get(`/user/global-search?searchTerm=${searchTerm}&page=${page}&size=${size}`, authHeader(token));
     return res.data;
-  }
+  },
 
+  getActiveTimeByUserEmail: async(email: string, token: string) => {
+    const res = await api.get(`/user/activeTime?email=${email}`, authHeader(token));
+    return res.data;
+  }
+  // localhost:8080/api/user/activeTime?email=tirthbhadani9@gmail.com
 };
 
 

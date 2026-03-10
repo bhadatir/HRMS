@@ -50,4 +50,6 @@ public interface AuthService {
     void logout();
 
     GlobalSearchResponse globalSearch(String searchTerm, int page, int size);
+
+    Integer getActiveTimeByUserEmail(String email);
 }

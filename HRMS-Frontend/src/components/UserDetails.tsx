@@ -24,6 +24,12 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
     enabled: !!token && !!userEmail,
   });
 
+  const { data: activeTime } = useQuery({
+    queryKey: ["activeTime", userEmail],
+    queryFn: () => apiService.getActiveTimeByUserEmail(userEmail!, token!),
+    enabled: !!token && !!userEmail,
+  });
+
   const inactivateMutation = useMutation({
     mutationFn: (reason: string) => apiService.inActiveUserByID(userData?.id, reason, token!),
     onSuccess: () => {
@@ -87,7 +93,8 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
                 <div className="space-y-4 md:col-span-2">
                     <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Account Information</h3>
                     <p><span className="font-medium">Account Created:</span> {new Date(userData?.employeeCreatedAt || "").toLocaleDateString()} : {new Date(userData?.employeeCreatedAt || "").toLocaleTimeString()}</p>
-                    <p><span className="font-medium">Last Login:</span> {new Date(userData?.lastLoginAt || "").toLocaleDateString()} : {new Date(userData?.lastLoginAt || "").toLocaleTimeString()}</p>
+                    {userData?.lastLoginAt && <p><span className="font-medium">Last Login:</span> {new Date(userData?.lastLoginAt || "").toLocaleDateString()} : {new Date(userData?.lastLoginAt || "").toLocaleTimeString()}</p>}
+                    {activeTime && <p><span className="font-medium">Active Time: </span> {activeTime} sec.</p>}
                 </div>
                 {userData?.employeeIsActive && user?.id !== userData?.id && (userData?.roleName != "ADMIN" || user?.roleName == "ADMIN") &&
                   <div className="flex gap-2">

@@ -12,4 +12,9 @@ public interface AuthAuditRepository extends JpaRepository<AuthAudit, Long> {
         where a.userEmail = :email
         and a.logoutTimestamp is null""")
     AuthAudit findAuditAuthByUserEmailAndLogoutTimestampIsNull(String email);
+
+    @Query(value = "SELECT SUM(a.activeMin) as activeTime " +
+            "FROM AuthAudit a " +
+            "WHERE a.userEmail = :userEmail")
+    Integer activeTimeByUserEmail(String userEmail);
 }
