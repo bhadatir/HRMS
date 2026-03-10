@@ -19,7 +19,7 @@ public interface JobService {
 
     void referFriend(ReferFriendRequest referFriendRequest, MultipartFile file) throws IOException;
 
-    Page<JobResponse> showAllJobs(String searchTerm, int page, int size);
+    Page<JobResponse> showAllJobs(String searchTerm, Long jobType, int page, int size);
 
     JobResponse showJobByJobId(Long jobId);
 

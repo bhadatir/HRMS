@@ -25,8 +25,8 @@ export const jobService = {
     return res.data;
   },
 
-  getAllJobs: async (searchTerm: string, page: number, size: number, token: string) => {
-    const res = await api.get(`/job/?searchTerm=${searchTerm}&page=${page}&size=${size}`, authHeader(token));
+  getAllJobs: async (searchTerm: string, jobType: number, page: number, size: number, token: string) => {
+    const res = await api.get(`/job/?searchTerm=${searchTerm}&jobType=${jobType}&page=${page}&size=${size}`, authHeader(token));
     return res.data;
   },
 

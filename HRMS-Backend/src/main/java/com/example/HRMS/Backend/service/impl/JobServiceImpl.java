@@ -277,11 +277,15 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<JobResponse> showAllJobs(String searchTerm, int page, int size){
+    public Page<JobResponse> showAllJobs(String searchTerm, Long jobType, int page, int size){
 
         Pageable pageable = PageRequest.of(page, size);
-
-        Page<Job> jobs = jobRepository.findJobBySearchTeam(searchTerm, pageable);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
+                () -> new RuntimeException("employee not found.")
+        );
+        Page<Job> jobs = jobRepository.findJobBySearchTeam(searchTerm, jobType, employee.getId(), pageable);
         return jobs.map(job -> modelMapper.map(job,JobResponse.class));
     }
 

@@ -655,10 +655,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
 
     @Override
-    public Page<TravelPlanResponse> findTravelPlanByEmployeeId(Long empId, String searchTerm, int page, int size){
+    public Page<TravelPlanResponse> findTravelPlanByEmployeeId(Long empId, String searchTerm, Long travelPlanType, int page, int size){
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<TravelPlan> travelPlans = employeeTravelPlanRepository.findTravelPlanByFkEmployee_Id(empId, searchTerm, pageable);
+        Page<TravelPlan> travelPlans = employeeTravelPlanRepository.findTravelPlanByFkEmployee_Id(empId, searchTerm, travelPlanType, pageable);
 
         return travelPlans.map(travelPlan -> {
             TravelPlanResponse travelPlanResponse = modelMapper.map(travelPlan,TravelPlanResponse.class);

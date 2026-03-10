@@ -44,7 +44,7 @@ public interface TravelPlanService {
 
     boolean isEmpAvailable(Long id, LocalDate startDate, LocalDate endDate);
 
-    Page<TravelPlanResponse> findTravelPlanByEmployeeId(Long empId, String searchTerm, int page, int size);
+    Page<TravelPlanResponse> findTravelPlanByEmployeeId(Long empId, String searchTerm, Long travelPlanType, int page, int size);
 
     void removeConflictGameBookings(List<GameBooking> conflicts, String details);
     void removeConflictWaitingListBookings(List<BookingWaitingList> conflicts, String details);

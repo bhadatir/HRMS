@@ -108,7 +108,7 @@ public class UserController {
                         "EMPLOYEE" ));
 
         Page<GlobalSearchResult> travelPage = employeeTravelPlanRepository
-                .findTravelPlanByFkEmployee_Id(employee.getId(), searchTerm, pageable)
+                .findTravelPlanByFkEmployee_Id(employee.getId(), searchTerm, 0L, pageable)
                 .map(t -> new GlobalSearchResult(
                         t.getId(),
                         "Trip to " + t.getTravelPlanTo(),
@@ -116,7 +116,7 @@ public class UserController {
                         "TRAVEL_PLAN" ));
 
         Page<GlobalSearchResult> jobPage = jobRepository
-                .findJobBySearchTeam(searchTerm, pageable)
+                .findJobBySearchTeam(searchTerm, 0L, employee.getId(), pageable)
                 .map(j -> new GlobalSearchResult(
                         j.getId(),
                         j.getJobTitle(),

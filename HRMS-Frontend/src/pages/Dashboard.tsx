@@ -56,7 +56,7 @@ export default function Dashboard() {
   
   const { data: travelPlans, isError: travelPlansError } = useQuery({
     queryKey: ["travelPlanByEmpId", user?.id],
-    queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id, "", 0, 100, token || ""),
+    queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id, "", 0, 0, 100, token || ""),
     enabled: !!token && !!user?.id,
   });
 

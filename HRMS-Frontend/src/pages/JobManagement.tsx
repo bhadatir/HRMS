@@ -47,7 +47,7 @@ export default function JobManagement() {
     hasNextPage,
     isFetchingNextPage,
     isError: allJobsOnError,
-  } = useGetAllJobs(searchTerm, token || "");
+  } = useGetAllJobs(searchTerm, jobType, token || "");
   const allJobs = allJobsData?.pages.flatMap(page => page.content) || [];
 
   const { ref, inView } = useInView();
@@ -61,17 +61,6 @@ export default function JobManagement() {
   if (allJobsOnError) {
     alert("Failed to load jobs: " + allJobsOnError);
   }
-
-  const filteredJobs = useMemo(() => {
-    if (!allJobs) return [];
-    return allJobs.filter((job: any) => {
-      if(jobType === 0) return true;
-      if(jobType === 1) return job.jobIsActive === true;
-      if(jobType === 2) return job.jobIsActive === false;
-      if(jobType === 3) return job.employeeId === user?.id;
-      return false;
-    });
-  }, [allJobs, debouncedSearchTerm, jobType]);
 
   const jobStatusmutation = useMutation({
     mutationFn: ({ jobId, reason }: { jobId: number; reason: string }) => jobService.updateJobStatus(jobId, reason, token || ""),
@@ -118,10 +107,13 @@ export default function JobManagement() {
           <div className="flex items-center gap-2">
             {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Job Board</h3>
-            {(searchTerm && searchTerm.length > 0 ) || jobType ?(
-              <Badge variant="outline">{filteredJobs.length} results</Badge>
-            ) : (<Badge variant="outline">No filter</Badge>)
-            }
+            {(debouncedSearchTerm && debouncedSearchTerm.length > 0) ? (
+              <Badge variant="outline">{allJobs.length} results</Badge>
+            ) : jobType ? (
+              <Badge variant="outline">{allJobsData?.pages[0]?.totalElements} results</Badge>
+            ) : (
+              <Badge variant="outline">No filter</Badge>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -252,8 +244,8 @@ export default function JobManagement() {
           )}
 
           <div className="job grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredJobs.length > 0 ? (
-              filteredJobs.map((job: any) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (
+            {allJobs.length > 0 ? (
+              allJobs.map((job: any) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (
                 <Card 
                   key={job.id} 
                   className="border-slate-200 cursor-pointer group"

@@ -40,8 +40,8 @@ export const travelService = {
     return res.data;
   },
 
-  findTravelPlanByEmployeeId: async (employeeId: number, searchTerm: string, page: number, size: number, token: string) => {
-    const res = await api.get(`/travel/empId/${employeeId}?searchTerm=${searchTerm}&page=${page}&size=${size}`, authHeader(token));
+  findTravelPlanByEmployeeId: async (employeeId: number, searchTerm: string, travelPlanType: number, page: number, size: number, token: string) => {
+    const res = await api.get(`/travel/empId/${employeeId}?searchTerm=${searchTerm}&travelPlanType=${travelPlanType}&page=${page}&size=${size}`, authHeader(token));
     return res.data;
   },
 

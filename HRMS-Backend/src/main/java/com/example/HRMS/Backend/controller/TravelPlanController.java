@@ -46,9 +46,10 @@ public class TravelPlanController {
     @GetMapping("/empId/{empId}")
     public ResponseEntity<Page<TravelPlanResponse>> findTravelPlanByEmployeeId(@PathVariable Long empId,
                                                                                @RequestParam String searchTerm,
+                                                                               @RequestParam Long travelPlanType,
                                                                                @RequestParam(defaultValue = "0") int page,
                                                                                @RequestParam(defaultValue = "10") int size){
-        return ResponseEntity.ok(travelPlanService.findTravelPlanByEmployeeId(empId, searchTerm, page, size));
+        return ResponseEntity.ok(travelPlanService.findTravelPlanByEmployeeId(empId, searchTerm, travelPlanType, page, size));
     }
 
     @GetMapping("/expense/{employeeId}/{travelPlanId}")

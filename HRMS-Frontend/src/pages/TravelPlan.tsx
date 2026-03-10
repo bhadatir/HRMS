@@ -18,6 +18,7 @@ import Notifications from "../components/Notifications.tsx";
 import { useInView } from "react-intersection-observer";
 import { useFindTravelPlanByEmployeeId, useGetAllTravelPlans } from "../hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
+import { useAppDebounce } from "@/hooks/useAppDebounce.tsx";
 
 export default function TravelPlan() {
   const { token, user, unreadNotifications } = useAuth(); 
@@ -30,7 +31,7 @@ export default function TravelPlan() {
   const [travelPlanType, setTravelPlanType] = useState<number>(1);
   const [selectedTravelId, setSelectedTravelId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
   
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -56,7 +57,7 @@ export default function TravelPlan() {
     hasNextPage: hasTravelPlanByEmpIdNextPage,
     isFetchingNextPage: isFetchingTravelPlanByEmpIdNextPage,
     isError: travelPlanByEmpIdError,
-  } = useFindTravelPlanByEmployeeId(searchTerm, token || "");
+  } = useFindTravelPlanByEmployeeId(searchTerm, travelPlanType, token || "");
   const travelPlanByEmpId = travelPlanDataByEmpId?.pages.flatMap(page => page.content) || [];
 
   const { ref, inView } = useInView();
@@ -90,17 +91,7 @@ export default function TravelPlan() {
       return allTravelPlans;
     }
     if (!travelPlanByEmpId) return [];
-    return travelPlanByEmpId.filter((plan: any) => {
-        if(travelPlanType === 0) return true;
-        if(travelPlanType === 1) return plan.travelPlanIsDeleted === false;
-        if(travelPlanType === 2) return plan.travelPlanIsDeleted === true;
-        if(travelPlanType === 3) return plan.employeeTravelPlanResponses
-          .some((resp: any) => resp.employeeIsDeletedFromTravel === true && resp.employeeId === user.id);
-        if(travelPlanType === 4) return plan.travelPlanIsReturn === true;
-        if(travelPlanType === 5) return plan.travelPlanIsReturn === false;
-        return false;
-      }) || [];
-
+    return travelPlanByEmpId;   
   }, [user, travelPlanByEmpId, allTravelPlans, travelPlanType, searchTerm]);
 
   const handleDelete = (travelPlanId: number) => {
@@ -143,10 +134,13 @@ export default function TravelPlan() {
           <div className="flex items-center gap-2">
             {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Travel Management</h3>
-            {(searchTerm && searchTerm.length > 0) || travelPlanType ?(
+            {(debouncedSearchTerm && debouncedSearchTerm.length > 0) ? (
               <Badge variant="outline">{filteredPlans.length} results</Badge>
-            ) : (<Badge variant="outline">No filter</Badge>)
-            }
+            ) : travelPlanType ? (
+              <Badge variant="outline">{travelPlanDataByEmpId?.pages[0]?.totalElements} results</Badge>
+            ) : (
+              <Badge variant="outline">No filter</Badge>
+            )}
           </div>
           {user?.roleName !== "ADMIN" && 
           <div className="flex items-center gap-2">

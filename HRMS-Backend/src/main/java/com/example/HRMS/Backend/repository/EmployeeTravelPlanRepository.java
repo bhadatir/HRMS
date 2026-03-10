@@ -70,6 +70,14 @@ public interface EmployeeTravelPlanRepository extends JpaRepository<EmployeeTrav
             "WHERE (tp.fkTravelPlanHREmployee.id = :empId " +
             "OR etp.fkEmployee.id = :empId " +
             "OR etp.fkEmployee.fkManagerEmployee.id = :empId) " +
+            "AND (" +
+            "  (:travelPlanType = 0) OR " +
+            "  (:travelPlanType = 1 AND tp.travelPlanIsDeleted = false) OR " +
+            "  (:travelPlanType = 2 AND tp.travelPlanIsDeleted = true) OR " +
+            "  (:travelPlanType = 3 AND etp.employeeIsDeletedFromTravel = true AND etp.fkEmployee.id = :empId) OR " +
+            "  (:travelPlanType = 4 AND tp.travelPlanIsReturn = true) OR " +
+            "  (:travelPlanType = 5 AND tp.travelPlanIsReturn = false)" +
+            ") " +
             "AND (CAST(tp.id AS string) LIKE concat('%', :searchTerm, '%') " +
             "OR lower(tp.travelPlanName) LIKE lower(concat('%', :searchTerm, '%')) " +
             "OR lower(tp.travelPlanDetails) LIKE lower(concat('%', :searchTerm, '%')) " +
@@ -78,5 +86,5 @@ public interface EmployeeTravelPlanRepository extends JpaRepository<EmployeeTrav
             "OR CAST(tp.travelPlanStartDate AS string) LIKE concat('%', :searchTerm, '%') " +
             "OR CAST(tp.travelPlanEndDate AS string) LIKE concat('%', :searchTerm, '%')) " +
             "ORDER BY tp.travelPlanCreatedAt DESC")
-    Page<TravelPlan> findTravelPlanByFkEmployee_Id(Long empId, String searchTerm, Pageable pageable);
+    Page<TravelPlan> findTravelPlanByFkEmployee_Id(Long empId, String searchTerm, Long travelPlanType, Pageable pageable);
 }

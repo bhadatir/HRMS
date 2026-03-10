@@ -39,9 +39,10 @@ public class JobController {
 
     @GetMapping("/")
     public ResponseEntity<Page<JobResponse>> allJob(@RequestParam String searchTerm,
+                                                    @RequestParam Long jobType,
                                                     @RequestParam(defaultValue = "0") int page,
                                                     @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(jobService.showAllJobs(searchTerm, page, size));
+        return ResponseEntity.ok(jobService.showAllJobs(searchTerm, jobType, page, size));
     }
 
     @GetMapping("/{jobId}")

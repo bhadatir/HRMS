@@ -17,6 +17,7 @@ import PostTags from "@/components/PostTags";
 import { useInView } from "react-intersection-observer";
 import { useShowAllPosts } from "@/hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { useAppDebounce } from "@/hooks/useAppDebounce";
 
 export default function PostManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -26,6 +27,7 @@ export default function PostManagement() {
   const [editPostId, setEditPostId] = useState<number>(0);
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
+  const debouncedSearch = useAppDebounce(searchTerm);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -35,13 +37,6 @@ export default function PostManagement() {
     }
   }, []);
   
-  const postVisibilityOptions = {
-    [user?.roleName as string]: true,
-    "EVERYONE": true,
-    [user?.positionName as string]: true,
-    [user?.departmentName as string]: true
-  };
-
   const {
     data: allPosts,
     fetchNextPage,
@@ -106,6 +101,10 @@ export default function PostManagement() {
           <div className="flex items-center gap-2 w-150">
             {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">Company Feed</h3>
+            {(debouncedSearch && debouncedSearch.length > 0) ?(
+              <Badge variant="outline">{filteredPosts.length} results</Badge>
+            ) : (<Badge variant="outline">No filter</Badge>)
+            }
           </div>
 
           <div className="post relative max-w-sm w-full mx-4">
