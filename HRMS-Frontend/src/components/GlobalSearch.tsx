@@ -12,6 +12,8 @@ export function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const currentPageUrl = window.location.href;
+  const currentPage = currentPageUrl.substring(currentPageUrl.lastIndexOf("/") + 1);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -119,7 +121,7 @@ export function GlobalSearch() {
         )}
 
         <div className="flex">
-          {latestResults?.employees?.content?.length > 0 && (
+          {!currentPage.includes("organization-chart") && latestResults?.employees?.content?.length > 0 && (
             <Command.Group heading={
               <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
                 <User size={14} /> <span>Employees</span>
@@ -140,7 +142,7 @@ export function GlobalSearch() {
             </Command.Group>
           )}
 
-          {latestResults?.travelPlans?.content?.length > 0 && (
+          {!currentPage.includes("travel-plan") && latestResults?.travelPlans?.content?.length > 0 && (
             <Command.Group heading={
               <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-green-600">
                 <Plane size={14} /> <span>Travel Plans</span>
@@ -161,7 +163,7 @@ export function GlobalSearch() {
             </Command.Group>
           )}
 
-          {latestResults?.job?.content?.length > 0 && (
+          {!currentPage.includes("job-management") && latestResults?.job?.content?.length > 0 && (
             <Command.Group heading={
               <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
                 <User size={14} /> <span>Jobs</span>
@@ -182,7 +184,7 @@ export function GlobalSearch() {
             </Command.Group>
           )}
 
-          {latestResults?.post?.content?.length > 0 && (
+          {!currentPage.includes("post-management") && latestResults?.post?.content?.length > 0 && (
             <Command.Group heading={
               <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
                 <User size={14} /> <span>Posts</span>
@@ -203,7 +205,7 @@ export function GlobalSearch() {
             </Command.Group>
           )}
 
-          {latestResults?.gameBooking?.content?.length > 0 && (
+          {!currentPage.includes("game-management") && latestResults?.gameBooking?.content?.length > 0 && (
             <Command.Group heading={
               <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
                 <User size={14} /> <span>Game Bookings</span>
