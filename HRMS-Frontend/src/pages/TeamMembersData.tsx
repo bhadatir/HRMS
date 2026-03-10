@@ -21,6 +21,14 @@ export default function TeamMemberData() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useAppDebounce(searchTerm);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const teamMemberId = urlParams.get("teamMemberId");
+    if (teamMemberId) {
+      setSearchTerm(teamMemberId);
+    }
+  }, []);
+
   const { data: orgData, isError: orgDataError } = useQuery({
     queryKey: ["orgChart", user?.id],
     queryFn: () => apiService.fetchOrgChart(user?.id || 0, token || ""),
@@ -29,6 +37,7 @@ export default function TeamMemberData() {
 
   const filteredData = orgData?.directReports.filter((org: any) =>
     debouncedSearch === "" || 
+    org.employeeId.toString().includes(debouncedSearch) ||
     org.firstName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
     org.lastName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
     org.employeeEmail.toLowerCase().includes(debouncedSearch.toLowerCase()) ||

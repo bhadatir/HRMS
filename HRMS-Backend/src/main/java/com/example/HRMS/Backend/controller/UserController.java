@@ -104,7 +104,7 @@ public class UserController {
                 .findAllBySearchTerm(searchTerm, pageable)
                 .map(e -> new GlobalSearchResult(
                         e.getId(),
-                        e.getEmployeeFirstName() + " " + e.getEmployeeLastName(),
+                        e.getEmployeeEmail(),
                         e.getFkRole().getRoleName(),
                         "EMPLOYEE" ));
 
@@ -144,7 +144,14 @@ public class UserController {
                         g.getFkHostEmployee().getEmployeeEmail(),
                         "GAME_BOOKING" ));
 
-        return ResponseEntity.ok(new GlobalSearchResponse(employeePage, travelPage, jobPage, postPage, gameBookingPage));
-    }
+        List<GlobalSearchResult> teamMemberPage = employeeRepository
+                .findByFkManagerEmployeeId(employee.getId())
+                .stream().map(e -> new GlobalSearchResult(
+                        e.getId(),
+                        e.getEmployeeEmail(),
+                        e.getFkRole().getRoleName(),
+                        "TEAM_MEMBER" )).toList();
 
+        return ResponseEntity.ok(new GlobalSearchResponse(employeePage, travelPage, jobPage, postPage, gameBookingPage, teamMemberPage));
+    }
 }
