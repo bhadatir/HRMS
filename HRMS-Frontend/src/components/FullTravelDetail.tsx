@@ -126,22 +126,29 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                 </div>
               </div>
               <div className="flex items-center gap-3">
+                <IndianRupee className="text-blue-500" />
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase">Expense Limit Per Day</p>
                   <p className="font-semibold">{plan?.travelMaxExpenseAmountPerDay}</p>
                 </div>
               </div>
-              <div className="col-span-1 md:col-span-3">
-                <p className="text-xs text-slate-500 font-bold uppercase">Travel Plan Deleted Members</p>
-                <p className="font-semibold">{plan?.employeeTravelPlanResponses?.map((e: any) => {
-                  return e.employeeIsDeletedFromTravel === true ? `${e.employeeEmail}` : null;
-                }).filter((name: any) => name !== null).join(", ")}</p>
-              </div>
-              <div className="col-span-1 md:col-span-3">
-                <p className="text-xs text-slate-500 font-bold uppercase">Travel Plan Active Members</p>
-                <p className="font-semibold">{plan?.employeeTravelPlanResponses?.map((e: any) => {
-                  return e.employeeIsDeletedFromTravel === false ? `${e.employeeEmail}` : null;
-                }).filter((name: any) => name !== null).join(", ")}</p>
+              <div className="flex gap-100">
+                <div className="flex items-center gap-3">  
+                  <div>
+                    <p className="text-xs text-slate-500 font-bold uppercase">Travel Plan Active Members</p>
+                    <p className="font-semibold">{plan?.employeeTravelPlanResponses?.map((e: any) => {
+                      return e.employeeIsDeletedFromTravel === false ? `${e.employeeEmail}` : null;
+                    }).filter((name: any) => name !== null).join(", ")}</p>
+                  </div>
+                </div>  
+                <div className="flex items-center gap-3">
+                  <div>
+                    <p className="text-xs text-slate-500 font-bold uppercase">Travel Plan Deleted Members</p>
+                    <p className="font-semibold">{plan?.employeeTravelPlanResponses?.map((e: any) => {
+                      return e.employeeIsDeletedFromTravel === true ? `${e.employeeEmail}` : null;
+                    }).filter((name: any) => name !== null).join(", ")}</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
         </Card>

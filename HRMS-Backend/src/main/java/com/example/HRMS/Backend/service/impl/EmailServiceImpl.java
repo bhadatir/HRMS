@@ -30,8 +30,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendEmail(List<String> email, String sub, String content){
-
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
             for (String email1 : email) {
                 if (!isValidEmail(email1)) {
                     throw new IllegalArgumentException("Invalid email format: " + email1);
@@ -39,12 +39,16 @@ public class EmailServiceImpl implements EmailService {
             }
             String[] emails = email.toArray(new String[0]);
 
-            mailMessage.setFrom(sender);
-            mailMessage.setTo(emails);
-            mailMessage.setText(content);
-            mailMessage.setSubject(sub);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(sender);
+            helper.setTo(emails);
+            helper.setText(content, true);
+            helper.setSubject(sub);
 
-            javaMailSender.send(mailMessage);
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

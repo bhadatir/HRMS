@@ -129,7 +129,7 @@ const getMutation = useMutation({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
-      queryClient.invalidateQueries({ queryKey: ["travelPlanByEmpId", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["travelPlanByEmpId"] });
       queryClient.invalidateQueries({ queryKey: ["travelPlan", editTravelPlanId] });
       queryClient.invalidateQueries({ queryKey: ["empTravelPlans", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["employeeSearch"] });
