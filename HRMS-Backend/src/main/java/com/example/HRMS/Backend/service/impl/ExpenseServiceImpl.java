@@ -6,7 +6,6 @@ import com.example.HRMS.Backend.dto.ExpenseResponse;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.AuthService;
-import com.example.HRMS.Backend.service.EmailService;
 import com.example.HRMS.Backend.service.ExpenseService;
 import com.example.HRMS.Backend.service.NotificationService;
 import jakarta.validation.Valid;
@@ -128,7 +127,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
         String filePath = "expanse_proof/" + proofTypeId +"_" + expenseId + "_" + originalFilePath;
-        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+        file.transferTo(new File(System.getProperty("user.dir") + '/' + folderPath + filePath));
 
         expenseProof.setFkExpense(expenseRepository.findExpensesById(expenseId));
         expenseProof.setFkExpenseProofType(expenseProofTypeRepository.findExpenseProofTypeById(proofTypeId));
@@ -237,7 +236,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
             String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
             String filePath = "expanse_proof/" + id +"_" + timeInString + "_" + originalFilePath;
-            file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+            file.transferTo(new File(System.getProperty("user.dir") + '/' + folderPath + filePath));
 
             expenseProof.setFkExpense(expense);
             expenseProof.setFkExpenseProofType(expenseProofTypeRepository.findExpenseProofTypeById(id));

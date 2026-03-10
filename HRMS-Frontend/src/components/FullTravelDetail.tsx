@@ -141,14 +141,14 @@ export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan
                     }).filter((name: any) => name !== null).join(", ")}</p>
                   </div>
                 </div>  
-                <div className="flex items-center gap-3">
+                {plan?.employeeTravelPlanResponses?.some((e: any) => e.employeeIsDeletedFromTravel === true) && <div className="flex items-center gap-3">
                   <div>
                     <p className="text-xs text-slate-500 font-bold uppercase">Travel Plan Deleted Members</p>
                     <p className="font-semibold">{plan?.employeeTravelPlanResponses?.map((e: any) => {
                       return e.employeeIsDeletedFromTravel === true ? `${e.employeeEmail}` : null;
                     }).filter((name: any) => name !== null).join(", ")}</p>
                   </div>
-                </div>
+                </div>}
               </div>
             </CardContent>
         </Card>

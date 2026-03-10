@@ -66,7 +66,7 @@ public class JobServiceImpl implements JobService {
         String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
         String filePath = "job_description/" + jobRequest.getFkJobTypeId() +"_"
                 + jobRequest.getFkJobOwnerEmployeeId() + "_" + time + "_" + originalFilePath;
-        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+        file.transferTo(new File(System.getProperty("user.dir") + '/' + folderPath + filePath));
 
         job.setJobCreatedAt(Instant.now());
         job.setJobSalary(jobRequest.getJobSalary());
@@ -100,7 +100,7 @@ public class JobServiceImpl implements JobService {
             String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
             String filePath = "job_description/" + jobRequest.getFkJobTypeId() +"_"
                     + jobRequest.getFkJobOwnerEmployeeId() + "_" + time + "_" + originalFilePath;
-            file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+            file.transferTo(new File(System.getProperty("user.dir") + '/' + folderPath + filePath));
             job.setJobDescriptionUrl(url + filePath);
         }
 
@@ -205,7 +205,7 @@ public class JobServiceImpl implements JobService {
         String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
         String filePath = "refer_friend_cv/" + fkReferFriendEmployeeId +"_" + time + "_" + originalFilePath;
 
-        file.transferTo(new File(System.getProperty("user.dir") + "/" + folderPath + filePath));
+        file.transferTo(new File(System.getProperty("user.dir") + '/' + folderPath + filePath));
 
         CvStatusType cvStatusType = cvStatusTypeRepository.findById(
                 referFriendRequest.getFkCvStatusTypeId()
@@ -253,7 +253,7 @@ public class JobServiceImpl implements JobService {
                 , htmlMessage
         );
 
-        File savedFile = new File(System.getProperty("user.dir") + "/" + folderPath + filePath);
+        File savedFile = new File(System.getProperty("user.dir") + '/' + folderPath + filePath);
         if(savedFile.exists() && savedFile.canRead()) {
             String htmlEmailMessage = "<html>" +
                     "<body>" +

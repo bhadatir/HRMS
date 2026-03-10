@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { travelService } from "../api/travelService";
 import { useAuth } from "../context/AuthContext";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Search, User, X, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useInView } from "react-intersection-observer";

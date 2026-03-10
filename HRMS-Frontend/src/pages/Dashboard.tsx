@@ -255,6 +255,10 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-500">Department</p>
                       <p className="text-base font-semibold">{user.departmentName || "N/A"}</p>
                     </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Position</p>
+                      <p className="text-base font-semibold">{user.positionName || "N/A"}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -266,7 +270,7 @@ export default function Dashboard() {
                   <CardTitle className="text-sm font-medium">Salary Overview</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-500">Annual Gross</p>
+                  <p className="text-sm text-gray-500">Monthly</p>
                   <p className="text-xl font-bold text-slate-900">
                     {user.employeeSalary?.toLocaleString()}
                   </p>

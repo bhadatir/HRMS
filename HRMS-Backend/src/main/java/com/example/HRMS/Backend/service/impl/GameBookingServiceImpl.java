@@ -15,8 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -325,8 +323,7 @@ public class GameBookingServiceImpl implements GameBookingService {
             LocalDateTime now = LocalDateTime.now();
             long minutesDiff = Duration.between(now, targetedSloatTime).toMinutes();
 
-            if (bookingWaitingList.get(0).getIsFirstGame() || minutesDiff < 30) {
-
+            if (Boolean.TRUE.equals(bookingWaitingList.get(0).getIsFirstGame()) || minutesDiff < 30) {
                 addInGameBookingWithNotification(bookingWaitingList.get(0));
             }
         }

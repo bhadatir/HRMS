@@ -28,8 +28,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.hibernate.type.descriptor.java.CoercionHelper.toLong;
-
 @Service
 @RequiredArgsConstructor
 public class TravelPlanServiceImpl implements TravelPlanService {
@@ -39,8 +37,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     private final ModelMapper modelMapper;
 
     private final TravelDocRepository travelDocRepository;
-
-    private final ExpenseStatusRepository expenseStatusRepository;
 
     private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
 
@@ -65,8 +61,6 @@ public class TravelPlanServiceImpl implements TravelPlanService {
     private final GameBookingRepository gameBookingRepository;
 
     private final GameBookingStatusRepository gameBookingStatusRepository;
-
-    private final NotificationRepository notificationRepository;
 
     private final GameBookingService gameBookingService;
 
@@ -705,7 +699,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
         String filePath = "travel_doc/" + employeeTravelPlanId +"_" + docTypeId + "_" + empId  + "_" + originalFilePath;
 
-        file.transferTo(new File(System.getProperty("user.dir") + "/" +folderPath + filePath));
+        file.transferTo(new File(System.getProperty("user.dir") + '/' +folderPath + filePath));
 
         TravelDoc travelDoc = new TravelDoc();
         travelDoc.setFkEmployee(employeeRepository.findEmployeeById(empId));
@@ -743,7 +737,7 @@ public class TravelPlanServiceImpl implements TravelPlanService {
         String originalFilePath = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","_");
         String filePath = "travel_doc/" + travelPlanId +"_" + docTypeId + "_" + empId  + "_" + originalFilePath;
 
-        file.transferTo(new File(System.getProperty("user.dir") + "/" +folderPath + filePath));
+        file.transferTo(new File(System.getProperty("user.dir") + '/' +folderPath + filePath));
 
         TravelDoc travelDoc = new TravelDoc();
         travelDoc.setFkEmployee(employeeRepository.findEmployeeById(empId));

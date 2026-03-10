@@ -35,6 +35,10 @@ export default function PostManagement() {
     if (postId) {
       setSearchTerm(postId);
     }
+    const employeeEmail = urlParams.get("employeeEmail");
+    if (employeeEmail) {
+      setSearchTerm(employeeEmail);
+    }
   }, []);
   
   const {

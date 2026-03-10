@@ -4,15 +4,16 @@ import com.example.HRMS.Backend.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
@@ -47,7 +48,7 @@ public class EmailServiceImpl implements EmailService {
 
             javaMailSender.send(message);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            log.info("Messaging Exception ",e);
         }
     }
 
@@ -69,7 +70,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(text, true);
 
             String relativePath = path.replace(url, "");
-            String fullPath = System.getProperty("user.dir") +"/"+ folderPath + relativePath;
+            String fullPath = System.getProperty("user.dir") +'/'+ folderPath + relativePath;
             FileSystemResource fileToAttach = new FileSystemResource(fullPath);
             if (!fileToAttach.exists()) {
                 throw new IOException("Image not found at " + fileToAttach.getPath());
@@ -81,7 +82,7 @@ public class EmailServiceImpl implements EmailService {
             javaMailSender.send(message);
 
         } catch (MessagingException | IOException e) {
-            e.printStackTrace();
+            log.info("Exception ",e);
         }
     }
 

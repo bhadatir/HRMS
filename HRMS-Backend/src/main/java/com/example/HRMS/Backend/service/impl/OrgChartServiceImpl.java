@@ -6,7 +6,6 @@ import com.example.HRMS.Backend.repository.EmployeeRepository;
 import com.example.HRMS.Backend.service.OrgChartService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

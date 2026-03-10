@@ -5,15 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send } from "lucide-react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 type ShareJobFormInputs = {
     fkJobShareEmployeeId: number;
     fkJobId: number;
     emails: string;
 }
-
-
 
 export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSuccess: () => void }) {
   const { token, user } = useAuth();
