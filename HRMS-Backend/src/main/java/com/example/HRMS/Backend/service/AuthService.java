@@ -27,7 +27,7 @@ public interface AuthService {
 
     void addProfileImage(Long empId, MultipartFile file) throws IOException;
 
-    Page<EmployeeResponse> getEmployeeByName(String query, int page, int size);
+    Page<EmployeeResponse> getEmployeeByName(String query, Long employeeType, int page, int size);
 
     Employee getLoginUser();
 

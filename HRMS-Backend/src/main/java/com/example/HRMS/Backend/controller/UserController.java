@@ -40,9 +40,10 @@ public class UserController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<EmployeeResponse>> getEmployee(@RequestParam String query,
+                                                              @RequestParam Long employeeType,
                                                             @RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(authService.getEmployeeByName(query, page, size));
+        return ResponseEntity.ok(authService.getEmployeeByName(query, employeeType, page, size));
     }
 
     @GetMapping("/travel/search")
@@ -136,7 +137,7 @@ public class UserController {
                         "POST" ));
 
         Page<GlobalSearchResult> gameBookingPage = gameBookingRepository
-                .findBookingsByUserAndSearch(employee.getId(), searchTerm, pageable)
+                .findBookingsByUserAndSearch(employee.getId(), searchTerm, 0L, 0L,pageable)
                 .map(g -> new GlobalSearchResult(
                         g.getId(),
                         g.getFkGameType().getGameName(),

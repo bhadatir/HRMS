@@ -37,9 +37,11 @@ public class GameBookingController {
     @GetMapping("/empId/{empId}")
     public Page<GameBookingResponse> bookingByEmpId(@PathVariable Long empId,
                                       @RequestParam String searchTerm,
+                                      @RequestParam Long gameType,
+                                      @RequestParam Long gameBookingStatusId,
                                       @RequestParam(defaultValue = "0") int page,
                                       @RequestParam(defaultValue = "10") int size) {
-        return gameBookingService.findBookingByEmpId(empId, searchTerm, page, size);
+        return gameBookingService.findBookingByEmpId(empId, searchTerm, gameType, gameBookingStatusId, page, size);
     }
 
     @GetMapping("/upcommingBooking")
@@ -77,8 +79,9 @@ public class GameBookingController {
     }
 
     @GetMapping("/waitList/emp/{empId}")
-    public ResponseEntity<List<BookingWaitingListResponse>> findWaitListbyEmpId(@PathVariable Long empId){
-        return ResponseEntity.ok(gameBookingService.findWaitListbyEmpId(empId));
+    public ResponseEntity<List<BookingWaitingListResponse>> findWaitListbyEmpId(@PathVariable Long empId
+                                                                                , @RequestParam Long gameType){
+        return ResponseEntity.ok(gameBookingService.findWaitListbyEmpId(empId, gameType));
     }
 
     @GetMapping("/waitList")

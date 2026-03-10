@@ -76,13 +76,13 @@ export const gameService = {
 
 
 
-    findGameBookingByUserId: async (userId: number, searchTerm: string, page: number, size: number, token: string) => {
-        const res = await api.get(`/game/empId/${userId}?searchTerm=${searchTerm}&page=${page}&size=${size}`, authHeader(token));
+    findGameBookingByUserId: async (userId: number, searchTerm: string, gameType: number, gameBookingStatusId: number, page: number, size: number, token: string) => {
+        const res = await api.get(`/game/empId/${userId}?searchTerm=${searchTerm}&gameType=${gameType}&gameBookingStatusId=${gameBookingStatusId}&page=${page}&size=${size}`, authHeader(token));
         return res.data;
     },
 
-    findGameBookingWaitingListByEmpId: async (empId: number, token: string) => {
-        const res = await api.get(`/game/waitList/emp/${empId}`, authHeader(token));
+    findGameBookingWaitingListByEmpId: async (empId: number, gameType: number, token: string) => {
+        const res = await api.get(`/game/waitList/emp/${empId}?gameType=${gameType}`, authHeader(token));
         return res.data;
     },
 

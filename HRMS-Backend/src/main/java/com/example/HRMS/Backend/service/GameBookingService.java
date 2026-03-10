@@ -20,7 +20,7 @@ public interface GameBookingService {
 
     void updateWaitingList(GameType gameType, LocalDateTime targetedSloatTime);
 
-    Page<GameBookingResponse> findBookingByEmpId(Long empId, String searchTerm, int page, int size);
+    Page<GameBookingResponse> findBookingByEmpId(Long empId, String searchTerm, Long gameType, Long gameBookingStatusId, int page, int size);
 
     void updateGameBooking(Long bookingId, GameBookingRequest gameBookingRequest);
 
@@ -40,7 +40,7 @@ public interface GameBookingService {
 
     void deleteWaitListById(Long waitId);
 
-    List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId);
+    List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId, Long gameType);
 
     List<GameBookingResponse> findUpcommingBooking();
 

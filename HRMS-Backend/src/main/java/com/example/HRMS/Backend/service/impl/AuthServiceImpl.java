@@ -239,16 +239,16 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Page<EmployeeResponse> getEmployeeByName(String query, int page, int size){
+    public Page<EmployeeResponse> getEmployeeByName(String query, Long employeeType, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
-        Page<Employee> employees = employeeRepository.searchEmployeeByName(query, pageable);
+        Page<Employee> employees = employeeRepository.searchEmployeeByName(query, employeeType, pageable);
         return employees.map(employee -> modelMapper.map(employee, EmployeeResponse.class));
     }
 
     @Override
     public Page<EmployeeResponse> getAvailableEmployeeForTravel(String query, int page, int size, LocalDate startDate, LocalDate endDate){
         Pageable pageable = PageRequest.of(page, size);
-        Page<Employee> employees = employeeRepository.searchEmployeeByName(query, pageable);
+        Page<Employee> employees = employeeRepository.searchEmployeeByName(query, 0L, pageable);
 
         if (employees == null || startDate == null || endDate == null) {
             throw new IllegalArgumentException("Page and date must not be null");
@@ -358,7 +358,7 @@ public class AuthServiceImpl implements AuthService {
         List<GameBooking> gameBookings = gameBookingRepository.findBookingsByUser(employee.getId());
         travelPlanService.removeConflictGameBookings(gameBookings, employee.getEmployeeEmail() + " status is inActive so your Bookings no more.");
 
-        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByUser(employee.getId());
+        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByUser(employee.getId(), 0L);
         travelPlanService.removeConflictWaitingListBookings(bookingWaitingLists, employee.getEmployeeEmail() + " status is inActive so your waiting list entry no more.");
 
         List<Long> travelPlansId = travelPlanRepository.findAllTravelPlanByEmployeeId(employee.getId());

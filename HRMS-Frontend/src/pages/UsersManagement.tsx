@@ -16,6 +16,7 @@ import { useInView } from "react-intersection-observer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { set } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { useAppDebounce } from "@/hooks/useAppDebounce";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -25,6 +26,7 @@ export default function JobManagement() {
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
   const [employeeType, setEmployeeType] = useState(1);
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   const { 
     data: allEmpData, 
@@ -32,7 +34,7 @@ export default function JobManagement() {
     hasNextPage, 
     isFetchingNextPage,
     isError: allEmpError 
-  } = useEmployeeSearch(searchTerm, token || "");
+  } = useEmployeeSearch(searchTerm, employeeType, token || "");
   const allEmp = allEmpData?.pages.flatMap(page => page.content) || [];
 
   const { ref, inView } = useInView();
@@ -62,16 +64,6 @@ export default function JobManagement() {
   if (allEmpError) {
     alert("Failed to load employees: " + allEmpError);
   }
-
-  const filterEmp = useMemo(() => {
-    if (!allEmp || !user) return [];
-    return allEmp?.filter((emp: any) => {
-        if(employeeType === 0) return true;
-        if(employeeType === 1) return emp.employeeIsActive === true;
-        if(employeeType === 2) return emp.employeeIsActive === false;
-        return false;
-      }) || [];
-    }, [allEmp, employeeType, user]);
   
   return (
     <SidebarProvider>
@@ -81,10 +73,13 @@ export default function JobManagement() {
           <div className="flex items-center gap-2">
             {/* <SidebarTrigger /> */}
             <h3 className="text-lg font-bold text-slate-800">User Management</h3>
-            {(searchTerm && searchTerm.length > 0 ) || employeeType ?(
-              <Badge variant="outline">{filterEmp.length} results</Badge>
-            ) : (<Badge variant="outline">No filter</Badge>)
-            }
+            {(debouncedSearchTerm && debouncedSearchTerm.length > 0) ? (
+              <Badge variant="outline">{allEmp.length} results</Badge>
+            ) : employeeType ? (
+              <Badge variant="outline">{allEmpData?.pages[0]?.totalElements} results</Badge>
+            ) : (
+              <Badge variant="outline">No filter</Badge>
+            )}
           </div>
   
           <div className="flex items-center gap-2">
@@ -186,8 +181,8 @@ export default function JobManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {filterEmp?.length > 0 ? (
-                        filterEmp.map((emp: any, index: number) => (
+                    {allEmp?.length > 0 ? (
+                        allEmp.map((emp: any, index: number) => (
                             <TableRow key={emp.id} 
                               title = {emp.employeeIsActive ? "Active User" : "Inactive User"}
                               className={cn(

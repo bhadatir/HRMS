@@ -7,13 +7,13 @@ import { jobService } from "@/api/jobService";
 import { postService } from "@/api/postService";
 import { gameService } from "@/api/gameService";
 
-export function useEmployeeSearch(searchTerm: string, token: string) {
+export function useEmployeeSearch(searchTerm: string, employeeType: number, token: string) {
   const debouncedSearch = useAppDebounce(searchTerm);
 
   const query = useInfiniteQuery({
-    queryKey: ["searchEmployees", debouncedSearch],
+    queryKey: ["searchEmployees", debouncedSearch, employeeType],
     queryFn: ({ pageParam = 0 }) =>
-      apiService.searchEmployees(debouncedSearch, pageParam, 5, token),
+      apiService.searchEmployees(debouncedSearch, employeeType, pageParam, 5, token),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token,
@@ -141,14 +141,14 @@ export function useShowAllPosts(searchTerm: string, token: string) {
   };
 } 
 
-export function useFindGameBookingByUserId(searchTerm: string, token: string) {
+export function useFindGameBookingByUserId(searchTerm: string, gameType: number, gameBookingStatusId: number, token: string) {
   const debouncedSearch = useAppDebounce(searchTerm);
   const { user } = useAuth();
 
   const query = useInfiniteQuery({
-    queryKey: ["Bookings", user?.id, debouncedSearch],
+    queryKey: ["Bookings", user?.id, debouncedSearch, gameType, gameBookingStatusId],
     queryFn: ({ pageParam = 0 }) => 
-      gameService.findGameBookingByUserId(user?.id, debouncedSearch, pageParam, 4, token || ""),
+      gameService.findGameBookingByUserId(user?.id, debouncedSearch, gameType, gameBookingStatusId, pageParam, 4, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token,

@@ -31,7 +31,7 @@ export default function OrganizationChart() {
     hasNextPage, 
     isFetchingNextPage,
     isError: searchError 
-  } = useEmployeeSearch(searchTerm, token || "");
+  } = useEmployeeSearch(searchTerm, 0, token || "");
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
   const { data: orgData, isLoading, isError: orgDataError } = useQuery({

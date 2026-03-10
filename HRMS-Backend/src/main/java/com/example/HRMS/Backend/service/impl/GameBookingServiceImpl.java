@@ -457,8 +457,8 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId) {
-        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByUser(employeeRepository.findEmployeeById(empId).getId());
+    public List<BookingWaitingListResponse> findWaitListbyEmpId(Long empId, Long gameType) {
+        List<BookingWaitingList> bookingWaitingLists = waitlistRepository.findBookingWaitingListsByUser(empId, gameType);
 
         return bookingWaitingLists.stream().map(bookingWaitingList -> {
             BookingWaitingListResponse bookingWaitingListResponse = modelMapper.map(bookingWaitingList, BookingWaitingListResponse.class);
@@ -514,10 +514,10 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public Page<GameBookingResponse> findBookingByEmpId(Long empId, String searchTerm, int page, int size) {
+    public Page<GameBookingResponse> findBookingByEmpId(Long empId, String searchTerm, Long gameType, Long gameBookingStatusId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<GameBooking> gameBookings = gameBookingRepository.findBookingsByUserAndSearch(empId, searchTerm, pageable);
+        Page<GameBooking> gameBookings = gameBookingRepository.findBookingsByUserAndSearch(empId, searchTerm, gameType, gameBookingStatusId, pageable);
 
         return gameBookings.map(gameBooking -> {
             GameBookingResponse response = modelMapper.map(gameBooking, GameBookingResponse.class);

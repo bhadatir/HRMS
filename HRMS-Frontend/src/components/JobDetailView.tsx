@@ -39,7 +39,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     hasNextPage, 
     isFetchingNextPage,
     isError: searchError 
-  } = useEmployeeSearch(searchTerm, token || "");
+  } = useEmployeeSearch(searchTerm, 0, token || "");
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
   
   const { ref, inView } = useInView();

@@ -62,13 +62,13 @@ export default function Dashboard() {
 
   const { data: gameBookings, isError: gameBookingsError } = useQuery({
     queryKey: ["gameBookings", user?.id],
-    queryFn: () => gameService.findGameBookingByUserId(user.id, "", 0, 100, token || ""), 
+    queryFn: () => gameService.findGameBookingByUserId(user.id, "", 0, 0, 0, 100, token || ""), 
     enabled: !!token && !!user?.id,
   });
 
   const { data: WaitingList, isError: waitingListError } = useQuery({ 
       queryKey: ["WaitingList", user?.id], 
-      queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, token!) 
+      queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, 0, token!) 
   });
 
   const modifiers = {

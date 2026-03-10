@@ -20,7 +20,13 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
 
     @Query("SELECT DISTINCT b FROM GameBooking b " +
                 "LEFT JOIN BookingParticipant bp ON bp.fkGameBooking.id = b.id " +
-                "WHERE (b.fkHostEmployee.id = :empId OR bp.fkEmployee.id = :empId) " +
+                "WHERE (:gameType = 0 " +
+                "OR :gameType = b.fkGameType.id " +
+                ") " +
+                "AND (:gameBookingStatusId = 0 " +
+                "OR :gameBookingStatusId = b.fkGameBookingStatus.id " +
+                ") " +
+                "AND (b.fkHostEmployee.id = :empId OR bp.fkEmployee.id = :empId) " +
                 "AND b.gameBookingIsDeleted = false " +
                 "AND (CAST(b.id AS string) LIKE concat('%', :searchTerm, '%') " +
                 "OR lower(b.fkGameType.gameName) LIKE lower(concat('%', :searchTerm, '%')) " +
@@ -31,6 +37,8 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
                 "ORDER BY b.gameBookingStartTime DESC")
     Page<GameBooking> findBookingsByUserAndSearch(@Param("empId") Long empId,
                                                       @Param("searchTerm") String searchTerm,
+                                                      Long gameType,
+                                                      Long gameBookingStatusId,
                                                       Pageable pageable);
 
     @Query("SELECT DISTINCT b FROM GameBooking b " +

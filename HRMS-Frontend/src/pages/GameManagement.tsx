@@ -25,7 +25,7 @@ export default function GameManagement() {
     const queryClient = useQueryClient();
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
     const [showGameTypeForm, setShowGameTypeForm] = useState(false);
-    const [gameType, setGameType] = useState<number | null>(null);
+    const [gameType, setGameType] = useState<number>(0);
     const [gameBookingStatusId, setgameBookingStatusId] = useState<number>(0);
     const [showNotification, setShowNotification] = useState(false);
     const [showGameIntrestForm, setShowGameIntrestForm] = useState(false);
@@ -34,6 +34,7 @@ export default function GameManagement() {
     const [waitingListId, setWaitingListId] = useState<number>(0);
     const [bookingSearchTerm, setBookingSearchTerm] = useState("");
     const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
+    const debouncedBookingSearchTerm = useAppDebounce(bookingSearchTerm);
     const debouncedWaitingListSearchTerm = useAppDebounce(waitingListSearchTerm);
 
     useEffect(() => {
@@ -60,8 +61,8 @@ export default function GameManagement() {
     });
 
     const { data: WaitingListByEmpId = [], isError: waitingListByEmpIdOnError } = useQuery({ 
-        queryKey: ["WaitingList", user?.id], 
-        queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, token!) 
+        queryKey: ["WaitingList", user?.id, gameType], 
+        queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, gameType, token!) 
     });
 
     const {
@@ -70,7 +71,7 @@ export default function GameManagement() {
         hasNextPage,
         isFetchingNextPage,
         isError: bookingsByEmpIdOnError,
-    } = useFindGameBookingByUserId(bookingSearchTerm, token || "");
+    } = useFindGameBookingByUserId(bookingSearchTerm, gameType, gameBookingStatusId, token || "");
     const filteredBookings = bookingsByEmpId?.pages.flatMap(page => page.content) || [];
     
     const { ref, inView } = useInView();
@@ -135,8 +136,23 @@ export default function GameManagement() {
                     <div className="flex items-center gap-2">
                         {/* <SidebarTrigger /> */}
                         <h3 className="font-bold">Game Zone</h3>
-                        <select className="border rounded-md px-2 py-1 text-sm" value={gameType || ""} onChange={(e) => setGameType(Number(e.target.value))}>
-                            <option value="">All Games</option>
+                        {(debouncedBookingSearchTerm && debouncedBookingSearchTerm.length > 0) ? (
+                        <Badge variant="outline">{filteredBookings.length} results</Badge>
+                        ) : (debouncedWaitingListSearchTerm && debouncedWaitingListSearchTerm.length > 0) ? (
+                        <Badge variant="outline">{filteredWaitingList.length} results</Badge>
+                        ) : gameBookingStatusId ? (
+                        <Badge variant="outline">{bookingsByEmpId?.pages[0]?.totalElements} results</Badge>
+                        ) : gameType ? ( 
+                            viewMode == "My Bookings" ? (
+                            <Badge variant="outline">{bookingsByEmpId?.pages[0]?.totalElements} results</Badge>
+                            ) : (
+                            <Badge variant="outline">{WaitingListByEmpId.length} results</Badge>
+                            )
+                        ) : (
+                        <Badge variant="outline">No filter</Badge>
+                        )}
+                        <select className="border rounded-md px-2 py-1 text-sm" value={gameType || 0} onChange={(e) => setGameType(Number(e.target.value))}>
+                            <option value="0">All Games</option>
                             {gameTypes.map((g: any) => <option key={g.id} value={g.id}>{g.gameName}</option>)}
                         </select>
                     </div>
@@ -253,10 +269,16 @@ export default function GameManagement() {
                         <div className="flex flex-row items-center gap-4">
                             <Button className={viewMode === "My Bookings" ? "rounded-md border text-gray-900" : "rounded-md text-gray-300"}
                                 size="sm"
-                                onClick={()=>setViewMode("My Bookings")}> My Bookings</Button>
+                                onClick={()=>{
+                                    setViewMode("My Bookings");
+                                    setWaitingListSearchTerm("");
+                                }}> My Bookings</Button>
                             <Button className={viewMode === "Waiting List" ? "rounded-md border text-gray-900" : "rounded-md text-gray-300"}
                                 size="sm"
-                                onClick={()=>setViewMode("Waiting List")}> Waiting List</Button>
+                                onClick={()=>{
+                                    setViewMode("Waiting List");
+                                    setBookingSearchTerm("");
+                                }}> Waiting List</Button>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="relative">
@@ -289,12 +311,8 @@ export default function GameManagement() {
                         <div className="game grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
                         {filteredBookings && filteredBookings.length > 0 ? (
                             <>                                
-                                {filteredBookings.filter((b: any) => (!gameType || b.gameTypeId === gameType) && (!gameBookingStatusId || b.gameBookingStatusId === gameBookingStatusId))
-                                    .map((b: any) => 
+                                {filteredBookings.map((b: any) => 
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />        
-                                )}
-                                {filteredBookings.filter((b: any) => (!gameType || b.gameTypeId === gameType) && (!gameBookingStatusId || b.gameBookingStatusId === gameBookingStatusId)).length === 0 && (
-                                    <p className="text-slate-500 italic">No bookings match the selected filters.</p>
                                 )}
                             </>
                         ) : (
