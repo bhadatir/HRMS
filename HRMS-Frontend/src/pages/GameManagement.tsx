@@ -19,6 +19,7 @@ import { useInView } from "react-intersection-observer";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useFindGameBookingByUserId } from "@/hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 export default function GameManagement() {
     const { token, user, unreadNotifications } = useAuth();
@@ -399,6 +400,7 @@ export default function GameManagement() {
                     )}
                     
                     <ScrollToTop />
+                    <GlobalSearch />
                 </main>
             </SidebarInset>
         </SidebarProvider>

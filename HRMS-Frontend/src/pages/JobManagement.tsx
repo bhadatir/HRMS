@@ -18,6 +18,7 @@ import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useGetAllJobs } from "../hooks/useInfinite";
 import { useInView } from "react-intersection-observer";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
+import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -354,6 +355,7 @@ export default function JobManagement() {
           </div>
           
           <ScrollToTop />
+          <GlobalSearch />
         </main>
       </SidebarInset>
     </SidebarProvider>

@@ -17,6 +17,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { set } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -214,6 +215,7 @@ export default function JobManagement() {
           </Card>
           
           <ScrollToTop />
+          <GlobalSearch />
         </main>
       </SidebarInset>
     </SidebarProvider>

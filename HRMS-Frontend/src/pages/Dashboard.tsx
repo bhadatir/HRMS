@@ -20,6 +20,7 @@ import { travelService } from "@/api/travelService.ts";
 import { gameService } from "@/api/gameService.ts";
 import { useNavigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
+import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 
 export default function Dashboard() {
   const { setIsFirstLogin, token, isFirstLogin, user, unreadNotifications } = useAuth();
@@ -385,6 +386,7 @@ export default function Dashboard() {
 
 
             <ScrollToTop />
+            <GlobalSearch />
           </main>
         </SidebarInset>
       </SidebarProvider>

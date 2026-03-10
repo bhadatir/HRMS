@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useEffect, type ReactNode, use } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
-import { io } from "socket.io-client";
 import SockJs from "sockjs-client";
 import Stomp from "stompjs";
 
@@ -51,10 +50,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("token");
       localStorage.removeItem("email");
       localStorage.removeItem("isFirstLogin");
+      queryClient.clear();
       setToken(null);
       setEmail(null);
       setUnreadNotifications(0);
-      queryClient.clear();
     },
     onError: (error: any) => {
       alert("Failed to log out: " + (error.response?.data || error.message));

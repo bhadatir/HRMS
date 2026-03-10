@@ -18,6 +18,7 @@ import { useInView } from "react-intersection-observer";
 import { useShowAllPosts } from "@/hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 export default function PostManagement() {
   const { token, user, unreadNotifications } = useAuth();
@@ -267,6 +268,7 @@ export default function PostManagement() {
           </div>
           
           <ScrollToTop />
+          <GlobalSearch />
         </main>
       </SidebarInset>
     </SidebarProvider>

@@ -1,7 +1,7 @@
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import Notifications from "../components/Notifications.tsx";
 import { useInView } from "react-intersection-observer";
 import { useEmployeeSearch } from "../hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
+import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 
 export default function OrganizationChart() {
   const { token, unreadNotifications } = useAuth(); 
@@ -242,6 +243,7 @@ export default function OrganizationChart() {
           )}
           
           <ScrollToTop />
+          <GlobalSearch />
         </div>
       </SidebarInset>
     </SidebarProvider>

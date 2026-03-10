@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 export default function TeamMemberData() {
   const { token, user, unreadNotifications } = useAuth();
@@ -156,6 +157,7 @@ export default function TeamMemberData() {
           </div>
           
           <ScrollToTop />
+          <GlobalSearch />
         </main>
       </SidebarInset>
     </SidebarProvider>

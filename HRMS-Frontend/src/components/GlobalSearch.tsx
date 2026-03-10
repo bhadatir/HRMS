@@ -8,14 +8,14 @@ import { User, Plane, Loader2, X, Search } from "lucide-react";
 import { Button } from "./ui/button";
 
 export function GlobalSearch() {
-  const { token, user } = useAuth();    
+  const { token, user} = useAuth();    
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const currentPageUrl = window.location.href;
   const currentPage = currentPageUrl.substring(currentPageUrl.lastIndexOf("/") + 1);
 
-  useEffect(() => {
+  useEffect(() => {    
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();

@@ -19,6 +19,7 @@ import { useInView } from "react-intersection-observer";
 import { useFindTravelPlanByEmployeeId, useGetAllTravelPlans } from "../hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { useAppDebounce } from "@/hooks/useAppDebounce.tsx";
+import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 
 export default function TravelPlan() {
   const { token, user, unreadNotifications } = useAuth(); 
@@ -402,6 +403,7 @@ export default function TravelPlan() {
           </div>
           
           <ScrollToTop />
+          <GlobalSearch />
         </main>
       </SidebarInset>
     </SidebarProvider>
