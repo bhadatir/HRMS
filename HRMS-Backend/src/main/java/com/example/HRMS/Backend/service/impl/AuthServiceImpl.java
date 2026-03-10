@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -40,37 +41,24 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
-
     private final EmployeeRepository employeeRepository;
-
     private final CloudinaryService cloudinaryService;
-
     private final GameTypeRepository gameTypeRepository;
-
     private final ModelMapper modelMapper;
-
-    private final TravelPlanRepository travelPlanRepository;
-
-    private final RoleRepository roleRepository;
-
-    private final DepartmentRepository departmentRepository;
-
-    private final PositionRepository positionRepository;
-
-    private final PasswordEncoder passwordEncoder;
-
-    private final JwtUtil jwtUtil;
-
-    private final AuthAuditRepository authAuditRepository;
-
-    private final EmailService emailService;
-
-    private final TravelPlanService travelPlanService;
-
+    private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
+    private final JobRepository jobRepository;
+    private final PostRepository postRepository;
     private final GameBookingRepository gameBookingRepository;
-
+    private final TravelPlanRepository travelPlanRepository;
+    private final RoleRepository roleRepository;
+    private final DepartmentRepository departmentRepository;
+    private final PositionRepository positionRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final AuthAuditRepository authAuditRepository;
+    private final EmailService emailService;
+    private final TravelPlanService travelPlanService;
     private final WaitlistRepository waitlistRepository;
-
 
     @Override
     public AuthResponse login(AuthRequest authRequest) {
@@ -117,6 +105,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void register(RegisterRequest request) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Employee activeUser = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
+                () -> new RuntimeException("employee not found.")
+        );
+
+        if (activeUser.getFkRole().getId() != 4 && request.getRoleId() == 4) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only Admin can create new user with role admin.");
+        }
 
         if (employeeRepository.existsByEmployeeEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
@@ -287,6 +285,21 @@ public class AuthServiceImpl implements AuthService {
         Employee employee = employeeRepository.findEmployeeByEmployeeEmail(userEmail).orElseThrow(
                 () -> new RuntimeException("employ email not found.")
         );
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Employee activeUser = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
+                () -> new RuntimeException("employee not found.")
+        );
+
+        if (activeUser.getFkRole().getId() != 4 && request.getRoleId() == 4) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only Admin can edit new user with role admin.");
+        }
+
+        if (Objects.equals(employee.getId(), activeUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "you can not edit your self.");
+        }
+
         if(Boolean.FALSE.equals(employee.getEmployeeIsActive())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "can not edit inactive user.");
         }
@@ -343,14 +356,27 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void inActiveUserById(Long userId, String reason){
         Employee employee = employeeRepository.findEmployeeById(userId);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Employee activeUser = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
+                () -> new RuntimeException("employee not found.")
+        );
+
+        if (activeUser.getFkRole().getId() != 4 && employee.getFkRole().getId() == 4) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only Admin can inactivate other admins.");
+        }
+
+        if (Objects.equals(employee.getId(), activeUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "you can not inactivate your self.");
+        }
+
         if(Boolean.FALSE.equals(employee.getEmployeeIsActive())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "can not make inactive who is already inactive user.");
         }
         employee.setEmployeeIsActive(false);
         employee.setReasonForInActive(reason);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-        employee.setEmployeeDeletedBy(userEmail);
+        employee.setEmployeeDeletedBy(email);
         employee.setEmployeeDeletedAt(Instant.now());
         employeeRepository.save(employee);
 
@@ -368,6 +394,7 @@ public class AuthServiceImpl implements AuthService {
 //            List<String> emails1 = new ArrayList<>();
 //            emails1.add(employee.getEmployeeEmail());
 //            emailService.sendEmail(emails1,"Removed from Travel Plan at :" + Instant.now(),"Because your status is inactive so if any problem in this so contact us.");
+
         }
 
         List<String> emails1 = new ArrayList<>();
@@ -382,5 +409,69 @@ public class AuthServiceImpl implements AuthService {
                 "</body>" +
                 "</html>";
         emailService.sendEmail(emails1,"Your ROIMA HRMS portal account is inactivated",htmlEmailMessage);
+    }
+
+    @Override
+    public GlobalSearchResponse globalSearch(String searchTerm, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
+                () -> new RuntimeException("employee not found.")
+        );
+
+        Page<GlobalSearchResult> employeePage = employeeRepository
+                .findAllBySearchTerm(searchTerm, pageable)
+                .map(e -> new GlobalSearchResult(
+                        e.getId(),
+                        e.getEmployeeEmail(),
+                        e.getFkRole().getRoleName(),
+                        "EMPLOYEE" ));
+
+        Page<GlobalSearchResult> travelPage = employeeTravelPlanRepository
+                .findTravelPlanByFkEmployee_Id(employee.getId(), searchTerm, 0L, pageable)
+                .map(t -> new GlobalSearchResult(
+                        t.getId(),
+                        "Trip to " + t.getTravelPlanTo(),
+                        t.getTravelPlanDetails(),
+                        "TRAVEL_PLAN" ));
+
+        Page<GlobalSearchResult> jobPage = jobRepository
+                .findJobBySearchTeam(searchTerm, 0L, employee.getId(), pageable)
+                .map(j -> new GlobalSearchResult(
+                        j.getId(),
+                        j.getJobTitle(),
+                        j.getFkJobType().getJobTypeName(),
+                        "JOB" ));
+
+        String role = employee.getFkRole().getRoleName();
+        String position = employee.getFkPosition().getPositionName();
+        String department = employee.getFkDepartment().getDepartmentName();
+
+        Page<GlobalSearchResult> postPage = postRepository
+                .searchPosts(employee.getId() ,searchTerm, role, position, department, pageable)
+                .map(p -> new GlobalSearchResult(
+                        p.getId(),
+                        p.getPostTitle(),
+                        p.getPostContent(),
+                        "POST" ));
+
+        Page<GlobalSearchResult> gameBookingPage = gameBookingRepository
+                .findBookingsByUserAndSearch(employee.getId(), searchTerm, 0L, 0L,pageable)
+                .map(g -> new GlobalSearchResult(
+                        g.getId(),
+                        g.getFkGameType().getGameName(),
+                        g.getFkHostEmployee().getEmployeeEmail(),
+                        "GAME_BOOKING" ));
+
+        List<GlobalSearchResult> teamMemberPage = employeeRepository
+                .findByFkManagerEmployeeId(employee.getId())
+                .stream().map(e -> new GlobalSearchResult(
+                        e.getId(),
+                        e.getEmployeeEmail(),
+                        e.getFkRole().getRoleName(),
+                        "TEAM_MEMBER" )).toList();
+
+        return new GlobalSearchResponse(employeePage, travelPage, jobPage, postPage, gameBookingPage, teamMemberPage);
     }
 }

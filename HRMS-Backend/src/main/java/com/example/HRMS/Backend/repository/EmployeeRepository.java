@@ -43,7 +43,14 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             ") " +
             "AND (lower(e.employeeFirstName) like lower(concat('%', :query,'%')) " +
             "or lower(e.employeeLastName) like lower(concat('%', :query,'%')) " +
-            "or lower(e.employeeEmail) like lower(concat('%', :query,'%'))) ")
+            "or lower(e.employeeEmail) like lower(concat('%', :query,'%')) " +
+            "OR CAST(e.employeeDob AS string) LIKE concat('%', :query, '%') " +
+            "OR CAST(e.employeeHireDate AS string) LIKE concat('%', :query, '%') " +
+            "OR CAST(e.employeeSalary AS string) LIKE concat('%', :query, '%') " +
+            "or lower(e.employeeGender) like lower(concat('%', :query,'%')) " +
+            "or lower(e.fkDepartment.departmentName) like lower(concat('%', :query,'%')) " +
+            "or lower(e.fkPosition.positionName) like lower(concat('%', :query,'%')) " +
+            "or lower(e.fkRole.roleName) like lower(concat('%', :query,'%'))) ")
     Page<Employee> searchEmployeeByName(@Param("query") String query, Long employeeType, Pageable pageable);
 
     @Query(value =

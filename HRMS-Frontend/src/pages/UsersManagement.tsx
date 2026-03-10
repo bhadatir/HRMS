@@ -158,7 +158,7 @@ export default function JobManagement() {
           {/* User Details */}
           {showUserDetails && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="userbg-white rounded-xl max-w-2xl w-full relative h-150 overflow-y-auto">
+              <div className="user bg-white rounded-xl max-w-2xl w-full relative h-150 overflow-y-auto">
                 <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
                   onClick={() => {
                   setShowUserDetails(false);
@@ -168,51 +168,54 @@ export default function JobManagement() {
             </div>
           )}
 
-          <Card className="border-slate-200">            
-            <CardContent className="space-y-4">
-                <Table>
-                <TableHeader>
-                  <TableRow className="bg-slate-50">
-                    <TableHead className="text-center">No</TableHead>
-                    <TableHead className="text-center">Name</TableHead>
-                    <TableHead className="text-center">Email</TableHead>
-                    <TableHead className="text-center">Department</TableHead>
-                    <TableHead className="text-center">Role</TableHead>
-                    <TableHead className="text-center">Position</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {allEmp?.length > 0 ? (
-                        allEmp.map((emp: any, index: number) => (
-                            <TableRow key={emp.id} 
-                              title = {emp.employeeIsActive ? "Active User" : "Inactive User"}
-                              className={cn(
-                              "border-t cursor-pointer",
-                              emp.employeeIsActive ? "hover:bg-slate-100" : "bg-red-50 hover:bg-red-100"
-                            )} onClick={() => {
-                                setSelectedUserEmail(emp.employeeEmail);
-                                setShowUserDetails(true);
-                                }}>
-                                <TableCell className="text-center">{index + 1}</TableCell>
-                                <TableCell className="text-center">{emp.employeeFirstName} {emp.employeeLastName}</TableCell>
-                                <TableCell className="text-center">{emp.employeeEmail}</TableCell>
-                                <TableCell className="text-center">{emp.departmentName}</TableCell>
-                                <TableCell className="text-center">{emp.roleName}</TableCell>
-                                <TableCell className="text-center">{emp.positionName}</TableCell>
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={6} className="text-center p-4">No employees found.</TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-              </Table>
-              <div ref={ref} className="h-10 flex justify-center items-center">
-                {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="user">
+            <Card className="border-slate-200">            
+              <CardContent className="space-y-4">
+                  <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-50">
+                      <TableHead className="text-center">No</TableHead>
+                      <TableHead className="text-center">Name</TableHead>
+                      <TableHead className="text-center">Email</TableHead>
+                      <TableHead className="text-center">Department</TableHead>
+                      <TableHead className="text-center">Role</TableHead>
+                      <TableHead className="text-center">Position</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                      {allEmp?.length > 0 ? (
+                          allEmp
+                            .map((emp: any, index: number) => (
+                              <TableRow key={emp.id} 
+                                title = {emp.employeeIsActive ? "Active User" : "Inactive User"}
+                                className={cn(
+                                "border-t cursor-pointer",
+                                emp.employeeIsActive ? "hover:bg-slate-100" : "bg-red-50 hover:bg-red-100"
+                              )} onClick={() => {
+                                  setSelectedUserEmail(emp.employeeEmail);
+                                  setShowUserDetails(true);
+                              }}>
+                                  <TableCell className="text-center">{index + 1}</TableCell>
+                                  <TableCell className="text-center">{emp.employeeFirstName} {emp.employeeLastName}</TableCell>
+                                  <TableCell className="text-center">{emp.employeeEmail}</TableCell>
+                                  <TableCell className="text-center">{emp.departmentName}</TableCell>
+                                  <TableCell className="text-center">{emp.roleName}</TableCell>
+                                  <TableCell className="text-center">{emp.positionName}</TableCell>
+                              </TableRow>
+                          ))
+                      ) : (
+                          <TableRow>
+                              <TableCell colSpan={6} className="text-center p-4">No employees found.</TableCell>
+                          </TableRow>
+                      )}
+                  </TableBody>
+                </Table>
+                <div ref={ref} className="h-10 flex justify-center items-center">
+                  {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           
           <ScrollToTop />
           <GlobalSearch />

@@ -1,16 +1,11 @@
 package com.example.HRMS.Backend.controller;
 
 import com.example.HRMS.Backend.dto.*;
-import com.example.HRMS.Backend.model.Employee;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,8 +13,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -27,11 +20,6 @@ import java.util.List;
 public class UserController {
 
     private final AuthService authService;
-    private final EmployeeRepository employeeRepository;
-    private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
-    private final JobRepository jobRepository;
-    private final PostRepository postRepository;
-    private final GameBookingRepository gameBookingRepository;
 
     @GetMapping("/email")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) {
@@ -93,65 +81,7 @@ public class UserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
-                () -> new RuntimeException("employee not found.")
-        );
+        return ResponseEntity.ok(authService.globalSearch(searchTerm, page, size));
 
-        Page<GlobalSearchResult> employeePage = employeeRepository
-                .findAllBySearchTerm(searchTerm, pageable)
-                .map(e -> new GlobalSearchResult(
-                        e.getId(),
-                        e.getEmployeeEmail(),
-                        e.getFkRole().getRoleName(),
-                        "EMPLOYEE" ));
-
-        Page<GlobalSearchResult> travelPage = employeeTravelPlanRepository
-                .findTravelPlanByFkEmployee_Id(employee.getId(), searchTerm, 0L, pageable)
-                .map(t -> new GlobalSearchResult(
-                        t.getId(),
-                        "Trip to " + t.getTravelPlanTo(),
-                        t.getTravelPlanDetails(),
-                        "TRAVEL_PLAN" ));
-
-        Page<GlobalSearchResult> jobPage = jobRepository
-                .findJobBySearchTeam(searchTerm, 0L, employee.getId(), pageable)
-                .map(j -> new GlobalSearchResult(
-                        j.getId(),
-                        j.getJobTitle(),
-                        j.getFkJobType().getJobTypeName(),
-                        "JOB" ));
-
-        String role = employee.getFkRole().getRoleName();
-        String position = employee.getFkPosition().getPositionName();
-        String department = employee.getFkDepartment().getDepartmentName();
-
-        Page<GlobalSearchResult> postPage = postRepository
-                .searchPosts(employee.getId() ,searchTerm, role, position, department, pageable)
-                .map(p -> new GlobalSearchResult(
-                        p.getId(),
-                        p.getPostTitle(),
-                        p.getPostContent(),
-                        "POST" ));
-
-        Page<GlobalSearchResult> gameBookingPage = gameBookingRepository
-                .findBookingsByUserAndSearch(employee.getId(), searchTerm, 0L, 0L,pageable)
-                .map(g -> new GlobalSearchResult(
-                        g.getId(),
-                        g.getFkGameType().getGameName(),
-                        g.getFkHostEmployee().getEmployeeEmail(),
-                        "GAME_BOOKING" ));
-
-        List<GlobalSearchResult> teamMemberPage = employeeRepository
-                .findByFkManagerEmployeeId(employee.getId())
-                .stream().map(e -> new GlobalSearchResult(
-                        e.getId(),
-                        e.getEmployeeEmail(),
-                        e.getFkRole().getRoleName(),
-                        "TEAM_MEMBER" )).toList();
-
-        return ResponseEntity.ok(new GlobalSearchResponse(employeePage, travelPage, jobPage, postPage, gameBookingPage, teamMemberPage));
     }
 }

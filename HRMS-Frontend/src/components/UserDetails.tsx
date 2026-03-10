@@ -89,7 +89,7 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
                     <p><span className="font-medium">Account Created:</span> {new Date(userData?.employeeCreatedAt || "").toLocaleDateString()} : {new Date(userData?.employeeCreatedAt || "").toLocaleTimeString()}</p>
                     <p><span className="font-medium">Last Login:</span> {new Date(userData?.lastLoginAt || "").toLocaleDateString()} : {new Date(userData?.lastLoginAt || "").toLocaleTimeString()}</p>
                 </div>
-                {userData?.employeeIsActive && user?.id !== userData?.id && 
+                {userData?.employeeIsActive && user?.id !== userData?.id && (userData?.roleName != "ADMIN" || user?.roleName == "ADMIN") &&
                   <div className="flex gap-2">
                     <Button title="Edit User"
                         onClick={() => setShowEditUserForm(true)} className="gap-2 text-gray-600">

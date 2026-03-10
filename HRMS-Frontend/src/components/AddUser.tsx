@@ -22,7 +22,7 @@ type AddUserFormInputs = {
 };
 
 export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: string | null, onSuccess: () => void}) {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
     const queryClient = useQueryClient();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<AddUserFormInputs>({
@@ -181,7 +181,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
                 {...register("roleId", { required: true })}
               >
                 <option value="">Select Role</option>
-                {allRoles?.map((role: any) => (
+                {allRoles?.map((role: any) => ((user?.roleName == "ADMIN" || (user?.roleName == "HR" && role.roleName != "ADMIN")) &&
                   <option key={role.id} value={role.id}>{role.roleName}</option>
                 ))}
               </select>

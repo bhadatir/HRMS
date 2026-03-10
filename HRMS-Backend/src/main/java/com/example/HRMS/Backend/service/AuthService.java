@@ -48,4 +48,6 @@ public interface AuthService {
     void updatePassword(Long empId, String newPassword);
 
     void logout();
+
+    GlobalSearchResponse globalSearch(String searchTerm, int page, int size);
 }
