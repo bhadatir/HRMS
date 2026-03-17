@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { jobService } from "../api/jobService";
@@ -20,28 +20,35 @@ import { useInView } from "react-intersection-observer";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 
+type Job = {
+  id: number;
+  jobTitle: string;
+  jobDescriptionUrl: string;
+  jobSalary: number;
+  jobIsActive: boolean;
+  employeeId: number;
+  employeeEmail: string;
+  jobCreatedAt: string;
+};
+
 export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");  
+  const [searchTerm, setSearchTerm] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("jobId") || "";
+  });
   const [shareJobId, setShareJobId] = useState<number | null>(null);
   const [editJobId, setEditJobId] = useState<number | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [referJobId, setReferJobId] = useState<number | null>(null);
   const queryClient = useQueryClient();
-  const [jobType, setJobType] = useState(1);
-  const debouncedSearchTerm = useAppDebounce(searchTerm);
-
-  useEffect(() => {
+  const [jobType, setJobType] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const jobId = urlParams.get("jobId");
-    
-    if (jobId) {
-      setSearchTerm(jobId);
-      setJobType(0);
-    }
-  }, []);
+    return urlParams.get("jobId") ? 0 : 1;
+  });
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   const {
     data: allJobsData,
@@ -58,7 +65,7 @@ export default function JobManagement() {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (allJobsOnError) {
     alert("Failed to load jobs: " + allJobsOnError);
@@ -70,8 +77,8 @@ export default function JobManagement() {
       queryClient.invalidateQueries({ queryKey: ["allJobs"] });
       queryClient.invalidateQueries({ queryKey: ["jobDetail"] });
     },
-    onError: (error: any) => {
-      alert("Failed to update job status: " + (error.response?.data || error.message)); }
+    onError: (error: Error) => {
+      alert("Failed to update job status: " + (error instanceof Error ? error.message : "Unknown error")); }
    });
 
   useEffect(() => {
@@ -247,7 +254,7 @@ export default function JobManagement() {
 
           <div className="job grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allJobs.length > 0 ? (
-              allJobs.map((job: any) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (
+              allJobs.map((job: Job) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (
                 <Card 
                   key={job.id} 
                   className="border-slate-200 cursor-pointer group"

@@ -19,9 +19,34 @@ import { useEmployeeSearch } from "../hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 
+type Employee = {
+  id: number;
+  employeeFirstName: string;
+  employeeLastName: string;
+};
+
+type OrganizationManager = {
+  employeeId: number;
+  firstName: string;
+  lastName: string;
+  positionName: string;
+};
+
+type OrganizationReport = {
+  employeeId: number;
+  firstName: string;
+  lastName: string;
+  positionName: string;
+  employeeProfileUrl: string;
+};
+
 export default function OrganizationChart() {
-  const { token, unreadNotifications } = useAuth(); 
-  const [selectedId, setSelectedId] = useState(2);
+  const { token, unreadNotifications } = useAuth();
+  const [selectedId, setSelectedId] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const employeeId = urlParams.get("employeeId");
+    return employeeId ? parseInt(employeeId) : 2;
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);  
   const [showNotification, setShowNotification] = useState(false);
@@ -41,30 +66,18 @@ export default function OrganizationChart() {
     enabled: !!selectedId,
   });
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const employeeId = urlParams.get("employeeId");
-    if (employeeId) {
-      setSelectedId(parseInt(employeeId));
-    }
-  }, []);
-
   const { ref, inView } = useInView();
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleSelectUser = (id: number) => {
     setSelectedId(id);
     setSearchTerm(""); 
     setShowDropdown(false);
   };
-
-  useEffect(() => {
-    setShowDropdown(false);
-  }, []);
 
   useEffect(() => {
     const clickOutside = (e: MouseEvent) => {
@@ -108,13 +121,12 @@ export default function OrganizationChart() {
                   setShowDropdown(true);
                 }}
                 onFocus={() => setShowDropdown(true)}
-                autoFocus
               />
             </div>
 
             {showDropdown && suggestions.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
-                {suggestions.map((emp: any) => (
+                {suggestions.map((emp: Employee) => (
                   <button
                     key={emp.id}
                     className="w-full text-left px-4 py-3 hover:bg-slate-100 flex items-center gap-3 border-b last:border-none"
@@ -172,7 +184,7 @@ export default function OrganizationChart() {
               <section className="bg-white p-4 rounded-lg border shadow-sm">
                 <Breadcrumb>
                   <BreadcrumbList>
-                    {orgData?.managerChain?.map((manager: any) => (
+                    {orgData?.managerChain?.map((manager: OrganizationManager) => (
                       <div key={manager.employeeId} className="flex items-center">
                         <BreadcrumbItem>
                           <button 
@@ -219,7 +231,7 @@ export default function OrganizationChart() {
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  {orgData.directReports?.map((report: any) => (
+                  {orgData.directReports?.map((report: OrganizationReport) => (
                     <Card 
                       key={report.employeeId} 
                       className="cursor-pointer hover:border-blue-400 transition-all"
