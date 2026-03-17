@@ -2,7 +2,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
 import { useAuth } from "../context/AuthContext";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +9,13 @@ import { CheckCheck, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useInView } from "react-intersection-observer";
 import { useGetUserNotifications } from "@/hooks/useInfinite";
-import { ScrollToTop } from "./ScrollToTop";
+
+type Notification = {
+  id: number;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+};  
 
 export default function Notifications() {
   const { token, user } = useAuth();
@@ -31,7 +36,7 @@ export default function Notifications() {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (notificationsError) {
     alert("Failed to load notifications: " + notificationsError);
@@ -42,8 +47,8 @@ export default function Notifications() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
-    onError: (error: any) => {
-      alert("Failed to mark notification as read: " + (error.response?.data || error.message)); }
+    onError: (error: Error) => {
+      alert("Failed to mark notification as read: " + (error instanceof Error ? error.message : "Unknown error")); }
   });
 
   const markAllReadMutation = useMutation({
@@ -51,13 +56,14 @@ export default function Notifications() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
-    onError: (error: any) => {
-      alert("Failed to mark all notifications as read: " + (error.response?.data || error.message)); }
+    onError: (error: Error) => {
+      alert("Failed to mark all notifications as read: " + (error instanceof Error ? error.message : "Unknown error")); }
   });
 
   const handleMarkAllRead = () => {
-    window.confirm("Are you sure you want to mark all notifications as read?") &&
-    markAllReadMutation.mutate();
+    if (window.confirm("Are you sure you want to mark all notifications as read?")) {
+      markAllReadMutation.mutate();
+    }
   };
 
 return (
@@ -92,7 +98,7 @@ return (
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {notifications?.length > 0 ? (
-            notifications?.map((notif: any) => (
+            notifications?.map((notif: Notification) => (
               <div className="relative flex-1">
                 <p className="text-sm text-gray-500">
                   <div dangerouslySetInnerHTML={{ __html: notif.message }} />

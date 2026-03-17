@@ -1,6 +1,6 @@
 
 import { useState, useMemo, useEffect } from "react";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { travelService } from "../api/travelService";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -21,6 +21,27 @@ import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { useAppDebounce } from "@/hooks/useAppDebounce.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 
+type Plan = {
+  id: number;
+  travelPlanName: string;
+  travelPlanFrom: string;
+  travelPlanTo: string;
+  travelPlanStartDate: string;
+  travelPlanEndDate: string;
+  travelPlanDetails: string;
+  travelPlanIsReturn: boolean;
+  travelPlanIsDeleted: boolean;
+  employeeId: number;
+  employeeEmail: string;
+  employeeTravelPlanResponses: EmployeeTravelPlanResponse[];
+}
+
+type EmployeeTravelPlanResponse = {
+  employeeId: number;
+  employeeEmail: string;
+  employeeIsDeletedFromTravel: boolean;
+}
+
 export default function TravelPlan() {
   const { token, user, unreadNotifications } = useAuth(); 
   const queryClient = useQueryClient();
@@ -29,20 +50,16 @@ export default function TravelPlan() {
   const [fullTravelDetails, setFullTravelDetails] = useState<number | null>(null);
   const [editTravelPlanId, setEditTravelPlanId] = useState<number | null>(null);
   const [activeExpenseId, setActiveExpenseId] = useState<number | null>(null);
-  const [travelPlanType, setTravelPlanType] = useState<number>(1);
-  const [selectedTravelId, setSelectedTravelId] = useState<number | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useAppDebounce(searchTerm);
-  
-  useEffect(() => {
+  const [searchTerm, setSearchTerm] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const travelPlanId = urlParams.get("travelPlanId");
-    
-    if (travelPlanId) {
-      setSearchTerm(travelPlanId);
-      setTravelPlanType(0);
-    }
-  }, []);
+    return urlParams.get("travelPlanId") || "";
+  });
+  const [travelPlanType, setTravelPlanType] = useState<number>(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("travelPlanId") ? 0 : 1;
+  });
+  const [selectedTravelId, setSelectedTravelId] = useState<number | null>(null);
+  const debouncedSearchTerm = useAppDebounce(searchTerm);
 
   const {
     data: allTravelPlansData,
@@ -51,7 +68,6 @@ export default function TravelPlan() {
     isFetchingNextPage: isFetchingAllTravelPlansNextPage,
     isError: allTravelPlansError,
   } = useGetAllTravelPlans(searchTerm, token || "");
-  const allTravelPlans = allTravelPlansData?.pages.flatMap(page => page.content) || [];
 
   const {
     data: travelPlanDataByEmpId,
@@ -60,7 +76,16 @@ export default function TravelPlan() {
     isFetchingNextPage: isFetchingTravelPlanByEmpIdNextPage,
     isError: travelPlanByEmpIdError,
   } = useFindTravelPlanByEmployeeId(searchTerm, travelPlanType, token || "");
-  const travelPlanByEmpId = travelPlanDataByEmpId?.pages.flatMap(page => page.content) || [];
+
+  const allTravelPlans = useMemo(
+    () => allTravelPlansData?.pages.flatMap(page => page.content) || [],
+    [allTravelPlansData]
+  );
+
+  const travelPlanByEmpId = useMemo(
+    () => travelPlanDataByEmpId?.pages.flatMap(page => page.content) || [],
+    [travelPlanDataByEmpId]
+  );
 
   const { ref, inView } = useInView();
   
@@ -68,13 +93,13 @@ export default function TravelPlan() {
     if (inView && hasAllTravelPlansNextPage && !isFetchingAllTravelPlansNextPage) {
       fetchAllTravelPlansNextPage();
     }
-  }, [inView, hasAllTravelPlansNextPage, isFetchingAllTravelPlansNextPage]);
+  }, [inView, hasAllTravelPlansNextPage, isFetchingAllTravelPlansNextPage, fetchAllTravelPlansNextPage]);
 
   useEffect(() => {
     if (inView && hasTravelPlanByEmpIdNextPage && !isFetchingTravelPlanByEmpIdNextPage) {
       fetchTravelPlanByEmpIdNextPage();
     }
-  }, [inView, hasTravelPlanByEmpIdNextPage, isFetchingTravelPlanByEmpIdNextPage]);
+  }, [inView, hasTravelPlanByEmpIdNextPage, isFetchingTravelPlanByEmpIdNextPage, fetchTravelPlanByEmpIdNextPage]);
 
   const deleteTravelPlanMutation = useMutation({
     mutationFn: ({ travelPlanId, reason }: { travelPlanId: number; reason: string }) => travelService.deleteTravelPlan(travelPlanId, reason, token || ""),
@@ -83,8 +108,8 @@ export default function TravelPlan() {
       queryClient.invalidateQueries({ queryKey: ["travelPlanByEmpId"] });
       alert("Travel plan deleted successfully");
     },
-    onError: (error: any) => {
-      alert("Failed to delete travel plan: " + (error.response?.data || error.message)); }
+    onError: (error: Error) => {
+      alert("Failed to delete travel plan: " + (error instanceof Error ? error.message : "Unknown error")); }
   });
 
   const filteredPlans = useMemo(() => {
@@ -95,7 +120,7 @@ export default function TravelPlan() {
     }
     if (!travelPlanByEmpId) return [];
     return travelPlanByEmpId;   
-  }, [user, travelPlanByEmpId, allTravelPlans, travelPlanType, searchTerm]);
+  }, [user, travelPlanByEmpId, allTravelPlans]);
 
   const handleDelete = (travelPlanId: number) => {
     const reason = window.prompt("Please enter reason for deleting this travel plan:", "")?.trim();
@@ -270,9 +295,9 @@ export default function TravelPlan() {
 
           <div className="travel grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPlans.length > 0 ? (
-              filteredPlans.sort((a: any, b: any) => new Date(b.travelPlanStartDate).getTime() 
+              filteredPlans.sort((a: Plan, b: Plan) => new Date(b.travelPlanStartDate).getTime() 
                                                       - new Date(a.travelPlanStartDate).getTime())
-              .map((plan: any) => 
+              .map((plan: Plan) => 
                 (
                 <Card key={plan.id}
                   onClick={() => setFullTravelDetails(plan.id)}
@@ -302,7 +327,7 @@ export default function TravelPlan() {
                     <div className="space-y-2">
                       <p className="text-xs font-bold text-slate-400 uppercase">Team Members</p>
                       <div className="flex flex-wrap gap-1">
-                        {plan.employeeTravelPlanResponses.map((m: any) => (
+                        {plan.employeeTravelPlanResponses.map((m: EmployeeTravelPlanResponse) => (
                           !m.employeeIsDeletedFromTravel ? (
                             <Badge key={m.employeeEmail} variant="secondary" className="text-[10px]">
                               {m.employeeEmail.split('@')[0]}
@@ -313,13 +338,13 @@ export default function TravelPlan() {
                     </div>
                     
                     {user?.roleName === "HR" || user?.roleName === "EMPLOYEE" || user?.roleName === "ADMIN" || 
-                      (user?.roleName === "MANAGER" && plan.employeeTravelPlanResponses.some((resp: any) => 
+                      (user?.roleName === "MANAGER" && plan.employeeTravelPlanResponses.some((resp: EmployeeTravelPlanResponse) => 
                           resp.employeeEmail === user.employeeEmail)) ? (
                       <div className="mt-2 flex justify-between gap-2">
                         { new Date(plan.travelPlanStartDate) > new Date()
                           && user?.roleName !== "ADMIN" 
                           && (user?.id === plan.employeeId || 
-                              plan?.employeeTravelPlanResponses.some((resp: any) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false))
+                              plan?.employeeTravelPlanResponses.some((resp: EmployeeTravelPlanResponse) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false))
                           && !plan.travelPlanIsDeleted ? (
                         <Button
                           disabled={plan.travelPlanIsDeleted}
@@ -335,7 +360,7 @@ export default function TravelPlan() {
                         ):(<></>)}
 
                         { (user?.roleName !== "HR" || (user?.roleName === "HR" && user?.id !== plan.employeeId )) &&
-                          (plan.employeeTravelPlanResponses.some((resp: any) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false))
+                          (plan.employeeTravelPlanResponses.some((resp: EmployeeTravelPlanResponse) => resp.employeeId === user?.id && resp.employeeIsDeletedFromTravel === false))
                           && user?.roleName !== "ADMIN"
                           && !plan.travelPlanIsDeleted ? ((() => {
                           const now = new Date().getTime();
