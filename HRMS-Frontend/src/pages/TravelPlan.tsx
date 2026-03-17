@@ -40,6 +40,7 @@ export default function TravelPlan() {
     
     if (travelPlanId) {
       setSearchTerm(travelPlanId);
+      setTravelPlanType(0);
     }
   }, []);
 
@@ -79,6 +80,7 @@ export default function TravelPlan() {
     mutationFn: ({ travelPlanId, reason }: { travelPlanId: number; reason: string }) => travelService.deleteTravelPlan(travelPlanId, reason, token || ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
+      queryClient.invalidateQueries({ queryKey: ["travelPlanByEmpId"] });
       alert("Travel plan deleted successfully");
     },
     onError: (error: any) => {

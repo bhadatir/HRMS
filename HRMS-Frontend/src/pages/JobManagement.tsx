@@ -39,6 +39,7 @@ export default function JobManagement() {
     
     if (jobId) {
       setSearchTerm(jobId);
+      setJobType(0);
     }
   }, []);
 

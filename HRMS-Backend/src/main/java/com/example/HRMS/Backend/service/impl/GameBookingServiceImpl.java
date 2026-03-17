@@ -3,10 +3,7 @@ package com.example.HRMS.Backend.service.impl;
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
-import com.example.HRMS.Backend.service.DynamicCycleService;
-import com.example.HRMS.Backend.service.EmailService;
-import com.example.HRMS.Backend.service.GameBookingService;
-import com.example.HRMS.Backend.service.NotificationService;
+import com.example.HRMS.Backend.service.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,6 +26,8 @@ public class GameBookingServiceImpl implements GameBookingService {
     private final GameBookingRepository gameBookingRepository;
 
     private final EmailService emailService;
+
+    private final TemplateService templateService;
 
     private final WaitlistRepository waitlistRepository;
 
@@ -157,21 +156,9 @@ public class GameBookingServiceImpl implements GameBookingService {
             pInterest.setPlayedInCurrentCycle(pInterest.getPlayedInCurrentCycle() + 1);
             employeeGameInterestRepository.save(pInterest);
 
-            String url = "http://localhost:5173/game-management?gameBookingId=" + saveGame.getId();
-
-            String htmlMessage = "<html>" +
-                    "<body>" +
-                    "<p><strong>Game Name:</strong> " + type.getGameName() + "</p>" +
-                    "<p><strong>Host Email:</strong> " + host.getEmployeeEmail() + "</p>" +
-                    "<p><strong>Slot Time:</strong> " + start.toLocalDate() + " : " + start.toLocalTime() + "</p>" +
-                    "<a href=\"" + url + "\">View Game Booking</a>" +
-                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                    "</body>" +
-                    "</html>";
-            notificationService.createNotification(pId,
-                    "Slot Confirmed !",
-                    htmlMessage);
+            String subject = "Slot Confirmed !";
+            String htmlMessage = templateService.generateGameBookingHtml(saveGame, null, subject, true);
+            notificationService.createNotification(pId, subject, htmlMessage);
             emails.add(p.getEmployeeEmail());
         }
 
@@ -279,21 +266,10 @@ public class GameBookingServiceImpl implements GameBookingService {
             return;
         }
         for (GameBooking gameBooking : upcomingBooking) {
-            String url = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
+            String subject = "Game Booking Alert! : your " + gameBooking.getFkGameType().getGameName() + " Game is start after half hour.";
+            String htmlMessage = templateService.generateGameBookingHtml(gameBooking, null, subject, true);
+            notificationService.createNotification(gameBooking.getFkHostEmployee().getId(), subject, htmlMessage);
 
-            String htmlMessage = "<html>" +
-                    "<body>" +
-                    "<p><strong>Message:</strong> your " + gameBooking.getFkGameType().getGameName() + " Game is start after half hour.</p>" +
-                    "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
-                    "<a href=\"" + url + "\">View Game Booking</a>" +
-                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                    "</body>" +
-                    "</html>";
-            notificationService.createNotification(gameBooking.getFkHostEmployee().getId()
-                    , "Game Booking Alert!"
-                    , htmlMessage
-            );
         }
 
         List<BookingWaitingList> upComingSlots = waitlistRepository.findAllByTargetSlotDatetimeBetween(now, targetSlot);
@@ -359,21 +335,11 @@ public class GameBookingServiceImpl implements GameBookingService {
                 employeeGameInterest.setPlayedInCurrentCycle(employeeGameInterest.getPlayedInCurrentCycle() + 1);
                 employeeGameInterestRepository.save(employeeGameInterest);
             }
-            String url = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
 
-            String htmlMessage = "<html>" +
-                    "<body>" +
-                    "<p><strong>Message:</strong> You have been promoted to your requested slot for " + bookingWaitingList.getFkGameType().getGameName() + "</p>" +
-                    "<p><strong>Slot Time:</strong> " + bookingWaitingList.getTargetSlotDatetime().toLocalDate() + " : " + bookingWaitingList.getTargetSlotDatetime().toLocalTime() + "</p>" +
-                    "<a href=\"" + url + "\">View Game Booking</a>" +
-                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                    "</body>" +
-                    "</html>";
-            notificationService.createNotification(bookingWaitingList.getFkHostEmployee().getId()
-                    , "Slot Confirmed!"
-                    , htmlMessage
-            );
+            String subject = "Slot Confirmed! : You have been promoted to your requested slot for " + bookingWaitingList.getFkGameType().getGameName();
+            String htmlMessage = templateService.generateGameBookingHtml(gameBooking, null, subject, true);
+            notificationService.createNotification(bookingWaitingList.getFkHostEmployee().getId(), subject, htmlMessage);
+
         }
 
         EmployeeGameInterest employeeGameInterest = employeeGameInterestRepository.findEmployeeGameInterestByFkEmployee_IdAndFkGameType_Id
@@ -382,21 +348,10 @@ public class GameBookingServiceImpl implements GameBookingService {
         employeeGameInterestRepository.save(employeeGameInterest);
 
         waitlistRepository.delete(bookingWaitingList);
-        String url = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
 
-        String htmlMessage = "<html>" +
-                "<body>" +
-                "<p><strong>Message:</strong> You have been promoted to your requested slot for " + bookingWaitingList.getFkGameType().getGameName() + "</p>" +
-                "<p><strong>Slot Time:</strong> " + bookingWaitingList.getTargetSlotDatetime().toLocalDate() + " : " + bookingWaitingList.getTargetSlotDatetime().toLocalTime() + "</p>" +
-                "<a href=\"" + url + "\">View Game Booking</a>" +
-                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                "</body>" +
-                "</html>";
-        notificationService.createNotification(bookingWaitingList.getFkHostEmployee().getId()
-                , "Slot Confirmed!"
-                , htmlMessage
-        );
+        String subject = "Slot Confirmed! : You have been promoted to your requested slot for " + bookingWaitingList.getFkGameType().getGameName();
+        String htmlMessage = templateService.generateGameBookingHtml(gameBooking, null, subject, true);
+        notificationService.createNotification(bookingWaitingList.getFkHostEmployee().getId(), subject, htmlMessage);
 
     }
 
@@ -615,21 +570,11 @@ public class GameBookingServiceImpl implements GameBookingService {
                 bookingParticipantRepository.save(bookingParticipant);
 
                 emails.add(employee.getEmployeeEmail());
-                String url = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
 
-                String htmlMessage = "<html>" +
-                        "<body>" +
-                        "<p><strong>Message:</strong> You are added in Game booking by your friend " + gameBooking.getFkHostEmployee().getEmployeeEmail() + " </p>" +
-                        "<p><strong>Game Name:</strong> " + gameBooking.getFkGameType().getGameName() + "</p>" +
-                        "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
-                        "<a href=\"" + url + "\">View Game Booking</a>" +
-                        "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                        "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                        "</body>" +
-                        "</html>";
-                notificationService.createNotification(id,
-                        "Game Booking complete",
-                        htmlMessage);
+                String subject = "Game Booking complete! You are added in Game booking by your friend " + gameBooking.getFkHostEmployee().getEmployeeEmail();
+                String htmlMessage = templateService.generateGameBookingHtml(gameBooking, null, subject, true);
+                notificationService.createNotification(id, subject, htmlMessage);
+
 
             }
         }
@@ -656,18 +601,9 @@ public class GameBookingServiceImpl implements GameBookingService {
                             "</html>";
                     emailService.sendEmail(emails1,"You are removed from " + gameBooking.getFkGameType().getGameName() + " Game Booking By your friend",htmlEmailMessage);
 
-                    String htmlMessage = "<html>" +
-                            "<body>" +
-                            "<p><strong>Message:</strong> You are removed from Game booking by your friend " + gameBooking.getFkHostEmployee().getEmployeeEmail() + " </p>" +
-                            "<p><strong>Game Name:</strong> " + gameBooking.getFkGameType().getGameName() + "</p>" +
-                            "<p><strong>Slot Time:</strong> " + gameBooking.getGameBookingStartTime().toLocalDate() + " : " + gameBooking.getGameBookingStartTime().toLocalTime() + "</p>" +
-                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                            "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                            "</body>" +
-                            "</html>";
-                    notificationService.createNotification(id,
-                            "Remove from booking",
-                            htmlMessage);
+                    String subject = "You are removed from Game booking by your friend " + gameBooking.getFkHostEmployee().getEmployeeEmail();
+                    String htmlMessage = templateService.generateGameBookingHtml(gameBooking, null, subject, false);
+                    notificationService.createNotification(id, subject, htmlMessage);
                 }
             }
         }

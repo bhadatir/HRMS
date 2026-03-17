@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { CheckCheck, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useInView } from "react-intersection-observer";
 import { useGetUserNotifications } from "@/hooks/useInfinite";
@@ -67,7 +67,7 @@ return (
           <h3 className="font-bold text-lg">Notifications</h3>
             {searchTerm && searchTerm.length > 0 ?(
               <Badge variant="outline">{notifications?.length} results</Badge>
-            ) : (<Badge variant="outline">No filter</Badge>)
+            ) : (<Badge variant="outline" className="ml-4">No filter</Badge>)
           }
           <div className="relative max-w-sm w-full mx-4">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
@@ -93,29 +93,21 @@ return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {notifications?.length > 0 ? (
             notifications?.map((notif: any) => (
-              <Card key={notif.id} className={`shadow-none border ${!notif.read ? 'bg-blue-50/30' : ''}`}>
-                <CardContent className="p-4 flex items-start gap-4">
-                  <div className="flex-1 space-y-1">
-                    <div className="flex justify-between">
-                      <h4 className={`text-sm font-bold ${notif.read ? "text-gray-500" : "text-gray-900"}`}>
-                        {notif.title}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-gray-500">
-                      <div dangerouslySetInnerHTML={{ __html: notif.message }} />
-                    </p>
-                    <Button 
-                      variant="link" 
-                      className="text-xs text-blue-600"
-                      onClick={() => markReadMutation.mutate(notif.id)}
-                    >
-                      Mark as read
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>)
+              <div className="relative flex-1">
+                <p className="text-sm text-gray-500">
+                  <div dangerouslySetInnerHTML={{ __html: notif.message }} />
+                </p>
+                <Button 
+                  variant="link" 
+                  title="Mark as read"
+                  className="text-xs text-blue-600 absolute right-2 top-2"
+                  onClick={() => markReadMutation.mutate(notif.id)}
+                >
+                <CheckCheck />
+                </Button>
+              </div>
             )
-          ) : (
+          )) : (
             <div className="text-center py-10 text-gray-400 italic">No notifications.</div>
           )}
         </div>

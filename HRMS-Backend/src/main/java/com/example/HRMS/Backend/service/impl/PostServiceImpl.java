@@ -3,10 +3,7 @@ package com.example.HRMS.Backend.service.impl;
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
-import com.example.HRMS.Backend.service.CloudinaryService;
-import com.example.HRMS.Backend.service.EmailService;
-import com.example.HRMS.Backend.service.NotificationService;
-import com.example.HRMS.Backend.service.PostService;
+import com.example.HRMS.Backend.service.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +41,15 @@ public class PostServiceImpl implements PostService {
     private final EmailService emailService;
     private final PostVisibilityRepository postVisibilityRepository;
     private final NotificationService notificationService;
+    private final TemplateService templateService;
     private final CloudinaryService cloudinaryService;
+
+    public Employee getLoginUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return employeeRepository.findEmployeeByEmployeeEmail(email)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
 
     @Override
     public void savePost(PostRequest postRequest, MultipartFile file) throws IOException {
@@ -343,18 +348,9 @@ public class PostServiceImpl implements PostService {
                 "</html>";
         emailService.sendEmail(emails,"Warning mail !!! ",htmlEmailMessage);
 
-        String htmlMessage = "<html>" +
-                "<body>" +
-                "<p><strong>Message:</strong>Do not share this type of comment second time</p>" +
-                "<p><strong>Comment Content:</strong> " + comment.getCommentContent() + "</p>" +
-                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                "</body>" +
-                "</html>";
-        notificationService.createNotification(comment.getFkCommentEmployee().getId()
-                ,"WARNING : comment is deleted by HR"
-                , htmlMessage
-        );
+        String subject = "WARNING : comment is deleted by HR (" + getLoginUser().getEmployeeEmail() + ")";
+        String htmlMessage = templateService.generatePostHtml(comment.getCommentContent(), "Do not share this type of comment second time", subject);
+        notificationService.createNotification(comment.getFkCommentEmployee().getId(), subject, htmlMessage);
     }
 
     @Override
@@ -400,19 +396,11 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(post);
 
-        String htmlMessage = "<html>" +
-                "<body>" +
-                "<p><strong>Message:</strong>Do not share this type of post second time</p>" +
-                "<p><strong>Post Title:</strong> " + post.getPostTitle() + "</p>" +
-                "<p><strong>Post Content:</strong> " + post.getPostContent() + "</p>" +
-                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                "</body>" +
-                "</html>";
-        notificationService.createNotification(post.getFkPostEmployee().getId()
-                ,"WARNING : post is deleted by HR"
-                , htmlMessage
-        );
+        String subject = "WARNING : post is deleted by HR (" + getLoginUser().getEmployeeEmail() + ")";
+        String htmlMessage = templateService.generatePostHtml(post.getPostTitle() + " : " + post.getPostContent()
+                , "Do not share this type of post second time", subject);
+        notificationService.createNotification(post.getFkPostEmployee().getId(), subject, htmlMessage);
+
         }
     }
 

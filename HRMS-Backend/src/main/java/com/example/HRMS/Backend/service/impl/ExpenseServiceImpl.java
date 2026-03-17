@@ -3,11 +3,13 @@ package com.example.HRMS.Backend.service.impl;
 import com.example.HRMS.Backend.dto.ExpenseProofResponse;
 import com.example.HRMS.Backend.dto.ExpenseRequest;
 import com.example.HRMS.Backend.dto.ExpenseResponse;
+import com.example.HRMS.Backend.dto.TravelPlanRequest;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
 import com.example.HRMS.Backend.service.AuthService;
 import com.example.HRMS.Backend.service.ExpenseService;
 import com.example.HRMS.Backend.service.NotificationService;
+import com.example.HRMS.Backend.service.TemplateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -41,6 +43,14 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ModelMapper modelMapper;
     private final NotificationService notificationService;
     private final AuthService authService;
+    private final TemplateService templateService;
+
+    public Employee getLoginUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return employeeRepository.findEmployeeByEmployeeEmail(email)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
 
     @Override
     public List<ExpenseResponse> getExpenseById(Long employeeId, Long travelPlanId){
@@ -162,22 +172,11 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setExpenseStatusChangeBy(email);
         expenseRepository.save(expense);
 
-        String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlan.getId();
-        String htmlMessage = "<html>" +
-                "<body>" +
-                "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
-                "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
-                "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
-                "<p><strong>Status:</strong> " + expenseStatusRepository.findExpenseStatusById(statusId).getExpenseStatusName() + "</p>" +
-                "<a href=\"" + link + "\">View Travel Plan</a>" +
-                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                "</body>" +
-                "</html>";
+        String subject = "Expense Status Upgraded by User (" + getLoginUser().getEmployeeEmail() + ")";
+        String htmlMessage = templateService.generateTravelPlanHtml(modelMapper.map(travelPlan, TravelPlanRequest.class)
+                , travelPlan.getId(), subject, expenseStatusRepository.findExpenseStatusById(statusId).getExpenseStatusName());
         notificationService.createNotification(expense.getFkEmployeeTravelPlan().getFkEmployee().getId()
-                ,"Expense Status Upgraded by " + expense.getFkEmployeeTravelPlan().getFkTravelPlan().getFkTravelPlanHREmployee().getEmployeeEmail()
-                , htmlMessage
-        );
+                , subject, htmlMessage);
     }
 
     @Override
@@ -244,23 +243,12 @@ public class ExpenseServiceImpl implements ExpenseService {
             expenseProof.setExpenseProofUrl(url + filePath);
 
             expenseProofRepository.save(expenseProof);
-
         }
-        String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlan.getId();
-        String htmlMessage = "<html>" +
-                "<body>" +
-                "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
-                "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
-                "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
-                "<a href=\"" + link + "\">View Travel Plan</a>" +
-                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                "</body>" +
-                "</html>";
+        String subject = "Expense Added by User (" + getLoginUser().getEmployeeEmail() + ")";
+        String htmlMessage = templateService.generateTravelPlanHtml(modelMapper.map(travelPlan, TravelPlanRequest.class)
+                , travelPlan.getId(), subject, expenseStatus.getExpenseStatusName());
         notificationService.createNotification(employeeTravelPlan.getFkTravelPlan().getFkTravelPlanHREmployee().getId()
-                ,"Expense Added by " + employeeTravelPlan.getFkEmployee().getEmployeeEmail()
-                , htmlMessage
-        );
+                , subject, htmlMessage);
 
     }
 

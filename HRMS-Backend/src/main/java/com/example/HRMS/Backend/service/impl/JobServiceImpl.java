@@ -3,10 +3,7 @@ package com.example.HRMS.Backend.service.impl;
 import com.example.HRMS.Backend.dto.*;
 import com.example.HRMS.Backend.model.*;
 import com.example.HRMS.Backend.repository.*;
-import com.example.HRMS.Backend.service.AuthService;
-import com.example.HRMS.Backend.service.EmailService;
-import com.example.HRMS.Backend.service.JobService;
-import com.example.HRMS.Backend.service.NotificationService;
+import com.example.HRMS.Backend.service.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +43,7 @@ public class JobServiceImpl implements JobService {
     private final EmailService emailService;
     private final AuthService authService;
     private final NotificationService notificationService;
+    private final TemplateService templateService;
 
     @Value("${img.path}")
     private String folderPath;
@@ -53,6 +51,12 @@ public class JobServiceImpl implements JobService {
     @Value("${URL.path}")
     private String url;
 
+    public Employee getLoginUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return employeeRepository.findEmployeeByEmployeeEmail(email)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
 
     @Override
     public void saveJob(@Valid JobRequest jobRequest, MultipartFile file) throws IOException {
@@ -237,21 +241,10 @@ public class JobServiceImpl implements JobService {
 
 
         referFriendRepository.save(referFriend);
-        String link = "http://localhost:5173/job-management?jobId=" + referFriendRequest.getFkJobId();
-        String htmlMessage = "<html>" +
-                "<body>" +
-                "<p><strong>By:</strong> " + employee.getEmployeeEmail() + "</p>" +
-                "<p><strong>For Job:</strong> " + job.getJobTitle() + "</p>" +
-                "<a href=\"" + link + "\">View Job</a>" +
-                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                "</body>" +
-                "</html>";
 
-        notificationService.createNotification(job.getFkJobOwnerEmployee().getId()
-                ,"Refer Friend For Job"
-                , htmlMessage
-        );
+        String subject = "Refer Friend For Job By User (" + getLoginUser().getEmployeeEmail() + ")";
+        String htmlMessage = templateService.generateJobHtml(referFriend, cvStatusType.getCvStatusTypeName(), subject);
+        notificationService.createNotification(job.getFkJobOwnerEmployee().getId(), subject, htmlMessage);
 
         File savedFile = new File(System.getProperty("user.dir") + '/' + folderPath + filePath);
         if(savedFile.exists() && savedFile.canRead()) {
@@ -333,21 +326,11 @@ public class JobServiceImpl implements JobService {
         ));
         referFriend.setReasonForCvStatusChange(reason);
         referFriendRepository.save(referFriend);
-        String link = "http://localhost:5173/job-management?jobId=" + job.getId();
-        String htmlMessage = "<html>" +
-                "<body>" +
-                "<p><strong>Status:</strong> " + cvStatusTypeRepository.findCvStatusTypeById(statusId).getCvStatusTypeName() + "</p>" +
-                "<p><strong>Updated by:</strong> " + referFriend.getFkJob().getFkJobOwnerEmployee().getEmployeeEmail() + "</p>" +
-                "<p><strong>Job:</strong> " + referFriend.getFkJob().getJobTitle() + "</p>" +
-                "<a href=\"" + link + "\">View Job</a>" +
-                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                "</body>" +
-                "</html>";
-        notificationService.createNotification(referFriend.getFkReferFriendEmployee().getId()
-                ,"Status upgraded of your Refer Friend CV"
-                , htmlMessage
-        );
+
+        String subject = "Status upgraded of your Refer Friend CV By HR (" + getLoginUser().getEmployeeEmail() + ")";
+        String htmlMessage = templateService.generateJobHtml(referFriend, cvStatusTypeRepository.findCvStatusTypeById(statusId).getCvStatusTypeName(), subject);
+        notificationService.createNotification(referFriend.getFkReferFriendEmployee().getId(), subject, htmlMessage);
+
     }
 
     @Override

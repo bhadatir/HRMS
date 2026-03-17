@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: sans-serif; line-height: 1.6; color: #333;">
+<div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+    <h2 style="color: #2c3e50;"><span th:text="${subject}">Subject</span></h2>
+
+    <p><strong>Game Name:</strong> <span th:text="${gameName}">Name</span></p>
+    <p><strong>Slot Time:</strong> <span th:text="${slotTime}">Date</span></p>
+
+    <div th:if="${link}" style="margin: 20px 0;">
+        <a th:href="${link}"
+           style="background: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+            View Game Booking
+        </a>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee;">
+    <p style="font-size: 0.8em; color: #888;">
+        Sent on: <span th:text="${currentDate}">Date</span> at <span th:text="${currentTime}">Time</span>
+    </p>
+</div>
+</body>
+</html>

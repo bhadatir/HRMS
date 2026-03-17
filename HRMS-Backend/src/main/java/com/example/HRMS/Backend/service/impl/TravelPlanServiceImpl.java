@@ -36,6 +36,8 @@ public class TravelPlanServiceImpl implements TravelPlanService {
 
     private final ModelMapper modelMapper;
 
+    private final TemplateService templateService;
+
     private final TravelDocRepository travelDocRepository;
 
     private final EmployeeTravelPlanRepository employeeTravelPlanRepository;
@@ -113,20 +115,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             employeeTravelPlanRepository.save(employeeTravelPlan);
 
             emails.add(employee.getEmployeeEmail());
-            String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
-            String htmlMessage = "<html>" +
-                    "<body>" +
-                    "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
-                    "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
-                    "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
-                    "<a href=\"" + link + "\">View Travel Plan</a>" +
-                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                    "</body>" +
-                    "</html>";
-            notificationService.createNotification(id,
-                    "you are added in Travel Plan by Hr " + savedTravelplan.getFkTravelPlanHREmployee().getEmployeeEmail(),
-                    htmlMessage);
+
+            String subject = "You have been added to a Travel Plan by HR (" + getLoginUser().getEmployeeEmail() + ")";
+            String htmlMessage = templateService.generateTravelPlanHtml(travelPlanRequest, savedTravelplan.getId(), subject, null);
+            notificationService.createNotification(id, subject, htmlMessage);
 
         }
 
@@ -157,34 +149,17 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findByFkBookingWaitingList_Id(wait.getId());
             for(BookingParticipant bookingParticipant : bookingParticipants){
                 emails.add(bookingParticipant.getFkEmployee().getEmployeeEmail());
-                String htmlMessage = "<html>" +
-                        "<body>" +
-                        "<p><strong>Game Name:</strong> " + wait.getFkGameType().getGameName() + "</p>" +
-                        "<p><strong>Slot Time:</strong> " + wait.getTargetSlotDatetime() + "</p>" +
-                        "<p><strong>Game Details:</strong> " + details + "</p>" +
-                        "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                        "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                        "</body>" +
-                        "</html>";
-                notificationService.createNotification(bookingParticipant.getFkEmployee().getId()
-                        ,"your game booking waiting list entry is removed by HR"
-                        ,htmlMessage);
+
+                String subject = "your game booking waiting list entry is removed by HR (" + getLoginUser().getEmployeeEmail() + ")";
+                String htmlMessage = templateService.generateGameBookingHtml(null, wait, subject, false);
+                notificationService.createNotification(bookingParticipant.getFkEmployee().getId(), subject, htmlMessage);
             }
             bookingParticipantRepository.deleteAll(bookingParticipants);
             waitlistRepository.delete(wait);
 
-            String htmlMessage = "<html>" +
-                    "<body>" +
-                    "<p><strong>Game Name:</strong> " + wait.getFkGameType().getGameName() + "</p>" +
-                    "<p><strong>Slot Time:</strong> " + wait.getTargetSlotDatetime() + "</p>" +
-                    "<p><strong>Game Details:</strong> " + details + "</p>" +
-                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                    "</body>" +
-                    "</html>";
-            notificationService.createNotification(wait.getFkHostEmployee().getId()
-                    ,"your game booking waiting list entry is removed by HR"
-                    ,htmlMessage);
+            String subject = "your game booking waiting list entry is removed by HR (" + getLoginUser().getEmployeeEmail() + ")";
+            String htmlMessage = templateService.generateGameBookingHtml(null, wait, subject, false);
+            notificationService.createNotification(wait.getFkHostEmployee().getId(), subject, htmlMessage);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String hrEmail = authentication.getName();
@@ -226,18 +201,11 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 }
 
                 emails.add(bookingParticipant.getFkEmployee().getEmployeeEmail());
-                String htmlMessage = "<html>" +
-                        "<body>" +
-                        "<p><strong>Game Name:</strong> " + booking.getFkGameType().getGameName() + "</p>" +
-                        "<p><strong>Slot Time:</strong> " + booking.getGameBookingStartTime() + "</p>" +
-                        "<p><strong>Game Details:</strong> " + details + "</p>" +
-                        "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                        "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                        "</body>" +
-                        "</html>";
-                notificationService.createNotification(bookingParticipant.getFkEmployee().getId()
-                        ,"your game booking is removed by HR"
-                        ,htmlMessage);
+
+                String subject = "your game booking is removed by HR (" + getLoginUser().getEmployeeEmail() + ")";
+                String htmlMessage = templateService.generateGameBookingHtml(booking, null, subject, false);
+                notificationService.createNotification(bookingParticipant.getFkEmployee().getId(), subject, htmlMessage);
+
                 bookingParticipantRepository.delete(bookingParticipant);
             }
 
@@ -252,18 +220,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             if (booking.getFkGameBookingStatus().getId() == 1 ) {
                 gameBookingService.updateWaitingList(booking.getFkGameType(), booking.getGameBookingStartTime());
             }
-            String htmlMessage = "<html>" +
-                    "<body>" +
-                    "<p><strong>Game Name:</strong> " + booking.getFkGameType().getGameName() + "</p>" +
-                    "<p><strong>Slot Time:</strong> " + booking.getGameBookingStartTime() + "</p>" +
-                    "<p><strong>Game Details:</strong> " + details + "</p>" +
-                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                    "</body>" +
-                    "</html>";
-            notificationService.createNotification(booking.getFkHostEmployee().getId()
-                    ,"your game booking is removed by HR"
-                    , htmlMessage);
+
+            String subject = "your game booking is removed by HR (" + getLoginUser().getEmployeeEmail() + ")";
+            String htmlMessage = templateService.generateGameBookingHtml(booking, null, subject, false);
+            notificationService.createNotification(booking.getFkHostEmployee().getId(), subject, htmlMessage);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String hrEmail = authentication.getName();
@@ -372,20 +332,9 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                             "</html>";
                     emailService.sendEmail(emails1,"You are reAdded in Travel Plan " + travelPlanRequest.getTravelPlanName() + " by Hr",htmlEmailMessage);
 
-                    String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
-                    String htmlMessage = "<html>" +
-                            "<body>" +
-                            "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
-                            "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
-                            "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
-                            "<a href=\"" + link + "\">View Travel Plan</a>" +
-                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                            "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                            "</body>" +
-                            "</html>";
-                    notificationService.createNotification(id,
-                            "You are reAdded in Travel Plan by HR",
-                            htmlMessage);
+                    String subject = "You have been reAdded to a Travel Plan by HR (" + getLoginUser().getEmployeeEmail() + ")";
+                    String htmlMessage = templateService.generateTravelPlanHtml(travelPlanRequest, savedTravelplan.getId(), subject, null);
+                    notificationService.createNotification(id, subject, htmlMessage);
 
                 } else {
 
@@ -400,21 +349,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     employeeTravelPlanRepository.save(employeeTravelPlan);
 
                     emails.add(employee.getEmployeeEmail());
-                    String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
-                    String htmlMessage = "<html>" +
-                            "<body>" +
-                            "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
-                            "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
-                            "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
-                            "<a href=\"" + link + "\">View Travel Plan</a>" +
-                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                            "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                            "</body>" +
-                            "</html>";
-                    addedTravelMembers.add(employee.getEmployeeEmail());
-                    notificationService.createNotification(id,
-                            "You are added in Travel Plan by Hr",
-                            htmlMessage);
+
+                    String subject = "You have been added to a Travel Plan by HR (" + getLoginUser().getEmployeeEmail() + ")";
+                    String htmlMessage = templateService.generateTravelPlanHtml(travelPlanRequest, savedTravelplan.getId(), subject, null);
+                    notificationService.createNotification(id, subject, htmlMessage);
 
                 }
             }
@@ -446,21 +384,9 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                         "</html>";
                 emailService.sendEmail(emails1,"You are Removed from Travel Plan " + travelPlanRequest.getTravelPlanName() + " by Hr",htmlEmailMessage);
 
-                String link = "http://localhost:5173/travel-plan?travelPlanId=" + savedTravelplan.getId();
-                String htmlMessage = "<html>" +
-                        "<body>" +
-                        "<p><strong>Travel Plan Name:</strong> " + travelPlanRequest.getTravelPlanName() + "</p>" +
-                        "<p><strong>Travel Plan Start Date:</strong> " + travelPlanRequest.getTravelPlanStartDate() + "</p>" +
-                        "<p><strong>Travel Plan Details:</strong> " + travelPlanRequest.getTravelPlanDetails() + "</p>" +
-                        "<a href=\"" + link + "\">View Travel Plan</a>" +
-                        "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                        "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                        "</body>" +
-                        "</html>";
-                notificationService.createNotification(id,
-                        "You are Removed from Travel Plan by HR",
-                        htmlMessage);
-
+                String subject = "You have been removed from a Travel Plan by HR (" + getLoginUser().getEmployeeEmail() + ")";
+                String htmlMessage = templateService.generateTravelPlanHtml(travelPlanRequest, savedTravelplan.getId(), subject, null);
+                notificationService.createNotification(id, subject, htmlMessage);
             }
         }
 
@@ -564,20 +490,9 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                     "</html>";
             emailService.sendEmail(emails1,"Travel Plan " + travelPlan.getTravelPlanName() + " is deleted by Hr",htmlEmailMessage);
 
-            String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlanId;
-            String htmlMessage = "<html>" +
-                    "<body>" +
-                    "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
-                    "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
-                    "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
-                    "<a href=\"" + link + "\">View Travel Plan</a>" +
-                    "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                    "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                    "</body>" +
-                    "</html>";
-            notificationService.createNotification(empId,
-                    "Travel Plan deleted by HR",
-                    htmlMessage);
+            String subject = "Travel Plan was deleted by HR (" + getLoginUser().getEmployeeEmail() + ")";
+            String htmlMessage = templateService.generateTravelPlanHtml(modelMapper.map(travelPlan,TravelPlanRequest.class), travelPlanId, subject, null);
+            notificationService.createNotification(empId, subject, htmlMessage);
         }
 
         String htmlEmailMessage = "<html>" +
@@ -595,20 +510,9 @@ public class TravelPlanServiceImpl implements TravelPlanService {
                 "</html>";
         emailService.sendEmail(emails,"Travel Plan " + travelPlan.getTravelPlanName() + " is deleted by you",htmlEmailMessage);
 
-        String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlanId;
-        String htmlMessage = "<html>" +
-                "<body>" +
-                "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
-                "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
-                "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
-                "<a href=\"" + link + "\">View Travel Plan</a>" +
-                "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                "</body>" +
-                "</html>";
-        notificationService.createNotification(hrId,
-                "Travel Plan is deleted by You",
-                htmlMessage);
+        String subject = "Travel Plan was deleted by You (" + getLoginUser().getEmployeeEmail() + ")";
+        String htmlMessage = templateService.generateTravelPlanHtml(modelMapper.map(travelPlan,TravelPlanRequest.class), travelPlanId, subject, null);
+        notificationService.createNotification(hrId, subject, htmlMessage);
     }
 
 
@@ -832,23 +736,10 @@ public class TravelPlanServiceImpl implements TravelPlanService {
             for(TravelPlan travelPlan : travelPlans) {
                 List<Long> employeeIdByTravelPlanId = employeeTravelPlanRepository.findEmployeeIdByTravelPlanId(travelPlan.getId());
 
-                String link = "http://localhost:5173/travel-plan?travelPlanId=" + travelPlan.getId();
                 for (Long id : employeeIdByTravelPlanId) {
-                    String htmlMessage = "<html>" +
-                            "<body>" +
-                            "<p><strong>Message:</strong> You have now only 5 days remaining to add expense </p>" +
-                            "<p><strong>Travel Plan Name:</strong> " + travelPlan.getTravelPlanName() + "</p>" +
-                            "<p><strong>Travel Plan Start Date:</strong> " + travelPlan.getTravelPlanStartDate() + "</p>" +
-                            "<p><strong>Travel Plan Details:</strong> " + travelPlan.getTravelPlanDetails() + "</p>" +
-                            "<a href=\"" + link + "\">View Travel Plan</a>" +
-                            "<p><strong>Date:</strong> " + LocalDateTime.now().toLocalDate() + "</p>" +
-                            "<p><strong>Time:</strong> " + LocalDateTime.now().toLocalTime() + "</p>" +
-                            "</body>" +
-                            "</html>";
-                    notificationService.createNotification(id
-                            , "Expense Upload reminder"
-                            , htmlMessage
-                    );
+                    String subject = "You have now only 5 days remaining to add expense";
+                    String htmlMessage = templateService.generateTravelPlanHtml(modelMapper.map(travelPlan,TravelPlanRequest.class), travelPlan.getId(), subject, null);
+                    notificationService.createNotification(id, subject, htmlMessage);
                 }
             }
 
