@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Building, X, Bell, IndianRupee, PenIcon, Pencil } from "lucide-react";
+import { Mail, Building, X, Bell, IndianRupee, Pencil } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +22,39 @@ import { useNavigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 
+type TravelPlan = {
+    id: number;
+    travelPlanName: string;
+    travelPlanFrom: string;
+    travelPlanTo: string;
+    travelPlanStartDate: string;
+    travelPlanEndDate: string;
+    travelPlanIsDeleted: boolean;
+};
+
+type GameBooking = {
+    id: number;
+    gameTypeId: number;
+    gameTypeName: string;
+    gameBookingStartTime: string;
+    gameBookingIsDeleted: boolean;
+    hostEmployeeId: number;
+    hostEmployeeEmail: string;
+    bookingParticipantResponses: BookingParticipantResponse[];
+};
+
+type BookingParticipantResponse = {
+    employeeId: number;
+    employeeEmail: string;
+};
+
+type WaitingList = {
+    id: number;
+    gameTypeId: number;
+    gameTypeName: string;
+    targetSlotDatetime: string;
+};
+
 export default function Dashboard() {
   const { setIsFirstLogin, token, isFirstLogin, user, unreadNotifications } = useAuth();
   const [showNotification, setShowNotification] = useState(false);
@@ -31,28 +64,33 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const navigate = useNavigate();
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-500">Failed to load user profile.</p>
-      </div>
-    );
-  }
-
   const profilePicMutation = useMutation({
     mutationFn: async (file: File) => {
     
       const formData = new FormData();
       formData.append("file", file);
   
-      return apiService.updateProfileImage(user.id, formData, token || "");
+      return apiService.updateProfileImage(user?.id, formData, token || "");
     },
     onSuccess: () => {
       alert("Profile picture updated!");
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
-    onError: (error: any) => {
-      alert("Failed to update profile picture: " + (error.response?.data || error.message)); }
+    onError: (error: Error) => {
+      alert("Failed to update profile picture: " + (error instanceof Error ? error.message : "An unknown error occurred"));
+    }
+  });
+
+  const updatePasswordMutation = useMutation({
+    mutationFn: () => apiService.updatePassword(user?.id, newPassword, token || ""),
+    onSuccess: () => {
+      alert("Password updated successfully!");
+      localStorage.setItem("isFirstLogin", "no");
+      setIsFirstLogin("no");
+    },
+    onError: (error: Error) => {
+      alert("Failed to update password: " + (error instanceof Error ? error.message : "An unknown error occurred"));
+    }
   });
   
   const { data: travelPlans, isError: travelPlansError } = useQuery({
@@ -63,7 +101,7 @@ export default function Dashboard() {
 
   const { data: gameBookings, isError: gameBookingsError } = useQuery({
     queryKey: ["gameBookings", user?.id],
-    queryFn: () => gameService.findGameBookingByUserId(user.id, "", 0, 0, 0, 100, token || ""), 
+    queryFn: () => gameService.findGameBookingByUserId(user?.id, "", 0, 0, 0, 100, token || ""), 
     enabled: !!token && !!user?.id,
   });
 
@@ -72,16 +110,24 @@ export default function Dashboard() {
       queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, 0, token!) 
   });
 
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-gray-500">Failed to load user profile.</p>
+      </div>
+    );
+  }
+
   const modifiers = {
-    travel: (date: Date) => travelPlans?.content?.some((p: any) => 
+    travel: (date: Date) => travelPlans?.content?.some((p: TravelPlan) => 
       (isSameDay(parseISO(p.travelPlanStartDate), date) || 
       (date >= parseISO(p.travelPlanStartDate) && date <= parseISO(p.travelPlanEndDate)))
       && p.travelPlanIsDeleted === false
     ),
-    game: (date: Date) => gameBookings?.content?.some((b: any) => 
+    game: (date: Date) => gameBookings?.content?.some((b: GameBooking) => 
       isSameDay(parseISO(b.gameBookingStartTime), date) && !b.gameBookingIsDeleted
     ),
-    wait: (date: Date) => WaitingList?.some((w: any) => 
+    wait: (date: Date) => WaitingList?.some((w: WaitingList) => 
       isSameDay(parseISO(w.targetSlotDatetime), date)
     ),
   };
@@ -95,30 +141,19 @@ export default function Dashboard() {
 
   const getEventsForDay = (date: Date | undefined) => {
     if (!date) return null;
-    const dayTravel = travelPlans?.content?.filter((p: any) => 
+    const dayTravel = travelPlans?.content?.filter((p: TravelPlan) => 
        (isSameDay(parseISO(p.travelPlanStartDate), date) || (date >= parseISO(p.travelPlanStartDate) && date <= parseISO(p.travelPlanEndDate))) 
         && p.travelPlanIsDeleted === false
     );
-    const dayGames = gameBookings?.content?.filter((b: any) => isSameDay(parseISO(b.gameBookingStartTime), date) && !b.gameBookingIsDeleted);
-    const dayWaiting = WaitingList?.filter((w: any) => isSameDay(parseISO(w.targetSlotDatetime), date));
+    const dayGames = gameBookings?.content?.filter((b: GameBooking) => isSameDay(parseISO(b.gameBookingStartTime), date) && !b.gameBookingIsDeleted);
+    const dayWaiting = WaitingList?.filter((w: WaitingList) => isSameDay(parseISO(w.targetSlotDatetime), date));
     
     return { dayTravel, dayGames, dayWaiting };
   };
 
   const dayEvents = getEventsForDay(selectedDate);
 
-  const updatePasswordMutation = useMutation({
-    mutationFn: () => apiService.updatePassword(user.id, newPassword, token || ""),
-    onSuccess: () => {
-      alert("Password updated successfully!");
-      localStorage.setItem("isFirstLogin", "no");
-      setIsFirstLogin("no");
-    },
-    onError: (error: any) => {
-      alert("Failed to update password: " + (error.response?.data || error.message));
-    }
-  });
-
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
       const clickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -341,9 +376,9 @@ export default function Dashboard() {
                   </h4>
                   
                   {dayEvents?.dayTravel?.length > 0 ? (
-                    dayEvents?.dayTravel.map((p: any) => (
+                    dayEvents?.dayTravel.map((p: TravelPlan) => (
                       <div key={p.id} 
-                        onClick={() => navigate(`/travel-plan`)}
+                        onClick={() => navigate(`/travel-plan?travelPlanId=${p.id}`)}
                         className="p-3 bg-blue-50 border-l-4 border-blue-500 rounded text-sm cursor-pointer">
                         <p className="font-bold text-blue-800">✈️ {p.travelPlanName}</p>
                         <p className="text-blue-600 text-xs">{p.travelPlanFrom} → {p.travelPlanTo}</p>
@@ -352,9 +387,9 @@ export default function Dashboard() {
                   ) : null}
 
                   {dayEvents?.dayGames?.length > 0 ? (
-                    dayEvents?.dayGames.map((g: any) => (
+                    dayEvents?.dayGames.map((g: GameBooking) => (
                       <div key={g.id} 
-                        onClick={() => navigate(`/game-management/${g.id}`)}
+                        onClick={() => navigate(`/game-management?gameBookingId=${g.id}`)}
                         className="p-3 bg-green-50 border-l-4 border-green-500 rounded text-sm cursor-pointer">
                         <p className="font-bold text-green-800">🎮 {g.gameTypeName}</p>
                         <p className="text-green-600 text-xs">
@@ -365,7 +400,7 @@ export default function Dashboard() {
                   ) : null}
 
                   {dayEvents?.dayWaiting?.length > 0 ? (
-                    dayEvents?.dayWaiting.map((w: any) => (
+                    dayEvents?.dayWaiting.map((w: WaitingList) => (
                       <div key={w.id}
                         className="p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded text-sm cursor-pointer"
                         onClick={() => navigate(`/game-management`)}>

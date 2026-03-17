@@ -21,6 +21,46 @@ import { useFindGameBookingByUserId } from "@/hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
 
+type GameType = {
+    id: number;
+    gameName: string;
+};
+
+type GameBookingStatus = {
+    id: number;
+    gameBookingStatusName: string;
+};
+
+type Booking = {
+    id: number;
+    gameTypeId: number;
+    gameTypeName: string;
+    hostEmployeeId: number;
+    hostEmployeeEmail: string;
+    slotDatetime: string;
+    slotEndDatetime: string;
+    gameBookingStatusId: number;
+    gameBookingStatusName: string;
+    gameBookingIsDeleted: boolean;
+};
+
+type WaitingList = {
+    id: number;
+    gameTypeId: number;
+    gameTypeName: string;
+    gameSlotDuration: number;
+    targetSlotDatetime: string;
+    targetSlotEndDatetime: string;
+    hostEmployeeId: number;
+    hostEmployeeEmail: string;
+    bookingParticipantResponses: BookingParticipantResponse[];
+};
+
+type BookingParticipantResponse = {
+    employeeEmail: string;
+    responseStatus: string;
+};
+
 export default function GameManagement() {
     const { token, user, unreadNotifications } = useAuth();
     const queryClient = useQueryClient();
@@ -33,18 +73,13 @@ export default function GameManagement() {
     const [showWaitingList, setShowWaitingList] = useState(false);
     const [viewMode, setViewMode] = useState<"My Bookings" | "Waiting List">("My Bookings");
     const [waitingListId, setWaitingListId] = useState<number>(0);
-    const [bookingSearchTerm, setBookingSearchTerm] = useState("");
+    const [bookingSearchTerm, setBookingSearchTerm] = useState(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("gameBookingId") || "";
+    });
     const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
     const debouncedBookingSearchTerm = useAppDebounce(bookingSearchTerm);
     const debouncedWaitingListSearchTerm = useAppDebounce(waitingListSearchTerm);
-
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const gameBookingId = urlParams.get("gameBookingId");
-        if (gameBookingId) {
-        setBookingSearchTerm(gameBookingId);
-        }
-    }, []);
 
     const { data: gameTypes = [], isError: gameTypesOnError } = useQuery({
         queryKey: ["gameTypes"],
@@ -80,7 +115,7 @@ export default function GameManagement() {
         if (inView && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
         }
-    }, [inView, hasNextPage, isFetchingNextPage]);
+    }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     if(gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError) {
         alert("Failed to load data: " + (gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError));
@@ -90,24 +125,26 @@ export default function GameManagement() {
         mutationFn: ({ id, status }: { id: number, status: number }) => 
             gameService.updateBookingStatus(id, status, token!),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings", user?.id] }),
-        onError: (error: any) => {
-            alert("Failed to update booking status: " + (error.response?.data || error.message)); }
+        onError: (error: Error) => {
+            alert("Failed to update booking status: " + (error instanceof Error ? error.message : "Failed to update booking status")); 
+        }
     });
 
     const removeWaitingListMutation = useMutation({
         mutationFn: (id: number) => gameService.deleteWaitingList(id, token!),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] }),
-        onError: (error: any) => {
-            alert("Failed to remove waiting list item: " + (error.response?.data || error.message)); }
+        onError: (error: Error) => {
+            alert("Failed to remove waiting list item: " + (error instanceof Error ? error.message : "Failed to remove waiting list item"));
+        }
     });
 
-    const filteredWaitingList = WaitingListByEmpId.filter((w: any) => {
+    const filteredWaitingList = WaitingListByEmpId.filter((w: WaitingList) => {
         const searchTerm = debouncedWaitingListSearchTerm?.toLowerCase();
         return w.gameTypeName.toLowerCase().includes(searchTerm) ||
             w.targetSlotDatetime.toLowerCase().includes(searchTerm) ||
             w.targetSlotEndDatetime.toLowerCase().includes(searchTerm) ||
             w.hostEmployeeEmail.toLowerCase().includes(searchTerm) ||
-            w.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(searchTerm));
+            w.bookingParticipantResponses.some((p: BookingParticipantResponse) => p.employeeEmail.toLowerCase().includes(searchTerm));
     });  
 
     useEffect(() => {
@@ -154,7 +191,7 @@ export default function GameManagement() {
                         )}
                         <select className="border rounded-md px-2 py-1 text-sm" value={gameType || 0} onChange={(e) => setGameType(Number(e.target.value))}>
                             <option value="0">All Games</option>
-                            {gameTypes.map((g: any) => <option key={g.id} value={g.id}>{g.gameName}</option>)}
+                            {gameTypes.map((g: GameType) => <option key={g.id} value={g.id}>{g.gameName}</option>)}
                         </select>
                     </div>
                     <div className="game flex items-center gap-4">
@@ -255,7 +292,7 @@ export default function GameManagement() {
                     <div className="game grid grid-cols-1 md:grid-cols-2 gap-4">
                         <h2 className="text-xl font-bold text-slate-900 col-span-full">Upcoming Bookings :</h2>
                         
-                        {upcomingBookings.map((b: any) => (
+                        {upcomingBookings.map((b: Booking) => (
                                 !b.gameBookingIsDeleted && b.gameBookingStatusId === 1 && (
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />
                                 )))
@@ -301,7 +338,7 @@ export default function GameManagement() {
                             {viewMode === "My Bookings" && <select className="border rounded-md px-2 py-1 text-sm" value={gameBookingStatusId || ""} 
                                 onChange={(e) => setgameBookingStatusId(Number(e.target.value))}>
                                 <option value="0">All Statuses</option>
-                                {gameBookingStatusOptions.map((g: any) => <option key={g.id} value={g.id}>{g.gameBookingStatusName}</option>)}
+                                {gameBookingStatusOptions.map((g: GameBookingStatus) => <option key={g.id} value={g.id}>{g.gameBookingStatusName}</option>)}
                             </select>}
                         </div>
                     </div>
@@ -312,7 +349,7 @@ export default function GameManagement() {
                         <div className="game grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
                         {filteredBookings && filteredBookings.length > 0 ? (
                             <>                                
-                                {filteredBookings.map((b: any) => 
+                                {filteredBookings.map((b: Booking) => 
                                     <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />        
                                 )}
                             </>
@@ -331,7 +368,7 @@ export default function GameManagement() {
                     <div className="my-5">
                         <div className="game grid grid-cols-1 md:grid-cols-2 gap-4">
                         {filteredWaitingList.length > 0 ? (
-                                filteredWaitingList.map((wait: any) => (
+                                filteredWaitingList.map((wait: WaitingList) => (
                                     <Card key={wait.id} className="hover:shadow-md transition-shadow border-slate-200 cursor-pointer"
                                         onClick={() => {
                                             setWaitingListId(wait.id);
@@ -361,7 +398,7 @@ export default function GameManagement() {
                                                 <div className="text-[10px] text-slate-400">Host: {wait.hostEmployeeEmail}</div>
                                                 {wait?.bookingParticipantResponses?.length > 0 && (
                                                     <div className="text-[10px] text-slate-400 ">
-                                                        Participants: {wait?.bookingParticipantResponses?.map((p: any) => p.employeeEmail).join(", ")}
+                                                        Participants: {wait?.bookingParticipantResponses?.map((p: BookingParticipantResponse) => p.employeeEmail).join(", ")}
                                                     </div>
                                                 )}
                                             </div>

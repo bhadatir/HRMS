@@ -20,27 +20,38 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { GlobalSearch } from "@/components/GlobalSearch";
 
+type Post = {
+  id: number;
+  employeeId: number;
+  employeeEmail: string;
+  postTitle: string;
+  postContent: string;
+  postContentUrl?: string;
+  postVisibilityName: string;
+  postCreatedAt: string;
+  recentLikerNames?: string[];
+  commentCount: number;
+};
+
 export default function PostManagement() {
   const { token, user, unreadNotifications } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  
+  const getInitialSearchTerm = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get("postId");
+    if (postId) return postId;
+    const employeeEmail = urlParams.get("employeeEmail");
+    if (employeeEmail) return employeeEmail;
+    return "";
+  };
+  
+  const [searchTerm, setSearchTerm] = useState(getInitialSearchTerm());
   const [editPostId, setEditPostId] = useState<number>(0);
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
   const debouncedSearch = useAppDebounce(searchTerm);
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get("postId");
-    if (postId) {
-      setSearchTerm(postId);
-    }
-    const employeeEmail = urlParams.get("employeeEmail");
-    if (employeeEmail) {
-      setSearchTerm(employeeEmail);
-    }
-  }, []);
   
   const {
     data: allPosts,
@@ -56,19 +67,19 @@ export default function PostManagement() {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
   
   const removePost = useMutation({
     mutationFn: ({ postId, reason }: { postId: number; reason: string }) => {
-      if ((user?.roleName === "HR" || user?.roleName === "ADMIN" ) && filteredPosts?.find((post: any) => post.id === postId)?.employeeId !== user.id) {
+      if ((user?.roleName === "HR" || user?.roleName === "ADMIN" ) && filteredPosts?.find((post: Post) => post.id === postId)?.employeeId !== user.id) {
       return postService.removePostByHr(postId, reason, token || "");
       } else {
         return postService.removePostByEmp(postId, reason, token || "");
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allPosts"] }),
-    onError: (error: any) => {
-      alert("Failed to delete post: " + (error.response?.data || error.message)); }
+    onError: (error: Error) => {
+      alert("Failed to delete post: " + (error instanceof Error ? error.message : "Unknown error")); }
   });
 
   const handleDelete = (postId: number) => {
@@ -176,7 +187,7 @@ export default function PostManagement() {
 
           <div className="post space-y-6">
             {filteredPosts.length > 0  ? (
-              filteredPosts.map((post: any) => (
+              filteredPosts.map((post: Post) => (
                   <Card key={post.id} className="hover:shadow-md transition-shadow border-slate-200">
                     <CardHeader>
                       <div className="flex justify-between items-start">
@@ -235,7 +246,7 @@ export default function PostManagement() {
                         <div className="flex items-center gap-6">
                           <div className="flex items-center gap-1 text-slate-500 cursor-pointer transition-colors">
                             <LikeButton postId={post.id} />
-                            {post.recentLikerNames?.length > 0 && (
+                            {post.recentLikerNames && post.recentLikerNames.length > 0 && (
                               <p className="text-[10px] text-slate-500">
                                 Liked by <span className="font-bold text-slate-700">{post.recentLikerNames.join(", ")}</span>
                                 {post.recentLikerNames.length > 2 && ` and ${post.recentLikerNames.length - 2} others`}

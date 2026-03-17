@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -14,13 +14,23 @@ import { cn } from "@/lib/utils";
 import { useEmployeeSearch } from "@/hooks/useInfinite";
 import { useInView } from "react-intersection-observer";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { set } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { GlobalSearch } from "@/components/GlobalSearch";
 
+type Employee = { 
+  id: number;
+  employeeFirstName: string;
+  employeeLastName: string;
+  employeeEmail: string;
+  departmentName: string;
+  roleName: string;
+  positionName: string;
+  employeeIsActive: boolean;
+};
+
 export default function JobManagement() {
-  const { token, user, unreadNotifications } = useAuth();
+  const { token, unreadNotifications } = useAuth();
   const [showNotification, setShowNotification] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddUserForm, setShowAddUserForm] = useState(false);
@@ -43,7 +53,7 @@ export default function JobManagement() {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     useEffect(() => {
     const clickOutside = (e: MouseEvent) => {
@@ -185,7 +195,7 @@ export default function JobManagement() {
                   <TableBody>
                       {allEmp?.length > 0 ? (
                           allEmp
-                            .map((emp: any, index: number) => (
+                            .map((emp: Employee, index: number) => (
                               <TableRow key={emp.id} 
                                 title = {emp.employeeIsActive ? "Active User" : "Inactive User"}
                                 className={cn(

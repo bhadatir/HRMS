@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -7,19 +7,24 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { apiService } from "@/api/apiService";
 import { useMutation } from "@tanstack/react-query";
 
+type LoginData = {
+  email: string;
+  password: string;
+};
+
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const loginMutation = useMutation({
-    mutationFn: (data: any) => apiService.login(data),
+    mutationFn: (data: LoginData) => apiService.login(data),
     onSuccess: (data) => {
       login(data.accessToken, formData.email, data.isFirstLogin);
       navigate("/dashboard");
     },
-    onError: (error: any) => {
-      alert("Login Error: " + (error.response?.data || error.message));
+    onError: (error: Error) => {
+      alert("Login Error: " + (error instanceof Error ? error.message : "Failed to login"));
     }
   });
 

@@ -15,20 +15,37 @@ import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
 
+type OrgData = {
+  id: number;
+  employeeId: number;
+  firstName: string;
+  lastName: string;
+  employeeEmail: string;
+  positionName: string;
+  departmentName: string;
+  employeeProfileUrl: string;
+};
+
+type OrgDataDirectReport = {
+  id: number;
+  employeeId: number;
+  firstName: string;
+  lastName: string;
+  employeeEmail: string;
+  positionName: string;
+  departmentName: string;
+  employeeProfileUrl: string;
+};
+
 export default function TeamMemberData() {
   const { token, user, unreadNotifications } = useAuth();
   const [showNotification, setShowNotification] = useState(false);
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearch = useAppDebounce(searchTerm);
-
-  useEffect(() => {
+  const [searchTerm, setSearchTerm] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const teamMemberId = urlParams.get("teamMemberId");
-    if (teamMemberId) {
-      setSearchTerm(teamMemberId);
-    }
-  }, []);
+    return urlParams.get("teamMemberId") || "";
+  });
+  const debouncedSearch = useAppDebounce(searchTerm);
 
   const { data: orgData, isError: orgDataError } = useQuery({
     queryKey: ["orgChart", user?.id],
@@ -36,7 +53,7 @@ export default function TeamMemberData() {
     enabled: !!user?.id,
   });
 
-  const filteredData = orgData?.directReports.filter((org: any) =>
+  const filteredData = orgData?.directReports.filter((org: OrgDataDirectReport) =>
     debouncedSearch === "" || 
     org.employeeId.toString().includes(debouncedSearch) ||
     org.firstName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
@@ -116,7 +133,7 @@ export default function TeamMemberData() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredData?.map((org: any) => (
+            {filteredData?.map((org: OrgData) => (
                 <Card 
                   key={org.id} 
                   className="border-slate-200"
