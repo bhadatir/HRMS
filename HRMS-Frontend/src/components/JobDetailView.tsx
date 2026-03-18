@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { jobService } from "../api/jobService";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -24,6 +24,30 @@ import { useEmployeeSearch } from "../hooks/useInfinite";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useInView } from "react-intersection-observer";
 
+type Referral = {
+  id: number;
+  referFriendName: string;
+  referFriendEmail: string;
+  referFriendCvUrl: string;
+  cvStatusTypeName: string;
+  employeeEmail: string;
+  reasonForCvStatusChange?: string;
+}
+
+type CvReviewerResponse = {
+  id: number;
+  employeeId: number;
+  employeeEmail: string;
+}
+
+type Employee = {
+  id: number;
+  employeeFirstName: string;
+  employeeLastName: string;
+  employeeEmail: string;
+  roleName: string;
+}
+
 export default function JobDetailView({ jobId }: { jobId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
@@ -47,7 +71,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
     
   const { data: job, isLoading: jobLoading, isError: jobError } = useQuery({
     queryKey: ["jobDetail", jobId],
@@ -63,7 +87,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
 
   if(jobError || referralsError || searchError) alert("Error loading data: " + (jobError || referralsError || searchError));
 
-  const filteredReferrals = referrals.filter((ref: any) => 
+  const filteredReferrals = referrals.filter((ref: Referral) => 
     ref.referFriendName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
     ref.referFriendEmail.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
     ref.employeeEmail.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
@@ -77,6 +101,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
       queryClient.invalidateQueries({ queryKey: ["jobReferrals", jobId] });
       alert("CV Status updated successfully");
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to update CV status: " + (error.response?.data || error.message)); }
   });
@@ -89,6 +114,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
       setSearchTerm("");
       alert("Reviewer added successfully");
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to add reviewer: " + (error.response?.data || error.message)); }
   });
@@ -189,9 +215,9 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
 
                   {showDropdown && suggestions.length > 0 && (
                     <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
-                      {suggestions.map((emp: any) => {
+                      {suggestions.map((emp: Employee) => {
 
-                        if (emp.id === user?.id || emp.roleName !== "EMPLOYEE" || job?.cvReviewerResponses?.some((rev: any) => rev.employeeId === emp.id)) return null;
+                        if (emp.id === user?.id || emp.roleName !== "EMPLOYEE" || job?.cvReviewerResponses?.some((rev: CvReviewerResponse) => rev.employeeId === emp.id)) return null;
 
                         return (
                         <div className="job">  
@@ -238,7 +264,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredReferrals.map((ref: any) => (
+                {filteredReferrals.map((ref: Referral) => (
                   <TableRow key={ref.id}>
                     <TableCell>
                       <p className="font-bold">{ref.referFriendName}</p>
@@ -307,7 +333,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                 <UserCheck size={16} className="text-blue-600" /> Assigned Reviewers
               </h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">                   
-                {job?.cvReviewerResponses?.map((rev: any) => (
+                {job?.cvReviewerResponses?.map((rev: CvReviewerResponse) => (
                 <Card key={rev.id} className="border-slate-200 flex items-start gap-4 p-4">
                   <div className="flex flex-col gap-1">
                       <p className="text-sm font-semibold truncate max-w-[180px]" title={rev.employeeEmail}>

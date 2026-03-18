@@ -1,11 +1,53 @@
 import { Command } from "cmdk";
 import { DialogTitle, DialogDescription } from "@/components/ui/dialog"; 
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useGlobalSearch } from "@/hooks/useInfinite";
 import { User, Plane, Loader2, X, Search } from "lucide-react"; 
 import { Button } from "./ui/button";
+
+type Employee = {
+  id: number;
+  title: string;
+  subtitle: string;
+  type: string;
+}
+
+type TravelPlan = {
+  id: number;
+  title: string;
+  subtitle: string;
+  type: string;
+}
+
+type Job = {
+  id: number;
+  title: string;
+  subtitle: string;
+  type: string;
+}
+
+type Post = {
+  id: number;
+  title: string;
+  subtitle: string;
+  type: string;
+}
+
+type GameBooking = {
+  id: number;
+  title: string;
+  subtitle: string;
+  type: string;
+}
+
+type TeamMember = {
+  id: number;
+  title: string;
+  subtitle: string;
+  type: string;
+}
 
 export function GlobalSearch() {
   const { token, user} = useAuth();    
@@ -130,7 +172,7 @@ export function GlobalSearch() {
                 <User size={14} /> <span>Employees</span>
               </div>
             }>
-              {latestResults?.employees?.content?.map((emp: any) => (
+              {latestResults?.employees?.content?.map((emp: Employee) => (
                 <Command.Item 
                   key={`emp-${emp.id}`} 
                   onSelect={() => handleSelect(emp.type, emp.id)}
@@ -151,7 +193,7 @@ export function GlobalSearch() {
                 <Plane size={14} /> <span>Travel Plans</span>
               </div>
             }>
-              {latestResults?.travelPlans?.content?.map((plan: any) => (
+              {latestResults?.travelPlans?.content?.map((plan: TravelPlan) => (
                 <Command.Item 
                   key={`plan-${plan.id}`} 
                   onSelect={() => handleSelect(plan.type, plan.id)}
@@ -172,7 +214,7 @@ export function GlobalSearch() {
                 <User size={14} /> <span>Jobs</span>
               </div>
             }>
-              {latestResults?.job?.content?.map((job: any) => (
+              {latestResults?.job?.content?.map((job: Job) => (
                 <Command.Item 
                   key={`job-${job.id}`} 
                   onSelect={() => handleSelect(job.type, job.id)}
@@ -193,7 +235,7 @@ export function GlobalSearch() {
                 <User size={14} /> <span>Posts</span>
               </div>
             }>
-              {latestResults?.post?.content?.map((post: any) => (
+              {latestResults?.post?.content?.map((post: Post) => (
                 <Command.Item 
                   key={`post-${post.id}`} 
                   onSelect={() => handleSelect(post.type, post.id)}
@@ -214,7 +256,7 @@ export function GlobalSearch() {
                 <User size={14} /> <span>Game Bookings</span>
               </div>
             }>
-              {latestResults?.gameBooking?.content?.map((gameBooking: any) => (
+              {latestResults?.gameBooking?.content?.map((gameBooking: GameBooking) => (
                 <Command.Item 
                   key={`gameBooking-${gameBooking.id}`} 
                   onSelect={() => handleSelect(gameBooking.type, gameBooking.id)}
@@ -235,7 +277,7 @@ export function GlobalSearch() {
                 <User size={14} /> <span>Team Members</span>
               </div>
             }>
-              {latestResults?.teamMember?.map((teamMember: any) => (
+              {latestResults?.teamMember?.map((teamMember: TeamMember) => (
                 <Command.Item 
                   key={`teamMember-${teamMember.id}`} 
                   onSelect={() => handleSelect(teamMember.type, teamMember.id)}

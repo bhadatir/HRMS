@@ -6,6 +6,17 @@ import { useAuth } from "../context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Delete, Plus, Tag as TagIcon } from "lucide-react";
 
+type Tag = {
+  id: number;
+  tagTypeId: number;
+  tagTypeName: string;
+}
+
+type TagType = {
+  id: number;
+  tagTypeName: string;
+}
+
 export default function PostTags({ postId, isOwner }: { postId: number; isOwner: boolean }) {
   const { token } = useAuth();
   const queryClient = useQueryClient();
@@ -30,6 +41,7 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
       setShowTagInput(false);
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to add tag: " + (error.response?.data || error.message)); }
   });
@@ -37,6 +49,7 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
   const removeTagMutation = useMutation({
     mutationFn: (tagId: number) => postService.removePostTagFromPost(postId, tagId, token || ""),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["postTags", postId] }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to remove tag: " + (error.response?.data || error.message)); }
   });
@@ -46,7 +59,7 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
   return (
     <div className="flex flex-wrap gap-2 items-center mt-2">
       <TagIcon size={14} className="text-slate-400" />
-      {tags.map((tag: any) => (
+      {tags.map((tag: Tag) => (
         <Badge key={tag.id} variant="secondary" className="text-[10px] bg-slate-100">
           {tag.tagTypeName}
           {isOwner && (
@@ -71,7 +84,7 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
                 onChange={(e) => addTagMutation.mutate(Number(e.target.value))}
               >
                 <option value="">Select tag to add</option>
-                {allTagTypes.map((tagType: any) => ( tagType.id !== 1 && !tags.find((tag: any) => tag.tagTypeId === tagType.id) && (
+                {allTagTypes.map((tagType: TagType) => ( tagType.id !== 1 && !tags.find((tag: Tag) => tag.tagTypeId === tagType.id) && (
                   <option key={tagType.id} value={tagType.id}>{tagType.tagTypeName}</option>
                 )))}
               </select> 

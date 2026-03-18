@@ -15,7 +15,9 @@ export default function ResetPassword() {
   const forgotMutation = useMutation({
     mutationFn: () => apiService.forgotPassword(email),
     onSuccess: () => setStep(2),
-    onError: (error: Error) => alert("Error: " + (error instanceof Error ? error.message : "Failed to send email")),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      alert("Error: " + (error.response?.data || error.message)); }
   });
 
   const resetMutation = useMutation({
@@ -24,7 +26,8 @@ export default function ResetPassword() {
       alert("Password updated successfully!");
       setStep(3);
     },
-    onError: (error: Error) => alert("Update failed: " + (error instanceof Error ? error.message : "Invalid Token")),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => alert("Update failed: " + (error.response?.data || error.message)),
   });
 
   return (

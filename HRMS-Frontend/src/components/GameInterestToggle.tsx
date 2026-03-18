@@ -5,6 +5,19 @@ import { Badge } from "@/components/ui/badge";
 import { Heart } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 
+type GameType = {
+    id: number;
+    gameName: string;
+}
+
+type EmployeeGameInterest = {
+    id: number;
+    employeeId: number;
+    gameTypeId: number;
+    interestDeleted: boolean;
+    playedInCurrentCycle: number;
+}
+
 export default function GameInterestToggle() {
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
@@ -16,25 +29,26 @@ export default function GameInterestToggle() {
 
     const { data: myInterests = [], isError: myInterestsError } = useQuery({
         queryKey: ["myInterests", user?.id],
-        queryFn: () => gameService.getEmployeeGameInterests(user?.id!, token!),
+        queryFn: () => gameService.getEmployeeGameInterests(user?.id || 0, token!),
         enabled: !!user?.id
     });
 
     const mutation = useMutation({
         mutationFn: (gameTypeId: number) => {
-            const existingInterest = myInterests.find((i: any) => (Number(i.gameTypeId) === Number(gameTypeId) && i.interestDeleted === false));
+            const existingInterest = myInterests.find((i: EmployeeGameInterest) => (Number(i.gameTypeId) === Number(gameTypeId) && i.interestDeleted === false));
             if(existingInterest) {
                 return gameService.updateEmployeeGameInterests(existingInterest.id, token!);
             } else {
-                return gameService.addEmployeeGameInterest(user?.id!, gameTypeId, token!);
+                return gameService.addEmployeeGameInterest(user?.id || 0, gameTypeId, token!);
             }
         }, 
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["myInterests", user?.id]}),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
             alert("Failed to update game interest: " + (error.response?.data || error.message)); }
     });
    
-    const isInterested = (gameId: number) => myInterests.some((i: any) => (Number(i.gameTypeId) === Number(gameId) && i.interestDeleted === false));
+    const isInterested = (gameId: number) => myInterests.some((i: EmployeeGameInterest) => (Number(i.gameTypeId) === Number(gameId) && i.interestDeleted === false));
 
     if(allGamesError || myInterestsError) alert("Failed to load data: " + (allGamesError || myInterestsError));
     return (
@@ -44,7 +58,7 @@ export default function GameInterestToggle() {
                     <Heart size={14} className="text-red-500 fill-red-500" /> Mark Your Interests
                 </p>
                 <div className="flex flex-wrap gap-2">
-                    {allGames.map((game: any) => (
+                    {allGames.map((game: GameType) => (
                         <Badge 
                             title="game with total played game in current cycle"
                             key={game.id}
@@ -52,7 +66,7 @@ export default function GameInterestToggle() {
                                 : "cursor-pointer bg-gray-100 text-gray-700"}
                             onClick={() => mutation.mutate(game.id)}
                         >
-                            {game.gameName} {isInterested(game.id) ? " : " + myInterests.find((interest: any) => game.id === interest.gameTypeId)?.playedInCurrentCycle + " times" : null}
+                            {game.gameName} {isInterested(game.id) ? " : " + myInterests.find((interest: EmployeeGameInterest) => game.id === interest.gameTypeId)?.playedInCurrentCycle + " times" : null}
                         </Badge>
                     ))}
                 </div>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UploadCloud, UserPlus } from "lucide-react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 
 type ReferFriendFormInputs ={
@@ -53,6 +53,7 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
       alert("Referral submitted successfully!");
       onSuccess();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to submit referral: " + (error.response?.data || error.message)); }
   });
@@ -103,6 +104,7 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
             title="Submit Referral"
             className="w-full text-black" 
             type="submit"
+            // eslint-disable-next-line react-hooks/incompatible-library
             disabled={referMutation.isPending || !watch("file") || !watch("referFriendName") || !watch("referFriendEmail") || !watch("referFriendShortNote")}
           >
             {referMutation.isPending ? "Submitting..." : "Submit Referral"}

@@ -98,7 +98,7 @@ export default function GameManagement() {
 
     const { data: WaitingListByEmpId = [], isError: waitingListByEmpIdOnError } = useQuery({ 
         queryKey: ["WaitingList", user?.id, gameType], 
-        queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, gameType, token!) 
+        queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id || 0, gameType, token!) 
     });
 
     const {
@@ -125,16 +125,17 @@ export default function GameManagement() {
         mutationFn: ({ id, status }: { id: number, status: number }) => 
             gameService.updateBookingStatus(id, status, token!),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings", user?.id] }),
-        onError: (error: Error) => {
-            alert("Failed to update booking status: " + (error instanceof Error ? error.message : "Failed to update booking status")); 
-        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onError: (error: any) => {
+            alert("Failed to update booking status: " + (error.response?.data || error.message)); }
     });
 
     const removeWaitingListMutation = useMutation({
         mutationFn: (id: number) => gameService.deleteWaitingList(id, token!),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] }),
-        onError: (error: Error) => {
-            alert("Failed to remove waiting list item: " + (error instanceof Error ? error.message : "Failed to remove waiting list item"));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onError: (error: any) => {
+            alert("Failed to remove waiting list item: " + (error.response?.data || error.message));
         }
     });
 

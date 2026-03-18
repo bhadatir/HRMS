@@ -77,8 +77,9 @@ export default function JobManagement() {
       queryClient.invalidateQueries({ queryKey: ["allJobs"] });
       queryClient.invalidateQueries({ queryKey: ["jobDetail"] });
     },
-    onError: (error: Error) => {
-      alert("Failed to update job status: " + (error instanceof Error ? error.message : "Unknown error")); }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      alert("Failed to update job status: " + (error.response?.data || error.message)); }
    });
 
   useEffect(() => {

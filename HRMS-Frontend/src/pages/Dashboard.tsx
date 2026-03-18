@@ -70,44 +70,44 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append("file", file);
   
-      return apiService.updateProfileImage(user?.id, formData, token || "");
+      return apiService.updateProfileImage(user?.id || 0, formData, token || "");
     },
     onSuccess: () => {
       alert("Profile picture updated!");
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
-    onError: (error: Error) => {
-      alert("Failed to update profile picture: " + (error instanceof Error ? error.message : "An unknown error occurred"));
-    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      alert("Failed to update profile details: " + (error.response?.data || error.message)); }
   });
 
   const updatePasswordMutation = useMutation({
-    mutationFn: () => apiService.updatePassword(user?.id, newPassword, token || ""),
+    mutationFn: () => apiService.updatePassword(user?.id || 0, newPassword, token || ""),
     onSuccess: () => {
       alert("Password updated successfully!");
       localStorage.setItem("isFirstLogin", "no");
       setIsFirstLogin("no");
     },
-    onError: (error: Error) => {
-      alert("Failed to update password: " + (error instanceof Error ? error.message : "An unknown error occurred"));
-    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      alert("Failed to update password: " + (error.response?.data || error.message)); }
   });
   
   const { data: travelPlans, isError: travelPlansError } = useQuery({
     queryKey: ["travelPlanByEmpId", user?.id],
-    queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id, "", 0, 0, 100, token || ""),
+    queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id || 0, "", 0, 0, 100, token || ""),
     enabled: !!token && !!user?.id,
   });
 
   const { data: gameBookings, isError: gameBookingsError } = useQuery({
     queryKey: ["gameBookings", user?.id],
-    queryFn: () => gameService.findGameBookingByUserId(user?.id, "", 0, 0, 0, 100, token || ""), 
+    queryFn: () => gameService.findGameBookingByUserId(user?.id || 0, "", 0, 0, 0, 100, token || ""), 
     enabled: !!token && !!user?.id,
   });
 
   const { data: WaitingList, isError: waitingListError } = useQuery({ 
       queryKey: ["WaitingList", user?.id], 
-      queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id, 0, token!) 
+      queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id || 0, 0, token!) 
   });
 
   if (!user) {

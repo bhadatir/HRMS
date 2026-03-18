@@ -9,7 +9,24 @@ import { Input } from "./ui/input";
 import { useState } from "react";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
 
-export default function WaitingList({waitingListId, onSuccess}: {waitingListId: number, onSuccess: () => void}) {
+type WaitingList = {
+  id: number;
+  gameTypeName: string;
+  targetSlotDatetime: string;
+  gameSlotDuration: number;
+  waitingStatusIsActive: boolean;
+  bookingParticipantResponses: BookingParticipantResponse[];
+  hostEmployeeEmail: string;
+  waitingListCreatedAt: string;
+  isFirstGame: boolean;
+}
+
+type BookingParticipantResponse = {
+  id: number;
+  employeeEmail: string;
+}
+
+export default function WaitingList({waitingListId}: {waitingListId: number, onSuccess: () => void}) {
   const { token } = useAuth();
   const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");  
   const debouncedSearch = useAppDebounce(waitingListSearchTerm);
@@ -26,9 +43,9 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
     enabled: !!waitingListId && !!token,
   });
 
-  const filteredWaitingListSeq = waitingListSeq?.filter((wls: any) =>
+  const filteredWaitingListSeq = waitingListSeq?.filter((wls: WaitingList) =>
     wls.hostEmployeeEmail.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-    wls.bookingParticipantResponses.some((p: any) => p.employeeEmail.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
+    wls.bookingParticipantResponses.some((p: BookingParticipantResponse) => p.employeeEmail.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
     wls.waitingListCreatedAt.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
@@ -91,7 +108,7 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {filteredWaitingListSeq?.map((wls: any, index: number) => (
+                    {filteredWaitingListSeq?.map((wls: WaitingList, index: number) => (
                     <TableRow key={wls.id}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{wls.hostEmployeeEmail}</TableCell>
@@ -100,7 +117,7 @@ export default function WaitingList({waitingListId, onSuccess}: {waitingListId: 
                       </TableCell>
                       <TableCell className="font-bold flex text-slate-900">{wls.isFirstGame ? "Yes" : "No"}</TableCell>
                       <TableCell className="text-slate-900">
-                        {wls.bookingParticipantResponses.map((p: any) => 
+                        {wls.bookingParticipantResponses.map((p: BookingParticipantResponse) => 
                             <div key={p.id} className="text-sm text-slate-500">
                                 {p.employeeEmail}
                             </div>

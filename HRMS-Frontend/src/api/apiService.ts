@@ -55,7 +55,7 @@ export const apiService = {
     return res.data;
   },
 
-  updatePassword: async (empId: string, newPassword: string, token: string) => {
+  updatePassword: async (empId: number, newPassword: string, token: string) => {
     const res = await api.patch(`/user/update-password?empId=${empId}&newPassword=${newPassword}`, null, authHeader(token));
     return res.data;
   },

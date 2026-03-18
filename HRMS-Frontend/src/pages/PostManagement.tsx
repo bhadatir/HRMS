@@ -78,8 +78,10 @@ export default function PostManagement() {
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allPosts"] }),
-    onError: (error: Error) => {
-      alert("Failed to delete post: " + (error instanceof Error ? error.message : "Unknown error")); }
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      alert("Failed to delete post: " + (error.response?.data || error.message)); }
   });
 
   const handleDelete = (postId: number) => {

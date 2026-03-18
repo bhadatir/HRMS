@@ -47,8 +47,9 @@ export default function Notifications() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
-    onError: (error: Error) => {
-      alert("Failed to mark notification as read: " + (error instanceof Error ? error.message : "Unknown error")); }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      alert("Failed to mark notification as read: " + (error.response?.data || error.message)); }
   });
 
   const markAllReadMutation = useMutation({
@@ -56,8 +57,9 @@ export default function Notifications() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
-    onError: (error: Error) => {
-      alert("Failed to mark all notifications as read: " + (error instanceof Error ? error.message : "Unknown error")); }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      alert("Failed to mark all notifications as read: " + (error.response?.data || error.message)); }
   });
 
   const handleMarkAllRead = () => {

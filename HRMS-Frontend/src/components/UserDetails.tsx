@@ -7,8 +7,7 @@ import {
   X,
   Edit,
   IndianRupee,
-  Trash,
-  Badge
+  Trash
 } from "lucide-react";
 import { apiService } from "@/api/apiService";
 import AddUser from "./AddUser";
@@ -36,9 +35,9 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
       queryClient.invalidateQueries({ queryKey: ["user", userEmail] });
       queryClient.invalidateQueries({ queryKey: ["searchEmployees"] });
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to inactivate user: " + (error.response?.data || error.message));
-    }
+      alert("Failed to inactivate user: " + (error.response?.data || error.message)); }
   });
 
   const handleInactivate = () => {

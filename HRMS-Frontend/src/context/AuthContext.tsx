@@ -1,13 +1,36 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
 import SockJs from "sockjs-client";
 import Stomp from "stompjs";
 
+type User = {
+  id: number;
+  employeeFirstName: string;
+  employeeLastName: string;
+  employeeEmail: string;
+  employeeDob: Date;
+  employeeGender: string;
+  employeeProfileUrl: string;
+  employeeHireDate: Date;
+  employeeSalary: number;
+  employeeIsActive: boolean;
+  employeeCreatedAt: Date;
+  lastLoginAt: Date;
+  departmentId: number;
+  departmentName: string;
+  positionId: number;
+  positionName: string;
+  roleId: number;
+  roleName: string;
+  managerEmployeeId: number;
+  managerEmployeeEmail: string;
+};
+
 type AuthContextType = {
   token: string | null;
   isFirstLogin: string;
-  user: any;
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (token: string, email: string, isFirstLogin: string) => void;
@@ -55,14 +78,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       setEmail(null);
       setUnreadNotifications(0);
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to log out: " + (error.response?.data || error.message));
-    }
+      alert("Failed to log out: " + (error.response?.data || error.message)); }
   });
   
   useEffect(() => {
     if(notifications) {
       const unreadCount = notifications.totalElements;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUnreadNotifications(unreadCount);
     }
   },[notifications]);
@@ -85,13 +109,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [userData?.id, token, queryClient]);
 
-  useEffect(() => {
-    if (userError || notificationsError) {
-      alert("Session expired or failed to load user data. Please log in again.");
-      logout(); 
-    }
-  }, [userError, notificationsError]);
-
   const login = (newToken: string, newEmail: string, isFirstLogin: string) => {
     localStorage.setItem("token", newToken);
     localStorage.setItem("email", newEmail);
@@ -101,9 +118,16 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     setIsFirstLogin(isFirstLogin);
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     logoutMutation.mutate();
-  };
+  }, [logoutMutation]);
+
+  useEffect(() => {
+    if (userError || notificationsError) {
+      alert("Session expired or failed to load user data. Please log in again.");
+      logout(); 
+    }
+  }, [userError, notificationsError, logout]);
 
   return (
     <AuthContext.Provider 
@@ -125,6 +149,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");

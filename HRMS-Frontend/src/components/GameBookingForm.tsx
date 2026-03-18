@@ -14,6 +14,47 @@ import { cn } from "@/lib/utils";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useInView } from "react-intersection-observer";
 
+type GameType = {
+    id: number;
+    gameName: string;
+    operatingStart: string;
+    operatingEnd: string;
+    gameSlotDuration: number;
+    gameMaxPlayerPerSlot: number;
+}
+
+type EmployeeGameInterest = {
+    id: number;
+    employeeId: number;
+    gameTypeId: number;
+    interestDeleted: boolean;
+    playedInCurrentCycle: number;
+}
+
+type Slot = {
+    time: string;
+    status: string;
+}
+
+type Employee = {
+    id: number;
+    employeeFirstName: string;
+    employeeLastName: string;
+    employeeEmail: string;
+}
+
+type GameBookingFormInputs = {
+    gameTypeId: number;
+    date: string;
+}
+
+type GameBookingFormPayload = {
+    empId: number | undefined;
+    gameTypeId: number;
+    requestedSlotStartTime: string;
+    bookingParticipantsEmpId: number[];
+}
+
 export default function GameBookingForm({ editBookingId, onSuccess }: { editBookingId?: number | null; onSuccess: () => void }) {
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
@@ -24,7 +65,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     const [selectedParticipants, setSelectedParticipants] = useState<{id: number, name: string}[]>([]);
     const debouncedSearchTerm = useAppDebounce(searchTerm);
 
-    const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
+    const { register, handleSubmit, watch, formState: { errors } } = useForm<GameBookingFormInputs>();
 
     const { data: gameTypes = [], isError: gameTypesError } = useQuery({ 
         queryKey: ["allGameTypes"], 
@@ -32,22 +73,23 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
 
     const { data: myInterests = [], isError: myInterestsError } = useQuery({
         queryKey: ["myInterests", user?.id],
-        queryFn: () => gameService.getEmployeeGameInterests(user?.id!, token!),
+        queryFn: () => gameService.getEmployeeGameInterests(user?.id || 0, token!),
         enabled: !!user?.id
     });
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const gameTypeId = Number(watch("gameTypeId"));
     const date = watch("date");
 
     const { data: slots = [], isError: slotsError } = useQuery({
         queryKey: ["availableSlots", gameTypeId, date],
-        queryFn: () => gameService.getAvalaibleSlots(gameTypeId, user?.id!, date, token!),
+        queryFn: () => gameService.getAvalaibleSlots(gameTypeId, user?.id || 0, date, token!),
         enabled: !!gameTypeId && !!date
     });
 
     
     const mutation = useMutation({
-        mutationFn: (data: any) => editBookingId 
+        mutationFn: (data: GameBookingFormPayload) => editBookingId 
             ? gameService.updateBooking(editBookingId, data, token!) 
             : gameService.addBooking(data, token!),
         onSuccess: (data) => {
@@ -57,20 +99,21 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
             queryClient.invalidateQueries({ queryKey: ["upcomingBookings"] });
             onSuccess();
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
             alert("Failed booking: " + (error.response?.data || error.message)); }
     });
 
     const filteredGames = useMemo(() => {
-        const interestIds = myInterests.filter((i: any) => !i.interestDeleted).map((i: any) => i.gameTypeId);
-        return gameTypes.filter((g: any) => interestIds.includes(g.id));
+        const interestIds = myInterests.filter((i: EmployeeGameInterest) => !i.interestDeleted).map((i: EmployeeGameInterest) => i.gameTypeId);
+        return gameTypes.filter((g: GameType) => interestIds.includes(g.id));
     }, [gameTypes, myInterests]);
 
         const selectedGameId = watch("gameTypeId");
     const selectedDate = watch("date");
-    const selectedGame = filteredGames.find((g: any) => g.id === Number(selectedGameId));
+    const selectedGame = filteredGames.find((g: GameType) => g.id === Number(selectedGameId));
 
-    const slotStartDateTime = selectedDate ? `${selectedDate} ${`${selectedTime}:00.0000000` || "00:00:00.0000000"}` : null;
+    const slotStartDateTime = selectedDate ? `${selectedDate} ${selectedTime ? `${selectedTime}:00.0000000` : "00:00:00.0000000"}` : null;
 
     const {
         data: infiniteData,
@@ -94,9 +137,9 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         if (inView && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
         }
-    }, [inView, hasNextPage, isFetchingNextPage]);
+    }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    const handleAddParticipant = (emp: any) => {
+    const handleAddParticipant = (emp: Employee) => {
         if(!selectedGame) {
             window.alert("Please select a game first");
             return;
@@ -112,7 +155,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         setSelectedParticipants(selectedParticipants.filter(p => p.id !== id));
     };
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: GameBookingFormInputs) => {
         if (!selectedTime) return alert("Please select a slot");
         if (selectedParticipants.length === 0) return alert("Please add at least one participant");
 
@@ -155,7 +198,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                         <label className="text-xs font-bold uppercase text-slate-500">Select Game</label>
                         <select {...register("gameTypeId", { required: true })} className="w-full border rounded-md p-2 text-sm h-10">
                             <option value=""> Choose Game </option>
-                            {filteredGames.map((g: any) => <option key={g.id} value={g.id}>{g.gameName}</option>)}
+                            {filteredGames.map((g: GameType) => <option key={g.id} value={g.id}>{g.gameName}</option>)}
                         </select>
                         {errors.gameTypeId && <p className="text-red-500 text-xs">Game selection is required.</p>}
                         {filteredGames.length === 0 && <p className="text-xs text-gray-500">You haven't marked any interests yet! Please mark them first.</p>}
@@ -180,7 +223,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                                 <TableRow>
                                     <TableCell className="p-4">
                                         <div className="grid grid-cols-5 gap-2 p-4">
-                                            {slots?.map((slot: any) => {                                                
+                                            {slots?.map((slot: Slot) => {                                                
                         
                                                 const isSelected = selectedTime === slot.time;
                                                 const isPersonallyBusy = slot.status === "BUSY";
@@ -216,7 +259,6 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                                 </TableRow>
                             </TableBody>
                         </Table>
-                        {errors.slot && <p className="text-red-500 text-xs">Please select a slot.</p>}
                     </div>
                 )}
 
@@ -235,7 +277,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
 
                         {showDropdown && suggestions.length > 0 && (
                             <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-40 overflow-y-auto">
-                                {suggestions.map((emp: any,) => {
+                                {suggestions.map((emp: Employee) => {
 
                                 if (emp.id === user?.id || selectedParticipants.find(e => e.id === emp.id)) return null;
 
@@ -286,7 +328,6 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                                 </div>
                             </Badge>
                         ))}
-                        {errors.employeesInTravelPlanId && <p className="text-red-500 text-xs">At least one employee must be assigned.</p>}
                     </div>
                 </div>
                 <Button type="submit" className="w-full text-black h-12 text-lg" disabled={mutation.isPending || !selectedTime  || selectedParticipants.length === 0}>

@@ -8,6 +8,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { useEffect, useState } from "react";
 import AddGameTypeForm from "./AddGameTypeForm";
 
+type GameType = {
+    id: number;
+    gameName: string;
+    operatingStart: string;
+    operatingEnd: string;
+    gameSlotDuration: number;
+    gameMaxPlayerPerSlot: number;
+}
+
 export default function GameTypeManager() {
     const { token, user } = useAuth();
     const [showForm, setShowForm] = useState(false);
@@ -83,7 +92,7 @@ return (
                 </TableRow>
               </TableHeader>
             <TableBody>
-                {games.map((g: any) => (
+                {games.map((g: GameType) => (
                     <TableRow key={g.id}>
                         <TableCell className="font-bold">{g.gameName}</TableCell>
                         <TableCell>{g.operatingStart} - {g.operatingEnd}</TableCell>

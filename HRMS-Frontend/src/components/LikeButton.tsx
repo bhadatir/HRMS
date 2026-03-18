@@ -3,6 +3,13 @@ import { postService } from "../api/postService";
 import { useAuth } from "../context/AuthContext";
 import { Heart } from "lucide-react";
 
+type Like = {
+  id: number;
+  fkPostId: number | null;
+  fkCommentId: number | null;
+  employeeId: number;
+}
+
 export default function LikeButton({ postId, commentId }: { postId: number, commentId?: number }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
@@ -18,7 +25,7 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
     alert("Failed to load likes for post/comment: " + likesError);
   }
 
-  const isLiked = likes.some((l: any) => l.employeeId === user?.id);
+  const isLiked = likes.some((l: Like) => l.employeeId === user?.id);
 
   const likeMutation = useMutation({
     mutationFn: () => {
@@ -26,7 +33,7 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
         return commentId ? postService.removeLikeByComment(commentId, user?.id || 0, token || "") 
                             : postService.removeLikeByPost(postId, user?.id || 0, token || "");
       }
-      var payload
+      let payload
       if(commentId) {
       payload = {
         fkPostId: null,
@@ -46,6 +53,7 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to update like status: " + (error.response?.data || error.message)); }
   });

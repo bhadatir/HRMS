@@ -108,8 +108,9 @@ export default function TravelPlan() {
       queryClient.invalidateQueries({ queryKey: ["travelPlanByEmpId"] });
       alert("Travel plan deleted successfully");
     },
-    onError: (error: Error) => {
-      alert("Failed to delete travel plan: " + (error instanceof Error ? error.message : "Unknown error")); }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      alert("Failed to delete travel plan: " + (error.response?.data || error.message)); }
   });
 
   const filteredPlans = useMemo(() => {

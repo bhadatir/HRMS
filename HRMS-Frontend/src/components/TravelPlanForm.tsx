@@ -25,6 +25,20 @@ type TravelPlanFormInputs = {
   employeesInTravelPlanId: number[];
 }
 
+type Employee = {
+  id: number;
+  employeeFirstName: string;
+  employeeLastName: string;
+}
+
+type EmployeeTravelPlanResponse = {
+  id: number;
+  employeeId: number;
+  employeeFirstName: string;
+  employeeLastName: string;
+  employeeIsDeletedFromTravel: boolean;
+}
+
 export default function TravelPlanForm({ editTravelPlanId, onSuccess }: { editTravelPlanId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
@@ -60,7 +74,7 @@ useEffect(() => {
   if (inView && hasNextPage && !isFetchingNextPage) {
     fetchNextPage();
   }
-}, [inView, hasNextPage, isFetchingNextPage]);
+}, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 const getMutation = useMutation({
   mutationFn: () => travelService.getTravelPlanById(editTravelPlanId!, token || ""),
@@ -68,8 +82,8 @@ const getMutation = useMutation({
     setCreatedAt(data.travelPlanCreatedAt.split("T")[0]);
     
     const existingEmps = data.employeeTravelPlanResponses
-      .filter((e: any) => !e.employeeIsDeletedFromTravel)
-      .map((e: any) => ({ id: e.employeeId, name: `${e.employeeFirstName} ${e.employeeLastName}` }));
+      .filter((e: EmployeeTravelPlanResponse) => !e.employeeIsDeletedFromTravel)
+      .map((e: EmployeeTravelPlanResponse) => ({ id: e.employeeId, name: `${e.employeeFirstName} ${e.employeeLastName}` }));
     
     setSelectedEmployees(existingEmps);
     setHrOwnerId(data.employeeId);
@@ -84,28 +98,30 @@ const getMutation = useMutation({
       travelPlanEndDate: data.travelPlanEndDate.split("T")[0],
       fkTravelPlanHREmployeeId: data.employeeId,
       travelMaxExpenseAmountPerDay: data.travelMaxExpenseAmountPerDay,
-      employeesInTravelPlanId: existingEmps.map((e: any) => e.id)
+      employeesInTravelPlanId: existingEmps.map((e: { id: number }) => e.id)
     });
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onError: (error: any) => {
-      alert("Failed to get travel plan details: " + (error.response?.data || error.message)); }
+    alert("Failed to get travel plan details: " + (error.response?.data || error.message)); }
 });
 
   useEffect(() => {
     if (editTravelPlanId) getMutation.mutate();
-  }, [editTravelPlanId]);
+  }, [editTravelPlanId, getMutation]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/incompatible-library
     if (watch("travelPlanEndDate") && watch("travelPlanStartDate") > watch("travelPlanEndDate")) {
       setValue("travelPlanEndDate", "");
       setSelectedEmployees([]);
       setValue("employeesInTravelPlanId", []);
     }
-  }, [watch("travelPlanStartDate")]);
+  }, [setValue, watch]);
     
 
-  const handleSelectEmployee = (emp: any) => {
-    if (!selectedEmployees.find(e => e.id === emp.id)) {
+  const handleSelectEmployee = (emp: Employee) => {
+    if (!selectedEmployees.find((e: { id: number }) => e.id === emp.id)) {
       const newList = [...selectedEmployees, { id: emp.id, name: `${emp.employeeFirstName} ${emp.employeeLastName}` }];
       setSelectedEmployees(newList);
       setValue("employeesInTravelPlanId", newList.map(e => e.id));
@@ -139,6 +155,7 @@ const getMutation = useMutation({
       setShowDropdown(false);
       onSuccess();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to create/update travel plan: " + (error.response?.data || error.message)); }
   });
@@ -239,7 +256,7 @@ const getMutation = useMutation({
 
             {showDropdown && suggestions.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-40 overflow-y-auto">
-                {suggestions.map((emp: any) => (                  
+                {suggestions.map((emp: Employee) => (                  
                   !(emp.id === hrOwnerId || emp.id == user?.id || selectedEmployees.find(e => e.id === emp.id)) 
                   &&
                   <div className="travel"> 

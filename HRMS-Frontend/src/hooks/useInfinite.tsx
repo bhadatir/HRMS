@@ -52,10 +52,10 @@ export function useFindTravelPlanByEmployeeId(searchTerm: string, travelPlanType
   const query = useInfiniteQuery({
     queryKey: ["travelPlanByEmpId", debouncedSearch, travelPlanType],
     queryFn: ({ pageParam = 0 }) => 
-      travelService.findTravelPlanByEmployeeId(user?.id, debouncedSearch, travelPlanType, pageParam, 3, token || ""),
+      travelService.findTravelPlanByEmployeeId(user?.id || 0, debouncedSearch, travelPlanType, pageParam, 3, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
-    enabled: !!token,
+    enabled: !!token && !!user?.id,
     placeholderData: (previousData) => previousData,
   });  
 
@@ -105,14 +105,15 @@ export function useSearchAvailableEmployeeForTravel(searchTerm: string, token: s
 
 export function useGetAllJobs(searchTerm: string, jobType: number, token: string) {
   const debouncedSearch = useAppDebounce(searchTerm);
-
+  const { user } = useAuth();
+  
   const query = useInfiniteQuery({
     queryKey: ["allJobs", debouncedSearch, jobType],
     queryFn: ({ pageParam = 0 }) => 
       jobService.getAllJobs(debouncedSearch, jobType, pageParam, 3, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
-    enabled: !!token,
+    enabled: !!token && !!user?.id,
     placeholderData: (previousData) => previousData,
   });
 
@@ -148,10 +149,10 @@ export function useFindGameBookingByUserId(searchTerm: string, gameType: number,
   const query = useInfiniteQuery({
     queryKey: ["Bookings", user?.id, debouncedSearch, gameType, gameBookingStatusId],
     queryFn: ({ pageParam = 0 }) => 
-      gameService.findGameBookingByUserId(user?.id, debouncedSearch, gameType, gameBookingStatusId, pageParam, 4, token || ""),
+      gameService.findGameBookingByUserId(user?.id || 0, debouncedSearch, gameType, gameBookingStatusId, pageParam, 4, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
-    enabled: !!token,
+    enabled: !!token && !!user?.id,
     placeholderData: (previousData) => previousData,
   });
 
@@ -168,10 +169,10 @@ export function useGetUserNotifications(searchTerm: string, token: string) {
   const query = useInfiniteQuery({
     queryKey: ["notifications", user?.id, debouncedSearch],
     queryFn: ({ pageParam = 0 }) => 
-      apiService.getUserNotifications(user?.id, debouncedSearch, pageParam, 4, token || ""),
+      apiService.getUserNotifications(user?.id || 0, debouncedSearch, pageParam, 4, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
-    enabled: !!token,
+    enabled: !!token && !!user?.id,
     placeholderData: (previousData) => previousData,
   });
 

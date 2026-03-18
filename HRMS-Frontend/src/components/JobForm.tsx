@@ -16,6 +16,11 @@ type JobFormInputs ={
     file?: File[];
 }
 
+type JobType = {
+    id: number;
+    jobTypeName: string;
+}
+
 export default function JobForm({ editJobId, onSuccess }: { editJobId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
@@ -30,7 +35,6 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
   const {register, handleSubmit, reset, watch, formState: { errors }} = useForm<JobFormInputs>({
     defaultValues: {
       jobTitle: "",
-      jobSalary: 0,
       fkJobTypeId: 1,
       fkJobOwnerEmployeeId: user?.id || 0
     }
@@ -47,6 +51,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
         fkJobOwnerEmployeeId: data.employeeId
       });
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to load job details: " + (error.response?.data || error.message)); }
   });
@@ -55,7 +60,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
     if (editJobId) {
       getJobMutation.mutate();
     }
-  }, [editJobId]);
+  }, [editJobId, getJobMutation]);
 
   const jobMutation = useMutation({
     mutationFn: async (data: JobFormInputs) => {
@@ -78,6 +83,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
       alert(editJobId ? "Job updated successfully!" : "Job created successfully!");
       onSuccess();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to " + (editJobId ? "update job" : "create job") + ": " + (error.response?.data || error.message)); }
   });
@@ -122,7 +128,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
             {...register("fkJobTypeId", { required: "Job category is required" })}
           >
             <option value="">Select job category</option>
-            {allJobTypes.map((type: any) => (
+            {allJobTypes.map((type: JobType) => (
               <option key={type.id} value={type.id}>{type.jobTypeName}</option>
             ))}
           </select>
@@ -141,7 +147,9 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
           <p className="text-xs text-slate-400">
             {editJobId ? "Upload new JD to replace existing file (Optional)" : "Upload job description (Required)"}
           </p>
-          {watch("file") && <p className="text-xs text-blue-600 font-medium">{watch("file")?.[0]?.name}</p>}
+          {
+          // eslint-disable-next-line react-hooks/incompatible-library
+          watch("file") && <p className="text-xs text-blue-600 font-medium">{watch("file")?.[0]?.name}</p>}
         </div>
 
         <Button

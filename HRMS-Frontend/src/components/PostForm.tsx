@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadCloud, Eye } from "lucide-react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 type PostFormInputs ={
   postTitle: string;
@@ -16,6 +16,12 @@ type PostFormInputs ={
   fkPostVisibilityId: number;
   file?: File[];
 }
+
+type Visibility = {
+  id: number;
+  postVisibilityName: string;
+}
+
 export default function PostForm({ editPostId, onSuccess }: { editPostId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
@@ -49,6 +55,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
         fkPostVisibilityId: data.postVisibilityId
       });
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to load post details: " + (error.response?.data || error.message)); }
   });
@@ -57,7 +64,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
     if (editPostId) {
       getPostMutation.mutate();
     }
-  }, [editPostId]);
+  }, [editPostId, getPostMutation]);
 
   const postMutation = useMutation({
     mutationFn: async (data: PostFormInputs) => {
@@ -90,6 +97,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
       alert(editPostId ? "Post updated!" : "Post shared to feed!");
       onSuccess();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to " + (editPostId ? "update post" : "create post") + ": " + (error.response?.data || error.message)); }
   });
@@ -125,7 +133,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
               className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
               {...register("fkPostVisibilityId", { required: "Visibility is required" })}
             >
-              {allVisibilities.map((vis: any) => (
+              {allVisibilities.map((vis: Visibility) => (
                 <option key={vis.id} value={vis.id}>{vis.postVisibilityName}</option>
               ))}
             </select>
@@ -149,6 +157,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
         <Button 
           type="submit"
           className="w-full text-black"
+          // eslint-disable-next-line react-hooks/incompatible-library
           disabled={postMutation.isPending || (!editPostId && !watch("postTitle") || !watch("postContent") || !watch("fkPostVisibilityId") || !watch("file"))}
         >
           {postMutation.isPending ? "Processing..." : editPostId ? "Update Post" : "Post to Feed"}

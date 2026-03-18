@@ -23,9 +23,9 @@ export default function Login() {
       login(data.accessToken, formData.email, data.isFirstLogin);
       navigate("/dashboard");
     },
-    onError: (error: Error) => {
-      alert("Login Error: " + (error instanceof Error ? error.message : "Failed to login"));
-    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      alert("Login Error: " + (error.response?.data || error.message)); }
   });
 
   const handleLogin = async (e: React.FormEvent) => {
