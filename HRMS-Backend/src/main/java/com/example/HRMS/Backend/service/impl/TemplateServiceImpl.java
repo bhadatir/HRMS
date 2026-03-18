@@ -44,15 +44,16 @@ public class TemplateServiceImpl implements TemplateService {
     public String generateGameBookingHtml(GameBooking gameBooking, BookingWaitingList bookingWaitingList, String subject, Boolean isLink){
 
         Context context = new Context();
-        String link = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
+        String link = "";
+        if(gameBooking != null) link = "http://localhost:5173/game-management?gameBookingId=" + gameBooking.getId();
 
-        if(gameBooking.getId() != null) {
+        if(gameBooking != null && gameBooking.getId() != null) {
             context.setVariable("gameName", gameBooking.getFkGameType().getGameName());
             context.setVariable("slotTime", gameBooking.getGameBookingStartTime());
             if(Boolean.TRUE.equals(isLink)) context.setVariable("link", link);
         }
 
-        if(bookingWaitingList.getId() != null) {
+        if(bookingWaitingList != null && bookingWaitingList.getId() != null) {
             context.setVariable("gameName", bookingWaitingList.getFkGameType().getGameName());
             context.setVariable("slotTime", bookingWaitingList.getTargetSlotDatetime());
         }
