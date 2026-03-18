@@ -14,6 +14,25 @@ const authHeader = (token: string) => ({
   },
 });
 
+type AddUserFormInputs = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  dob: string;
+  gender: "male" | "female" | "other";
+  hireDate: string;
+  salary: number;
+  departmentId: number;
+  positionId: number;
+  roleId: number;
+}
+
+type LoginData = {
+  email: string;
+  password: string;
+}
+
 export const apiService = {
 
   updateProfileImage: async (empId: number, formData: FormData, token: string) => {
@@ -25,7 +44,7 @@ export const apiService = {
     return res.data;
   },
 
-  login: async (data: any) => {
+  login: async (data: LoginData) => {
     const res = await api.post("/auth/login", data);
     return res.data;
   },
@@ -35,12 +54,12 @@ export const apiService = {
     return res.data;
   },
 
-  register: async (data: any, token: string) => {
+  register: async (data: AddUserFormInputs, token: string) => {
     const res = await api.post("/admin/register", data, authHeader(token));
     return res.data;
   },
 
-  updateUserByEmail: async (userEmail: string, data: any, token: string) => {
+  updateUserByEmail: async (userEmail: string, data: AddUserFormInputs, token: string) => {
     const res = await api.put(`/admin/user/${userEmail}`, data, authHeader(token));
     return res.data;
   },
@@ -129,7 +148,6 @@ export const apiService = {
     const res = await api.get(`/user/activeTime?email=${email}`, authHeader(token));
     return res.data;
   }
-  // localhost:8080/api/user/activeTime?email=tirthbhadani9@gmail.com
 };
 
 

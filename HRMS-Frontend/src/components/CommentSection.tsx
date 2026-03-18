@@ -7,6 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Reply, Send, Trash2, X } from "lucide-react";
 import LikeButton from "./LikeButton";
 
+type Comment = {
+  id: number;
+  commentContent: string;
+  employeeId: number;
+  employeeEmail: string;
+  parentCommentId: number | null;
+  parentCommentEmployeeEmail?: string;
+  commentIsDeleted: boolean;
+  commentCreatedAt: string;
+  recentLikerNames?: string[];
+};
+
 export default function CommentSection({ postId }: { postId: number }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
@@ -36,13 +48,14 @@ export default function CommentSection({ postId }: { postId: number }) {
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to add comment: " + (error.response?.data || error.message)); }
   });
 
   const removeCommentMutation = useMutation({
     mutationFn: ({ commentId, reason }: { commentId: number; reason: string }) => {
-      if ((user?.roleName === "HR" || user?.roleName === "ADMIN" ) && comments.find((c: any) => c.id === commentId)?.employeeId !== user.id) {
+      if ((user?.roleName === "HR" || user?.roleName === "ADMIN" ) && comments.find((c: Comment) => c.id === commentId)?.employeeId !== user.id) {
         return postService.removeCommentByHr(commentId, reason, token || "");
       } else {
         return postService.removeCommentByOwner(commentId, reason, token || "");
@@ -52,11 +65,12 @@ export default function CommentSection({ postId }: { postId: number }) {
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to delete comment: " + (error.response?.data || error.message)); }
   });
 
-  const handleReplyClick = (comment: any) => {
+  const handleReplyClick = (comment: Comment) => {
     setReplyTo({ id: comment.id, name: `User ${comment.employeeId}` });
     commentref.current?.focus();
   }
@@ -73,7 +87,7 @@ export default function CommentSection({ postId }: { postId: number }) {
   return (
     <div className="mt-4 space-y-4 pt-4 border-t">
       <div className="space-y-3">
-        {comments.filter((c: any) => !c.commentIsDeleted).map((comment: any) => (
+        {comments.filter((c: Comment) => !c.commentIsDeleted).map((comment: Comment) => (
           <div key={comment.id} className={`p-2 rounded-lg group ${comment.parentCommentId ? 
                                             "ml-8 bg-slate-50 border-l-2 border-blue-200" 
                                             : "bg-white border"}`}>
@@ -88,7 +102,7 @@ export default function CommentSection({ postId }: { postId: number }) {
 
                 <div className="flex items-center gap-4 mt-2">
                     <LikeButton postId={postId} commentId={comment.id} />
-                    {comment.recentLikerNames?.length > 0 && (
+                    {comment.recentLikerNames && comment.recentLikerNames.length > 0 && (
                       <p className="text-[10px] text-slate-500">
                         Liked by <span className="font-bold text-slate-700">{comment.recentLikerNames.join(", ")}</span>
                         {comment.recentLikerNames.length > 2 && ` and ${comment.recentLikerNames.length - 2} others`}

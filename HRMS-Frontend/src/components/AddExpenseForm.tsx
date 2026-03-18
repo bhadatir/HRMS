@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 type ProofEntry = {
   file: File;
   typeId: string;
-};
+}
 
 type ExpenseForm = {
   expenseAmount: number;
@@ -19,14 +19,19 @@ type ExpenseForm = {
   expenseRemark: string;
   fkExpenseExpenseStatusId: number;
   fkEmployeeTravelPlanId: number | null;
-};
+}
+
+type ExpenseType = {
+  id: number;
+  expenseProofTypeName: string;
+}
 
 export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlanId: number, onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   
   const [proofs, setProofs] = useState<ProofEntry[]>([]);
-  const { register, handleSubmit, watch, setError, clearErrors, reset, formState: { errors } } = useForm<ExpenseForm>(
+  const { register, handleSubmit, watch, setError, clearErrors, formState: { errors } } = useForm<ExpenseForm>(
     {
       defaultValues: {
       expenseDate: new Date().toISOString().split("T")[0],
@@ -39,7 +44,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
   
   const { data: employeeTravelPlanId, isLoading, isError: employeeTravelPlanError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
-    queryFn: () => travelService.findEmployeeTravelPlanId(user?.id, travelPlanId, token || ""),
+    queryFn: () => travelService.findEmployeeTravelPlanId(user?.id || 0, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
@@ -75,10 +80,11 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
     setProofs(proofs.filter((_, i) => i !== index));
   };
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const selectedDate = watch("expenseDate");
   const { data: alreadySpent } = useQuery({
     queryKey: ["dailyExpenseTotal", travelPlanId, user?.id, selectedDate],
-    queryFn: () => travelService.getTotalSpentByDate(travelPlanId, user?.id, selectedDate, token || ""),
+    queryFn: () => travelService.getTotalSpentByDate(travelPlanId, user?.id || 0, selectedDate, token || ""),
     enabled: !!selectedDate && !!token,
   });
 
@@ -99,7 +105,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
         clearErrors("expenseAmount");
       }
     }
-  }, [currentAmount, alreadySpent, dailyLimit, selectedDate, setError, clearErrors, isOverLimit]);
+  }, [currentAmount, alreadySpent, dailyLimit, selectedDate, setError, clearErrors, isOverLimit, plan]);
     
   const expenseMutation = useMutation({
     mutationFn: async (data: ExpenseForm) => {
@@ -127,6 +133,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
       queryClient.invalidateQueries({ queryKey: ["dailyExpenseTotal", travelPlanId, user?.id] });
       onSuccess();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
     const errorMessage = err.response?.data?.message || err.response?.data || err.message;
     alert("Failed to submit expense: " + (typeof errorMessage === 'object' ? JSON.stringify(errorMessage) : errorMessage));
@@ -190,7 +197,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
                   onChange={(e) => updateProofType(index, e.target.value)}
                 >
                   <option value="">Select Type</option>
-                  {expenseTypes?.map((type: any) => (
+                  {expenseTypes?.map((type: ExpenseType) => (
                     <option key={type.id} value={type.id}>{type.expenseProofTypeName}</option>
                   ))}
                 </select>

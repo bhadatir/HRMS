@@ -2,14 +2,38 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, CheckCircle, Edit } from "lucide-react";
+import { Calendar, Clock, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import GameBookingForm from "./GameBookingForm";
 import { useAuth } from "@/context/AuthContext";
 import { gameService } from "@/api/gameService";
 import { useQuery } from "@tanstack/react-query";
 
-export default function BookingCard({ booking, onStatusChange }: { booking: any, onStatusChange: () => void }) {
+type Booking = {
+    id: number;
+    gameBookingIsDeleted: boolean;
+    gameBookingStartTime: string;
+    gameBookingEndTime: string;
+    gameBookingStatusId: number;
+    gameTypeId: number;
+    gameTypeName: string;
+    gameSlotDuration: number;
+    employeeId: number;
+    employeeEmail: string;
+    gameBookingCreatedAt: string;
+    bookingParticipantResponses: BookingParticipantResponse[];
+}
+
+type BookingParticipantResponse = {
+    employeeEmail: string;
+}
+
+type GameBookingStatus = {
+    id: number;
+    gameBookingStatusName: string;
+}
+
+export default function BookingCard({ booking, onStatusChange }: { booking: Booking, onStatusChange: () => void }) {
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
     const { user, token } = useAuth();
 
@@ -38,7 +62,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
             <CardContent className="p-4 space-y-3">
             <div className="flex justify-between items-start">
                     <Badge variant="outline">Game Name: {booking.gameTypeName}</Badge>
-                    <Badge variant="outline" className="capitalize">{gameBookingStatusOptions.find((s: any) => s.id === booking.gameBookingStatusId)?.gameBookingStatusName || "Unknown Status"}</Badge>   
+                    <Badge variant="outline" className="capitalize">{gameBookingStatusOptions.find((s: GameBookingStatus) => s.id === booking.gameBookingStatusId)?.gameBookingStatusName || "Unknown Status"}</Badge>   
             </div>
             
             <div className="flex items-center gap-2 text-sm font-semibold">
@@ -60,7 +84,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: any,
                     <div className="text-[10px] text-slate-400">Host: {booking.employeeEmail}</div>
                     {booking?.bookingParticipantResponses?.length > 0 && (
                         <div className="text-[10px] text-slate-400 ">
-                            Participants: {booking.bookingParticipantResponses.map((p: any) => p.employeeEmail).join(", ")}
+                            Participants: {booking.bookingParticipantResponses.map((p: BookingParticipantResponse) => p.employeeEmail).join(", ")}
                         </div>
                     )}
                 </div>

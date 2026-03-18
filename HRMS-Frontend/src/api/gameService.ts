@@ -1,4 +1,3 @@
-import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 
 
@@ -14,6 +13,22 @@ const authHeader = (token: string) => ({
     "Content-Type": "application/json" 
   },
 });
+
+type GameBookingFormPayload = {
+    empId: number | undefined;
+    gameTypeId: number;
+    requestedSlotStartTime: string;
+    bookingParticipantsEmpId: number[];
+}
+
+type GameTypeInputs = {
+    gameName: string;
+    operatingStart: string;
+    operatingEnd: string;
+    gameSlotDuration: number;
+    gameMaxPlayerPerSlot: number;
+};
+
 
 export const gameService = {
 
@@ -47,12 +62,12 @@ export const gameService = {
         return res.data;
     },
 
-    addGameType: async (payload: any, token: string) => {
+    addGameType: async (payload: GameTypeInputs, token: string) => {
         const res = await api.post("/hr/gameType", payload, authHeader(token));
         return res.data;
     },
 
-    updateGameType: async (gameTypeId: number, payload: any, token: string) => {
+    updateGameType: async (gameTypeId: number, payload: GameTypeInputs, token: string) => {
         const res = await api.put(`/hr/gameType/${gameTypeId}`, payload, authHeader(token));
         return res.data;
     },
@@ -62,7 +77,7 @@ export const gameService = {
     return res.data;
     },
  
-    addBooking: async (payload: any, token: string) => {
+    addBooking: async (payload: GameBookingFormPayload, token: string) => {
         const res = await api.post("/game/", payload, authHeader(token));
         return res.data;
     },
@@ -114,7 +129,7 @@ export const gameService = {
         return res.data;
     },
 
-    updateBooking: async (bookingId: number, payload: any, token: string) => {
+    updateBooking: async (bookingId: number, payload: GameBookingFormPayload, token: string) => {
         const res = await api.put(`/game/booking/${bookingId}`, payload, authHeader(token));
         return res.data;
     },

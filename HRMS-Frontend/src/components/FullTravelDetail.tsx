@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
 import { travelService } from "../api/travelService";
 import { useMemo, useState } from "react";
@@ -10,7 +11,7 @@ import { Plane, Calendar, MapPin, FileText, CheckCircle, XCircle, ExternalLink, 
 import { Input } from "./ui/input";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 
-export default function TravelPlanDetails({travelPlan, onSuccess } : {travelPlan: number| null; onSuccess: () => void }) {
+export default function TravelPlanDetails({travelPlan } : {travelPlan: number| null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<"EXPENSES" | "DOCUMENTS">("EXPENSES");

@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { gameService } from "../api/gameService";
@@ -22,7 +21,7 @@ type GameTypeInputs = {
 export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGameTypeId?: number | null, onSuccess: () => void }) {
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<GameTypeInputs>(
+    const { register, handleSubmit, reset } = useForm<GameTypeInputs>(
         {
             defaultValues: {
                 gameName: "",
@@ -45,13 +44,14 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
                 gameMaxPlayerPerSlot: data.gameMaxPlayerPerSlot
             });
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
             alert("Failed to get game details: " + (error.response?.data || error.message)); }
     });
 
     useEffect(() => {
         if (editGameTypeId) getMutation.mutate();
-    }, [editGameTypeId]);
+    }, [editGameTypeId, getMutation]);
 
     const gameTypeMutation = useMutation({
         mutationFn: async (data: GameTypeInputs) => {
@@ -65,6 +65,7 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
           queryClient.invalidateQueries({ queryKey: ["allGameTypes"] });
           onSuccess();
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
             alert("Failed to update game type: " + (error.response?.data || error.message)); }
     });

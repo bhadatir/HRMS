@@ -13,6 +13,19 @@ const authHeader = (token: string) => ({
   },
 });
 
+type TravelPlanFormInputs = {
+  travelPlanName: string;
+  travelPlanDetails: string;
+  travelPlanFrom: string;
+  travelPlanTo: string;
+  travelPlanIsReturn: boolean;
+  travelPlanStartDate: string;
+  travelPlanEndDate: string;
+  fkTravelPlanHREmployeeId: number;
+  travelMaxExpenseAmountPerDay: number;
+  employeesInTravelPlanId: number[];
+}
+
 export const travelService = {
     
   getAllTravelPlans: async (searchTerm: string, page: number, size: number, token: string) => {
@@ -45,7 +58,7 @@ export const travelService = {
     return res.data;
   },
 
-  createTravelPlan: async (data: any, token: string) => {
+  createTravelPlan: async (data: TravelPlanFormInputs, token: string) => {
     const res = await api.post("/hr/travelPlan", data, authHeader(token));
     return res.data;
   },
@@ -55,7 +68,7 @@ export const travelService = {
     return res.data;
   },
 
-  updateTravelPlan: async (travelPlanId: number, data: any, token: string) => {
+  updateTravelPlan: async (travelPlanId: number, data: TravelPlanFormInputs, token: string) => {
     const res = await api.put(`/hr/travelPlan/${travelPlanId}`, data, authHeader(token));
     return res.data;
   },

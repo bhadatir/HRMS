@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 type LoginData = {
   email: string;
   password: string;
-};
+}
 
 export default function Login() {
   const navigate = useNavigate();

@@ -9,16 +9,21 @@ import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+type TagType = {
+  id: number;
+  travelDocsTypeName: string;
+}
 export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { travelPlanId: number, onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [docFile, setDocFile] = useState<File>(null as any);
   const [docType, setDocType] = useState<number>(1);
 
   const { data: employeeTravelPlanId, isError: employeeTravelPlanError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
-    queryFn: () => travelService.findEmployeeTravelPlanId(user?.id, travelPlanId, token || ""),
+    queryFn: () => travelService.findEmployeeTravelPlanId(user?.id || 0, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
@@ -49,6 +54,7 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
       alert("Travel document submitted!");
       onSuccess();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to submit travel document: " + (error.response?.data || error.message)); }
   });
@@ -73,7 +79,7 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
                 onChange={e => setDocType(Number(e.target.value))}
               >
                 <option value="">Select document type</option> 
-                {allTagTypes.map((type: any) => (
+                {allTagTypes.map((type: TagType) => (
                   <option key={type.id} value={type.id}>{type.travelDocsTypeName}</option>
                 ))}
               </select>

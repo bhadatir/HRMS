@@ -13,6 +13,18 @@ const authHeader = (token: string) => ({
   },
 });
 
+type Like = {
+  fkPostId: number | null;
+  fkLikeEmployeeId: number;
+  fkCommentId: number | null;
+}
+
+type Comment = {
+  commentContent: string;
+  fkPostId: number;
+  fkCommentEmployeeId: number;
+  parentCommentId: number | null;
+}
 export const postService = {
  
 
@@ -54,7 +66,7 @@ export const postService = {
     return res.data;
   },
 
-  addLike: async (payload: any, token: string) => {
+  addLike: async (payload: Like, token: string) => {
     const res = await api.post(`/post/like`, payload, authHeader(token));
     return res.data;
   },
@@ -79,7 +91,7 @@ export const postService = {
     return res.data;
   },
   
-  addComment: async (payload: any, token: string) => {
+  addComment: async (payload: Comment, token: string) => {
     const res = await api.post(`/post/comment`, payload, authHeader(token));
     return res.data;
   },  

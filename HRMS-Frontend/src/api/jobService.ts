@@ -13,6 +13,12 @@ const authHeader = (token: string) => ({
   },
 });
 
+type ShareJobFormInputs = {
+    fkJobShareEmployeeId: number;
+    fkJobId: number;
+    emails: string;
+}
+
 export const jobService = {
  
 
@@ -64,7 +70,7 @@ export const jobService = {
     return res.data;
   },
 
-  shareJob: async (data: any, token: string) => {
+  shareJob: async (data: ShareJobFormInputs, token: string) => {
     const res = await api.post("/job/shareJob", data, authHeader(token));
     return res.data;
   },

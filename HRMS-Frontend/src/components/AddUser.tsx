@@ -19,13 +19,28 @@ type AddUserFormInputs = {
   departmentId: number;
   positionId: number;
   roleId: number;
-};
+}
+
+type Role = {
+  id: number;
+  roleName: string;
+}
+
+type Department = {
+  id: number;
+  departmentName: string;
+}
+
+type Position = {
+  id: number;
+  positionName: string;
+}
 
 export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: string | null, onSuccess: () => void}) {
   const { token, user } = useAuth();
     const queryClient = useQueryClient();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<AddUserFormInputs>({
+  const { register, handleSubmit, reset } = useForm<AddUserFormInputs>({
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -77,6 +92,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
         roleId: data.roleId
       });
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       alert("Failed to get user details: " + (error.response?.data || error.message));
     }
@@ -84,7 +100,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
   
   useEffect(() => {
     if (editUserEmail) getMutation.mutate();
-  }, [editUserEmail]);
+  }, [editUserEmail, getMutation]);
 
   const registerMutation = useMutation({
     mutationFn: (data: AddUserFormInputs) => 
@@ -100,6 +116,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
         alert(editUserEmail ? "User updated successfully!" : "User created successfully!");
         onSuccess();
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (error: any) => {
         alert("Registration failed: " + (error.response?.data || error.message));
     }
@@ -169,7 +186,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
                 {...register("departmentId", { required: true })}
               >
                 <option value="">Select Department</option>
-                {allDepartments?.map((dept: any) => (
+                {allDepartments?.map((dept: Department) => (
                   <option key={dept.id} value={dept.id}>{dept.departmentName}</option>
                 ))}
               </select>
@@ -181,7 +198,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
                 {...register("roleId", { required: true })}
               >
                 <option value="">Select Role</option>
-                {allRoles?.map((role: any) => ((user?.roleName == "ADMIN" || (user?.roleName == "HR" && role.roleName != "ADMIN")) &&
+                {allRoles?.map((role: Role) => ((user?.roleName == "ADMIN" || (user?.roleName == "HR" && role.roleName != "ADMIN")) &&
                   <option key={role.id} value={role.id}>{role.roleName}</option>
                 ))}
               </select>
@@ -193,7 +210,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
                 {...register("positionId", { required: true })}
               >
                 <option value="">Select Position</option>
-                {allPositions?.map((position: any) => (
+                {allPositions?.map((position: Position) => (
                   <option key={position.id} value={position.id}>{position.positionName}</option>
                 ))}
               </select>
