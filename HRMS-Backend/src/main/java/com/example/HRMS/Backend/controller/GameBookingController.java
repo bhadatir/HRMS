@@ -30,8 +30,12 @@ public class GameBookingController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<GameBookingResponse>> showAllBookings(){
-        return ResponseEntity.ok(gameBookingService.findAllGameBooking());
+    public ResponseEntity<Page<GameBookingResponse>> showAllBookings(@RequestParam String searchTerm,
+                                                                     @RequestParam Long gameType,
+                                                                     @RequestParam Long gameBookingStatusId,
+                                                                     @RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "10") int size){
+        return ResponseEntity.ok(gameBookingService.findAllGameBooking(searchTerm, gameType, gameBookingStatusId, page, size));
     }
 
     @GetMapping("/empId/{empId}")
@@ -50,8 +54,8 @@ public class GameBookingController {
     }
 
     @PatchMapping("/status")
-    public ResponseEntity<String> changeGameBookingStatus(@RequestParam Long gameBookingId,@RequestParam Long statusId){
-        gameBookingService.updateGameBookingStatus(gameBookingId,statusId);
+    public ResponseEntity<String> changeGameBookingStatus(@RequestParam Long gameBookingId,@RequestParam Long statusId, @RequestParam String reason){
+        gameBookingService.updateGameBookingStatus(gameBookingId, statusId, reason);
         return ResponseEntity.ok("update status successfully");
     }
 

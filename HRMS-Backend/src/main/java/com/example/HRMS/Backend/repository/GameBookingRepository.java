@@ -33,6 +33,7 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
                 "OR CAST(b.gameBookingStartTime AS string) LIKE (concat('%', :searchTerm, '%')) " +
                 "OR CAST(b.gameBookingEndTime AS string) LIKE (concat('%', :searchTerm, '%')) " +
                 "OR CAST(b.gameBookingCreatedAt AS string) LIKE (concat('%', :searchTerm, '%')) " +
+                "OR lower(b.fkHostEmployee.employeeEmail) LIKE lower(concat('%', :searchTerm, '%')) " +
                 "OR lower(b.fkHostEmployee.employeeFirstName) LIKE lower(concat('%', :searchTerm, '%'))) " +
                 "ORDER BY b.gameBookingStartTime DESC")
     Page<GameBooking> findBookingsByUserAndSearch(@Param("empId") Long empId,
@@ -40,6 +41,24 @@ public interface GameBookingRepository extends JpaRepository<GameBooking, Long> 
                                                       Long gameType,
                                                       Long gameBookingStatusId,
                                                       Pageable pageable);
+    @Query("SELECT DISTINCT b FROM GameBooking b " +
+            "WHERE (:gameType = 0 " +
+            "OR :gameType = b.fkGameType.id " +
+            ") " +
+            "AND (:gameBookingStatusId = 0 " +
+            "OR :gameBookingStatusId = b.fkGameBookingStatus.id " +
+            ") " +
+            "AND b.gameBookingIsDeleted = false " +
+            "AND (CAST(b.id AS string) LIKE concat('%', :searchTerm, '%') " +
+            "OR lower(b.fkGameType.gameName) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR CAST(b.gameBookingStartTime AS string) LIKE (concat('%', :searchTerm, '%')) " +
+            "OR CAST(b.gameBookingEndTime AS string) LIKE (concat('%', :searchTerm, '%')) " +
+            "OR CAST(b.gameBookingCreatedAt AS string) LIKE (concat('%', :searchTerm, '%')) " +
+            "OR lower(b.fkHostEmployee.employeeEmail) LIKE lower(concat('%', :searchTerm, '%')) " +
+            "OR lower(b.fkHostEmployee.employeeFirstName) LIKE lower(concat('%', :searchTerm, '%'))) " +
+            "ORDER BY b.gameBookingStartTime DESC")
+    Page<GameBooking> findBookingsWithSearch(String searchTerm, Long gameType, Long gameBookingStatusId, Pageable pageable);
+
 
     @Query("SELECT DISTINCT b FROM GameBooking b " +
             "LEFT JOIN BookingParticipant bp ON bp.fkGameBooking.id = b.id " +

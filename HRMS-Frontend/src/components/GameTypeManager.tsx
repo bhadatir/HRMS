@@ -69,7 +69,7 @@ return (
                 </CardTitle>
                 <CardDescription className="mt-1">List of all game types</CardDescription>
             </div>
-            {user?.roleName === "HR" &&
+            {user?.roleName === "HR" || user?.roleName === "ADMIN" &&
                 <div className="gameType">
                     <Button variant="outline" onClick={() => setShowForm(!showForm)} className="gap-2">
                         <Plus size={18}/> Game Type
@@ -86,7 +86,7 @@ return (
                     <TableHead>Operating Hours</TableHead>
                     <TableHead>Slot Size</TableHead>
                     <TableHead>Max Players</TableHead>
-                    {user?.roleName === "HR" &&
+                    {user?.roleName === "HR" || user?.roleName === "ADMIN" &&
                     <TableHead>Actions</TableHead>
                     }
                 </TableRow>
@@ -98,7 +98,7 @@ return (
                         <TableCell>{g.operatingStart} - {g.operatingEnd}</TableCell>
                         <TableCell>{g.gameSlotDuration} Mins</TableCell>
                         <TableCell>{g.gameMaxPlayerPerSlot} per slot</TableCell>
-                        {user?.roleName === "HR" &&
+                        {user?.roleName === "HR" || user?.roleName === "ADMIN" &&
                         <TableCell className="text-right">
                             <div className="gameType">
                                 <Button variant="ghost" size="sm" onClick={() => {

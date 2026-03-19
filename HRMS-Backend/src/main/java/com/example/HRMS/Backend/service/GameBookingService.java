@@ -12,11 +12,11 @@ public interface GameBookingService {
 
     String attemptBooking(GameBookingRequest gameBookingRequest);
 
-    List<GameBookingResponse> findAllGameBooking();
+    Page<GameBookingResponse> findAllGameBooking(String searchTerm, Long gameType, Long gameBookingStatusId, int page, int size);
 
     void addToWaitlist(Long empId, Long gameId, LocalDateTime slot, LocalDateTime end, Boolean isFirstGame, List<Long> bookingParticipantsEmpId);
 
-    void updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId);
+    void updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId, String reason);
 
     void updateWaitingList(GameType gameType, LocalDateTime targetedSloatTime);
 

@@ -78,7 +78,7 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
             </CardTitle>
         </CardHeader>
         <CardContent className="space-y-400">
-        { user?.roleName === "HR" && (
+        { user?.roleName === "HR" || user?.roleName === "ADMIN" && (
             <form onSubmit={handleSubmit((data) => gameTypeMutation.mutate(data))} 
                 className="bg-white p-4 rounded-xl border items-end">
                 <div className="space-y-1">

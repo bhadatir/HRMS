@@ -162,6 +162,26 @@ export function useFindGameBookingByUserId(searchTerm: string, gameType: number,
   };
 } 
 
+export function useFindGameBookings(searchTerm: string, gameType: number, gameBookingStatusId: number, token: string) {
+  const debouncedSearch = useAppDebounce(searchTerm);
+  const { user } = useAuth();
+
+  const query = useInfiniteQuery({
+    queryKey: ["Bookings", debouncedSearch, gameType, gameBookingStatusId],
+    queryFn: ({ pageParam = 0 }) => 
+      gameService.showAllBookings(debouncedSearch, gameType, gameBookingStatusId, pageParam, 4, token || ""),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
+    enabled: !!token && !!user?.id,
+    placeholderData: (previousData) => previousData,
+  });
+
+  return {
+    ...query,
+    debouncedSearch,
+  };
+} 
+
 export function useGetUserNotifications(searchTerm: string, token: string) {
   const debouncedSearch = useAppDebounce(searchTerm);
   const { user } = useAuth();

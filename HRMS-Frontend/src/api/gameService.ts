@@ -82,8 +82,8 @@ export const gameService = {
         return res.data;
     },
     
-    showAllBookings: async (token: string) => {
-        const res = await api.get("/game/", authHeader(token));
+    showAllBookings: async (searchTerm: string, gameType: number, gameBookingStatusId: number, page: number, size: number, token: string) => {
+        const res = await api.get(`/game/?searchTerm=${searchTerm}&gameType=${gameType}&gameBookingStatusId=${gameBookingStatusId}&page=${page}&size=${size}`, authHeader(token));
         return res.data;
     },
 
@@ -124,8 +124,8 @@ export const gameService = {
         return res.data;
     },
     
-    updateBookingStatus: async (bookingId: number, statusId: number, token: string) => {
-        const res = await api.patch(`/game/status?gameBookingId=${bookingId}&statusId=${statusId}`, null, authHeader(token));
+    updateBookingStatus: async (bookingId: number, statusId: number, reason: string, token: string) => {
+        const res = await api.patch(`/game/status?gameBookingId=${bookingId}&statusId=${statusId}&reason=${reason}`, null, authHeader(token));
         return res.data;
     },
 

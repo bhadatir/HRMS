@@ -12,12 +12,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +52,12 @@ public class GameBookingServiceImpl implements GameBookingService {
 
     private final TravelPlanRepository travelPlanRepository;
 
+    public Employee getLoginUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return employeeRepository.findEmployeeByEmployeeEmail(email)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
 
     @Override
     @Transactional
@@ -202,8 +211,19 @@ public class GameBookingServiceImpl implements GameBookingService {
     //update game booking status to cancel (after get sloat I require cancel booking so this method do that)
     @Override
     @Transactional
-    public void updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId) {
+    public void updateGameBookingStatus(Long pkGameBookingId, Long fkGameStatusId, String reason) {
+
         GameBooking gameBooking = gameBookingRepository.findGameBookingById(pkGameBookingId);
+
+        Employee employee = getLoginUser();
+        boolean isHR = "HR".equals(employee.getFkRole().getRoleName());
+        boolean isAdmin = "ADMIN".equals(employee.getFkRole().getRoleName());
+        boolean isHost = Objects.equals(employee.getId(), gameBooking.getFkHostEmployee().getId());
+
+        if (!(isHR || isAdmin || isHost)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied: you can not update status.");
+        }
+
         if (gameBooking.getFkGameBookingStatus().getId() == 2)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "played booking cannot be cancel.");
         else if (gameBooking.getFkGameBookingStatus().getId() == 3)
@@ -211,6 +231,7 @@ public class GameBookingServiceImpl implements GameBookingService {
 
         GameBookingStatus gameBookingStatus = gameBookingStatusRepository.findGameBookingStatusById(fkGameStatusId);
         gameBooking.setFkGameBookingStatus(gameBookingStatus);
+        gameBooking.setReasonForStatusChange(reason);
         gameBookingRepository.save(gameBooking);
 
         List<BookingParticipant> bookingParticipants = bookingParticipantRepository.findByFkGameBooking_Id(pkGameBookingId);
@@ -356,21 +377,20 @@ public class GameBookingServiceImpl implements GameBookingService {
     }
 
     @Override
-    public List<GameBookingResponse> findAllGameBooking() {
-        List<GameBooking> gameBookings = gameBookingRepository.findAll();
-        List<GameBookingResponse> gameBookingResponses = new ArrayList<>();
-        for (GameBooking gameBooking : gameBookings) {
-            GameBookingResponse gameBookingResponse = modelMapper.map(gameBooking,
-                    GameBookingResponse.class);
+    public Page<GameBookingResponse> findAllGameBooking(String searchTerm, Long gameType, Long gameBookingStatusId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
 
-            List<BookingParticipantResponse> bookingParticipantResponses =
+        Page<GameBooking> gameBookings = gameBookingRepository.findBookingsWithSearch(searchTerm, gameType, gameBookingStatusId, pageable);
+
+        return gameBookings.map(gameBooking -> {
+            GameBookingResponse response = modelMapper.map(gameBooking, GameBookingResponse.class);
+
+            List<BookingParticipantResponse> participants =
                     bookingParticipantRepository.findAllByGameBookingId(gameBooking.getId());
 
-            gameBookingResponse.setBookingParticipantResponses(bookingParticipantResponses);
-
-            gameBookingResponses.add(gameBookingResponse);
-        }
-        return gameBookingResponses;
+            response.setBookingParticipantResponses(participants);
+            return response;
+        });
     }
 
     @Override

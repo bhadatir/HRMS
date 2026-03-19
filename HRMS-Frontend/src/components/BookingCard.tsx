@@ -33,7 +33,7 @@ type GameBookingStatus = {
     gameBookingStatusName: string;
 }
 
-export default function BookingCard({ booking, onStatusChange }: { booking: Booking, onStatusChange: () => void }) {
+export default function BookingCard({ booking, onStatusChange }: { booking: Booking, onStatusChange: (reason: string) => void }) {
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
     const { user, token } = useAuth();
 
@@ -89,13 +89,16 @@ export default function BookingCard({ booking, onStatusChange }: { booking: Book
                     )}
                 </div>
                 
-                {booking.gameBookingStatusId === 1 && booking.employeeId === user?.id 
+                {booking.gameBookingStatusId === 1 && (booking.employeeId === user?.id || user?.roleName === "Admin" || user?.roleName === "HR")
                     && !booking.gameBookingIsDeleted && new Date(booking.gameBookingStartTime) > new Date() ? (
                     <div className="flex gap-2">
                         <Button size="sm" variant="outline" className="h-7 text-red-600" 
                         onClick={() => {
-                            if (confirm("Are you sure you want to cancel this booking?")) {
-                                onStatusChange();
+                            const reason = window.prompt("Please enter a reason for cancellation:", "")?.trim();
+                            if (reason) {                                
+                                onStatusChange(`${reason} (Updated by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`);
+                            }else {
+                                alert("Cancellation reason is required.");
                             }
                         }}>
                             <CheckCircle size={14} className="mr-1"/> Cancel

@@ -36,6 +36,9 @@ public class GameBooking {
     @JoinColumn(name = "fk_game_booking_status_id", nullable = false)
     private GameBookingStatus fkGameBookingStatus;
 
+    @Column(name = "reason_for_status_change")
+    private String reasonForStatusChange;
+
     @NotNull(message = "game type id is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_game_type_id", nullable = false)

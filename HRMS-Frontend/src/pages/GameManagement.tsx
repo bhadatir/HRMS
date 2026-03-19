@@ -17,7 +17,7 @@ import WaitingList from "@/components/WaitingList";
 import { Input } from "@/components/ui/input";
 import { useInView } from "react-intersection-observer";
 import { useAppDebounce } from "../hooks/useAppDebounce";
-import { useFindGameBookingByUserId } from "@/hooks/useInfinite";
+import { useFindGameBookingByUserId, useFindGameBookings } from "@/hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
 
@@ -71,15 +71,17 @@ export default function GameManagement() {
     const [showNotification, setShowNotification] = useState(false);
     const [showGameIntrestForm, setShowGameIntrestForm] = useState(false);
     const [showWaitingList, setShowWaitingList] = useState(false);
-    const [viewMode, setViewMode] = useState<"My Bookings" | "Waiting List">("My Bookings");
+    const [viewMode, setViewMode] = useState<"My Bookings" | "Waiting List" | "All Bookings">("My Bookings");
     const [waitingListId, setWaitingListId] = useState<number>(0);
     const [bookingSearchTerm, setBookingSearchTerm] = useState(() => {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get("gameBookingId") || "";
     });
     const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
+    const [allBookingsSearchTerm, setAllBookingsSearchTerm] = useState("");
     const debouncedBookingSearchTerm = useAppDebounce(bookingSearchTerm);
     const debouncedWaitingListSearchTerm = useAppDebounce(waitingListSearchTerm);
+    const debouncedAllBookingsSearchTerm = useAppDebounce(allBookingsSearchTerm);
 
     const { data: gameTypes = [], isError: gameTypesOnError } = useQuery({
         queryKey: ["gameTypes"],
@@ -103,28 +105,43 @@ export default function GameManagement() {
 
     const {
         data: bookingsByEmpId,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
+        fetchNextPage: fetchNextPageByEmpId,
+        hasNextPage: hasNextPageByEmpId,
+        isFetchingNextPage: isFetchingNextPageByEmpId,
         isError: bookingsByEmpIdOnError,
     } = useFindGameBookingByUserId(bookingSearchTerm, gameType, gameBookingStatusId, token || "");
     const filteredBookings = bookingsByEmpId?.pages.flatMap(page => page.content) || [];
+
+    const {
+        data: bookings,
+        fetchNextPage: fetchNextPageBookings,
+        hasNextPage: hasNextPageBookings,
+        isFetchingNextPage: isFetchingNextPageBookings,
+        isError: bookingsOnError,
+    } = useFindGameBookings(allBookingsSearchTerm, gameType, gameBookingStatusId, token || "");
+    const filteredAllBookings = bookings?.pages.flatMap(page => page.content) || [];
     
     const { ref, inView } = useInView();
     useEffect(() => {
-        if (inView && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
+        if (inView && hasNextPageByEmpId && !isFetchingNextPageByEmpId) {
+        fetchNextPageByEmpId();
         }
-    }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+    }, [inView, hasNextPageByEmpId, isFetchingNextPageByEmpId, fetchNextPageByEmpId]);
 
-    if(gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError) {
-        alert("Failed to load data: " + (gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError));
+    useEffect(() => {
+        if (inView && hasNextPageBookings && !isFetchingNextPageBookings) {
+        fetchNextPageBookings();
+        }
+    }, [inView, hasNextPageBookings, isFetchingNextPageBookings, fetchNextPageBookings]);
+
+    if( bookingsOnError || gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError) {
+        alert("Failed to load data: " + (bookingsOnError || gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError));
     }
 
     const statusMutation = useMutation({
-        mutationFn: ({ id, status }: { id: number, status: number }) => 
-            gameService.updateBookingStatus(id, status, token!),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings", user?.id] }),
+        mutationFn: ({ id, status, reason }: { id: number, status: number, reason: string }) => 
+            gameService.updateBookingStatus(id, status, reason, token!),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings"] }),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
             alert("Failed to update booking status: " + (error.response?.data || error.message)); }
@@ -179,6 +196,8 @@ export default function GameManagement() {
                         <Badge variant="outline">{filteredBookings.length} results</Badge>
                         ) : (debouncedWaitingListSearchTerm && debouncedWaitingListSearchTerm.length > 0) ? (
                         <Badge variant="outline">{filteredWaitingList.length} results</Badge>
+                        ) : (debouncedAllBookingsSearchTerm && debouncedAllBookingsSearchTerm.length > 0) ? (
+                        <Badge variant="outline">{filteredAllBookings.length} results</Badge>
                         ) : gameBookingStatusId ? (
                         <Badge variant="outline">{bookingsByEmpId?.pages[0]?.totalElements} results</Badge>
                         ) : gameType ? ( 
@@ -295,7 +314,7 @@ export default function GameManagement() {
                         
                         {upcomingBookings.map((b: Booking) => (
                                 !b.gameBookingIsDeleted && b.gameBookingStatusId === 1 && (
-                                    <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />
+                                    <BookingCard key={b.id} booking={b} onStatusChange={(reason) => statusMutation.mutate({ id: b.id, status: 3, reason})} />
                                 )))
                         }
                         {upcomingBookings.length === 0 && (
@@ -318,6 +337,12 @@ export default function GameManagement() {
                                     setViewMode("Waiting List");
                                     setBookingSearchTerm("");
                                 }}> Waiting List</Button>
+                            <Button className={viewMode === "All Bookings" ? "rounded-md border text-gray-900" : "rounded-md text-gray-300"}
+                                size="sm"
+                                onClick={()=>{
+                                    setViewMode("All Bookings");
+                                    setBookingSearchTerm("");
+                                }}> All Bookings</Button>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="relative">
@@ -325,18 +350,20 @@ export default function GameManagement() {
                                 <Input 
                                     placeholder={`Search ${viewMode.toLowerCase()}...`} 
                                     className="pl-9"
-                                    value={viewMode === "My Bookings" ? bookingSearchTerm : waitingListSearchTerm}
+                                    value={viewMode === "My Bookings" ? bookingSearchTerm : viewMode === "Waiting List" ? waitingListSearchTerm : allBookingsSearchTerm}
                                     onChange={(e) => {
                                     if(viewMode === "My Bookings") {
                                         setBookingSearchTerm(e.target.value);
-                                    } else {
+                                    } else if(viewMode === "Waiting List") {
                                         setWaitingListSearchTerm(e.target.value);
+                                    } else {
+                                        setAllBookingsSearchTerm(e.target.value);
                                     }
                                     }}
                                     autoFocus
                                 />
                             </div>
-                            {viewMode === "My Bookings" && <select className="border rounded-md px-2 py-1 text-sm" value={gameBookingStatusId || ""} 
+                            {viewMode === "My Bookings" || viewMode === "All Bookings" && <select className="border rounded-md px-2 py-1 text-sm" value={gameBookingStatusId || ""} 
                                 onChange={(e) => setgameBookingStatusId(Number(e.target.value))}>
                                 <option value="0">All Statuses</option>
                                 {gameBookingStatusOptions.map((g: GameBookingStatus) => <option key={g.id} value={g.id}>{g.gameBookingStatusName}</option>)}
@@ -351,7 +378,7 @@ export default function GameManagement() {
                         {filteredBookings && filteredBookings.length > 0 ? (
                             <>                                
                                 {filteredBookings.map((b: Booking) => 
-                                    <BookingCard key={b.id} booking={b} onStatusChange={() => statusMutation.mutate({ id: b.id, status: 3 })} />        
+                                    <BookingCard key={b.id} booking={b} onStatusChange={(reason) => statusMutation.mutate({ id: b.id, status: 3, reason })} />        
                                 )}
                             </>
                         ) : (
@@ -359,7 +386,7 @@ export default function GameManagement() {
                         )}
                         </div>
                         <div ref={ref} className="h-10 flex justify-center items-center">
-                            { isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+                            { isFetchingNextPageByEmpId ? <p className="text-xs">Loading more...</p> : null}
                         </div>
                     </div>
                     )}
@@ -433,6 +460,26 @@ export default function GameManagement() {
                             ) : (
                                 <p className="text-slate-500 italic">You are not on any waiting list.</p>
                             )}
+                        </div>
+                    </div>
+                    )}
+
+                    {/* all bookings  */}
+                    {viewMode === "All Bookings" && (user?.roleName === "Admin" || user?.roleName === "HR") && (
+                    <div className="mt-2">
+                        <div className="game grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
+                        {filteredAllBookings && filteredAllBookings.length > 0 ? (
+                            <>                                
+                                {filteredAllBookings.map((b: Booking) => 
+                                    <BookingCard key={b.id} booking={b} onStatusChange={(reason) => statusMutation.mutate({ id: b.id, status: 3, reason })} />        
+                                )}
+                            </>
+                        ) : (
+                            <p className="text-slate-500 italic">No bookings yet.</p>
+                        )}
+                        </div>
+                        <div ref={ref} className="h-10 flex justify-center items-center">
+                            { isFetchingNextPageBookings ? <p className="text-xs">Loading more...</p> : null}
                         </div>
                     </div>
                     )}
