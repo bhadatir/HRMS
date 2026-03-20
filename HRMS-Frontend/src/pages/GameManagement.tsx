@@ -75,10 +75,14 @@ export default function GameManagement() {
     const [waitingListId, setWaitingListId] = useState<number>(0);
     const [bookingSearchTerm, setBookingSearchTerm] = useState(() => {
         const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get("gameBookingId") || "";
+        return !(user?.roleName === "HR" || user?.roleName === "ADMIN") ? urlParams.get("gameBookingId") || "" : "";
     });
     const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");
-    const [allBookingsSearchTerm, setAllBookingsSearchTerm] = useState("");
+    const [allBookingsSearchTerm, setAllBookingsSearchTerm] = useState(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (user?.roleName === "HR" || user?.roleName === "ADMIN"){setViewMode("All Bookings");}
+        return (user?.roleName === "HR" || user?.roleName === "ADMIN") ? urlParams.get("gameBookingId") || "" : "";
+    });
     const debouncedBookingSearchTerm = useAppDebounce(bookingSearchTerm);
     const debouncedWaitingListSearchTerm = useAppDebounce(waitingListSearchTerm);
     const debouncedAllBookingsSearchTerm = useAppDebounce(allBookingsSearchTerm);
@@ -337,12 +341,12 @@ export default function GameManagement() {
                                     setViewMode("Waiting List");
                                     setBookingSearchTerm("");
                                 }}> Waiting List</Button>
-                            <Button className={viewMode === "All Bookings" ? "rounded-md border text-gray-900" : "rounded-md text-gray-300"}
+                            {(user?.roleName === "HR" || user?.roleName === "ADMIN") && <Button className={viewMode === "All Bookings" ? "rounded-md border text-gray-900" : "rounded-md text-gray-300"}
                                 size="sm"
                                 onClick={()=>{
                                     setViewMode("All Bookings");
                                     setBookingSearchTerm("");
-                                }}> All Bookings</Button>
+                                }}> All Bookings</Button>}
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="relative">
