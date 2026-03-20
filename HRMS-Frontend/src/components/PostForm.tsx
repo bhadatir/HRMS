@@ -64,7 +64,8 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
     if (editPostId) {
       getPostMutation.mutate();
     }
-  }, [editPostId, getPostMutation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editPostId]);
 
   const postMutation = useMutation({
     mutationFn: async (data: PostFormInputs) => {

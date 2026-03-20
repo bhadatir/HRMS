@@ -108,10 +108,10 @@ const getMutation = useMutation({
 
   useEffect(() => {
     if (editTravelPlanId) getMutation.mutate();
-  }, [editTravelPlanId, getMutation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editTravelPlanId]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/incompatible-library
+  useEffect(() => {     
     if (watch("travelPlanEndDate") && watch("travelPlanStartDate") > watch("travelPlanEndDate")) {
       setValue("travelPlanEndDate", "");
       setSelectedEmployees([]);

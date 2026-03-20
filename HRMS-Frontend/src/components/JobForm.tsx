@@ -60,7 +60,8 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
     if (editJobId) {
       getJobMutation.mutate();
     }
-  }, [editJobId, getJobMutation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editJobId]);
 
   const jobMutation = useMutation({
     mutationFn: async (data: JobFormInputs) => {
