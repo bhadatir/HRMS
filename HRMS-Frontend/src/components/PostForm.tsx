@@ -158,7 +158,6 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
         <Button 
           type="submit"
           className="w-full text-black"
-          // eslint-disable-next-line react-hooks/incompatible-library
           disabled={postMutation.isPending || (!editPostId && !watch("postTitle") || !watch("postContent") || !watch("fkPostVisibilityId") || !watch("file"))}
         >
           {postMutation.isPending ? "Processing..." : editPostId ? "Update Post" : "Post to Feed"}

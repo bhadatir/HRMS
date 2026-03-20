@@ -13,6 +13,7 @@ public class PostRequest {
     @NotNull(message = "post title is required")
     private String postTitle;
 
+    @Size(max = 9999)
     @NotNull(message = "post content is required")
     private String postContent;
 

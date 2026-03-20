@@ -37,6 +37,7 @@ export default function PostManagement() {
   const { token, user, unreadNotifications } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  const [showFullContent, setShowFullContent] = useState(false);
   
   const getInitialSearchTerm = () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -231,11 +232,24 @@ export default function PostManagement() {
                     </CardHeader>
                     
                     <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm text-slate-600 whitespace-pre-wrap">{post.postContent}</p>              
-                        <span className="text-[10px] text-slate-400">{post.postCreatedAt?.split("T")[0]}</span>                          
+                    <div>
+                    {post.postContent.length < 100 ? (
+                      <p className="text-sm text-slate-600 whitespace-pre-wrap">{post.postContent}</p>
+                    ) : (
+                      <div>
+                        {showFullContent ? (
+                          <p className="text-sm text-slate-600">{post.postContent}</p>
+                        ) : (
+                          <p className="text-sm text-slate-600">{post.postContent.substring(0, 200)}...</p>
+                        )}
+                        <p className="text-[12px] text-blue-600 underline cursor-pointer" onClick={() => {
+                          setShowFullContent(!showFullContent);
+                        }}>{showFullContent ? "Show Less" : "Read More"}</p>
                       </div>
+                    )}
+                    </div>
                       {post.postContentUrl && (
+                        <div className="relative">
                         <div className="rounded-lg overflow-hidden border">
                           <img 
                             src={post.postContentUrl} 
@@ -243,8 +257,11 @@ export default function PostManagement() {
                             className="w-full object-cover max-h-96"
                           />
                         </div>
+                        <span className="text-[10px] text-slate-400 absolute right-0 m-2">{post.postCreatedAt?.split("T")[0]}</span>   
+                        </div>
                       )}
-                      <div className="flex items-center justify-between pt-4 border-t">
+                      <hr className="border-slate-200 mt-8" />
+                      <div className="flex items-center justify-between pt-4">
                         <div className="flex items-center gap-6">
                           <div className="flex items-center gap-1 text-slate-500 cursor-pointer transition-colors">
                             <LikeButton postId={post.id} />

@@ -149,7 +149,6 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
             {editJobId ? "Upload new JD to replace existing file (Optional)" : "Upload job description (Required)"}
           </p>
           {
-          // eslint-disable-next-line react-hooks/incompatible-library
           watch("file") && <p className="text-xs text-blue-600 font-medium">{watch("file")?.[0]?.name}</p>}
         </div>
 

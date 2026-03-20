@@ -23,6 +23,7 @@ public class Post {
     @Column(name = "post_title", nullable = false)
     private String postTitle;
 
+    @Size(max = 9999)
     @NotNull(message = "post content is required")
     @Column(name = "post_content", nullable = false)
     private String postContent;
