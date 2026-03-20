@@ -100,7 +100,8 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
   
   useEffect(() => {
     if (editUserEmail) getMutation.mutate();
-  }, [editUserEmail, getMutation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editUserEmail]);
 
   const registerMutation = useMutation({
     mutationFn: (data: AddUserFormInputs) => 
