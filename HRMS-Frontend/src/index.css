@@ -55,6 +55,20 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+*::-webkit-scrollbar {
+  width: 5px !important;
+  height: 5px !important;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgb(159, 159, 173) !important;
+  border-radius: 10px !important;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
