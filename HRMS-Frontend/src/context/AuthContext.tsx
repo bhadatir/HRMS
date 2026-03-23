@@ -70,6 +70,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useMutation({
     mutationFn: () => apiService.logout(token || ""),
     onSuccess: () => {
+      localStorage.clear();
       localStorage.removeItem("token");
       localStorage.removeItem("email");
       localStorage.removeItem("isFirstLogin");
@@ -124,7 +125,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // localStorage.clear();
+      localStorage.clear();
       logout();
     };
 
@@ -132,6 +133,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

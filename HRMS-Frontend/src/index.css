@@ -69,6 +69,13 @@
   border-radius: 10px !important;
 }
 
+.data-\[selected-single\=true\]\:text-primary-foreground {
+    &[data-selected-single="true"] {
+        color: oklch(0.39 0.23 266.92);
+        background-color: rgb(208, 207, 238) !important;
+    }
+}
+
 a {
   font-weight: 500;
   color: #646cff;
