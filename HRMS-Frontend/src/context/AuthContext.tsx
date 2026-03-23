@@ -123,6 +123,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }, [logoutMutation]);
 
   useEffect(() => {
+    const handleBeforeUnload = () => {
+      // localStorage.clear();
+      logout();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  useEffect(() => {
     if (userError || notificationsError) {
       alert("Session expired or failed to load user data. Please log in again.");
       logout(); 
