@@ -6,6 +6,8 @@ import com.example.HRMS.Backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +25,13 @@ public class UserController {
 
     @GetMapping("/email")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(authService.getEmployeeByEmail(email));
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<EmployeeResponse> getEmployee() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
         return ResponseEntity.ok(authService.getEmployeeByEmail(email));
     }
 

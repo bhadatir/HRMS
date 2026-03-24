@@ -43,4 +43,7 @@ public class EmployeeResponse {
 
         private Long  managerEmployeeId;
         private String  managerEmployeeEmail;
+
+
+        private String isFirstLogin = "";
 }

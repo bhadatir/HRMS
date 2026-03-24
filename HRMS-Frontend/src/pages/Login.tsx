@@ -14,14 +14,20 @@ type LoginData = {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({ email: "", password: "" });
+
+  if (isAuthenticated) {
+    navigate("/dashboard");
+  }
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginData) => apiService.login(data),
     onSuccess: (data) => {
-      login(data.accessToken, formData.email, data.isFirstLogin);
+      localStorage.setItem("token", data.accessToken);
+      login(data.isFirstLogin);
       navigate("/dashboard");
+      window.location.reload();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

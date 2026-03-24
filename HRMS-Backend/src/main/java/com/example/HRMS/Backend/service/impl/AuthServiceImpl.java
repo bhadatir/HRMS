@@ -221,7 +221,13 @@ public class AuthServiceImpl implements AuthService {
     public EmployeeResponse getEmployeeByEmail(String email) {
         Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email)
                 .orElseThrow( () -> new RuntimeException("employee not found"));
-        return modelMapper.map(employee,EmployeeResponse.class);
+        EmployeeResponse employeeResponse = modelMapper.map(employee,EmployeeResponse.class);
+        String isFirstLogin = "no";
+        if(employee.getLastLoginAt() == null){
+            isFirstLogin="yes";
+        }
+        employeeResponse.setIsFirstLogin(isFirstLogin);
+        return employeeResponse;
     }
 
     @Override

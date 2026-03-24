@@ -56,13 +56,17 @@ type WaitingList = {
 };
 
 export default function Dashboard() {
-  const { setIsFirstLogin, token, isFirstLogin, user, unreadNotifications } = useAuth();
+  const { setIsFirstLogin, token, isFirstLogin, user, unreadNotifications, isAuthenticated } = useAuth();
   const [showNotification, setShowNotification] = useState(false);
   const [newPassword, setNewPassword] = useState(""); 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const navigate = useNavigate();
+
+  if (!isAuthenticated) {
+    navigate("/login");
+  }
 
   const profilePicMutation = useMutation({
     mutationFn: async (file: File) => {

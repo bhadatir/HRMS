@@ -89,6 +89,11 @@ export const apiService = {
     return res.data;
   },
 
+  getUser: async (token: string) => {
+    const res = await api.get("/user/", authHeader(token));
+    return res.data;
+  },
+
   getAllRoles: async (token: string) => {
     const res = await api.get("/admin/allRoles", authHeader(token));
     return res.data;

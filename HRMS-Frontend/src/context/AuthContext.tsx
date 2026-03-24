@@ -33,7 +33,7 @@ type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (token: string, email: string, isFirstLogin: string) => void;
+  login: (isFirstLogin: string) => void;
   logout: () => void;
   unreadNotifications: number;
   setUnreadNotifications: (count: number) => void;
@@ -44,22 +44,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
 
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
-  const [email, setEmail] = useState<string | null>(() => localStorage.getItem("email"));
-  const [isFirstLogin, setIsFirstLogin] = useState<string>(() => {
-    const isFirstLogin = localStorage.getItem("isFirstLogin");
-    return isFirstLogin==="yes" ? "yes" : "no";
-  });
-
+  const token = localStorage.getItem("token");
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
-
   const queryClient = useQueryClient();
 
   const { data: userData, isLoading, isError: userError } = useQuery({
-    queryKey: ["user", email],
-    queryFn: () => apiService.getUserByEmail(email!, token!),
-    enabled: !!token && !!email,
+    queryKey: ["user"],
+    queryFn: () => apiService.getUser(token!),
+    enabled: !!token,
   });
+  const [isFirstLogin, setIsFirstLogin] = useState<string>(userData?.isFirstLogin || "no");
 
   const { data: notifications, isError: notificationsError } = useQuery({
     queryKey: ["notifications"],
@@ -72,12 +66,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: () => {
       localStorage.clear();
       localStorage.removeItem("token");
-      localStorage.removeItem("email");
-      localStorage.removeItem("isFirstLogin");
       queryClient.clear();
-      setToken(null);
-      setEmail(null);
       setUnreadNotifications(0);
+      setIsFirstLogin("no");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -110,12 +101,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [userData?.id, token, queryClient]);
 
-  const login = (newToken: string, newEmail: string, isFirstLogin: string) => {
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("email", newEmail);
-    localStorage.setItem("isFirstLogin", isFirstLogin);
-    setToken(newToken);
-    setEmail(newEmail);
+  const login = (isFirstLogin: string) => {
     setIsFirstLogin(isFirstLogin);
   };
 
@@ -124,22 +110,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }, [logoutMutation]);
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      localStorage.clear();
-      logout();
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     if (userError || notificationsError) {
-      alert("Session expired or failed to load user data. Please log in again.");
       logout(); 
+      localStorage.removeItem("token");
+      alert("Session expired or failed to load user data. Please log in again.");
     }
   }, [userError, notificationsError, logout]);
 
@@ -150,7 +124,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         setIsFirstLogin,
         isFirstLogin,
         user: userData || null, 
-        isAuthenticated: !!token, 
+        isAuthenticated: !!userData, 
         isLoading,
         login, 
         logout,
