@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useToast } from "@/context/ToastContext";
 
 type ShareJobFormInputs = {
     fkJobShareEmployeeId: number;
@@ -15,6 +16,7 @@ type ShareJobFormInputs = {
 
 export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSuccess: () => void }) {
   const { token, user } = useAuth();
+  const toast = useToast();
   
   const {register, handleSubmit, watch, formState: { errors }} = useForm<ShareJobFormInputs>({
     defaultValues: {
@@ -35,12 +37,12 @@ export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSucces
       return jobService.shareJob(payload, token || "");
     },
     onSuccess: () => {
-      alert("Job shared successfully!");
+      toast?.success("Job shared successfully!");
       onSuccess();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to share job: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to share job: " + (error.response?.data || error.message)); }
   });
 
   return (

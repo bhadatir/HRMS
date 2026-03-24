@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import { Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { useToast } from "@/context/ToastContext";
 
 
 type GameTypeInputs = {
@@ -19,6 +20,7 @@ type GameTypeInputs = {
 
 
 export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGameTypeId?: number | null, onSuccess: () => void }) {
+    const toast = useToast();
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
     const { register, handleSubmit, reset } = useForm<GameTypeInputs>(
@@ -46,7 +48,7 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            alert("Failed to get game details: " + (error.response?.data || error.message)); }
+            toast?.error("Failed to get game details: " + (error.response?.data || error.message)); }
     });
 
     useEffect(() => {
@@ -68,7 +70,7 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            alert("Failed to update game type: " + (error.response?.data || error.message)); }
+            toast?.error("Failed to update game type: " + (error.response?.data || error.message)); }
     });
 
     return (

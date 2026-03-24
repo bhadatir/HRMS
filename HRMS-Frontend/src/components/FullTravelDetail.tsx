@@ -10,8 +10,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plane, Calendar, MapPin, FileText, CheckCircle, XCircle, ExternalLink, IndianRupee, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useAppDebounce } from "../hooks/useAppDebounce";
+import { useToast } from "@/context/ToastContext";
 
 export default function TravelPlanDetails({travelPlan } : {travelPlan: number| null; onSuccess: () => void }) {
+  const toast = useToast();
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<"EXPENSES" | "DOCUMENTS">("EXPENSES");
@@ -68,14 +70,14 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
       await queryClient.invalidateQueries({ queryKey: ["travelPlan", travelPlan]});
       await queryClient.invalidateQueries({ queryKey: ["travelPlanExpense"] });
       await queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });      
-      alert("Status updated successfully");
+      toast?.success("Status updated successfully");
       // onSuccess();
     },
     onError: (error: any) => {
-      alert("Failed to update expense status: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to update expense status: " + (error.response?.data || error.message)); }
   });
 
-  if (planError || docsError) alert("Failed to load travel plan details: " + (planError || docsError));
+  if (planError || docsError) toast?.error("Failed to load travel plan details: " + (planError || docsError));
   if (isLoadingData) return <div className="p-10">Loading Details...</div>;
 
   const handleExpenseApproval = (expenseId: number, statusId: number) => {

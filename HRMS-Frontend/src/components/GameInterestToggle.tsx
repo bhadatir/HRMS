@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Heart } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
+import { useToast } from "@/context/ToastContext";
 
 type GameType = {
     id: number;
@@ -19,6 +20,7 @@ type EmployeeGameInterest = {
 }
 
 export default function GameInterestToggle() {
+    const toast = useToast();
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
 
@@ -45,12 +47,12 @@ export default function GameInterestToggle() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["myInterests", user?.id]}),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            alert("Failed to update game interest: " + (error.response?.data || error.message)); }
+            toast?.error("Failed to update game interest: " + (error.response?.data || error.message)); }
     });
    
     const isInterested = (gameId: number) => myInterests.some((i: EmployeeGameInterest) => (Number(i.gameTypeId) === Number(gameId) && i.interestDeleted === false));
 
-    if(allGamesError || myInterestsError) alert("Failed to load data: " + (allGamesError || myInterestsError));
+    if(allGamesError || myInterestsError) toast?.error("Failed to load data: " + (allGamesError || myInterestsError));
     return (
         <Card className="bg-slate-50 border-dashed">
             <CardContent className="p-4">

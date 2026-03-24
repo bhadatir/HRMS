@@ -11,9 +11,11 @@ import {
 } from "lucide-react";
 import { apiService } from "@/api/apiService";
 import AddUser from "./AddUser";
+import { useToast } from "@/context/ToastContext";
 
 export default function UserDetails({ userEmail }: { userEmail: string | null}) {
   const { token, user } = useAuth();
+  const toast = useToast();
   const queryClient = useQueryClient();
   const [showEditUserForm, setShowEditUserForm] = useState(false); 
     
@@ -37,7 +39,7 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to inactivate user: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to inactivate user: " + (error.response?.data || error.message)); }
   });
 
   const handleInactivate = () => {
@@ -48,7 +50,7 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
   };
 
   if (isLoading) return <div className="p-10 text-center text-slate-500">Loading User Data...</div>;
-  if (isError) alert("Failed to load user data: " + isError);
+  if (isError) toast?.error("Failed to load user data: " + isError);
 
   return (
     <div>

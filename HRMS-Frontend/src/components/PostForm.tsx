@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadCloud, Eye } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useToast } from "@/context/ToastContext.tsx";
 
 type PostFormInputs ={
   postTitle: string;
@@ -25,6 +26,7 @@ type Visibility = {
 export default function PostForm({ editPostId, onSuccess }: { editPostId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
+  const toast = useToast();
   
   const { data: allVisibilities = [], isError: allVisibilitiesError } = useQuery({
     queryKey: ["allVisibilities"],
@@ -33,7 +35,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
   });
 
   if (allVisibilitiesError) {
-    alert("Failed to load visibilities: " + allVisibilitiesError);
+    toast?.error("Failed to load visibilities: " + allVisibilitiesError);
   }
   
   const {register, handleSubmit, reset, watch, formState: { errors }} = useForm<PostFormInputs>({
@@ -57,7 +59,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to load post details: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to load post details: " + (error.response?.data || error.message)); }
   });
 
   useEffect(() => {
@@ -95,12 +97,12 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
-      alert(editPostId ? "Post updated!" : "Post shared to feed!");
+      toast?.success(editPostId ? "Post updated!" : "Post shared to feed!");
       onSuccess();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to " + (editPostId ? "update post" : "create post") + ": " + (error.response?.data || error.message)); }
+      toast?.error("Failed to " + (editPostId ? "update post" : "create post") + ": " + (error.response?.data || error.message)); }
   });
 
   return (

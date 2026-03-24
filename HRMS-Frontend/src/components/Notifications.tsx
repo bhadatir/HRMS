@@ -9,6 +9,7 @@ import { CheckCheck, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useInView } from "react-intersection-observer";
 import { useGetUserNotifications } from "@/hooks/useInfinite";
+import { useToast } from "@/context/ToastContext";
 
 type Notification = {
   id: number;
@@ -18,6 +19,7 @@ type Notification = {
 };  
 
 export default function Notifications() {
+  const toast = useToast();
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,7 +41,7 @@ export default function Notifications() {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (notificationsError) {
-    alert("Failed to load notifications: " + notificationsError);
+    toast?.error("Failed to load notifications: " + notificationsError);
   }
 
   const markReadMutation = useMutation({
@@ -49,7 +51,7 @@ export default function Notifications() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to mark notification as read: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to mark notification as read: " + (error.response?.data || error.message)); }
   });
 
   const markAllReadMutation = useMutation({
@@ -59,7 +61,7 @@ export default function Notifications() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to mark all notifications as read: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to mark all notifications as read: " + (error.response?.data || error.message)); }
   });
 
   const handleMarkAllRead = () => {

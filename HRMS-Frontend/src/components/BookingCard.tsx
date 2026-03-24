@@ -8,6 +8,7 @@ import GameBookingForm from "./GameBookingForm";
 import { useAuth } from "@/context/AuthContext";
 import { gameService } from "@/api/gameService";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/context/ToastContext";
 
 type Booking = {
     id: number;
@@ -36,13 +37,14 @@ type GameBookingStatus = {
 export default function BookingCard({ booking, onStatusChange }: { booking: Booking, onStatusChange: (reason: string) => void }) {
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
     const { user, token } = useAuth();
+    const toast = useToast();
 
     const { data: gameBookingStatusOptions = [], isError: gameBookingStatusOptionsError } = useQuery({
         queryKey: ["gameBookingStatusOptions"],
         queryFn: () => gameService.getAllGameBookingStatus(token!)
     });
 
-    if (gameBookingStatusOptionsError) alert("Failed to load booking status options: " + gameBookingStatusOptionsError);
+    if (gameBookingStatusOptionsError) toast?.error("Failed to load booking status options: " + gameBookingStatusOptionsError);
 
     return (
         <>
@@ -98,7 +100,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: Book
                             if (reason) {                                
                                 onStatusChange(`${reason} (Updated by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`);
                             }else {
-                                alert("Cancellation reason is required.");
+                                toast?.error("Cancellation reason is required.");
                             }
                         }}>
                             <CheckCircle size={14} className="mr-1"/> Cancel

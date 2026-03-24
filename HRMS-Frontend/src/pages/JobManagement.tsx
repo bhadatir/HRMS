@@ -19,6 +19,7 @@ import { useGetAllJobs } from "../hooks/useInfinite";
 import { useInView } from "react-intersection-observer";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
+import { useToast } from "@/context/ToastContext.tsx";
 
 type Job = {
   id: number;
@@ -32,6 +33,7 @@ type Job = {
 };
 
 export default function JobManagement() {
+  const toast = useToast();
   const { token, user, unreadNotifications } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
@@ -68,7 +70,7 @@ export default function JobManagement() {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (allJobsOnError) {
-    alert("Failed to load jobs: " + allJobsOnError);
+    toast?.error("Failed to load jobs: " + allJobsOnError);
   }
 
   const jobStatusmutation = useMutation({
@@ -79,8 +81,9 @@ export default function JobManagement() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to update job status: " + (error.response?.data || error.message)); }
-   });
+      toast?.error("Failed to update job status: " + (error.response?.data || error.message));
+    }
+  });
 
   useEffect(() => {
     const clickOutside = (e: MouseEvent) => {

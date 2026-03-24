@@ -20,6 +20,7 @@ import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useFindGameBookingByUserId, useFindGameBookings } from "@/hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { useToast } from "@/context/ToastContext";
 
 type GameType = {
     id: number;
@@ -62,6 +63,7 @@ type BookingParticipantResponse = {
 };
 
 export default function GameManagement() {
+    const toast = useToast();
     const { token, user, unreadNotifications } = useAuth();
     const queryClient = useQueryClient();
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
@@ -139,7 +141,7 @@ export default function GameManagement() {
     }, [inView, hasNextPageBookings, isFetchingNextPageBookings, fetchNextPageBookings]);
 
     if( bookingsOnError || gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError) {
-        alert("Failed to load data: " + (bookingsOnError || gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError));
+        toast?.error("Failed to load data: " + (bookingsOnError || gameTypesOnError || gameBookingStatusOptionsOnError || upcomingBookingsOnError || waitingListByEmpIdOnError || bookingsByEmpIdOnError));
     }
 
     const statusMutation = useMutation({
@@ -148,7 +150,8 @@ export default function GameManagement() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings"] }),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            alert("Failed to update booking status: " + (error.response?.data || error.message)); }
+            toast?.error("Failed to update booking status" + (error.response?.data || error.message));
+        }
     });
 
     const removeWaitingListMutation = useMutation({
@@ -156,7 +159,7 @@ export default function GameManagement() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] }),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            alert("Failed to remove waiting list item: " + (error.response?.data || error.message));
+            toast?.error("Failed to remove waiting list item" + (error.response?.data || error.message));
         }
     });
 

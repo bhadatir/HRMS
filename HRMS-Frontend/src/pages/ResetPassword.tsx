@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiService } from "../api/apiService";
 import { MailCheck, ShieldCheck } from "lucide-react"; 
+import { useToast } from "@/context/ToastContext";
 
 export default function ResetPassword() {
+  const toast = useToast();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [details, setDetails] = useState({ token: "", newPassword: "" });
@@ -17,17 +19,17 @@ export default function ResetPassword() {
     onSuccess: () => setStep(2),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Error: " + (error.response?.data || error.message)); }
+      toast?.error("Error: " + (error.response?.data || error.message)); }
   });
 
   const resetMutation = useMutation({
     mutationFn: () => apiService.resetPassword(details),
     onSuccess: () => {
-      alert("Password updated successfully!");
+      toast?.success("Password updated successfully!");
       setStep(3);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (error: any) => alert("Update failed: " + (error.response?.data || error.message)),
+    onError: (error: any) => toast?.error("Update failed: " + (error.response?.data || error.message)),
   });
 
   return (

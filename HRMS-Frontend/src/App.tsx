@@ -12,9 +12,13 @@ import GameManagement from "./pages/GameManagement";
 import TeamMemberData from "./pages/TeamMembersData";
 import UsersManagement from "./pages/UsersManagement";
 import { GlobalSearch } from "./components/GlobalSearch";
+import { ToastProvider } from "./context/ToastContext";
+import Toast from "./Toast/Toast";
 
 export default function App() {
   return (
+    
+    <ToastProvider>
     <BrowserRouter>
       <AuthProvider>
         <Routes>
@@ -37,5 +41,7 @@ export default function App() {
         </Routes>
       </AuthProvider>
     </BrowserRouter>
+    <Toast />
+    </ToastProvider>
   );
 }

@@ -19,6 +19,7 @@ import { useShowAllPosts } from "@/hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { useToast } from "@/context/ToastContext";
 
 type Post = {
   id: number;
@@ -34,6 +35,7 @@ type Post = {
 };
 
 export default function PostManagement() {
+  const toast = useToast();
   const { token, user, unreadNotifications } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
@@ -82,7 +84,7 @@ export default function PostManagement() {
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to delete post: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to delete post: " + (error.response?.data || error.message)); }
   });
 
   const handleDelete = (postId: number) => {
@@ -109,7 +111,7 @@ export default function PostManagement() {
   }, [showForm, showNotification]);
   
   if (allPostsError) {
-    alert("Failed to load posts: " + allPostsError);
+    toast?.error("Failed to load posts: " + allPostsError);
   }  
 
   return (

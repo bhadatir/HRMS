@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { postService } from "../api/postService";
 import { useAuth } from "../context/AuthContext";
 import { Heart } from "lucide-react";
+import { useToast } from "@/context/ToastContext";
 
 type Like = {
   id: number;
@@ -13,6 +14,7 @@ type Like = {
 export default function LikeButton({ postId, commentId }: { postId: number, commentId?: number }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const { data: likes = [], isError: likesError } = useQuery({
     queryKey: commentId ? ["commentLikes", commentId] : ["postLikes", postId],
@@ -22,7 +24,7 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
   });
 
   if (likesError) {
-    alert("Failed to load likes for post/comment: " + likesError);
+    toast?.error("Failed to load likes for post/comment: " + likesError);
   }
 
   const isLiked = likes.some((l: Like) => l.employeeId === user?.id);
@@ -55,7 +57,7 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to update like status: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to update like status: " + (error.response?.data || error.message)); }
   });
 
   return (

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Reply, Send, Trash2, X } from "lucide-react";
 import LikeButton from "./LikeButton";
+import { useToast } from "@/context/ToastContext";
 
 type Comment = {
   id: number;
@@ -20,6 +21,7 @@ type Comment = {
 };
 
 export default function CommentSection({ postId }: { postId: number }) {
+  const toast = useToast();
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
@@ -50,7 +52,7 @@ export default function CommentSection({ postId }: { postId: number }) {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to add comment: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to add comment: " + (error.response?.data || error.message)); }
   });
 
   const removeCommentMutation = useMutation({
@@ -67,7 +69,7 @@ export default function CommentSection({ postId }: { postId: number }) {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to delete comment: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to delete comment: " + (error.response?.data || error.message)); }
   });
 
   const handleReplyClick = (comment: Comment) => {
@@ -82,7 +84,7 @@ export default function CommentSection({ postId }: { postId: number }) {
     }
   };
 
-  if (commentsError) alert("Failed to load comments: " + commentsError);
+  if (commentsError) toast?.error("Failed to load comments: " + commentsError);
 
   return (
     <div className="mt-4 space-y-4 pt-4 border-t">

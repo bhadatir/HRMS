@@ -18,6 +18,7 @@ import { useInView } from "react-intersection-observer";
 import { useEmployeeSearch } from "../hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
+import { useToast } from "@/context/ToastContext.tsx";
 
 type Employee = {
   id: number;
@@ -41,6 +42,7 @@ type OrganizationReport = {
 };
 
 export default function OrganizationChart() {
+  const toast = useToast(); 
   const { token, unreadNotifications } = useAuth();
   const [selectedId, setSelectedId] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -96,7 +98,7 @@ export default function OrganizationChart() {
   }, [showDropdown, showNotification]);
 
   if(searchError || orgDataError) {
-    alert("Failed to load organization data: " + (searchError || orgDataError));
+    toast?.error("Failed to load organization data: " + (searchError || orgDataError));
   }
 
   return (

@@ -7,6 +7,7 @@ import { travelService } from "../api/travelService";
 import { useAuth } from "../context/AuthContext";
 import { UploadCloud, X } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useToast } from "@/context/ToastContext";
 
 type ProofEntry = {
   file: File;
@@ -27,6 +28,7 @@ type ExpenseType = {
 }
 
 export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlanId: number, onSuccess: () => void }) {
+  const toast = useToast();
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   
@@ -127,7 +129,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
       return travelService.addExpenseWithProof(formData, token || "");
     },
     onSuccess: () => {
-      alert("Expense submitted!");
+      toast?.success("Expense submitted!");
       queryClient.invalidateQueries({ queryKey: ["travelPlanByEmpId", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["travelPlanExpense"] });
       queryClient.invalidateQueries({ queryKey: ["dailyExpenseTotal", travelPlanId, user?.id] });
@@ -136,12 +138,12 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
     const errorMessage = err.response?.data?.message || err.response?.data || err.message;
-    alert("Failed to submit expense: " + (typeof errorMessage === 'object' ? JSON.stringify(errorMessage) : errorMessage));
+    toast?.error("Failed to submit expense: " + (typeof errorMessage === 'object' ? JSON.stringify(errorMessage) : errorMessage));
   }
   });
 
   if (isLoading || planLoading) return <div>Loading...</div>;
-  if (employeeTravelPlanError || expenseTypesError || planError) alert("Failed to load data: " + (employeeTravelPlanError || expenseTypesError || planError));
+  if (employeeTravelPlanError || expenseTypesError || planError) toast?.error("Failed to load data: " + (employeeTravelPlanError || expenseTypesError || planError));
 
   return (
     <Card className="border-none shadow-none">

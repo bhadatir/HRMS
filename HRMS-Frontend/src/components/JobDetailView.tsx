@@ -23,6 +23,7 @@ import {
 import { useEmployeeSearch } from "../hooks/useInfinite";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useInView } from "react-intersection-observer";
+import { useToast } from "@/context/ToastContext";
 
 type Referral = {
   id: number;
@@ -56,6 +57,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const debouncedSearchTerm = useAppDebounce(searchTerm); 
+  const toast = useToast();
 
   const { 
     data: infiniteData, 
@@ -85,7 +87,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     enabled: !!jobId && !!token && viewMode === "REFERRALS",
   });
 
-  if(jobError || referralsError || searchError) alert("Error loading data: " + (jobError || referralsError || searchError));
+  if(jobError || referralsError || searchError) toast?.error("Error loading data: " + (jobError || referralsError || searchError));
 
   const filteredReferrals = referrals.filter((ref: Referral) => 
     ref.referFriendName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
@@ -99,11 +101,11 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
       jobService.updateReferCvStatus(referId, statusId, reason, token || ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["jobReferrals", jobId] });
-      alert("CV Status updated successfully");
+      toast?.success("CV Status updated successfully");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to update CV status: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to update CV status: " + (error.response?.data || error.message)); }
   });
 
   const addReviewerMutation = useMutation({
@@ -112,11 +114,11 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
       queryClient.invalidateQueries({ queryKey: ["jobDetail", jobId] });
       setNewReviewerId(0);
       setSearchTerm("");
-      alert("Reviewer added successfully");
+      toast?.success("Reviewer added successfully");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to add reviewer: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to add reviewer: " + (error.response?.data || error.message)); }
   });
 
   const handleSelectUser = (id: number) => {

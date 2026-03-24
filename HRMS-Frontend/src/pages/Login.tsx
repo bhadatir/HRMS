@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiService } from "@/api/apiService";
 import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/context/ToastContext";
 
 type LoginData = {
   email: string;
@@ -16,6 +17,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const toast = useToast();
 
   if (isAuthenticated) {
     navigate("/dashboard");
@@ -28,10 +30,12 @@ export default function Login() {
       login(data.isFirstLogin);
       navigate("/dashboard");
       window.location.reload();
+      toast?.success("Login successful!");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Login Error: " + (error.response?.data || error.message)); }
+      toast?.error("Login failed!" + (error.response?.data || error.message));
+    }
   });
 
   const handleLogin = async (e: React.FormEvent) => {

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiService } from "../api/apiService";
 import SockJs from "sockjs-client";
 import Stomp from "stompjs";
+import { useToast } from "./ToastContext";
 
 type User = {
   id: number;
@@ -43,7 +44,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-
+  const toast = useToast();
   const token = localStorage.getItem("token");
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const queryClient = useQueryClient();
@@ -72,7 +73,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to log out: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to log out: " + (error.response?.data || error.message));
+    }
   });
   
   useEffect(() => {
@@ -113,7 +115,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     if (userError || notificationsError) {
       logout(); 
       localStorage.removeItem("token");
-      alert("Session expired or failed to load user data. Please log in again.");
+      toast?.error("Session expired or failed to load user data. Please log in again.");
     }
   }, [userError, notificationsError, logout]);
 

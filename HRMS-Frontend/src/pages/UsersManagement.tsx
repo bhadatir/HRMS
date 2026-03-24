@@ -17,6 +17,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { Badge } from "@/components/ui/badge";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { useToast } from "@/context/ToastContext";
 
 type Employee = { 
   id: number;
@@ -38,7 +39,8 @@ export default function JobManagement() {
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null);
   const [employeeType, setEmployeeType] = useState(1);
   const debouncedSearchTerm = useAppDebounce(searchTerm);
-
+  const toast = useToast();
+  
   const { 
     data: allEmpData, 
     fetchNextPage, 
@@ -73,7 +75,7 @@ export default function JobManagement() {
   }, [showUserDetails, showAddUserForm, showNotification]);
 
   if (allEmpError) {
-    alert("Failed to load employees: " + allEmpError);
+    toast?.error("Failed to load employees: " + allEmpError);
   }
   
   return (

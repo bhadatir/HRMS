@@ -7,6 +7,7 @@ import { Edit, Plus, X } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { useEffect, useState } from "react";
 import AddGameTypeForm from "./AddGameTypeForm";
+import { useToast } from "@/context/ToastContext";
 
 type GameType = {
     id: number;
@@ -18,6 +19,7 @@ type GameType = {
 }
 
 export default function GameTypeManager() {
+    const toast = useToast();
     const { token, user } = useAuth();
     const [showForm, setShowForm] = useState(false);
     const [editGameTypeId, setEditGameTypeId] = useState<number | null>(null);
@@ -42,7 +44,7 @@ export default function GameTypeManager() {
         return () => document.removeEventListener("click", clickOutside);
     }, [showForm]);
 
-    if(gamesError) alert("Failed to load game types: " + gamesError);
+    if(gamesError) toast?.error("Failed to load game types: " + gamesError);
 return (
     <main className="p-2 max-w-5xl mx-auto w-full">
 

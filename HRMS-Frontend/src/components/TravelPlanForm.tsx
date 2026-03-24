@@ -11,6 +11,7 @@ import { Search, User, X, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useInView } from "react-intersection-observer";
 import { useSearchAvailableEmployeeForTravel } from "../hooks/useInfinite";
+import { useToast } from "@/context/ToastContext";
 
 type TravelPlanFormInputs = {
   travelPlanName: string;
@@ -42,7 +43,7 @@ type EmployeeTravelPlanResponse = {
 export default function TravelPlanForm({ editTravelPlanId, onSuccess }: { editTravelPlanId: number | null; onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
-  
+  const toast = useToast(); 
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedEmployees, setSelectedEmployees] = useState<{id: number, name: string}[]>([]);
@@ -103,7 +104,7 @@ const getMutation = useMutation({
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onError: (error: any) => {
-    alert("Failed to get travel plan details: " + (error.response?.data || error.message)); }
+    toast?.error("Failed to get travel plan details: " + (error.response?.data || error.message)); }
 });
 
   useEffect(() => {
@@ -157,7 +158,7 @@ const getMutation = useMutation({
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to create/update travel plan: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to create/update travel plan: " + (error.response?.data || error.message)); }
   });
 
     useEffect(() => {
@@ -175,7 +176,7 @@ const getMutation = useMutation({
       return () => document.removeEventListener("click", clickOutside);
     }, [showDropdown]);
 
-  if (employeeSearchError) alert("Failed to search employees: " + employeeSearchError);
+  if (employeeSearchError) toast?.error("Failed to search employees: " + employeeSearchError);
 
   return (
     <Card className="border-none shadow-none">

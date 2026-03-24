@@ -5,6 +5,7 @@ import { postService } from "../api/postService";
 import { useAuth } from "../context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Delete, Plus, Tag as TagIcon } from "lucide-react";
+import { useToast } from "@/context/ToastContext";
 
 type Tag = {
   id: number;
@@ -21,6 +22,7 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
   const { token } = useAuth();
   const queryClient = useQueryClient();
   const [showTagInput, setShowTagInput] = useState(false);
+  const toast = useToast();
 
   const { data: tags = [], isError: tagsError } = useQuery({
     queryKey: ["postTags", postId],
@@ -43,7 +45,7 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to add tag: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to add tag: " + (error.response?.data || error.message)); }
   });
 
   const removeTagMutation = useMutation({
@@ -51,10 +53,10 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["postTags", postId] }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to remove tag: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to remove tag: " + (error.response?.data || error.message)); }
   });
 
-  if (tagsError || allTagTypesError) alert("Failed to load tags: " + (tagsError || allTagTypesError));
+  if (tagsError || allTagTypesError) toast?.error("Failed to load tags: " + (tagsError || allTagTypesError));
   
   return (
     <div className="flex flex-wrap gap-2 items-center mt-2">

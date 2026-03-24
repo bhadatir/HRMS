@@ -8,6 +8,7 @@ import { Calendar, Clock, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useState } from "react";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
+import { useToast } from "@/context/ToastContext";
 
 type WaitingList = {
   id: number;
@@ -28,6 +29,7 @@ type BookingParticipantResponse = {
 
 export default function WaitingList({waitingListId}: {waitingListId: number, onSuccess: () => void}) {
   const { token } = useAuth();
+  const toast = useToast();
   const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");  
   const debouncedSearch = useAppDebounce(waitingListSearchTerm);
 
@@ -50,7 +52,7 @@ export default function WaitingList({waitingListId}: {waitingListId: number, onS
   );
 
   if(waitingListError || waitingListSeqError) {
-    alert("Failed to load waiting list data: " + (waitingListError || waitingListSeqError));
+    toast?.error("Failed to load waiting list data: " + (waitingListError || waitingListSeqError));
   }
 
   return (

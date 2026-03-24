@@ -13,6 +13,7 @@ import { Search, User, X, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useInView } from "react-intersection-observer";
+import { useToast } from "@/context/ToastContext";
 
 type GameType = {
     id: number;
@@ -58,7 +59,7 @@ type GameBookingFormPayload = {
 export default function GameBookingForm({ editBookingId, onSuccess }: { editBookingId?: number | null; onSuccess: () => void }) {
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
-    
+    const toast = useToast();   
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
@@ -93,7 +94,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
             ? gameService.updateBooking(editBookingId, data, token!) 
             : gameService.addBooking(data, token!),
         onSuccess: (data) => {
-            window.alert(typeof data === "string" ? data : "Booking saved!");
+            toast?.success(typeof data === "string" ? data : "Booking saved!");
             queryClient.invalidateQueries({ queryKey: ["Bookings", user?.id] });
             queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] });
             queryClient.invalidateQueries({ queryKey: ["upcomingBookings"] });
@@ -101,7 +102,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            alert("Failed booking: " + (error.response?.data || error.message)); }
+            toast?.error("Failed booking: " + (error.response?.data || error.message)); }
     });
 
     const filteredGames = useMemo(() => {
@@ -141,7 +142,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
 
     const handleAddParticipant = (emp: Employee) => {
         if(!selectedGame) {
-            window.alert("Please select a game first");
+            toast?.error("Please select a game first");
             return;
         }
         if (!selectedParticipants.find(p => p.id === emp.id)) {
@@ -156,8 +157,8 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     };
 
     const onSubmit = (data: GameBookingFormInputs) => {
-        if (!selectedTime) return alert("Please select a slot");
-        if (selectedParticipants.length === 0) return alert("Please add at least one participant");
+        if (!selectedTime) return toast?.error("Please select a slot");
+        if (selectedParticipants.length === 0) return toast?.error("Please add at least one participant");
 
         const payload = {
             empId: user?.id,
@@ -185,7 +186,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
 
 
     if (gameTypesError || myInterestsError || slotsError || employeeSearchError) {
-        alert("Failed to load data: " + (gameTypesError || myInterestsError || slotsError || employeeSearchError));
+        toast?.error("Failed to load data: " + (gameTypesError || myInterestsError || slotsError || employeeSearchError));
     }
 
     return (

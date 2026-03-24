@@ -20,6 +20,7 @@ import { useFindTravelPlanByEmployeeId, useGetAllTravelPlans } from "../hooks/us
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { useAppDebounce } from "@/hooks/useAppDebounce.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
+import { useToast } from "@/context/ToastContext.tsx";
 
 type Plan = {
   id: number;
@@ -43,6 +44,7 @@ type EmployeeTravelPlanResponse = {
 }
 
 export default function TravelPlan() {
+  const toast = useToast();
   const { token, user, unreadNotifications } = useAuth(); 
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
@@ -106,11 +108,12 @@ export default function TravelPlan() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
       queryClient.invalidateQueries({ queryKey: ["travelPlanByEmpId"] });
-      alert("Travel plan deleted successfully");
+      toast?.success("Travel plan deleted successfully");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to delete travel plan: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to delete travel plan: " + (error.response?.data || error.message));
+    }
   });
 
   const filteredPlans = useMemo(() => {
@@ -128,7 +131,7 @@ export default function TravelPlan() {
     if (reason) {
       deleteTravelPlanMutation.mutate({ travelPlanId, reason });
     }else{
-      alert("Deletion reason is required");
+      toast?.error("Deletion reason is required");
     }
   };
 
@@ -152,7 +155,7 @@ export default function TravelPlan() {
   }, [fullTravelDetails, selectedTravelId, activeExpenseId, showForm, showNotification]);
 
   if (travelPlanByEmpIdError || allTravelPlansError) {
-    alert("Failed to load travel plans: " + (travelPlanByEmpIdError || allTravelPlansError));
+    toast?.error("Failed to load travel plans: " + (travelPlanByEmpIdError || allTravelPlansError));
   }
 
   return (

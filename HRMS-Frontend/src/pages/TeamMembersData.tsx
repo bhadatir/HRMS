@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { useToast } from "@/context/ToastContext";
 
 type OrgData = {
   id: number;
@@ -38,6 +39,7 @@ type OrgDataDirectReport = {
 };
 
 export default function TeamMemberData() {
+  const toast = useToast();
   const { token, user, unreadNotifications } = useAuth();
   const [showNotification, setShowNotification] = useState(false);
   const navigate = useNavigate();
@@ -79,7 +81,7 @@ export default function TeamMemberData() {
   }, [showNotification]);
 
   if (orgDataError) {
-    alert("Failed to load organization data: " + orgDataError);
+    toast?.error("Failed to load organization data: " + orgDataError);
   }
 
   return (

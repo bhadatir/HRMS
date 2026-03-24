@@ -7,6 +7,7 @@ import { jobService } from "../api/jobService";
 import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useToast } from "@/context/ToastContext";
 
 type JobFormInputs ={
     jobTitle: string;
@@ -25,6 +26,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [createdAt, setCreatedAt] = useState("");
+  const toast = useToast();
 
   const { data: allJobTypes = [], isError: allJobTypesError } = useQuery({
     queryKey: ["allJobTypes"],
@@ -53,7 +55,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to load job details: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to load job details: " + (error.response?.data || error.message)); }
   });
 
   useEffect(() => {
@@ -81,17 +83,17 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allJobs"] });
-      alert(editJobId ? "Job updated successfully!" : "Job created successfully!");
+      toast?.success(editJobId ? "Job updated successfully!" : "Job created successfully!");
       onSuccess();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to " + (editJobId ? "update job" : "create job") + ": " + (error.response?.data || error.message)); }
+      toast?.error("Failed to " + (editJobId ? "update job" : "create job") + ": " + (error.response?.data || error.message)); }
   });
 
   
 
-  if (allJobTypesError) alert("Failed to load job categories: " + allJobTypesError);
+  if (allJobTypesError) toast?.error("Failed to load job categories: " + allJobTypesError);
 
   return (
     <Card className="border-none shadow-none">

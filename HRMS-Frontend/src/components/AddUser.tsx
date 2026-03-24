@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiService } from "@/api/apiService";
 import { useAuth } from "@/context/AuthContext";
 import { useForm } from "react-hook-form";
+import { useToast } from "@/context/ToastContext";
 
 type AddUserFormInputs = {
   firstName: string;
@@ -38,8 +39,9 @@ type Position = {
 
 export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: string | null, onSuccess: () => void}) {
   const { token, user } = useAuth();
-    const queryClient = useQueryClient();
-
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  
   const { register, handleSubmit, reset } = useForm<AddUserFormInputs>({
     defaultValues: {
       firstName: "",
@@ -94,7 +96,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to get user details: " + (error.response?.data || error.message));
+      toast?.error("Failed to get user details: " + (error.response?.data || error.message));
     }
   });
   
@@ -114,16 +116,17 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
         queryClient.invalidateQueries({ queryKey: ["user", editUserEmail] });
         queryClient.invalidateQueries({ queryKey: ["searchEmployees"] });
         reset();
-        alert(editUserEmail ? "User updated successfully!" : "User created successfully!");
+        toast?.success(editUserEmail ? "User updated successfully!" : "User created successfully!");
         onSuccess();
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (error: any) => {
-        alert("Registration failed: " + (error.response?.data || error.message));
+        toast?.error("Registration failed: " + (error.response?.data || error.message));
+      }
     }
-  });
+  );
 
-  if (allRolesError || allDepartmentsError || allPositionsError) alert("Failed to load data: " + (allRolesError || allDepartmentsError || allPositionsError));
+  if (allRolesError || allDepartmentsError || allPositionsError) toast?.error("Failed to load data: " + (allRolesError || allDepartmentsError || allPositionsError));
 
   return (
     <Card className="border-none shadow-none">

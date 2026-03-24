@@ -8,12 +8,14 @@ import { travelService } from "../api/travelService";
 import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/context/ToastContext";
 
 type TagType = {
   id: number;
   travelDocsTypeName: string;
 }
 export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { travelPlanId: number, onSuccess: () => void }) {
+  const toast = useToast();
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -51,15 +53,15 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["allTravelPlans"] });
       await queryClient.invalidateQueries({ queryKey: ["travelPlanDocs", travelPlanId] });
-      alert("Travel document submitted!");
+      toast?.success("Travel document submitted!");
       onSuccess();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to submit travel document: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to submit travel document: " + (error.response?.data || error.message)); }
   });
 
-  if (employeeTravelPlanError || allTagTypesError) alert("Failed to load data: " + (employeeTravelPlanError || allTagTypesError));
+  if (employeeTravelPlanError || allTagTypesError) toast?.error("Failed to load data: " + (employeeTravelPlanError || allTagTypesError));
 
   return (
     <Card className="border-none shadow-none">

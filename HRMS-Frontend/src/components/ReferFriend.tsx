@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UploadCloud, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useToast } from "@/context/ToastContext";
 
 
 type ReferFriendFormInputs ={
@@ -23,6 +24,7 @@ type ReferFriendFormInputs ={
 export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuccess: () => void }) {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
+  const toast = useToast(); 
 
     const {register, handleSubmit, watch, formState: { errors }} = useForm<ReferFriendFormInputs>({
       defaultValues: {
@@ -50,12 +52,12 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allJobs"] });
       queryClient.invalidateQueries({ queryKey: ["jobDetail", jobId] });
-      alert("Referral submitted successfully!");
+      toast?.success("Referral submitted successfully!");
       onSuccess();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      alert("Failed to submit referral: " + (error.response?.data || error.message)); }
+      toast?.error("Failed to submit referral: " + (error.response?.data || error.message)); }
   });
 
   return (
