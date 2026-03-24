@@ -249,7 +249,7 @@ export default function GameManagement() {
                     </div>
                 </header>
 
-                <main className="p-6 max-w-5xl mx-auto w-250">
+                <main className="p-6 max-w-5xl mx-auto w-254">
                     {/* Notifications */}
                     {showNotification && (
                       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">

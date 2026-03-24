@@ -21,7 +21,6 @@ import { gameService } from "@/api/gameService.ts";
 import { useNavigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
-import { useToast } from "@/context/ToastContext.tsx";
 
 type TravelPlan = {
     id: number;
@@ -64,7 +63,6 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const navigate = useNavigate();
-  const toast = useToast();  
 
   if (!isAuthenticated) {
     navigate("/login");
@@ -79,26 +77,24 @@ export default function Dashboard() {
       return apiService.updateProfileImage(user?.id || 0, formData, token || "");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });      
-      toast?.success("Profile picture updated!");
+      alert("Profile picture updated!");
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to update profile details" + (error.response?.data || error.message));
-    }
+      alert("Failed to update profile details: " + (error.response?.data || error.message)); }
   });
 
   const updatePasswordMutation = useMutation({
     mutationFn: () => apiService.updatePassword(user?.id || 0, newPassword, token || ""),
     onSuccess: () => {
-      toast?.success("Password updated successfully!");
+      alert("Password updated successfully!");
       localStorage.setItem("isFirstLogin", "no");
       setIsFirstLogin("no");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to update password" + (error.response?.data || error.message));
-    }
+      alert("Failed to update password: " + (error.response?.data || error.message)); }
   });
   
   const { data: travelPlans, isError: travelPlansError } = useQuery({
@@ -178,7 +174,7 @@ export default function Dashboard() {
   }, [showNotification]);
 
   if(travelPlansError || gameBookingsError || waitingListError) {
-    toast?.error("Failed to load events: " + (travelPlansError || gameBookingsError || waitingListError));
+    alert("Failed to load events: " + (travelPlansError || gameBookingsError || waitingListError));
   }
 
   return (
@@ -230,7 +226,7 @@ export default function Dashboard() {
               )}
             </div>
           </header>
-          <main className="p-6 max-w-7xl mx-auto space-y-6 w-250">
+          <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
             
             {/* Notifications */}
             {showNotification && (

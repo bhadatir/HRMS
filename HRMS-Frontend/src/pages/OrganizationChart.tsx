@@ -163,7 +163,7 @@ export default function OrganizationChart() {
           </div>
         </header>
 
-        <div className="p-6 max-w-6xl mx-auto space-y-8 w-250">
+        <div className="p-6 max-w-6xl mx-auto space-y-8 w-254">
           {isLoading ? (
             <div className="p-10 text-center text-slate-500 font-medium">Loading employee data...</div>
           ) : orgDataError ? (

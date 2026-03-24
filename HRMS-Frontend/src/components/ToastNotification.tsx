@@ -22,8 +22,7 @@ const Notifications = ({ children, kind, onClose, className = "" }: Notification
   return (
     <div
       className={`
-        flex items-center w-80 p-4 mb-3 border-l-4 rounded-r-lg shadow-lg 
-        transition-all duration-500 ease-in-out transform
+        flex items-center w-full p-4 mb-3 border-l-4 rounded-r-lg shadow-lg
         ${selectedStyle} 
         ${className}
       `}

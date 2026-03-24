@@ -225,7 +225,7 @@ export default function TravelPlan() {
 
         </header>
 
-        <main className="p-6 max-w-7xl mx-auto space-y-6 w-250">
+        <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
           
           {/* Notifications */}
           {showNotification && (

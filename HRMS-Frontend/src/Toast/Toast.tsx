@@ -12,8 +12,7 @@ export default function Toast() {
 
   return (
     <div
-      className="fixed bottom-10 py-10 z-[9999] flex flex-col items-end width-max justify-content-center align-items-center"
-      style={{ height: toasts?.length * 68 + "px" }}
+      className="fixed bottom-5 z-[9999] flex w-full"
     >
       {toasts.map((toast) => (
         <Notification
