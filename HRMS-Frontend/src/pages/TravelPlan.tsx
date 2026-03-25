@@ -243,7 +243,7 @@ export default function TravelPlan() {
           {/* Create or edit travel plan form */}
           {showForm && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="travel relative bg-white rounded-xl max-w-lg w-full">
+              <div className="travel relative bg-white rounded-xl max-w-lg w-full h-150 overflow-y-auto">
                 <Button title="Close Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setShowForm(false);
                   setEditTravelPlanId(null);

@@ -1,6 +1,8 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -19,11 +21,12 @@ public class Job {
     private Long id;
 
     @Size(max = 50)
-    @NotNull(message = "job title is required")
+    @NotBlank(message = "job title is required")
     @Column(name = "job_title", nullable = false, length = 50)
     private String jobTitle;
 
     @NotNull(message = "job salary is required")
+    @Min(value = 1,message = "Salary cannot be negative")
     @Column(name = "job_salary", nullable = false)
     private Integer jobSalary;
 

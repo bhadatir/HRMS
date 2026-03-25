@@ -1,5 +1,7 @@
 package com.example.HRMS.Backend.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -8,10 +10,11 @@ import lombok.Data;
 public class JobRequest {
 
         @Size(max = 50)
-        @NotNull(message = "job title is required")
+        @NotBlank(message = "job title is required")
         private String jobTitle;
 
         @NotNull(message = "job salary is required")
+        @Min(value = 1,message = "Salary cannot be negative")
         private Integer jobSalary;
 
         @NotNull(message = "job type id is required")

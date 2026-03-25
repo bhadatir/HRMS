@@ -158,7 +158,12 @@ const getMutation = useMutation({
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to create/update travel plan: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+        ? JSON.stringify(data, null, 2) 
+        : data || error.message;
+      toast?.error("Failed to create/update travel plan: " + detailedError);
+    }
   });
 
     useEffect(() => {

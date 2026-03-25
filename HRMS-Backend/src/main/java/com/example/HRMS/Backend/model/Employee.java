@@ -59,7 +59,7 @@ public class Employee {
     private LocalDate employeeHireDate;
 
     @NotNull(message = "Employee salary is required")
-    @Min(value = 0,message = "Salary cannot be negative")
+    @Min(value = 1,message = "Salary cannot be negative")
     @Column(name = "employee_salary", nullable = false)
     private Integer employeeSalary;
 

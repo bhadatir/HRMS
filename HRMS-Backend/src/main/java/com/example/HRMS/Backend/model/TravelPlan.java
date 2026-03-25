@@ -1,6 +1,8 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -20,22 +22,22 @@ public class TravelPlan {
     private Long id;
 
     @Size(max = 255)
-    @NotNull(message = "travel plan name is required")
+    @NotBlank(message = "travel plan name is required")
     @Column(name = "travel_plan_name", nullable = false)
     private String travelPlanName;
 
     @Size(max = 255)
-    @NotNull(message = "travel plan detail is required")
+    @NotBlank(message = "travel plan detail is required")
     @Column(name = "travel_plan_details", nullable = false)
     private String travelPlanDetails;
 
     @Size(max = 255)
-    @NotNull(message = "travel plan starting location is required")
+    @NotBlank(message = "travel plan starting location is required")
     @Column(name = "travel_plan_from", nullable = false)
     private String travelPlanFrom;
 
     @Size(max = 255)
-    @NotNull(message = "travel plan ending location is required")
+    @NotBlank(message = "travel plan ending location is required")
     @Column(name = "travel_plan_to", nullable = false)
     private String travelPlanTo;
 
@@ -63,6 +65,7 @@ public class TravelPlan {
     private LocalDate travelPlanEndDate;
 
     @NotNull(message = "Travel Plan Max Expense Amount Per Day is required")
+    @Min(value = 1,message = "Salary cannot be negative")
     @Column(name = "travel_max_expense_amount_per_day", nullable = false)
     private Integer travelMaxExpenseAmountPerDay;
 

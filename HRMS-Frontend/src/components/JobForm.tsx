@@ -88,7 +88,11 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to " + (editJobId ? "update job" : "create job") + ": " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+        ? JSON.stringify(data, null, 2) 
+        : data || error.message;
+      toast?.error("Failed to " + (editJobId ? "update job" : "create job") + ": " + detailedError); }
   });
 
   
@@ -157,7 +161,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
         <Button
           title={editJobId ? "Update Job Posting" : "Create Job Posting"}
           className="w-full text-black mt-4"
-          disabled={jobMutation.isPending || (!editJobId && !watch("file")) || !watch("jobTitle") || !watch("jobSalary") || !watch("fkJobTypeId") }
+          disabled={jobMutation.isPending || (!editJobId && !watch("file")) || !watch("jobTitle")?.trim() || !watch("jobSalary") || !watch("fkJobTypeId") }
         >
           {jobMutation.isPending ? "Processing..." : editJobId ? "Update Job Posting" : "Create Job Posting"}
         </Button>
