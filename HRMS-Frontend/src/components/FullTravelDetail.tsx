@@ -89,6 +89,8 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
       const reason = window.prompt("Please enter reason for approval:", "")?.trim();
       if (reason) {
         approveMutation.mutate({ expenseId, statusId, reason: `${reason} (Rejected by : ${user?.employeeEmail} at ${new Date().toLocaleString()})` });
+      } else {
+        toast?.error("reason is required.");
       }
     }
   };
@@ -189,7 +191,7 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
                   />
                 </div>
               
-                <div className="travel flex bg-gray-100 p-1 rounded-lg w-max right-10 absolute">
+                <div className="travel flex bg-gray-100 p-1 rounded-lg w-max right-10 absolute gap-2">
                   <Button className={viewMode === "EXPENSES" ? "rounded-md border text-gray-700" : "rounded-md text-gray-400"}
                     size="sm"
                     onClick={()=>setViewMode("EXPENSES")}>Expenses</Button>

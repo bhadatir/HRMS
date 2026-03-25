@@ -178,7 +178,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
               <Input type="date" max={new Date().toISOString().split("T")[0]} {...register("expenseDate", { required: true })} />
             </div>
           </div>   
-          <Input disabled={isOverLimit} placeholder="Remark" {...register("expenseRemark", { required: "Remark is required" })} />
+          <Input disabled={isOverLimit} placeholder="Remark" {...register("expenseRemark")} />
          
           <div className="border-2 border-dashed rounded-lg p-4 text-center border-slate-200">
             <label className="cursor-pointer block">
@@ -217,7 +217,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
             className="w-full text-gray-700"
             type="submit"
             title="submit expense claim"
-            disabled={expenseMutation.isPending || isOverLimit || proofs.length === 0 || proofs.some(p => !p.typeId)|| !watch("expenseAmount") || !watch("expenseDate") || !watch("expenseRemark")}
+            disabled={expenseMutation.isPending || isOverLimit || proofs.length === 0 || proofs.some(p => !p.typeId)|| !watch("expenseAmount") || !watch("expenseDate")}
           >
             {expenseMutation.isPending ? "Uploading..." : "Submit Claim"}
           </Button>

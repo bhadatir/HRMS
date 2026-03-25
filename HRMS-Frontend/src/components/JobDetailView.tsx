@@ -136,6 +136,8 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
       const reason = window.prompt("Please enter reason for this action :", "")?.trim();
       if (reason) {
         updateCvStatusMutation.mutate({ referId, statusId, reason });
+      } else {
+        toast?.error("reason is required.");
       }
     }
   };
@@ -292,7 +294,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                         <>
                             <div className="job">
                               <Button 
-                              size="sm" variant="outline" className="text-green-600 border-green-200"
+                              size="sm" variant="outline" className="text-green-600 border-green-200 mr-2"
                               onClick={() => handleUpdateCvStatus(ref.id, 5)}
                               >
                               <CheckCircle size={14} />

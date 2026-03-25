@@ -228,7 +228,7 @@ const getMutation = useMutation({
         </div>
             
         <div className="gap-5 flex">
-          <Input type="number" placeholder="Max Expense Amount Per Day" min={0} step={0.01}
+          <Input type="number" placeholder="Max Expense Amount Per Day" min={1}
             {...register("travelMaxExpenseAmountPerDay", { required: "Max expense amount per day is required", valueAsNumber: true })} />
             {errors.travelMaxExpenseAmountPerDay && <p className="text-red-500 text-xs">{errors.travelMaxExpenseAmountPerDay.message}</p>}
         </div>  
@@ -305,7 +305,7 @@ const getMutation = useMutation({
           <Button 
             type="submit" 
             className="w-full text-black font-bold" 
-            disabled={travelPlanMutation.isPending || selectedEmployees.length === 0}
+            disabled={travelPlanMutation.isPending || selectedEmployees.length === 0 || !watch("travelPlanStartDate") || !watch("travelPlanEndDate") || !watch("travelPlanFrom")?.trim() || !watch("travelPlanTo")?.trim() || !watch("travelPlanDetails")?.trim()}
           >
             {travelPlanMutation.isPending ? "Deploying..." : editTravelPlanId ? "Update Plan" : "Create Plan"}
           </Button>
