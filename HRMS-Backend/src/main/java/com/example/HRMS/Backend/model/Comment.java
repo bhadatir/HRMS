@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
@@ -32,7 +33,7 @@ public class Comment {
     @JoinColumn(name = "parent_comment_id")
     private Comment parentComment;
 
-    @NotNull(message = "Comment content is required")
+    @NotBlank(message = "Comment content is required")
     @Column(name = "comment_content", nullable = false)
     private String commentContent;
 

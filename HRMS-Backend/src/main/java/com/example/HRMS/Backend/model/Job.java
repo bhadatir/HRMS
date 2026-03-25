@@ -34,7 +34,7 @@ public class Job {
     private Instant jobCreatedAt = Instant.now();
 
     @Size(max = 255)
-    @NotNull(message = "job description(JD) is required")
+    @NotBlank(message = "job description(JD) is required")
     @Column(name = "job_description_url", nullable = false)
     private String jobDescriptionUrl;
 

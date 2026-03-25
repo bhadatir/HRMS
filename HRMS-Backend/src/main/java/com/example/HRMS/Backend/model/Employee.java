@@ -22,23 +22,23 @@ public class Employee {
     private Long id;
 
     @Size(max = 25)
-    @NotNull(message = "Employee first name is required")
+    @NotBlank(message = "Employee first name is required")
     @Column(name = "employee_first_name", nullable = false)
     private String employeeFirstName;
 
     @Size(max = 25)
-    @NotNull(message = "Employee last name is required")
+    @NotBlank(message = "Employee last name is required")
     @Column(name = "employee_last_name", nullable = false)
     private String employeeLastName;
 
     @Size(max = 25)
-    @NotNull(message = "Employee email address is required")
+    @NotBlank(message = "Employee email address is required")
     @Email(message = "Email is not in perfect formate")
     @Column(name = "employee_email", nullable = false)
     private String employeeEmail;
 
     @Size(max = 100)
-    @NotNull(message = "Employee password is required")
+    @NotBlank(message = "Employee password is required")
     @Column(name = "employee_password", nullable = false)
     private String employeePassword;
 
@@ -59,7 +59,7 @@ public class Employee {
     private LocalDate employeeHireDate;
 
     @NotNull(message = "Employee salary is required")
-    @Min(value = 1,message = "Salary cannot be negative")
+    @Min(value = 1,message = "Salary cannot be less than 1")
     @Column(name = "employee_salary", nullable = false)
     private Integer employeeSalary;
 

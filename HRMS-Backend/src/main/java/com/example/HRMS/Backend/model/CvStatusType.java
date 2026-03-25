@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class CvStatusType {
     private Long id;
 
     @Size(max = 255)
-    @NotNull(message = "status type is required")
+    @NotBlank(message = "status type is required")
     @Column(name = "cv_status_type_name", nullable = false)
     private String cvStatusTypeName;
 

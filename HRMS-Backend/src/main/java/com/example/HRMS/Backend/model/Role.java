@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class Role {
     private Long id;
 
     @Size(max = 50)
-    @NotNull(message = "role name is required")
+    @NotBlank(message = "role name is required")
     @Column(name = "role_name", nullable = false, length = 50)
     private String roleName;
 

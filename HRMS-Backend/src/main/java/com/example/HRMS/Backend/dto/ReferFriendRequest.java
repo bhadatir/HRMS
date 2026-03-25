@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.dto;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -9,12 +10,12 @@ import lombok.Data;
 public class ReferFriendRequest {
 
     @Size(max = 50)
-    @NotNull(message = "refer friend name is required")
+    @NotBlank(message = "refer friend name is required")
     private String referFriendName;
 
     @Size(max = 50)
     @Email(message = "email formate is not proper")
-    @NotNull(message = "refer friend email is required")
+    @NotBlank(message = "refer friend email is required")
     private String referFriendEmail;
 
     @Size(max = 255)

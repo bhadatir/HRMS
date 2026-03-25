@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class ExpenseProof {
     private Instant expenseProofUploadedAt = Instant.now();
 
     @Size(max = 255)
-    @NotNull(message = "expense proof doc/img is required")
+    @NotBlank(message = "expense proof doc/img is required")
     @Column(name = "expense_proof_url", nullable = false)
     private String expenseProofUrl;
 

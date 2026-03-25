@@ -2,7 +2,8 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
-        import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.Instant;
@@ -17,11 +18,11 @@ public class ShareJobData {
     @Column(name = "pk_Share_job_data_id", nullable = false)
     private Long id;
 
-    @NotNull(message = "Who share job that is required")
+    @NotBlank(message = "Who share job that is required")
     @Column(name = "share_job_by", nullable = false)
     private String shareJobBy;
 
-    @NotNull(message = "receiver Email is required")
+    @NotBlank(message = "receiver Email is required")
     @Column(name = "receiver_email", nullable = false)
     private String receiverEmail;
 

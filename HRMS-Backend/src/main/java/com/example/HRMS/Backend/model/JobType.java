@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class JobType {
     private Long id;
 
     @Size(max = 255)
-    @NotNull(message = "job type name is required")
+    @NotBlank(message = "job type name is required")
     @Column(name = "job_type_name", nullable = false)
     private String jobTypeName;
 

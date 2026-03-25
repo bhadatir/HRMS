@@ -121,7 +121,11 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (error: any) => {
-        toast?.error("Registration failed: " + (error.response?.data || error.message));
+        const data = error.response?.data;  
+        const detailedError = typeof data === 'object' 
+        ? JSON.stringify(data, null, 2) 
+        : data || error.message;
+        toast?.error("Registration failed: " + detailedError);
       }
     }
   );

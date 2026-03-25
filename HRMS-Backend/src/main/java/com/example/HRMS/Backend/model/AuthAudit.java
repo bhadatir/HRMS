@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,11 +17,11 @@ public class AuthAudit {
     @Column(name = "pk_auth_audit_id", nullable = false)
     private Long id;
 
-    @NotNull(message = "user email is required")
+    @NotBlank(message = "user email is required")
     @Column(name = "auth_audit_user_email", nullable = false)
     private String userEmail;
 
-    @NotNull(message = "user role is required")
+    @NotBlank(message = "user role is required")
     @Column(name = "auth_audit_role", nullable = false)
     private String userRoleName;
 

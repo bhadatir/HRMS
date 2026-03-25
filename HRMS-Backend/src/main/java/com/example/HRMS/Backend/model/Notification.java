@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -22,11 +23,11 @@ public class Notification {
     @JoinColumn(name = "fk_employee_id")
     private Employee fkEmployee;
 
-    @NotNull(message = "notification title is required")
+    @NotBlank(message = "notification title is required")
     @Column(name = "notification_title", nullable = false)
     private String title;
 
-    @NotNull(message = "notification message is required")
+    @NotBlank(message = "notification message is required")
     @Size(max = 8000, message = "Notification message must not exceed 8000 characters")
     @Column(name = "notification_message", nullable = false)
     private String message;

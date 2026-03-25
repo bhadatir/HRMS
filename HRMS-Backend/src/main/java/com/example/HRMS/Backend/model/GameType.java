@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class GameType {
     private Long id;
 
     @Size(max = 50)
-    @NotNull(message = "game name is required")
+    @NotBlank(message = "game name is required")
     @Column(name = "game_name", nullable = false, length = 50)
     private String gameName;
 

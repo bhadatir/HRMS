@@ -8,17 +8,17 @@ import lombok.Data;
 @Data
 public class RegisterRequest {
 
-    @NotNull(message = "employee first name is required")
+    @NotBlank(message = "employee first name is required")
     private String firstName;
 
-    @NotNull(message = "employee last name is required")
+    @NotBlank(message = "employee last name is required")
     private String lastName;
 
-    @NotNull(message = "employee email is required")
+    @NotBlank(message = "employee email is required")
     @Email(message = "employee email must be in proper formate")
     private String email;
 
-    @NotNull(message = "employee password is required")
+    @NotBlank(message = "employee password is required")
     private String password;
 
     @NotNull(message = "employee DOB is required")
@@ -32,7 +32,7 @@ public class RegisterRequest {
     private LocalDate hireDate;
 
     @NotNull(message = "employee salary is required")
-    @Min(value = 0, message = "employee salary can not be -ve")
+    @Min(value = 1, message = "employee salary can less than 1")
     private Integer salary;
 
     @NotNull(message = "employee department is required")

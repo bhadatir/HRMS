@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -19,16 +20,16 @@ public class Post {
     private Long id;
 
     @Size(max = 255)
-    @NotNull(message = "post title is required")
+    @NotBlank(message = "post title is required")
     @Column(name = "post_title", nullable = false)
     private String postTitle;
 
     @Size(max = 9999)
-    @NotNull(message = "post content is required")
+    @NotBlank(message = "post content is required")
     @Column(name = "post_content", nullable = false)
     private String postContent;
 
-    @NotNull(message = "post content url is required")
+    @NotBlank(message = "post content url is required")
     @Column(name = "post_content_url")
     private String postContentUrl;
 

@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class GameBookingStatus {
     private Long id;
 
     @Size(max = 50)
-    @NotNull(message = "game booking status name is required")
+    @NotBlank(message = "game booking status name is required")
     @Column(name = "game_booking_status_name", nullable = false, length = 50)
     private String gameBookingStatusName;
 

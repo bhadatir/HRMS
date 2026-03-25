@@ -2,6 +2,7 @@ package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -20,18 +21,18 @@ public class ReferFriend {
     private Long id;
 
     @Size(max = 50)
-    @NotNull(message = "refer friend name is required")
+    @NotBlank(message = "refer friend name is required")
     @Column(name = "refer_friend_name", nullable = false, length = 50)
     private String referFriendName;
 
     @Size(max = 50)
     @Email(message = "email formate is not proper")
-    @NotNull(message = "refer friend email is required")
+    @NotBlank(message = "refer friend email is required")
     @Column(name = "refer_friend_email", nullable = false, length = 50)
     private String referFriendEmail;
 
     @Size(max = 255)
-    @NotNull(message = "refer friend cv is required")
+    @NotBlank(message = "refer friend cv is required")
     @Column(name = "refer_friend_cv_url", nullable = false)
     private String referFriendCvUrl;
 

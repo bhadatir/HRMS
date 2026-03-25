@@ -177,7 +177,7 @@ export default function PostManagement() {
           {/* Post Form Modal */}
           {showForm && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="post bg-white rounded-xl max-w-lg w-full relative">
+              <div className="post bg-white rounded-xl max-w-lg w-full relative h-120 overflow-y-auto">
                 <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
                   setShowForm(false);
                   setEditPostId(0);

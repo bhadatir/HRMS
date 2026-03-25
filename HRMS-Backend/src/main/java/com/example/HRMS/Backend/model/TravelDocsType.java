@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class TravelDocsType {
     private Long id;
 
     @Size(max = 20)
-    @NotNull(message = "travel doc type name is required")
+    @NotBlank(message = "travel doc type name is required")
     @Column(name = "travel_docs_type_name", nullable = false, length = 20)
     private String travelDocsTypeName;
 

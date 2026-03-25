@@ -1,6 +1,7 @@
 package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,11 +18,11 @@ public class AuditTravelPlan {
     @Column(name = "pk_audit_travel_plan_id", nullable = false)
     private Long id;
 
-    @NotNull(message = "action is required")
+    @NotBlank(message = "action is required")
     @Column(name = "audit_travel_plan_action", nullable = false)
     private String action;
 
-    @NotNull(message = "owner email is required")
+    @NotBlank(message = "owner email is required")
     @Column(name = "audit_travel_plan_owner_email", nullable = false)
     private String ownerEmail;
 

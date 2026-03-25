@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 public class ExpenseRequest {
 
-    @Min(value = 0,message = "expense amount cannot be negative")
+    @Min(value = 1,message = "expense amount cannot be less than 1")
     private Integer expenseAmount;
 
     @NotNull(message = "expense date is required")
