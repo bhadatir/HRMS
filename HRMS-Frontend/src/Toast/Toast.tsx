@@ -12,7 +12,7 @@ export default function Toast() {
 
   return (
     <div
-      className="fixed bottom-5 z-[9999] flex w-full"
+      className="fixed bottom-5 z-[9999] flex w-full flex-col items-end gap-2 px-5"
     >
       {toasts.map((toast) => (
         <Notification

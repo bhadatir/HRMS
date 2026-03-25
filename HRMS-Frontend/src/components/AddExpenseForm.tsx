@@ -138,7 +138,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
     const errorMessage = err.response?.data?.message || err.response?.data || err.message;
-    toast?.error("Failed to submit expense: " + (typeof errorMessage === 'object' ? JSON.stringify(errorMessage) : errorMessage));
+    toast?.error("Failed to submit expense: " + errorMessage);
   }
   });
 
@@ -178,13 +178,13 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
               <Input type="date" max={new Date().toISOString().split("T")[0]} {...register("expenseDate", { required: true })} />
             </div>
           </div>   
-          <Input disabled={isOverLimit} placeholder="Remark" {...register("expenseRemark")} />
+          <Input disabled={isOverLimit} placeholder="Remark" {...register("expenseRemark", { required: "Remark is required" })} />
          
           <div className="border-2 border-dashed rounded-lg p-4 text-center border-slate-200">
             <label className="cursor-pointer block">
               <UploadCloud className="mx-auto text-slate-400" size={32} />
               <span className="text-sm text-slate-500">Click to upload receipts</span>
-              <input disabled={isOverLimit} type="file" multiple className="hidden" onChange={handleFileChange} />
+              <input disabled={isOverLimit} type="file" accept=".jpg,.jpeg,.png,.pdf,.docx,.doc" multiple className="hidden" onChange={handleFileChange} />
             </label>
           </div>
 
@@ -217,7 +217,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
             className="w-full text-gray-700"
             type="submit"
             title="submit expense claim"
-            disabled={expenseMutation.isPending || isOverLimit || proofs.length === 0 || proofs.some(p => !p.typeId)|| !watch("expenseAmount") || !watch("expenseDate")}
+            disabled={expenseMutation.isPending || isOverLimit || proofs.length === 0 || proofs.some(p => !p.typeId)|| !watch("expenseAmount") || !watch("expenseDate") || !watch("expenseRemark")}
           >
             {expenseMutation.isPending ? "Uploading..." : "Submit Claim"}
           </Button>

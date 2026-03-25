@@ -95,7 +95,7 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
             <Input 
               type="file" 
               className="cursor-pointer" 
-              accept=".pdf,.doc,.docx"
+              accept=".jpg,.jpeg,.png,.pdf,.docx,.doc"
               {...register("file", { required: "CV is required" })}
             />
             <p className="text-xs text-slate-400">Upload CV/Resume (PDF or Word)</p>

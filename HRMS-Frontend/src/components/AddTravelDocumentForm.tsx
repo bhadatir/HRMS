@@ -70,7 +70,7 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
 
         <div className="border-2 border-dashed rounded-lg p-6 text-center space-y-2 border-slate-200">
           <UploadCloud className="mx-auto text-slate-400" size={32} />
-          <Input type="file" multiple className="cursor-pointer" onChange={(e) => e.target.files && setDocFile(Array.from(e.target.files)[0])} />
+          <Input type="file" accept=".jpg,.jpeg,.png,.pdf,.docx,.doc" multiple className="cursor-pointer" onChange={(e) => e.target.files && setDocFile(Array.from(e.target.files)[0])} />
           <p className="text-xs text-slate-400">Upload receipts or proof of travel</p>
         </div>
 

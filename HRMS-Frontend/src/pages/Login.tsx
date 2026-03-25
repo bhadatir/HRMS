@@ -29,7 +29,6 @@ export default function Login() {
       localStorage.setItem("token", data.accessToken);
       login(data.isFirstLogin);
       navigate("/dashboard");
-      window.location.reload();
       toast?.success("Login successful!");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
