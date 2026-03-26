@@ -24,6 +24,7 @@ import { useEmployeeSearch } from "../hooks/useInfinite";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useInView } from "react-intersection-observer";
 import { useToast } from "@/context/ToastContext";
+import { ConformationDialog } from "./ConformationDialog";
 
 type Referral = {
   id: number;
@@ -55,6 +56,9 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
   const [viewMode, setViewMode] = useState<"REFERRALS" | "REVIEWERS">("REFERRALS");
   const [newReviewerId, setNewReviewerId] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [referId, setReferId] = useState<number>(0);
+  const [statusId, setStatusId] = useState<number>(0);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const debouncedSearchTerm = useAppDebounce(searchTerm); 
   const toast = useToast();
@@ -136,18 +140,8 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     addReviewerMutation.mutate();
   };
   
-  const handleUpdateCvStatus = (referId: number, statusId: number) => {
-    if(statusId === 5) {
-      const confirm = window.confirm("Are you sure you want to approve this cv?");
-      if (confirm) updateCvStatusMutation.mutate({ referId, statusId, reason: `Approved By : ${user?.employeeEmail} at ${new Date().toLocaleString()}` });
-    } else {
-      const reason = window.prompt("Please enter reason for this action :", "")?.trim();
-      if (reason) {
-        updateCvStatusMutation.mutate({ referId, statusId, reason });
-      } else {
-        toast?.error("reason is required.");
-      }
-    }
+  const handleUpdateCvStatus = (reason: string) => {
+    updateCvStatusMutation.mutate({ referId, statusId, reason });
   };
 
   useEffect(() => {
@@ -171,6 +165,22 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
 
   return (
     <div>
+      {/* Confirmation Dialog */}
+      {isDialogOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="post bg-white bottom-45 rounded-xl max-w-lg w-full relative">
+            <ConformationDialog
+              onClose={() => setIsDialogOpen(false)} 
+              onConfirm={(reason) => handleUpdateCvStatus(
+                statusId === 2 ? `Approved by : ${user?.employeeEmail} at ${new Date().toLocaleString()}` : `${reason} (Rejected by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`
+              )} 
+              iteam="cv status"
+              action={statusId === 2 ? "Approve" : "Reject"}
+            />
+          </div>
+        </div>
+      )}
+
       <Card className="border-none shadow-none">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <div>
@@ -303,13 +313,23 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                             <div className="job">
                               <Button 
                               size="sm" variant="outline" className="text-green-600 border-green-200 mr-2"
-                              onClick={() => handleUpdateCvStatus(ref.id, 5)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setReferId(ref.id);
+                                setStatusId(2);
+                                setIsDialogOpen(true);
+                              }}
                               >
                               <CheckCircle size={14} />
                               </Button>
                               <Button 
                               size="sm" variant="outline" className="text-red-600 border-red-200"
-                              onClick={() => handleUpdateCvStatus(ref.id, 6)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setReferId(ref.id);
+                                setStatusId(6);
+                                setIsDialogOpen(true);
+                              }}
                               >
                               <XCircle size={14} />
                               </Button>

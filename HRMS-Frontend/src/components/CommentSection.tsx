@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Reply, Send, Trash2, X } from "lucide-react";
 import LikeButton from "./LikeButton";
 import { useToast } from "@/context/ToastContext";
+import { ConformationDialog } from "./ConformationDialog";
 
 type Comment = {
   id: number;
@@ -27,6 +28,8 @@ export default function CommentSection({ postId }: { postId: number }) {
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(null);
   const commentref = useRef<HTMLInputElement>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deletingCommentId, setDeletingCommentId] = useState<number>(0);
 
   const { data: comments = [], isError: commentsError } = useQuery({
     queryKey: ["postComments", postId],
@@ -85,17 +88,29 @@ export default function CommentSection({ postId }: { postId: number }) {
     commentref.current?.focus();
   }
 
-  const handleDelete = (commentId: number) => {
-    const reason = window.prompt("Please enter reason for deleting this comment:", "")?.trim();
-    if (reason) {
-      removeCommentMutation.mutate({ commentId, reason });
-    }
+  const handleDelete = (reason: string) => {
+    removeCommentMutation.mutate({ commentId: deletingCommentId, reason });
   };
 
   if (commentsError) toast?.error("Failed to load comments: " + commentsError);
 
   return (
     <div className="mt-4 space-y-4 pt-4 border-t">
+
+      {/* Confirmation Dialog */}
+      {isDialogOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="post bg-white bottom-55 rounded-xl max-w-lg w-full relative">
+            <ConformationDialog
+              onClose={() => setIsDialogOpen(false)} 
+              onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
+              iteam="comment"
+              action="Delete"
+            />
+          </div>
+        </div>
+      )}
+
       <div className="space-y-3">
         {comments.filter((c: Comment) => !c.commentIsDeleted).map((comment: Comment) => (
           <div key={comment.id} className={`p-2 rounded-lg group ${comment.parentCommentId ? 
@@ -129,9 +144,13 @@ export default function CommentSection({ postId }: { postId: number }) {
                       <Reply size={12} />
                 </button>
                 {(user?.roleName === "HR" || user?.roleName === "ADMIN" || user?.id === comment.employeeId) && (
-                    <button
-                    onClick={() => handleDelete(comment.id)}
-                          className="flex opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsDialogOpen(true);
+                      setDeletingCommentId(comment.id);
+                    }}
+                    className="flex opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
                   >
                     <Trash2 size={12} />
                     {removeCommentMutation.isPending && removeCommentMutation.variables?.commentId === comment.id ? <span className="text-[10px] text-red-600"> Deleting...</span> : null}

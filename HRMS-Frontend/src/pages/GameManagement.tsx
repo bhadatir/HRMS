@@ -21,6 +21,7 @@ import { useFindGameBookingByUserId, useFindGameBookings } from "@/hooks/useInfi
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { useToast } from "@/context/ToastContext";
+import { ConformationDialog } from "@/components/ConformationDialog";
 
 type GameType = {
     id: number;
@@ -66,6 +67,7 @@ export default function GameManagement() {
     const toast = useToast();
     const { token, user, unreadNotifications } = useAuth();
     const queryClient = useQueryClient();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
     const [showGameTypeForm, setShowGameTypeForm] = useState(false);
     const [gameType, setGameType] = useState<number>(0);
@@ -258,6 +260,21 @@ export default function GameManagement() {
                 </header>
 
                 <main className="p-6 max-w-5xl mx-auto w-254">
+
+                    {/* Confirmation Dialog */}
+                    {isDialogOpen && (
+                      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+                            <ConformationDialog
+                            onClose={() => setIsDialogOpen(false)} 
+                            onConfirm={() => removeWaitingListMutation.mutate(waitingListId)} 
+                            iteam="waiting list entry"
+                            action="Delete"
+                            />
+                        </div>
+                      </div>
+                    )}
+
                     {/* Notifications */}
                     {showNotification && (
                       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
@@ -448,13 +465,12 @@ export default function GameManagement() {
                                             
                                                 <div className="flex gap-2">
                                                     {wait.hostEmployeeId === user?.id && 
-                                                        <>
+                                                        <>                                                        
                                                         <Button size="sm" variant="outline" className="h-7 text-red-600" 
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            if (confirm("Are you sure you want to delete this waiting list entry?")) {
-                                                                removeWaitingListMutation.mutate(wait.id);
-                                                            }
+                                                            setIsDialogOpen(true);
+                                                            setWaitingListId(wait.id);
                                                         }}>
                                                             <Trash size={14} className="mr-1"/> Delete
                                                         </Button>

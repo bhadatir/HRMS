@@ -21,6 +21,7 @@ import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { useAppDebounce } from "@/hooks/useAppDebounce.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
+import { ConformationDialog } from "@/components/ConformationDialog.tsx";
 
 type Plan = {
   id: number;
@@ -52,6 +53,8 @@ export default function TravelPlan() {
   const [fullTravelDetails, setFullTravelDetails] = useState<number | null>(null);
   const [editTravelPlanId, setEditTravelPlanId] = useState<number | null>(null);
   const [activeExpenseId, setActiveExpenseId] = useState<number | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deletingTravelPlanId, setDeletingTravelPlanId] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get("travelPlanId") || "";
@@ -130,13 +133,8 @@ export default function TravelPlan() {
     return travelPlanByEmpId;   
   }, [user, travelPlanByEmpId, allTravelPlans]);
 
-  const handleDelete = (travelPlanId: number) => {
-    const reason = window.prompt("Please enter reason for deleting this travel plan:", "")?.trim();
-    if (reason) {
-      deleteTravelPlanMutation.mutate({ travelPlanId, reason });
-    }else{
-      toast?.error("Deletion reason is required");
-    }
+  const handleDelete = (reason: string) => {
+    deleteTravelPlanMutation.mutate({ travelPlanId: deletingTravelPlanId, reason });
   };
 
   useEffect(() => {
@@ -230,6 +228,20 @@ export default function TravelPlan() {
         </header>
 
         <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
+
+          {/* Confirmation Dialog */}
+          {isDialogOpen && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+                <ConformationDialog
+                  onClose={() => setIsDialogOpen(false)} 
+                  onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
+                  iteam="travel plan"
+                  action="Delete"
+                />
+              </div>
+            </div>
+          )}
           
           {/* Notifications */}
           {showNotification && (
@@ -411,7 +423,8 @@ export default function TravelPlan() {
                             title="Delete Travel Plan"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(plan.id);
+                              setIsDialogOpen(true);
+                              setDeletingTravelPlanId(plan.id);
                             }}
                             className="text-red-500 hover:text-red-700 right-0 mt-2"
                           >

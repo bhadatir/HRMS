@@ -20,6 +20,7 @@ import { useInView } from "react-intersection-observer";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
+import { ConformationDialog } from "@/components/ConformationDialog.tsx";
 
 type Job = {
   id: number;
@@ -37,6 +38,8 @@ export default function JobManagement() {
   const { token, user, unreadNotifications } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteJobId, setDeleteJobId] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get("jobId") || "";
@@ -109,11 +112,8 @@ export default function JobManagement() {
     return () => document.removeEventListener("click", clickOutside);
   }, [editJobId, referJobId, shareJobId, selectedJobId, showForm, showNotification]);
 
-  const handleDelete = (id: number) => {
-    const reason = window.prompt("Please enter reason for change this job status:", "")?.trim();
-    if (reason) {
-      jobStatusmutation.mutate({ jobId: id, reason });
-    }
+  const handleDelete = (reason: string) => {
+    jobStatusmutation.mutate({ jobId: deleteJobId, reason });
   };
 
   return (
@@ -179,6 +179,20 @@ export default function JobManagement() {
 
         <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
           
+          {/* Confirmation Dialog */}
+          {isDialogOpen && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+                <ConformationDialog
+                  onClose={() => setIsDialogOpen(false)} 
+                  onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
+                  iteam="job"
+                  action="Delete"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Notifications */}
           {showNotification && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -295,7 +309,8 @@ export default function JobManagement() {
                               title="close job"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDelete(job.id);
+                                setIsDialogOpen(true);
+                                setDeleteJobId(job.id);
                               }}
                               className="text-gray-600"
                             >

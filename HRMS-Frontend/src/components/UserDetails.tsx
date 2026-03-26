@@ -12,11 +12,13 @@ import {
 import { apiService } from "@/api/apiService";
 import AddUser from "./AddUser";
 import { useToast } from "@/context/ToastContext";
+import { ConformationDialog } from "./ConformationDialog";
 
 export default function UserDetails({ userEmail }: { userEmail: string | null}) {
   const { token, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showEditUserForm, setShowEditUserForm] = useState(false); 
     
   const { data: userData, isLoading, isError } = useQuery({
@@ -46,11 +48,8 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
       toast?.error("Failed to inactivate user: " + detailedError); }
   });
 
-  const handleInactivate = () => {
-    const reason = prompt("Please enter the reason for inactivating this user:");
-    if (reason) {
-      inactivateMutation.mutate(reason);
-    }
+  const handleInactivate = (reason: string) => {
+    inactivateMutation.mutate(reason);
   };
 
   if (isLoading) return <div className="p-10 text-center text-slate-500">Loading User Data...</div>;
@@ -58,6 +57,21 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
 
   return (
     <div>
+
+      {/* Confirmation Dialog */}
+      {isDialogOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+            <ConformationDialog
+              onClose={() => setIsDialogOpen(false)} 
+              onConfirm={(reason) => handleInactivate(`${reason} (Inactivated by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
+              iteam="user"
+              action="Inactivate"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Edit user */}
       {showEditUserForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -109,7 +123,10 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
                         Edit User
                     </Button>
                     <Button title="Inactivate User"
-                        onClick={handleInactivate} className="gap-2 text-gray-600">
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsDialogOpen(true);
+                        }} className="gap-2 text-gray-600">
                         <Trash size={18} />
                         {inactivateMutation.isPending ? "Inactiving..." : "Inactivate User"}
                     </Button>

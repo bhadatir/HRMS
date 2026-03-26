@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { gameService } from "@/api/gameService";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/context/ToastContext";
+import { ConformationDialog } from "./ConformationDialog";
 
 type Booking = {
     id: number;
@@ -38,6 +39,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: Book
     const [showGameBookingForm, setShowGameBookingForm] = useState(false);
     const { user, token } = useAuth();
     const toast = useToast();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const { data: gameBookingStatusOptions = [], isError: gameBookingStatusOptionsError } = useQuery({
         queryKey: ["gameBookingStatusOptions"],
@@ -48,6 +50,20 @@ export default function BookingCard({ booking, onStatusChange }: { booking: Book
 
     return (
         <>
+        {/* Confirmation Dialog */}
+        {isDialogOpen && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+              <ConformationDialog
+                onClose={() => setIsDialogOpen(false)} 
+                onConfirm={(reason) => onStatusChange(`${reason} (Cancelled by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
+                iteam="game booking"
+                action="Cancel"
+              />
+            </div>
+          </div>
+        )}
+
         {/* add game booking */}
         {showGameBookingForm && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -95,13 +111,9 @@ export default function BookingCard({ booking, onStatusChange }: { booking: Book
                     && !booking.gameBookingIsDeleted && new Date(booking.gameBookingStartTime) > new Date() ? (
                     <div className="flex gap-2">
                         <Button size="sm" variant="outline" className="h-7 text-red-600" 
-                        onClick={() => {
-                            const reason = window.prompt("Please enter a reason for cancellation:", "")?.trim();
-                            if (reason) {                                
-                                onStatusChange(`${reason} (Updated by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`);
-                            }else {
-                                toast?.error("Cancellation reason is required.");
-                            }
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsDialogOpen(true);
                         }}>
                             <CheckCircle size={14} className="mr-1"/> Cancel
                         </Button>

@@ -11,6 +11,7 @@ import { Plane, Calendar, MapPin, FileText, CheckCircle, XCircle, ExternalLink, 
 import { Input } from "./ui/input";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useToast } from "@/context/ToastContext";
+import { ConformationDialog } from "./ConformationDialog";
 
 export default function TravelPlanDetails({travelPlan } : {travelPlan: number| null; onSuccess: () => void }) {
   const toast = useToast();
@@ -19,6 +20,9 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
   const [viewMode, setViewMode] = useState<"EXPENSES" | "DOCUMENTS">("EXPENSES");
   const [expenseSearchTerm, setExpenseSearchTerm] = useState("");
   const [docSearchTerm, setDocSearchTerm] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [expenseId, setExpenseId] = useState<number>(0);
+  const [statusId, setStatusId] = useState<number>(0);
   const debouncedExpenseSearchTerm = useAppDebounce(expenseSearchTerm);
   const debouncedDocSearchTerm = useAppDebounce(docSearchTerm);
 
@@ -84,23 +88,28 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
   if (planError || docsError) toast?.error("Failed to load travel plan details: " + (planError || docsError));
   if (isLoadingData) return <div className="p-10">Loading Details...</div>;
 
-  const handleExpenseApproval = (expenseId: number, statusId: number) => {
-    if(statusId === 2) {
-      const confirm = window.confirm("Are you sure you want to approve this expense?");
-      const reason = `Approved by : ${user?.employeeEmail} at ${new Date().toLocaleString()}`;
-      if (confirm) approveMutation.mutate({ expenseId, statusId, reason });
-    } else {
-      const reason = window.prompt("Please enter reason for approval:", "")?.trim();
-      if (reason) {
-        approveMutation.mutate({ expenseId, statusId, reason: `${reason} (Rejected by : ${user?.employeeEmail} at ${new Date().toLocaleString()})` });
-      } else {
-        toast?.error("reason is required.");
-      }
-    }
+  const handleExpenseStatusUpdate = (reason: string) => {
+    approveMutation.mutate({ expenseId, statusId, reason });
   };
 
   return (
         <>
+        {/* Confirmation Dialog */}
+        {isDialogOpen && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="post bg-white bottom-45 rounded-xl max-w-lg w-full relative">
+              <ConformationDialog
+                onClose={() => setIsDialogOpen(false)} 
+                onConfirm={(reason) => handleExpenseStatusUpdate(
+                  statusId === 2 ? `Approved by : ${user?.employeeEmail} at ${new Date().toLocaleString()}` : `${reason} (Rejected by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`
+                )} 
+                iteam="expense status"
+                action={statusId === 2 ? "Approve" : "Reject"}
+              />
+            </div>
+          </div>
+        )}
+
         <Card className="border-none shadow-none">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
@@ -271,7 +280,12 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
                                 size="sm" 
                                 variant="outline" 
                                 className="text-green-600 border-green-200 hover:bg-green-50"
-                                onClick={() => handleExpenseApproval(exp.id, 2)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpenseId(exp.id);
+                                  setStatusId(2);
+                                  setIsDialogOpen(true);
+                                }}
                                 disabled={approveMutation.isPending || plan?.travelPlanIsDeleted}
                               >
                                 <CheckCircle size={16} />
@@ -280,7 +294,12 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
                                 size="sm" 
                                 variant="outline" 
                                 className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => handleExpenseApproval(exp.id, 3)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpenseId(exp.id);
+                                  setStatusId(3);
+                                  setIsDialogOpen(true);
+                                }}
                                 disabled={approveMutation.isPending || plan?.travelPlanIsDeleted}
                               >
                                 <XCircle size={16} />

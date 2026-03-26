@@ -20,6 +20,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { useToast } from "@/context/ToastContext";
+import { ConformationDialog } from "@/components/ConformationDialog";
 
 type Post = {
   id: number;
@@ -55,6 +56,8 @@ export default function PostManagement() {
   const [showComments, setShowComments] = useState(false);
   const queryClient = useQueryClient();
   const debouncedSearch = useAppDebounce(searchTerm);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deletingPostId, setDeletingPostId] = useState<number>(0);
   
   const {
     data: allPosts,
@@ -91,13 +94,10 @@ export default function PostManagement() {
       toast?.error("Failed to delete post: " + detailedError); }
   });
 
-  const handleDelete = (postId: number) => {
-    const reason = window.prompt("Please enter reason for deleting this post:", "")?.trim();
-    if (reason) {
-      removePost.mutate({ postId, reason });
-    }
+  const handleDelete = (reason: string) => {
+    removePost.mutate({ postId: deletingPostId, reason });
   };
-
+   
   useEffect(() => {
     const clickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -164,6 +164,20 @@ export default function PostManagement() {
         </header>
 
         <main className="p-6 max-w-3xl mx-auto space-y-6 w-full">
+
+          {/* Confirmation Dialog */}
+          {isDialogOpen && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+                <ConformationDialog
+                  onClose={() => setIsDialogOpen(false)} 
+                  onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
+                  iteam="post"
+                  action="Delete"
+                />
+              </div>
+            </div>
+          )}
           
           {/* Notifications */}
           {showNotification && (
@@ -224,14 +238,17 @@ export default function PostManagement() {
                             </div>
                           )}
                           {(user?.roleName === "HR" || user?.roleName === "ADMIN" || user?.id === post.employeeId) 
-                            && (  
-                            <Button variant="ghost" size="sm" className="ml-2" onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(post.id);
-                            }}>
-                            <Trash size={16} className="text-red-600" />
-                            {removePost.isPending && removePost.variables?.postId === post?.id ? <span className="text-[10px] text-red-600">Deleting...</span> : null}
-                            </Button>
+                            && ( 
+                            <>
+                              <Button variant="ghost" size="sm" className="ml-2" onClick={(e) => {
+                                e.stopPropagation();
+                                setIsDialogOpen(true);
+                                setDeletingPostId(post.id);
+                              }}>
+                              <Trash size={16} className="text-red-600" />
+                              {removePost.isPending && removePost.variables?.postId === post?.id ? <span className="text-[10px] text-red-600">Deleting...</span> : null}
+                              </Button>
+                            </>
                           )}
                         </div>
                       </div>
