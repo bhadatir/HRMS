@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Building, X, Bell, IndianRupee, Pencil } from "lucide-react";
+import { Mail, Building, X, Bell, IndianRupee, Pencil, Cake, Building2, User } from "lucide-react";
 import Notifications from "../components/Notifications.tsx";
 import { Button } from "@/components/ui/button";
 import {
@@ -84,7 +84,11 @@ export default function Dashboard() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to update profile details: " + (error.response?.data || error.message));
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to update profile details: " + detailedError);
     }
   });
 
@@ -97,7 +101,11 @@ export default function Dashboard() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to update password: " + (error.response?.data || error.message));
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to update password: " + detailedError);
     }
   });
   
@@ -141,10 +149,10 @@ export default function Dashboard() {
   };
 
   const modifiersStyles = {
-    travel: { border: "1px solid #1e40af", borderRadius: "4px" },
-    game: { border: "1px solid #22c55e",borderRadius: "4px" },
-    wait: { border: "1px solid #f59e0b", borderRadius: "4px" },
-    selected: { border: "2px solid #000000", borderRadius: "4px", text: "black" },
+    travel: { border: "1px solid #1e40af", borderRadius: "8px" },
+    game: { border: "1px solid #22c55e",borderRadius: "8px" },
+    wait: { border: "1px solid #f59e0b", borderRadius: "8px" },
+    selected: { border: "2px solid #000000", borderRadius: "8px", text: "black" },
   };
 
   const getEventsForDay = (date: Date | undefined) => {
@@ -322,62 +330,36 @@ export default function Dashboard() {
               </Card>
             </div>
 
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  Employment Timeline
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="flex gap-4 items-start">
-                  <div className="p-2 bg-slate-100 rounded-lg">🎂</div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Date of Birth</p>
-                    <p className="text-base">{new Date(user.employeeDob).toLocaleDateString()}</p>
-                  </div>
-                </div>
-                <div className="flex gap-4 items-start">
-                  <div className="p-2 bg-slate-100 rounded-lg">🏢</div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Date of Joining</p>
-                    <p className="text-base">{new Date(user.employeeHireDate).toLocaleDateString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="col-span-1 md:col-span-3 lg:col-span-2">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  Schedule Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col md:flex-row gap-8">
-                
-                <div className="border rounded-md p-2 bg-white">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    modifiers={modifiers}
-                    modifiersStyles={modifiersStyles}
-                    className="rounded-md"
-                  />
-                  <div className="mt-4 flex gap-4 text-xs p-2 border-t">
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 border-1 border-blue-400 rounded" /> Travel
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 border-1 border-green-500 rounded" /> Game
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 border-1 border-yellow-500 rounded" /> Waiting List
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    Employment Timeline
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-rows-1 md:grid-rows-2 gap-8">
+                  <div className="flex gap-4 items-start">
+                    <div className="p-2 bg-slate-100 rounded-lg"><Cake /></div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Date of Birth</p>
+                      <p className="text-base">{new Date(user.employeeDob).toLocaleDateString()}</p>
                     </div>
                   </div>
-                </div>
-
-                {/* Details Panel for Selected Date */}
+                  <div className="flex gap-4 items-start">
+                    <div className="p-2 bg-slate-100 rounded-lg"><Building2 /></div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Date of Joining</p>
+                      <p className="text-base">{new Date(user.employeeHireDate).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 items-start">
+                    <div className="p-2 bg-slate-100 rounded-lg"><User /></div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Account Created At</p>
+                      <p className="text-base">{new Date(user.employeeCreatedAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  {/* Details Panel for Selected Date */}
                 <div className="flex-1 space-y-4">
                   <h4 className="font-bold text-slate-700 border-b pb-2">
                     Details: {selectedDate?.toLocaleDateString()}
@@ -424,8 +406,42 @@ export default function Dashboard() {
                     <p className="text-slate-400 italic text-sm">No events scheduled for this day.</p>
                   )}
                 </div>
+                </CardContent>
+              </Card>
+
+              <Card className="col-span-1 md:col-span-3 lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  Schedule Overview : {selectedDate ? selectedDate.toLocaleDateString() : "Select a date"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col md:flex-row gap-8">
+                
+                <div className="border rounded-md p-2 bg-white ml-10">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    modifiers={modifiers}
+                    modifiersStyles={modifiersStyles}
+                    className="rounded-md"
+                  />
+                  <div className="mt-4 flex gap-4 text-xs p-2 border-t">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 border-1 border-blue-400 rounded" /> Travel
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 border-1 border-green-500 rounded" /> Game
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 border-1 border-yellow-500 rounded" /> Waiting List
+                    </div>
+                  </div>
+                </div>
+
               </CardContent>
-            </Card>
+              </Card>
+            </div>  
 
 
             <ScrollToTop />
