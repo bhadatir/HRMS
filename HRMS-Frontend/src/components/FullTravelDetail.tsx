@@ -74,7 +74,11 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
       // onSuccess();
     },
     onError: (error: any) => {
-      toast?.error("Failed to update expense status: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to update expense status: " + detailedError); }
   });
 
   if (planError || docsError) toast?.error("Failed to load travel plan details: " + (planError || docsError));

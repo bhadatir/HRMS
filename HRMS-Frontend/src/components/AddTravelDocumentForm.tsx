@@ -58,7 +58,11 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to submit travel document: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+        : data || error.message;
+      toast?.error("Failed to submit travel document: " + detailedError); }
   });
 
   if (employeeTravelPlanError || allTagTypesError) toast?.error("Failed to load data: " + (employeeTravelPlanError || allTagTypesError));

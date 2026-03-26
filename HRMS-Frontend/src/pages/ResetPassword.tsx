@@ -19,7 +19,11 @@ export default function ResetPassword() {
     onSuccess: () => setStep(2),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Error: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Error: " + detailedError); }
   });
 
   const resetMutation = useMutation({
@@ -29,7 +33,13 @@ export default function ResetPassword() {
       setStep(3);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (error: any) => toast?.error("Update failed: " + (error.response?.data || error.message)),
+    onError: (error: any) => {
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Update failed: " + detailedError);
+    },
   });
 
   return (

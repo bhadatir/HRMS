@@ -163,7 +163,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
               <Input 
                 type="number" 
                 placeholder="Amount" 
-                {...register("expenseAmount", { required: "Amount is required", min: 1 })} 
+                {...register("expenseAmount")} 
               />
               {errors.expenseAmount && (
                 <p className="text-[10px] font-bold text-red-500">
@@ -175,7 +175,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
               <div className="flex justify-between items-center mb-1">
                 <label className="text-[10px] font-bold text-slate-500 uppercase">Date</label>
               </div>
-              <Input type="date" max={new Date().toISOString().split("T")[0]} {...register("expenseDate", { required: true })} />
+              <Input type="date" max={new Date().toISOString().split("T")[0]} {...register("expenseDate")} />
             </div>
           </div>   
           <Input disabled={isOverLimit} placeholder="Remark" {...register("expenseRemark")} />

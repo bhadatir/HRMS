@@ -59,7 +59,11 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to load post details: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to load post details: " + detailedError); }
   });
 
   useEffect(() => {
@@ -102,7 +106,11 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to " + (editPostId ? "update post" : "create post") + ": " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to " + (editPostId ? "update post" : "create post") + ": " + detailedError); }
   });
 
   return (
@@ -116,14 +124,14 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
         <form onSubmit={handleSubmit(data => postMutation.mutate(data))} className="space-y-4">
         <Input 
           placeholder="Catchy Title" 
-          {...register("postTitle", { required: "Title is required" })}
+          {...register("postTitle")}
         />
         {errors.postTitle && <p className="text-red-500 text-xs">{errors.postTitle.message}</p>}
         
         <Textarea 
           placeholder="What would you like to share?" 
           className="min-h-[120px]"
-          {...register("postContent", { required: "Content is required" })}
+          {...register("postContent")}
         />
         {errors.postContent && <p className="text-red-500 text-xs">{errors.postContent.message}</p>}
 
@@ -134,7 +142,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
             </label>
             <select 
               className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-              {...register("fkPostVisibilityId", { required: "Visibility is required" })}
+              {...register("fkPostVisibilityId")}
             >
               {allVisibilities.map((vis: Visibility) => (
                 <option key={vis.id} value={vis.id}>{vis.postVisibilityName}</option>
@@ -160,7 +168,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
         <Button 
           type="submit"
           className="w-full text-black"
-          disabled={postMutation.isPending || (!editPostId && !watch("postTitle") || !watch("postContent") || !watch("fkPostVisibilityId") || !watch("file"))}
+          disabled={postMutation.isPending || !watch("postTitle")?.trim() || !watch("postContent")?.trim() || !watch("fkPostVisibilityId") || !watch("file")}
         >
           {postMutation.isPending ? "Processing..." : editPostId ? "Update Post" : "Post to Feed"}
         </Button>

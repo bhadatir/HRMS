@@ -104,7 +104,11 @@ const getMutation = useMutation({
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onError: (error: any) => {
-    toast?.error("Failed to get travel plan details: " + (error.response?.data || error.message)); }
+    const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+    toast?.error("Failed to get travel plan details: " + detailedError); }
 });
 
   useEffect(() => {
@@ -192,22 +196,22 @@ const getMutation = useMutation({
         <form onSubmit={handleSubmit(data => travelPlanMutation.mutate(data))} className="md:col-span-2 space-y-4">
         <div className="gap-5 flex">
           <Input placeholder="Plan Name"
-           {...register("travelPlanName", { required: "Travel plan name is required" })} />
+           {...register("travelPlanName")} />
           {errors.travelPlanName && <p className="text-red-500 text-xs">{errors.travelPlanName.message}</p>}
         
           <div className="space-y-2 flex">
             <label className="text-sm font-medium text-gray-500 w-30 mt-2">Start Date :</label>
             <Input type="date" placeholder="Start Date" min={new Date().toISOString().split("T")[0]}
-              {...register("travelPlanStartDate", { required: "Start date is required" })} />
+              {...register("travelPlanStartDate")} />
               {errors.travelPlanStartDate && <p className="text-red-500 text-xs">{errors.travelPlanStartDate.message}</p>}
           </div>
         </div>
         <div className="gap-5 flex">
           <Input placeholder="From" 
-            {...register("travelPlanFrom", { required: "Travel plan from is required" })} />
+            {...register("travelPlanFrom")} />
             {errors.travelPlanFrom && <p className="text-red-500 text-xs">{errors.travelPlanFrom.message}</p>}
           <Input placeholder="To" 
-            {...register("travelPlanTo", { required: "Travel plan to is required" })} />
+            {...register("travelPlanTo")} />
             {errors.travelPlanTo && <p className="text-red-500 text-xs">{errors.travelPlanTo.message}</p>}
             {errors.travelPlanTo && errors.travelPlanStartDate && watch("travelPlanStartDate") > watch("travelPlanEndDate") && (
               <p className="text-red-500 text-xs">End date cannot be before start date</p>
@@ -218,13 +222,13 @@ const getMutation = useMutation({
           <div className="space-y-2 flex">
             <label className="text-sm font-medium text-gray-500 w-30 mt-2">End Date :</label>
             <Input type="date" placeholder="End Date" min={watch("travelPlanStartDate")} disabled={!watch("travelPlanStartDate")}
-              {...register("travelPlanEndDate", { required: "End date is required" })} />
+              {...register("travelPlanEndDate")} />
               {errors.travelPlanEndDate && <p className="text-red-500 text-xs">{errors.travelPlanEndDate.message}</p>}
           </div>
 
           <select 
             className="flex h-9 w-full rounded-md border border-input px-3 py-2 text-sm"
-            {...register("travelPlanIsReturn", { required: "Please select trip type" })}
+            {...register("travelPlanIsReturn")}
           >
             <option value="true">Return Trip</option>
             <option value="false">One Way</option>
@@ -234,12 +238,12 @@ const getMutation = useMutation({
             
         <div className="gap-5 flex">
           <Input type="number" placeholder="Max Expense Amount Per Day" min={1}
-            {...register("travelMaxExpenseAmountPerDay", { required: "Max expense amount per day is required", valueAsNumber: true })} />
+            {...register("travelMaxExpenseAmountPerDay")} />
             {errors.travelMaxExpenseAmountPerDay && <p className="text-red-500 text-xs">{errors.travelMaxExpenseAmountPerDay.message}</p>}
         </div>  
         
         <Textarea className="md:col-span-2" placeholder="Details" 
-          {...register("travelPlanDetails", { required: "Travel plan details are required" })} />
+          {...register("travelPlanDetails")} />
           {errors.travelPlanDetails && <p className="text-red-500 text-xs">{errors.travelPlanDetails.message}</p>}
 
           <div className="space-y-3">
@@ -310,7 +314,7 @@ const getMutation = useMutation({
           <Button 
             type="submit" 
             className="w-full text-black font-bold" 
-            disabled={travelPlanMutation.isPending || selectedEmployees.length === 0 || !watch("travelPlanStartDate") || !watch("travelPlanEndDate") || !watch("travelPlanFrom")?.trim() || !watch("travelPlanTo")?.trim() || !watch("travelPlanDetails")?.trim()}
+            disabled={travelPlanMutation.isPending || selectedEmployees.length === 0 || !watch("travelPlanStartDate") || !watch("travelPlanEndDate") || !watch("travelPlanFrom")?.trim() || !watch("travelPlanTo")?.trim() || !watch("travelPlanDetails")?.trim() || !watch("travelMaxExpenseAmountPerDay") || !watch("travelPlanName")?.trim() || !watch("travelPlanIsReturn")}
           >
             {travelPlanMutation.isPending ? "Deploying..." : editTravelPlanId ? "Update Plan" : "Create Plan"}
           </Button>

@@ -42,7 +42,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
   const queryClient = useQueryClient();
   const toast = useToast();
   
-  const { register, handleSubmit, reset } = useForm<AddUserFormInputs>({
+  const { register, handleSubmit, watch, reset } = useForm<AddUserFormInputs>({
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -96,7 +96,11 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to get user details: " + (error.response?.data || error.message));
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to get user details: " + detailedError);
     }
   });
   
@@ -145,20 +149,20 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
             
             <div className="space-y-2">
               <label className="text-sm font-medium">First Name</label>
-              <Input required placeholder="Tirth" {...register("firstName", { required: true })} />
+              <Input required placeholder="Tirth" {...register("firstName" )} />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Last Name</label>
-              <Input required placeholder="Bhadani" {...register("lastName", { required: true })} />
+              <Input required placeholder="Bhadani" {...register("lastName" )} />
             </div>
             <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-medium">Email Address</label>
-              <Input required type="email" placeholder="tirth.bhadani@roimaint.com" {...register("email", { required: true })} />
+              <Input required type="email" placeholder="tirth.bhadani@roimaint.com" {...register("email" )} />
             </div>
             { !editUserEmail && (
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-medium">Password</label>
-                <Input required type="password" placeholder="••••••••" {...register("password", { required: true })} />
+                <Input required type="password" placeholder="••••••••" {...register("password" )} />
               </div>
             )}
             <div className="space-y-4 md:col-span-2 border-b pb-2 pt-4">
@@ -166,17 +170,17 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Date of Birth</label>
-              <Input required type="date" max={new Date().toISOString().split("T")[0]} {...register("dob", { required: true })} />
+              <Input required type="date" max={new Date().toISOString().split("T")[0]} {...register("dob" )} />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Hire Date</label>
-              <Input required type="date" {...register("hireDate", { required: true })} />
+              <Input required type="date" {...register("hireDate" )} />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Gender</label>
               <select 
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-                {...register("gender", { required: true })}
+                {...register("gender" )}
               >
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -185,13 +189,13 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Annual Salary</label>
-              <Input required type="number" placeholder="0.00" {...register("salary", { required: true })} />
+              <Input required type="number" placeholder="0.00" {...register("salary" )} />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Department</label>
               <select 
                 className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm"
-                {...register("departmentId", { required: true })}
+                {...register("departmentId" )}
               >
                 <option value="">Select Department</option>
                 {allDepartments?.map((dept: Department) => (
@@ -203,7 +207,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
               <label className="text-sm font-medium">Role</label>
               <select 
                 className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm"
-                {...register("roleId", { required: true })}
+                {...register("roleId" )}
               >
                 <option value="">Select Role</option>
                 {allRoles?.map((role: Role) => ((user?.roleName == "ADMIN" || (user?.roleName == "HR" && role.roleName != "ADMIN")) &&
@@ -215,7 +219,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
               <label className="text-sm font-medium">Position</label>
               <select 
                 className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm "
-                {...register("positionId", { required: true })}
+                {...register("positionId" )}
               >
                 <option value="">Select Position</option>
                 {allPositions?.map((position: Position) => (
@@ -226,7 +230,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
             <Button 
               type="submit" 
               className="md:col-span-2 w-full h-11 bg-blue-600 hover:bg-blue-700 text-black font-bold mt-4"
-              disabled={registerMutation.isPending}
+              disabled={registerMutation.isPending || !watch("firstName")?.trim() || !watch("lastName")?.trim() || !watch("email")?.trim() || (!editUserEmail && !watch("password")) || !watch("dob") || !watch("hireDate") || !watch("salary") || !watch("departmentId") || !watch("roleId") || !watch("positionId")}
             >
               {registerMutation.isPending ? editUserEmail ? "Updating User..." : "Registering User..." : "Submit User Data"}
             </Button>

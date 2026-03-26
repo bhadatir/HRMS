@@ -51,7 +51,11 @@ export default function Notifications() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to mark notification as read: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to mark notification as read: " + detailedError); }
   });
 
   const markAllReadMutation = useMutation({
@@ -61,7 +65,11 @@ export default function Notifications() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to mark all notifications as read: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to mark all notifications as read: " + detailedError); }
   });
 
   const handleMarkAllRead = () => {

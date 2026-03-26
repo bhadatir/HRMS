@@ -9,7 +9,6 @@ import { Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useToast } from "@/context/ToastContext";
 
-
 type GameTypeInputs = {
     gameName: string;
     operatingStart: string;
@@ -23,7 +22,7 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
     const toast = useToast();
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
-    const { register, handleSubmit, reset } = useForm<GameTypeInputs>(
+    const { register, handleSubmit, watch, reset } = useForm<GameTypeInputs>(
         {
             defaultValues: {
                 gameName: "",
@@ -48,7 +47,11 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            toast?.error("Failed to get game details: " + (error.response?.data || error.message)); }
+            const data = error.response?.data;  
+            const detailedError = typeof data === 'object' 
+            ? JSON.stringify(data, null, 2) 
+            : data || error.message;
+            toast?.error("Failed to get game details: " + detailedError); }
     });
 
     useEffect(() => {
@@ -70,7 +73,11 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            toast?.error("Failed to update game type: " + (error.response?.data || error.message)); }
+            const data = error.response?.data;  
+            const detailedError = typeof data === 'object' 
+            ? JSON.stringify(data, null, 2) 
+            : data || error.message;
+            toast?.error("Failed to update game type: " + detailedError); }
     });
 
     return (
@@ -86,28 +93,28 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
                 className="bg-white p-4 rounded-xl border items-end">
                 <div className="space-y-1">
                     <label className="text-xs font-bold uppercase text-slate-500">Game Name</label>
-                    <Input {...register("gameName", { required: true })} placeholder="Pool, Chess..." />
+                    <Input {...register("gameName")} placeholder="Pool, Chess..." />
                 </div>
                 <div className="space-y-2 my-2 flex gap-12">
                     <div>
-                    <label className="text-xs font-bold uppercase text-slate-500">Start Time</label>
-                    <Input type="time" {...register("operatingStart", { required: true })} />
+                        <label className="text-xs font-bold uppercase text-slate-500">Start Time</label>
+                        <Input type="time" {...register("operatingStart")} />
                     </div>
                 
                     <div>
                     <label className="text-xs font-bold uppercase text-slate-500">End Time</label>
-                    <Input type="time" {...register("operatingEnd", { required: true })} />
+                    <Input type="time" {...register("operatingEnd")} />
                     </div>
                 </div>
                 <div className="space-y-1">
                     <label className="text-xs font-bold uppercase text-slate-500">Duration (Min)</label>
-                    <Input type="number" {...register("gameSlotDuration", { required: true })} />
+                    <Input type="number" {...register("gameSlotDuration")} />
                 </div>
                 <div className="space-y-1">
-                    <label className="text-xs font-bold uppercase text-slate-500">Max Players Per Sloat </label>
-                    <Input type="number" {...register("gameMaxPlayerPerSlot", { required: true })} />
+                    <label className="text-xs font-bold uppercase text-slate-500">Max Players Per Slot </label>
+                    <Input type="number" {...register("gameMaxPlayerPerSlot")} />
                 </div>
-                <Button type="submit" className="my-2 text-black bg-blue-500 w-full">
+                <Button type="submit" className="my-2 text-black bg-blue-500 w-full" disabled={!watch("gameName")?.trim() || !watch("operatingStart") || !watch("operatingEnd") || !watch("gameSlotDuration") || !watch("gameMaxPlayerPerSlot")}>
                     <Save size={16} className="mr-2"/> Save Game
                 </Button>
             </form>

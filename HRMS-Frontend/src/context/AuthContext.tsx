@@ -73,7 +73,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to log out: " + (error.response?.data || error.message));
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to log out: " + detailedError);
     }
   });
   

@@ -55,7 +55,11 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to load job details: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to load job details: " + detailedError); }
   });
 
   useEffect(() => {
@@ -112,7 +116,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
           <label className="text-xs font-bold text-slate-500 uppercase">Job Title</label>
           <Input 
             type="text" 
-            {...register("jobTitle", { required: "Job title is required" })}
+            {...register("jobTitle")}
             placeholder="e.g. Senior Java Developer" 
           />
           {errors.jobTitle && <p className="text-red-500 text-xs">{errors.jobTitle.message}</p>}
@@ -122,7 +126,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
           <label className="text-xs font-bold text-slate-500 uppercase">Salary</label>
           <Input 
             type="number" 
-            {...register("jobSalary", { required: "Job salary is required" })}
+            {...register("jobSalary")}
             placeholder="Annual Salary" 
           />
           {errors.jobSalary && <p className="text-red-500 text-xs">{errors.jobSalary.message}</p>}
@@ -132,7 +136,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
           <label className="text-xs font-bold text-slate-500 uppercase">Job Category</label>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-            {...register("fkJobTypeId", { required: "Job category is required" })}
+            {...register("fkJobTypeId")}
           >
             <option value="">Select job category</option>
             {allJobTypes.map((type: JobType) => (

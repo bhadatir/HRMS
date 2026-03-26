@@ -150,7 +150,11 @@ export default function GameManagement() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings"] }),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            toast?.error("Failed to update booking status" + (error.response?.data || error.message));
+            const data = error.response?.data;  
+            const detailedError = typeof data === 'object' 
+            ? JSON.stringify(data, null, 2) 
+            : data || error.message;
+            toast?.error("Failed to update booking status" + detailedError);
         }
     });
 
@@ -159,7 +163,11 @@ export default function GameManagement() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] }),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            toast?.error("Failed to remove waiting list item" + (error.response?.data || error.message));
+            const data = error.response?.data;  
+            const detailedError = typeof data === 'object' 
+            ? JSON.stringify(data, null, 2) 
+            : data || error.message;
+            toast?.error("Failed to remove waiting list item" + detailedError);
         }
     });
 

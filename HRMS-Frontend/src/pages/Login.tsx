@@ -33,7 +33,11 @@ export default function Login() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Login failed!" + (error.response?.data || error.message));
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Login failed!" + detailedError);
     }
   });
 

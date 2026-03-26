@@ -102,7 +102,11 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
-            toast?.error("Failed booking: " + (error.response?.data || error.message)); }
+            const data = error.response?.data;  
+            const detailedError = typeof data === 'object' 
+            ? JSON.stringify(data, null, 2) 
+            : data || error.message;
+            toast?.error("Failed booking: " + detailedError); }
     });
 
     const filteredGames = useMemo(() => {
@@ -197,7 +201,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <label className="text-xs font-bold uppercase text-slate-500">Select Game</label>
-                        <select {...register("gameTypeId", { required: true })} className="w-full border rounded-md p-2 text-sm h-10">
+                        <select {...register("gameTypeId")} className="w-full border rounded-md p-2 text-sm h-10">
                             <option value=""> Choose Game </option>
                             {filteredGames.map((g: GameType) => <option key={g.id} value={g.id}>{g.gameName}</option>)}
                         </select>
@@ -206,7 +210,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                     </div>
                     <div className="space-y-2">
                         <label className="text-xs font-bold uppercase text-slate-500">Date</label>
-                        <Input type="date" {...register("date", { required: true })} min={new Date().toISOString().split("T")[0]} />
+                        <Input type="date" {...register("date")} min={new Date().toISOString().split("T")[0]} />
                         {errors.date && <p className="text-red-500 text-xs">Date is required.</p>}
                     </div>
                 </div>
@@ -331,7 +335,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
                         ))}
                     </div>
                 </div>
-                <Button type="submit" className="w-full text-black h-12 text-lg" disabled={mutation.isPending || !selectedTime  || selectedParticipants.length === 0}>
+                <Button type="submit" className="w-full text-black h-12 text-lg" disabled={mutation.isPending || !selectedTime  || selectedParticipants.length === 0 || !watch("gameTypeId") || !watch("date")}>
                     {mutation.isPending ? "Saving..." : editBookingId ? "Update Booking" : `Confirm ${selectedTime || ''} Slot`}
                 </Button>
             </form>

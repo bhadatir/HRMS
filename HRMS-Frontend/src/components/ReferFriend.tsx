@@ -57,8 +57,12 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to submit referral: " + (error.response?.data || error.message)); }
-  });
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+        toast?.error("Failed to submit referral: " + detailedError); }
+    });
 
   return (
     <Card className="border-none shadow-none">
@@ -72,21 +76,20 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input 
               placeholder="Friend's Full Name" 
-              {...register("referFriendName", { required: "Friend's name is required" })}
+              {...register("referFriendName")}
             />
             {errors.referFriendName && <p className="text-red-500 text-xs">{errors.referFriendName.message}</p>}
             <Input 
               type="email" 
               placeholder="Friend's Email" 
-              {...register("referFriendEmail", { required: "Friend's email is required" , 
-                pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" } })}
+              {...register("referFriendEmail", { pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" } })}
             />
             {errors.referFriendEmail && <p className="text-red-500 text-xs">{errors.referFriendEmail.message}</p>}
           </div>
           
           <Textarea 
             placeholder="Short note about the candidate..." 
-            {...register("referFriendShortNote", { required: "Short note is required" })}
+            {...register("referFriendShortNote")}
           />
           {errors.referFriendShortNote && <p className="text-red-500 text-xs">{errors.referFriendShortNote.message}</p>}
 
@@ -96,7 +99,7 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
               type="file" 
               className="cursor-pointer" 
               accept=".jpg,.jpeg,.png,.pdf,.docx,.doc"
-              {...register("file", { required: "CV is required" })}
+              {...register("file")}
             />
             <p className="text-xs text-slate-400">Upload CV/Resume (PDF or Word)</p>
             {errors.file && <p className="text-red-500 text-xs">{errors.file.message}</p>}
@@ -107,7 +110,7 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
             className="w-full text-black" 
             type="submit"
             // eslint-disable-next-line react-hooks/incompatible-library
-            disabled={referMutation.isPending || !watch("file") || !watch("referFriendName") || !watch("referFriendEmail") || !watch("referFriendShortNote")}
+            disabled={referMutation.isPending || !watch("file") || !watch("referFriendName")?.trim() || !watch("referFriendEmail")?.trim() || !watch("referFriendShortNote")?.trim()}
           >
             {referMutation.isPending ? "Submitting..." : "Submit Referral"}
           </Button>

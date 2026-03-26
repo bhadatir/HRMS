@@ -52,7 +52,11 @@ export default function CommentSection({ postId }: { postId: number }) {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to add comment: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to add comment: " + detailedError); }
   });
 
   const removeCommentMutation = useMutation({
@@ -69,7 +73,11 @@ export default function CommentSection({ postId }: { postId: number }) {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to delete comment: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to delete comment: " + detailedError); }
   });
 
   const handleReplyClick = (comment: Comment) => {

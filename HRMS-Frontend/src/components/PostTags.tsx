@@ -45,7 +45,11 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to add tag: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to add tag: " + detailedError); }
   });
 
   const removeTagMutation = useMutation({
@@ -53,7 +57,11 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["postTags", postId] }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to remove tag: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to remove tag: " + detailedError); }
   });
 
   if (tagsError || allTagTypesError) toast?.error("Failed to load tags: " + (tagsError || allTagTypesError));

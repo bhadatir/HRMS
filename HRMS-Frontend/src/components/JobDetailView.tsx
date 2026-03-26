@@ -105,7 +105,11 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to update CV status: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to update CV status: " + detailedError); }
   });
 
   const addReviewerMutation = useMutation({
@@ -118,7 +122,11 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to add reviewer: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to add reviewer: " + detailedError); }
   });
 
   const handleSelectUser = (id: number) => {

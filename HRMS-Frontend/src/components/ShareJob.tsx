@@ -42,7 +42,11 @@ export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSucces
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast?.error("Failed to share job: " + (error.response?.data || error.message)); }
+      const data = error.response?.data;  
+      const detailedError = typeof data === 'object' 
+      ? JSON.stringify(data, null, 2) 
+      : data || error.message;
+      toast?.error("Failed to share job: " + detailedError); }
   });
 
   return (
@@ -73,7 +77,7 @@ export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSucces
           title="Send Job Details"
           className="w-full text-black" 
           // eslint-disable-next-line react-hooks/incompatible-library
-          disabled={shareMutation.isPending || !watch("emails")}
+          disabled={shareMutation.isPending || !watch("emails")?.trim()}
         >
           {shareMutation.isPending ? "Sharing..." : "Send Job Details"}
         </Button>
