@@ -227,92 +227,87 @@ export default function TravelPlan() {
 
         </header>
 
-        <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
-
-          {/* Confirmation Dialog */}
-          {isDialogOpen && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
-                <ConformationDialog
-                  onClose={() => setIsDialogOpen(false)} 
-                  onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
-                  iteam="travel plan"
-                  action="Delete"
-                />
-              </div>
+        {/* Confirmation Dialog */}
+        {isDialogOpen && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+              <ConformationDialog
+                onClose={() => setIsDialogOpen(false)} 
+                onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
+                iteam="travel plan"
+                action="Delete"
+              />
             </div>
-          )}
-          
-          {/* Notifications */}
-          {showNotification && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="travel relative bg-white rounded-xl max-w-3xl w-full h-150 overflow-y-auto">
-                <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
-                  onClick={() => {
-                  setShowNotification(false);
-                }}><X /></Button>
-                <Notifications />
-              </div>
-            </div>
-          )}
-
-          {/* Create or edit travel plan form */}
-          {showForm && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="travel relative bg-white rounded-xl max-w-lg w-full h-150 overflow-y-auto">
-                <Button title="Close Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                  setShowForm(false);
-                  setEditTravelPlanId(null);
-                }}><X /></Button>
-                <TravelPlanForm editTravelPlanId={editTravelPlanId} onSuccess={() => setShowForm(false)} />
-              </div>
-            </div>
-          )}
-
-          {/*Add travel expense by employee */}
-          {activeExpenseId && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="travel relative bg-white rounded-xl max-w-lg w-full">
-                <Button title="Close Expense Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                  setActiveExpenseId(null);
-                }}><X /></Button>
-                <AddExpenseForm travelPlanId={activeExpenseId} onSuccess={() => {
-                  setActiveExpenseId(null);
-                }} />
-              </div>
-            </div>
-          )}
-
-          {/* Add travel doc by employee or HR */}
-          {selectedTravelId && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="travel relative bg-white rounded-xl max-w-lg w-full">
-                <Button title="Close Document Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                  setSelectedTravelId(null);
-                  setEditTravelPlanId(null);
-                }}><X /></Button>
-                <AddTravelDocumentForm travelPlanId={selectedTravelId}  onSuccess={() => {
-                  setSelectedTravelId(null);
-                  setEditTravelPlanId(null);
-                }} />
-              </div>
-            </div>
-          )}
-
-          {/* Full travel details modal */}
-          {fullTravelDetails && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="travel relative bg-white rounded-xl max-w-4xl w-full p-6 h-150 overflow-y-auto">
-                <Button title="Close Travel Details" variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                  setFullTravelDetails(null);
-                }}><X /></Button>
-                <FullTravelDetail travelPlan={fullTravelDetails} onSuccess={() => {
-                  setFullTravelDetails(null);
-                }} />
-              </div>
           </div>
-          )}
+        )}
+          
+        {/* Notifications */}
+        {showNotification && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="travel relative bg-white rounded-xl max-w-3xl w-full max-h-150 overflow-y-auto">
+              <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => {
+                setShowNotification(false);
+              }}><X /></Button>
+              <Notifications />
+            </div>
+          </div>
+        )}
+        {/* Create or edit travel plan form */}
+        {showForm && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="travel relative bg-white rounded-xl max-w-lg w-full max-h-150 overflow-y-auto">
+              <Button title="Close Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                setShowForm(false);
+                setEditTravelPlanId(null);
+              }}><X /></Button>
+              <TravelPlanForm editTravelPlanId={editTravelPlanId} onSuccess={() => setShowForm(false)} />
+            </div>
+          </div>
+        )}
+        {/*Add travel expense by employee */}
+        {activeExpenseId && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="travel relative bg-white rounded-xl max-w-lg w-full">
+              <Button title="Close Expense Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                setActiveExpenseId(null);
+              }}><X /></Button>
+              <AddExpenseForm travelPlanId={activeExpenseId} onSuccess={() => {
+                setActiveExpenseId(null);
+              }} />
+            </div>
+          </div>
+        )}
+        {/* Add travel doc by employee or HR */}
+        {selectedTravelId && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="travel relative bg-white rounded-xl max-w-lg w-full">
+              <Button title="Close Document Form" variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                setSelectedTravelId(null);
+                setEditTravelPlanId(null);
+              }}><X /></Button>
+              <AddTravelDocumentForm travelPlanId={selectedTravelId}  onSuccess={() => {
+                setSelectedTravelId(null);
+                setEditTravelPlanId(null);
+              }} />
+            </div>
+          </div>
+        )}
+        {/* Full travel details modal */}
+        {fullTravelDetails && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="travel relative bg-white rounded-xl max-w-4xl w-full p-2 max-h-150 overflow-y-auto">
+              <Button title="Close Travel Details" variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                setFullTravelDetails(null);
+              }}><X /></Button>
+              <FullTravelDetail travelPlan={fullTravelDetails} onSuccess={() => {
+                setFullTravelDetails(null);
+              }} />
+            </div>
+        </div>
+        )}
 
+        <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
           <div className="travel grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPlans.length > 0 ? (
               filteredPlans.sort((a: Plan, b: Plan) => new Date(b.travelPlanStartDate).getTime() 

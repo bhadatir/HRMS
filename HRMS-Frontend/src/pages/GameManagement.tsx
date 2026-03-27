@@ -259,86 +259,81 @@ export default function GameManagement() {
                     </div>
                 </header>
 
-                <main className="p-6 max-w-5xl mx-auto w-254">
-
-                    {/* Confirmation Dialog */}
-                    {isDialogOpen && (
-                      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
-                            <ConformationDialog
-                            onClose={() => setIsDialogOpen(false)} 
-                            onConfirm={() => removeWaitingListMutation.mutate(waitingListId)} 
-                            iteam="waiting list entry"
-                            action="Delete"
-                            />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Notifications */}
-                    {showNotification && (
-                      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-                        <div className="game bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
-                          <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                {/* Confirmation Dialog */}
+                {isDialogOpen && (
+                  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+                        <ConformationDialog
+                        onClose={() => setIsDialogOpen(false)} 
+                        onConfirm={() => removeWaitingListMutation.mutate(waitingListId)} 
+                        iteam="waiting list entry"
+                        action="Delete"
+                        />
+                    </div>
+                  </div>
+                )}
+                {/* Notifications */}
+                {showNotification && (
+                  <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                    <div className="game bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
+                      <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                        onClick={() => {
+                        setShowNotification(false);
+                      }}><X /></Button>
+                      <Notifications />
+                    </div>
+                  </div>
+                )}
+                {/* Waiting List */}
+                {showWaitingList && (
+                  <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                    <div className="game bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
+                      <Button title="Close Waiting List" variant="ghost" className="absolute right-2 top-2" 
+                        onClick={() => {
+                        setShowWaitingList(false);
+                      }}><X /></Button>
+                      <WaitingList waitingListId={waitingListId} onSuccess={() => setShowWaitingList(false)} />
+                    </div>
+                  </div>
+                )}
+                {/* add game booking */}
+                {showGameBookingForm && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                        <div className="game bg-white rounded-xl w-full max-w-2xl relative max-h-150 overflow-y-auto">     
+                            <Button variant="ghost" className="absolute top-2 right-2" 
                             onClick={() => {
-                            setShowNotification(false);
-                          }}><X /></Button>
-                          <Notifications />
+                                setShowGameBookingForm(false);
+                            }}><X /></Button>
+                            <GameBookingForm onSuccess={() => setShowGameBookingForm(false)} />
                         </div>
-                      </div>
-                    )}
+                    </div>
+                )}
+                {/* game type manager */}
+                {showGameTypeForm && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <div className="game bg-white rounded-xl max-w-lg w-full relative p-2 max-h-150 overflow-y-auto">
+                            <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
+                            onClick={() => setShowGameTypeForm(false)}>
+                            <X />
+                            </Button>
+                            <GameTypeManager />
+                        </div>
+                    </div>
+                )}
+                {/* Game Interest */}
+                {showGameIntrestForm && (
+                  <div className="absolute right-2 top-16 z-50 flex items-center justify-center p-4">
+                    <div className="game bg-white rounded-xl max-w-100 w-full relative max-h-50 overflow-y-auto">
+                      <Button title="Close Game Interests" variant="ghost" className="absolute right-2 top-2" 
+                        onClick={() => {
+                        setShowGameIntrestForm(false);
+                      }}><X /></Button>
+                      <GameInterestToggle />
+                    </div>
+                  </div>
+                )}                
 
-                    {/* Waiting List */}
-                    {showWaitingList && (
-                      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-                        <div className="game bg-white rounded-xl max-w-3xl w-full relative h-100 overflow-y-auto">
-                          <Button title="Close Waiting List" variant="ghost" className="absolute right-2 top-2" 
-                            onClick={() => {
-                            setShowWaitingList(false);
-                          }}><X /></Button>
-                          <WaitingList waitingListId={waitingListId} onSuccess={() => setShowWaitingList(false)} />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* add game booking */}
-                    {showGameBookingForm && (
-                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                            <div className="game bg-white rounded-xl w-full max-w-2xl relative h-150 overflow-y-auto">     
-                                <Button variant="ghost" className="absolute top-2 right-2" 
-                                onClick={() => {
-                                    setShowGameBookingForm(false);
-                                }}>X</Button>
-                                <GameBookingForm onSuccess={() => setShowGameBookingForm(false)} />
-                            </div>
-                        </div>
-                    )}
-
-                    {/* add game type */}
-                    {showGameTypeForm && (
-                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                            <div className="game bg-white rounded-xl max-w-lg w-full relative h-120 overflow-y-auto">
-                                <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
-                                onClick={() => setShowGameTypeForm(false)}>
-                                <X />
-                                </Button>
-                                <GameTypeManager />
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Game Interest */}
-                    {showGameIntrestForm && (
-                      <div className="absolute right-2 top-16 z-50 flex items-center justify-center p-4">
-                        <div className="game bg-white rounded-xl max-w-lg w-full relative h-max">
-                          <Button title="Close Game Interests" variant="ghost" className="absolute right-2 top-2" 
-                            onClick={() => {
-                            setShowGameIntrestForm(false);
-                          }}><X /></Button>
-                          <GameInterestToggle />
-                        </div>
-                      </div>
-                    )}
+                <main className="p-6 max-w-5xl mx-auto w-254">                  
 
                     {/* upcomming games */}
                     <div className="game grid grid-cols-1 md:grid-cols-2 gap-4">

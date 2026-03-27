@@ -163,51 +163,50 @@ export default function PostManagement() {
           </div>
         </header>
 
-        <main className="p-6 max-w-3xl mx-auto space-y-6 w-full">
-
-          {/* Confirmation Dialog */}
-          {isDialogOpen && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
-                <ConformationDialog
-                  onClose={() => setIsDialogOpen(false)} 
-                  onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
-                  iteam="post"
-                  action="Delete"
-                />
-              </div>
+        {/* Confirmation Dialog */}
+        {isDialogOpen && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+              <ConformationDialog
+                onClose={() => setIsDialogOpen(false)} 
+                onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
+                iteam="post"
+                action="Delete"
+              />
             </div>
-          )}
-          
-          {/* Notifications */}
-          {showNotification && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="post bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
-                <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
-                  onClick={() => {
-                  setShowNotification(false);
-                }}><X /></Button>
-                <Notifications />
-              </div>
+          </div>
+        )}
+        
+        {/* Notifications */}
+        {showNotification && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="post bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => {
+                setShowNotification(false);
+              }}><X /></Button>
+              <Notifications />
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Post Form Modal */}
-          {showForm && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="post bg-white rounded-xl max-w-lg w-full relative h-120 overflow-y-auto">
-                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                  setShowForm(false);
-                  setEditPostId(0);
-                }}><X /></Button>
-                <PostForm editPostId={editPostId} onSuccess={() => {
-                  setShowForm(false);
-                  setEditPostId(0);
-                }} />
-              </div>
+        {/* Post Form Modal */}
+        {showForm && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className={`post bg-white rounded-xl max-w-lg w-full relative max-h-150 overflow-y-auto`}>
+              <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                setShowForm(false);
+                setEditPostId(0);
+              }}><X /></Button>
+              <PostForm editPostId={editPostId} onSuccess={() => {
+                setShowForm(false);
+                setEditPostId(0);
+              }} />
             </div>
-          )}
+          </div>
+        )}
 
+        <main className="p-6 max-w-3xl mx-auto space-y-6 w-full">          
           <div className="post space-y-6">
             {filteredPosts.length > 0  ? (
               filteredPosts.map((post: Post) => (

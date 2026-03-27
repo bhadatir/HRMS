@@ -22,7 +22,7 @@ const Notifications = ({ children, kind, onClose, className = "" }: Notification
   return (
     <div
       className={`
-        manager job user game post notification sub travel flex items-center w-full p-4 mb-3 border-l-4 rounded-r-lg shadow-lg
+        gameType manager job user game post notification sub travel flex items-center w-full p-4 mb-3 border-l-4 rounded-r-lg shadow-lg
         ${selectedStyle} 
         ${className}
       `}

@@ -139,47 +139,46 @@ export default function JobManagement() {
           </div>
         </header>
 
-        <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
-          
-          {/* Notifications */}
-          {showNotification && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="user bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
-                <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
-                  onClick={() => {
-                  setShowNotification(false);
-                }}><X /></Button>
-                <Notifications />
-              </div>
+        {/* Add user */}
+        {showAddUserForm && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="user bg-white rounded-xl max-w-2xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => {
+                setShowAddUserForm(false);
+              }}><X /></Button>
+              <AddUser editUserEmail={null} onSuccess={() => setShowAddUserForm(false)} />
             </div>
-          )}
-
-          {/* Add user */}
-          {showAddUserForm && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="user bg-white rounded-xl max-w-2xl w-full relative h-150 overflow-y-auto">
-                <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
-                  onClick={() => {
-                  setShowAddUserForm(false);
-                }}><X /></Button>
-                <AddUser editUserEmail={null} onSuccess={() => setShowAddUserForm(false)} />
-              </div>
+          </div>
+        )}
+        
+        {/* Notifications */}
+        {showNotification && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="user bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => {
+                setShowNotification(false);
+              }}><X /></Button>
+              <Notifications />
             </div>
-          )}
-
-          {/* User Details */}
-          {showUserDetails && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="user bg-white rounded-xl max-w-2xl w-full relative h-150 overflow-y-auto">
-                <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
-                  onClick={() => {
-                  setShowUserDetails(false);
-                }}><X /></Button>
-                <UserDetails userEmail={selectedUserEmail} />
-              </div>
+          </div>
+        )}
+        
+        {/* User Details */}
+        {showUserDetails && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="user bg-white rounded-xl max-w-2xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => {
+                setShowUserDetails(false);
+              }}><X /></Button>
+              <UserDetails userEmail={selectedUserEmail} />
             </div>
-          )}
-
+          </div>
+        )}
+        
+        <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">          
           <div className="user">
             <Card className="border-slate-200">            
               <CardContent className="space-y-4">

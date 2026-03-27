@@ -46,23 +46,23 @@ export default function GameTypeManager() {
 
     if(gamesError) toast?.error("Failed to load game types: " + gamesError);
 return (
-    <main className="p-2 max-w-5xl mx-auto w-full">
-
-        {showForm && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <div className="gameType bg-white rounded-xl max-w-lg w-full relative h-120 overflow-y-auto">
-                    <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
-                    onClick={() => setShowForm(false)}>
-                    <X />
-                    </Button>
-                    <AddGameTypeForm editGameTypeId={editGameTypeId} onSuccess={() => {
-                        setShowForm(false); 
-                        setEditGameTypeId(null);
-                    }}/>
-                </div>
+    <>
+    {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="game gameType bg-white rounded-xl max-w-lg w-full relative p-3 max-h-150 overflow-y-auto">
+                <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => setShowForm(false)}>
+                <X />
+                </Button>
+                <AddGameTypeForm editGameTypeId={editGameTypeId} onSuccess={() => {
+                    setShowForm(false); 
+                    setEditGameTypeId(null);
+                }}/>
             </div>
-        )}
+        </div>
+    )}
 
+    <main className="p-2 max-w-5xl mx-auto w-full">
        <Card className="border-none shadow-none">
         <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -119,6 +119,7 @@ return (
           </CardContent>
       </Card>
       
-    </main>    
+    </main>   
+    </> 
     );
 }

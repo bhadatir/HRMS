@@ -163,6 +163,19 @@ export default function OrganizationChart() {
           </div>
         </header>
 
+        {/* Notifications */}
+        {showNotification && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                setShowNotification(false);
+              }}><X /></Button>
+              <Notifications />
+            </div>
+          </div>
+        )}
+
+
         <div className="p-6 max-w-6xl mx-auto space-y-8 w-254">
           {isLoading ? (
             <div className="p-10 text-center text-slate-500 font-medium">Loading employee data...</div>
@@ -170,19 +183,6 @@ export default function OrganizationChart() {
             <div className="p-10 text-center text-red-500 font-medium">Employee data could not be retrieved.</div>
           ) : (
             <>
-
-              {/* Notifications */}
-              {showNotification && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                  <div className="bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
-                    <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                      setShowNotification(false);
-                    }}><X /></Button>
-                    <Notifications />
-                  </div>
-                </div>
-              )}
-
               <section className="bg-white p-4 rounded-lg border shadow-sm">
                 <Breadcrumb>
                   <BreadcrumbList>

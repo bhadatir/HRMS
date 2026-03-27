@@ -119,21 +119,20 @@ export default function TeamMemberData() {
           </div>
         </header>
 
-        <main className="p-6 max-w-7xl mx-auto space-y-6 w-250">
-          
-          {/* Notifications */}
-          {showNotification && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="manager bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
-                <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
-                  onClick={() => {
-                  setShowNotification(false);
-                }}><X /></Button>
-                <Notifications />
-              </div>
+        {/* Notifications */}
+        {showNotification && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="manager bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => {
+                setShowNotification(false);
+              }}><X /></Button>
+              <Notifications />
             </div>
-          )}
+          </div>
+        )}
 
+        <main className="p-6 max-w-7xl mx-auto space-y-6 w-250">       
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredData?.map((org: OrgData) => (
                 <Card 

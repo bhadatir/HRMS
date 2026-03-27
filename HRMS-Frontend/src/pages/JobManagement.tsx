@@ -177,103 +177,96 @@ export default function JobManagement() {
           </div>
         </header>
 
+        {/* Confirmation Dialog */}
+        {isDialogOpen && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+              <ConformationDialog
+                onClose={() => setIsDialogOpen(false)} 
+                onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
+                iteam="job"
+                action="Delete"
+              />
+            </div>
+          </div>
+        )}
+        {/* Notifications */}
+        {showNotification && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="job bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => {
+                setShowNotification(false);
+              }}><X /></Button>
+              <Notifications />
+            </div>
+          </div>
+        )}
+        {/* job details with reviewer and referral management */}
+        {selectedJobId && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="job bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => setSelectedJobId(null)}>
+                <X />
+              </Button>
+              <JobDetailView jobId={selectedJobId} onSuccess={() => setSelectedJobId(null)} />
+            </div>
+          </div>            
+        )}
+        {/* Job Post Form Modal */}
+        {showForm && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="job bg-white rounded-xl max-w-lg w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
+                onClick={() => setShowForm(false)}>
+                <X />
+              </Button>
+              <JobForm editJobId={null} onSuccess={() => setShowForm(false)} />
+            </div>
+          </div>
+        )}
+        {/* share job */}
+        {shareJobId && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="job bg-white rounded-xl max-w-2xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close" variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                setShareJobId(null);
+              }}><X /></Button>
+              <ShareJob jobId={shareJobId} onSuccess={() => {
+                setShareJobId(null);
+              }} />
+            </div>
+        </div>
+        )}
+        {/* refer friend to job */}
+        {referJobId && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="job bg-white rounded-xl max-w-2xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close" variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                setReferJobId(null);
+              }}><X /></Button>
+              <ReferFriend jobId={referJobId} onSuccess={() => {
+                setReferJobId(null);
+              }} />
+            </div>
+        </div>
+        )}
+        {/* edit job */}
+        {editJobId && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="job bg-white rounded-xl max-w-2xl w-full relative max-h-150 overflow-y-auto">
+              <Button title="Close" variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                setEditJobId(null);
+              }}><X /></Button>
+              <JobForm editJobId={editJobId} onSuccess={() => {
+                setEditJobId(null);
+              }} />
+            </div>
+          </div>
+        )}
+
         <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
-          
-          {/* Confirmation Dialog */}
-          {isDialogOpen && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
-                <ConformationDialog
-                  onClose={() => setIsDialogOpen(false)} 
-                  onConfirm={(reason) => handleDelete(`${reason} (Deleted by : ${user?.employeeEmail} at ${new Date().toLocaleString()})`)} 
-                  iteam="job"
-                  action="Delete"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Notifications */}
-          {showNotification && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="job bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
-                <Button title="Close Notifications" variant="ghost" className="absolute right-2 top-2" 
-                  onClick={() => {
-                  setShowNotification(false);
-                }}><X /></Button>
-                <Notifications />
-              </div>
-            </div>
-          )}
-
-          {/* job details with reviewer and referral management */}
-          {selectedJobId && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="job bg-white rounded-xl max-w-3xl w-full relative h-150 overflow-y-auto">
-                <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
-                  onClick={() => setSelectedJobId(null)}>
-                  <X />
-                </Button>
-                <JobDetailView jobId={selectedJobId} onSuccess={() => setSelectedJobId(null)} />
-              </div>
-            </div>            
-          )}
-
-          {/* Job Post Form Modal */}
-          {showForm && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="job bg-white rounded-xl max-w-lg w-full relative">
-                <Button title="Close" variant="ghost" className="absolute right-2 top-2" 
-                  onClick={() => setShowForm(false)}>
-                  <X />
-                </Button>
-                <JobForm editJobId={null} onSuccess={() => setShowForm(false)} />
-              </div>
-            </div>
-          )}
-
-          {/* share job */}
-          {shareJobId && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="job bg-white rounded-xl max-w-2xl w-full relative p-6 overflow-y-auto">
-                <Button title="Close" variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                  setShareJobId(null);
-                }}><X /></Button>
-                <ShareJob jobId={shareJobId} onSuccess={() => {
-                  setShareJobId(null);
-                }} />
-              </div>
-          </div>
-          )}
-
-          {/* refer friend to job */}
-          {referJobId && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="job bg-white rounded-xl max-w-2xl w-full relative p-6 overflow-y-auto">
-                <Button title="Close" variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                  setReferJobId(null);
-                }}><X /></Button>
-                <ReferFriend jobId={referJobId} onSuccess={() => {
-                  setReferJobId(null);
-                }} />
-              </div>
-          </div>
-          )}
-
-          {/* edit job */}
-          {editJobId && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="job bg-white rounded-xl max-w-2xl w-full relative p-6 h-150 overflow-y-auto">
-                <Button title="Close" variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                  setEditJobId(null);
-                }}><X /></Button>
-                <JobForm editJobId={editJobId} onSuccess={() => {
-                  setEditJobId(null);
-                }} />
-              </div>
-            </div>
-          )}
-
           <div className="job grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allJobs.length > 0 ? (
               allJobs.map((job: Job) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (
