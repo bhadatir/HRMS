@@ -10,6 +10,7 @@ import { Input } from "./ui/input";
 import { useInView } from "react-intersection-observer";
 import { useGetUserNotifications } from "@/hooks/useInfinite";
 import { useToast } from "@/context/ToastContext";
+import { ConformationDialog } from "./ConformationDialog";
 
 type Notification = {
   id: number;
@@ -23,6 +24,7 @@ export default function Notifications() {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const {
     data: notificationsData,
@@ -72,14 +74,23 @@ export default function Notifications() {
       toast?.error("Failed to mark all notifications as read: " + detailedError); }
   });
 
-  const handleMarkAllRead = () => {
-    if (window.confirm("Are you sure you want to mark all notifications as read?")) {
-      markAllReadMutation.mutate();
-    }
-  };
-
 return (
     <main className="p-4 w-full">
+
+      {/* Confirmation Dialog */}
+      {isDialogOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="post bg-white bottom-52 rounded-xl max-w-lg w-full relative">
+              <ConformationDialog
+              onClose={() => setIsDialogOpen(false)} 
+              onConfirm={() => markAllReadMutation.mutate()} 
+              iteam="all notifications"
+              action="Mark as read"
+              />
+          </div>
+        </div>
+      )}
+
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="font-bold text-lg">Notifications</h3>
@@ -102,8 +113,10 @@ return (
             className="mr-16"
             variant="outline" 
             size="sm"
-            onClick={handleMarkAllRead}
-          >
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDialogOpen(true);
+          }}>
             Mark all as read
           </Button>
         </div>

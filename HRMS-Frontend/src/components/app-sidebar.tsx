@@ -28,7 +28,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
 
-      <SidebarHeader className="p-4 font-bold text-lg">HRMS</SidebarHeader>
+      <SidebarHeader className="p-4 font-bold text-lg">ROIMA</SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
           {items.map((item) => (

@@ -24,7 +24,7 @@ export const ToastProvider = ({ children } : { children: React.ReactNode }) => {
   }, []);
 
   const addToast = useCallback(
-    (message: string, type = "info", duration = 100000) => {
+    (message: string, type = "info", duration = message.length * 200) => {
       const id = Date.now() + Math.random();
       const newToast = {
         id,
@@ -44,9 +44,9 @@ export const ToastProvider = ({ children } : { children: React.ReactNode }) => {
   );
 
   const show = (message: string, type = "info") => addToast(message, type);
-  const success = (message: string) => addToast(message, "info");
+  const success = (message: string) => addToast(message, "success");
   const error = (message: string) => addToast(message, "error");
-  const info = (message: string) => addToast(message, "notice");
+  const info = (message: string) => addToast(message, "info");
   const warning = (message: string) => addToast(message, "warning");
 
   return (

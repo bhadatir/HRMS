@@ -29,13 +29,16 @@ export function ConformationDialog({ onConfirm, onClose, iteam, action }: Confor
       <CardContent className="space-y-4">
         <div className="flex-col">
             <label htmlFor="reason" className="text-md text-muted-foreground">
-              {action === "Approve" ? 
-                `Are you sure you want to approve this ${iteam}?` 
-                : iteam === "waiting list entry" ? 
-                  `Are you sure you want to delete this ${iteam}?` 
-                  : `Please enter reason for ${action.toLowerCase()} this ${iteam}:`}
+              {iteam === "all notifications" ? 
+                `Are you sure you want to mark this all ${iteam} as read?` 
+                : action === "Approve" ? 
+                  `Are you sure you want to approve this ${iteam}?` 
+                  : iteam === "waiting list entry" ? 
+                    `Are you sure you want to delete this ${iteam}?` 
+                    : `Please enter reason for ${action.toLowerCase()} this ${iteam}:`
+              }
             </label>
-            {(action !== "Approve" && iteam !== "waiting list entry") && (
+            {(iteam !== "all notifications" && action !== "Approve" && iteam !== "waiting list entry") && (
               <Input
                 id="reason"
                 value={reason}
@@ -49,14 +52,14 @@ export function ConformationDialog({ onConfirm, onClose, iteam, action }: Confor
               />
             )}
           </div>
-          <div className="job travel flex justify-end space-x-2">
+          <div className="manager job user game post notification sub travel flex justify-end space-x-2">
             <Button variant="ghost" onClick={onClose} className="h-9">
                 Close
             </Button>
             <Button 
                 variant="destructive" 
                 onClick={handleConfirm}
-                disabled={action !== "Approve" && iteam !== "waiting list entry" && !reason.trim()}
+                disabled={iteam !== "all notifications" && action !== "Approve" && iteam !== "waiting list entry" && !reason.trim()}
                 className="h-9 px-4 text-black"
             >
                 {action}
