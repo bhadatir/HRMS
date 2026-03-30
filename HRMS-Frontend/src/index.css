@@ -78,18 +78,22 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #b8bfcb;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #9ca3af;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  width: 100%;
   min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
   min-height: 100vh;
 }
 
@@ -110,7 +114,7 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #9ca3af;
 }
 button:focus,
 button:focus-visible {
@@ -128,6 +132,40 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+select:focus,
+select:focus-visible {
+  outline: 2px solid #d1d5db;
+  outline-offset: 1px;
+}
+
+select option:hover {
+  background-color: #f0f0f0;
+  color: green;
+}
+
+option{
+  padding: 0.5em;
+  font-size: 1em;
+  font-family: inherit; 
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+select option:focus,
+select option:focus-visible {
+  outline: 2px solid #82ae1d;
+  outline-offset: 1px;
+}
+
+header {
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.users {
+  background-color: #ffffff;
 }
 
 @theme inline {

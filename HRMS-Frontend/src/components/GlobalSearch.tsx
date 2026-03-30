@@ -168,7 +168,7 @@ export function GlobalSearch() {
         <div className="flex">
           {!currentPage.includes("organization-chart") && latestResults?.employees?.content?.length > 0 && (
             <Command.Group heading={
-              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-gray-600">
                 <User size={14} /> <span>Employees</span>
               </div>
             }>
@@ -210,7 +210,7 @@ export function GlobalSearch() {
 
           {!currentPage.includes("job-management") && latestResults?.job?.content?.length > 0 && (
             <Command.Group heading={
-              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-gray-600">
                 <User size={14} /> <span>Jobs</span>
               </div>
             }>
@@ -231,7 +231,7 @@ export function GlobalSearch() {
 
           {!currentPage.includes("post-management") && latestResults?.post?.content?.length > 0 && (
             <Command.Group heading={
-              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-gray-600">
                 <User size={14} /> <span>Posts</span>
               </div>
             }>
@@ -252,7 +252,7 @@ export function GlobalSearch() {
 
           {!currentPage.includes("game-management") && latestResults?.gameBooking?.content?.length > 0 && (
             <Command.Group heading={
-              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-gray-600">
                 <User size={14} /> <span>Game Bookings</span>
               </div>
             }>
@@ -273,7 +273,7 @@ export function GlobalSearch() {
 
           {user?.roleName == "MANAGER" && !currentPage.includes("team-member-data") && latestResults?.teamMember?.length > 0 && (
             <Command.Group heading={
-              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-blue-600">
+              <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-gray-600">
                 <User size={14} /> <span>Team Members</span>
               </div>
             }>

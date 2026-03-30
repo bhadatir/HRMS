@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { gameService } from "../api/gameService";
 import { useAuth } from "../context/AuthContext";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useInView } from "react-intersection-observer";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useFindGameBookingByUserId, useFindGameBookings } from "@/hooks/useInfinite";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { useToast } from "@/context/ToastContext";
@@ -65,6 +66,7 @@ type BookingParticipantResponse = {
 
 export default function GameManagement() {
     const toast = useToast();
+    const isMobile = useIsMobile();
     const { token, user, unreadNotifications } = useAuth();
     const queryClient = useQueryClient();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -205,9 +207,9 @@ export default function GameManagement() {
         <SidebarProvider>
             <AppSidebar />
             <SidebarInset className="bg-slate-50">
-                <header className="flex h-16 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
-                    <div className="flex items-center gap-2">
-                        {/* <SidebarTrigger /> */}
+                <header className="flex h-16 items-center justify-between border-b px-6 bg-white sticky top-0 z-10 w-full">
+                    <div className="flex items-center gap-2 pr-2">
+                        <SidebarTrigger />
                         <h3 className="font-bold">Game Zone</h3>
                         {(debouncedBookingSearchTerm && debouncedBookingSearchTerm.length > 0) ? (
                         <Badge variant="outline">{filteredBookings.length} results</Badge>
@@ -233,22 +235,22 @@ export default function GameManagement() {
                     </div>
                     <div className="game flex items-center gap-4">
                         <Button onClick={() => setShowGameBookingForm(true)} className="gap-2 text-gray-600">
-                            <Plus size={18}/> New Booking
+                            <Plus size={18}/> {!isMobile ? "Booking" : ""} 
                         </Button>
 
                         <Button onClick={() => setShowGameTypeForm(true)} className="gap-2 text-gray-600">
-                            <Gamepad2 size={18}/> Game Types
+                            <Gamepad2 size={18}/> {!isMobile ? "Game Types" : ""}
                         </Button>
 
                         <Button onClick={() => setShowGameIntrestForm(true)} className="gap-2 text-gray-600">
-                            <Gamepad size={18}/> Game Interests
+                            <Gamepad size={18}/> {!isMobile ? "Game Interests" : ""}
                         </Button>
 
                         <div className="relative inline-block">
                             <Bell 
                             size={25} 
                             onClick={() => setShowNotification(true)} 
-                            className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+                            className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
                             />
                             {unreadNotifications > 0 && (
                             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
@@ -333,7 +335,7 @@ export default function GameManagement() {
                   </div>
                 )}                
 
-                <main className="p-6 max-w-5xl mx-auto w-254">                  
+                <main className="p-6 space-y-6 w-full">                  
 
                     {/* upcomming games */}
                     <div className="game grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -114,7 +114,7 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
                     <label className="text-xs font-bold uppercase text-slate-500">Max Players Per Slot </label>
                     <Input type="number" {...register("gameMaxPlayerPerSlot")} />
                 </div>
-                <Button type="submit" className="my-2 text-black bg-blue-500 w-full" disabled={!watch("gameName")?.trim() || !watch("operatingStart") || !watch("operatingEnd") || !watch("gameSlotDuration") || !watch("gameMaxPlayerPerSlot")}>
+                <Button type="submit" className="my-2 text-black bg-gray-500 w-full" disabled={!watch("gameName")?.trim() || !watch("operatingStart") || !watch("operatingEnd") || !watch("gameSlotDuration") || !watch("gameMaxPlayerPerSlot")}>
                     <Save size={16} className="mr-2"/> Save Game
                 </Button>
             </form>

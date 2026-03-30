@@ -131,7 +131,7 @@ return (
                 <Button 
                   variant="link" 
                   title="Mark as read"
-                  className="text-xs text-blue-600 absolute right-2 top-2"
+                  className="text-xs text-gray-600 absolute right-2 top-2"
                   onClick={() => markReadMutation.mutate(notif.id)}
                 >
                 <CheckCheck />

@@ -68,7 +68,7 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
     <Card className="border-none shadow-none">
       <CardHeader>
         <CardTitle className="text-xl flex items-center gap-2">
-          <UserPlus size={20} className="text-blue-600" /> Refer a Friend
+          <UserPlus size={20} className="text-gray-600" /> Refer a Friend
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

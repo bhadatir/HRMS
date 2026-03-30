@@ -48,7 +48,7 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 w-318">
-      <Card className="w-full max-w-md shadow-xl border-t-4 border-blue-600">
+      <Card className="w-full max-w-md shadow-xl border-t-4 border-gray-600">
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold text-center">Login</CardTitle>
           <CardDescription className="text-center">
@@ -78,7 +78,7 @@ export default function Login() {
             
             <Button 
               type="submit"
-              className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-black font-medium transition-colors" 
+              className="w-full h-11 bg-gray-600 hover:bg-gray-700 text-black font-medium transition-colors" 
               disabled={loginMutation.isPending}
             >
               {loginMutation.isPending ? "Authenticating..." : "Sign In"}
@@ -87,7 +87,7 @@ export default function Login() {
             <div className="text-sm text-center space-y-4 pt-2">
                <Link 
                  to="/reset-password" 
-                 className="text-blue-600 hover:underline block transition-all"
+                 className="text-gray-600 hover:underline block transition-all"
                >
                  Forgot Password?
                </Link>
@@ -101,7 +101,7 @@ export default function Login() {
 
                <p className="text-gray-600">
                  Don't have an account?{" "}
-                 <Link to="/signup" className="text-blue-600 font-bold hover:underline">
+                 <Link to="/signup" className="text-gray-600 font-bold hover:underline">
                    Sign Up
                  </Link>
                </p> */}

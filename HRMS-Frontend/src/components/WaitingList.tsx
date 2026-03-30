@@ -92,7 +92,7 @@ export default function WaitingList({waitingListId}: {waitingListId: number, onS
                   }}
                 />
               </div>
-              <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50 mt-2">
+              <Badge variant="outline" className="text-gray-600 border-gray-200 bg-gray-50 mt-2">
                 {waitingList?.waitingStatusIsActive ? "Active" : "Inactive"}
               </Badge>
             </CardHeader>

@@ -116,20 +116,20 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
                 <CardTitle className="text-2xl font-bold text-slate-900">{plan?.travelPlanName}</CardTitle>
                 <CardDescription className="mt-1">{plan?.travelPlanDetails}</CardDescription>
               </div>
-              <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
+              <Badge variant="outline" className="text-gray-600 border-gray-200 bg-gray-50">
                 {plan?.travelPlanIsReturn ? "Return Trip" : "One Way"}
               </Badge>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-4">
               <div className="flex items-center gap-3">
-                <MapPin className="text-blue-500" />
+                <MapPin className="text-gray-500" />
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase">Route</p>
                   <p className="font-semibold">{plan?.travelPlanFrom} → {plan?.travelPlanTo}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Calendar className="text-blue-500" />
+                <Calendar className="text-gray-500" />
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase">Duration</p>
                   <p className="font-semibold">{plan?.travelPlanStartDate} to </p>
@@ -137,14 +137,14 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Plane className="text-blue-500" />
+                <Plane className="text-gray-500" />
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase">Created At</p>
                   <p className="font-semibold">{plan?.travelPlanCreatedAt.split("T")[0]}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <IndianRupee className="text-blue-500" />
+                <IndianRupee className="text-gray-500" />
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase">Expense Limit Per Day</p>
                   <p className="font-semibold">{plan?.travelMaxExpenseAmountPerDay}</p>
@@ -174,7 +174,7 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
         <Card className="border-none shadow-none">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
-                <FileText className="text-blue-600" /> {viewMode === "EXPENSES" ? "Expenses" : "Travel Documents"}
+                <FileText className="text-gray-600" /> {viewMode === "EXPENSES" ? "Expenses" : "Travel Documents"}
 
                 {viewMode === "EXPENSES" && 
                   <div className="ml-2 flex-col">
@@ -258,7 +258,7 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
                               href={proof.expenseProofUrl} 
                               target="_blank" 
                               rel="noreferrer"
-                              className="text-blue-600 hover:underline flex items-center gap-1 text-xs"
+                              className="text-gray-600 hover:underline flex items-center gap-1 text-xs"
                             >
                               <ExternalLink size={12} /> Doc {idx + 1}
                             </a>
@@ -327,8 +327,8 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
                       <TableCell>{doc.employeeEmail} ({doc.fkRoleRoleName})</TableCell>
                       <TableCell >{doc.travelDocUploadedAt.split("T")[0]}</TableCell>
                       <TableCell className="text-right">
-                        <a href = {doc.travelDocUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline flex items-center gap-1 justify-end">
-                        <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50">
+                        <a href = {doc.travelDocUrl} target="_blank" rel="noreferrer" className="text-gray-600 hover:underline flex items-center gap-1 justify-end">
+                        <Button variant="outline" size="sm" className="text-gray-600 border-gray-200 hover:bg-gray-50">
                           <ExternalLink size={12} /> View
                         </Button>
                         </a>

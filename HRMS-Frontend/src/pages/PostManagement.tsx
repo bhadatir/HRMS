@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { postService } from "../api/postService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { useToast } from "@/context/ToastContext";
 import { ConformationDialog } from "@/components/ConformationDialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Post = {
   id: number;
@@ -36,6 +37,7 @@ type Post = {
 };
 
 export default function PostManagement() {
+  const isMobile = useIsMobile();
   const toast = useToast();
   const { token, user, unreadNotifications } = useAuth();
   const [showForm, setShowForm] = useState(false);
@@ -124,7 +126,7 @@ export default function PostManagement() {
       <SidebarInset className="bg-slate-50">
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-2 w-150">
-            {/* <SidebarTrigger /> */}
+            <SidebarTrigger />
             <h3 className="text-lg font-bold text-slate-800">Company Feed</h3>
             {(debouncedSearch && debouncedSearch.length > 0) ?(
               <Badge variant="outline">{filteredPosts.length} results</Badge>
@@ -146,14 +148,14 @@ export default function PostManagement() {
           </div>
           <div className="post">
             <Button onClick={() => setShowForm(true)} className="gap-2 mr-2 text-black">
-              <Plus size={18} /> New Post
+              <Plus size={18} /> {!isMobile ? "New Post" : ""}
             </Button>
           </div>
           <div className="post relative inline-block">
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
-              className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+              className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
             />
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
@@ -206,7 +208,7 @@ export default function PostManagement() {
           </div>
         )}
 
-        <main className="p-6 max-w-3xl mx-auto space-y-6 w-full">          
+        <main className="p-6 space-y-6 w-full">          
           <div className="post space-y-6">
             {filteredPosts.length > 0  ? (
               filteredPosts.map((post: Post) => (
@@ -219,7 +221,7 @@ export default function PostManagement() {
                             <p className="text-[10px] text-gray-500">By {post?.employeeEmail || "ROIMA"}</p>
                           </CardTitle>
                           <div className="flex gap-2 items-center mt-1">
-                            <Badge variant="secondary" className="text-[10px] bg-blue-50 text-blue-700">
+                            <Badge variant="secondary" className="text-[10px] bg-gray-50 text-gray-700">
                               <Eye size={10} className="mr-1" /> {post.postVisibilityName}
                             </Badge>
                           </div>
@@ -232,7 +234,7 @@ export default function PostManagement() {
                                 setEditPostId(post.id);
                                 setShowForm(true);
                               }}>
-                              <Edit size={16} className="text-blue-600" />
+                              <Edit size={16} className="text-gray-600" />
                               </Button>
                             </div>
                           )}
@@ -244,7 +246,7 @@ export default function PostManagement() {
                                 setIsDialogOpen(true);
                                 setDeletingPostId(post.id);
                               }}>
-                              <Trash size={16} className="text-red-600" />
+                              <Trash size={16} className="text-gray-600" />
                               {removePost.isPending && removePost.variables?.postId === post?.id ? <span className="text-[10px] text-red-600">Deleting...</span> : null}
                               </Button>
                             </>
@@ -264,7 +266,7 @@ export default function PostManagement() {
                         ) : (
                           <p className="text-sm text-slate-600">{post.postContent.substring(0, 200)}...</p>
                         )}
-                        <p className="text-[12px] text-blue-600 underline cursor-pointer" onClick={() => {
+                        <p className="text-[12px] text-gray-600 underline cursor-pointer" onClick={() => {
                           setShowFullContent(!showFullContent);
                         }}>{showFullContent ? "Show Less" : "Read More"}</p>
                       </div>

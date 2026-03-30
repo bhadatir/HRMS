@@ -110,7 +110,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: Book
                 {booking.gameBookingStatusId === 1 && (booking.employeeId === user?.id || user?.roleName === "Admin" || user?.roleName === "HR")
                     && !booking.gameBookingIsDeleted && new Date(booking.gameBookingStartTime) > new Date() ? (
                     <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="h-7 text-red-600" 
+                        <Button size="sm" variant="outline" className="h-7 text-gray-600" 
                         onClick={(e) => {
                             e.stopPropagation();
                             setIsDialogOpen(true);

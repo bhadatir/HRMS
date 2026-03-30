@@ -1,5 +1,7 @@
 import { Home, Plane, LogOut, Network, Briefcase, Mail, Building, ShieldCheck, Building2 } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
+import { useLocation } from "react-router-dom"
+import roimaLogo from "@/assets/roima_logo.png"
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +14,7 @@ import {
 
 export function AppSidebar() {
   const { logout, user } = useAuth();
+  const location = useLocation();
 
   const items = [
     { title: "Home", icon: Home, url: "/dashboard" },
@@ -26,32 +29,57 @@ export function AppSidebar() {
   ]
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="px-2 bg-sidebar text-sidebar-foreground">
 
-      <SidebarHeader className="p-4 font-bold text-lg">ROIMA</SidebarHeader>
+      <SidebarHeader className="p-4 font-bold text-lg flex items-center gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2">
+        <img
+          src={roimaLogo}
+          alt="Roima logo"
+          className="h-8 w-auto object-contain bg-primary rounded group-data-[collapsible=icon]:h-7"
+        />
+      </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
+            <SidebarMenuItem key={item.title} className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+              <SidebarMenuButton
+                asChild
+                tooltip={item.title}
+                className={`!text-black hover:!text-black group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:[&>svg]:size-5 ${
+                  location.pathname === item.url ? "border border-primary border-l-4" : ""
+                }`}
+              >
+                <a href={item.url} className="!text-black hover:!text-black [&>*]:!text-black">
+                  <item.icon className="shrink-0" />
+                  <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
-        <div className="p-4 mt-auto">
-          <p className="text-sm text-blue-500 flex gap-2"><Mail size={14} className="mt-1"/>{user?.employeeEmail}</p>
-          <p className="text-sm text-blue-500 flex gap-2"><ShieldCheck size={14} className="mt-1"/>{user?.roleName}</p>
-          <p className="text-sm text-blue-500 flex gap-2"><Building2 size={14} className="mt-1"/>{user?.departmentName}</p>
+        <div className="p-4 mt-auto space-y-2 group-data-[collapsible=icon]:p-2">
+          <p title={user?.employeeEmail} className="text-sm text-black flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
+            <Mail size={14} className="shrink-0 group-data-[collapsible=icon]:size-5" />
+            <span className="group-data-[collapsible=icon]:hidden">{user?.employeeEmail}</span>
+          </p>
+          <p title={user?.roleName} className="text-sm text-black flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
+            <ShieldCheck size={14} className="shrink-0 group-data-[collapsible=icon]:size-5" />
+            <span className="group-data-[collapsible=icon]:hidden">{user?.roleName}</span>
+          </p>
+          <p title={user?.departmentName} className="text-sm text-black flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
+            <Building2 size={14} className="shrink-0 group-data-[collapsible=icon]:size-5" />
+            <span className="group-data-[collapsible=icon]:hidden">{user?.departmentName}</span>
+          </p>
         </div>
       </SidebarContent>
-      <SidebarFooter className="p-4 border-t">
-        <SidebarMenuButton onClick={logout} className="text-red-500 bg-slate-500">
+      <SidebarFooter className="p-4 border-t group-data-[collapsible=icon]:p-2">
+        <SidebarMenuButton
+          onClick={logout}
+          tooltip="Logout"
+          className="text-red-600 hover:text-red-700 hover:bg-red-50 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:[&>svg]:size-5"
+        >
           <LogOut />
-          <span >Logout</span>
+          <span className="group-data-[collapsible=icon]:hidden">Logout</span>
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>

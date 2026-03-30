@@ -53,7 +53,7 @@ export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSucces
     <Card className="border-none shadow-none">
       <CardHeader>
         <CardTitle className="text-xl flex items-center gap-2">
-          <Send size={20} className="text-blue-600" /> Share Job
+          <Send size={20} className="text-gray-600" /> Share Job
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

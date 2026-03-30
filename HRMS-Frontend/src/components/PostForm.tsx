@@ -141,7 +141,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
               <Eye size={12} /> Visibility
             </label>
             <select 
-              className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+              className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm focus:ring-2 focus:ring-gray-500"
               {...register("fkPostVisibilityId")}
             >
               {allVisibilities.map((vis: Visibility) => (

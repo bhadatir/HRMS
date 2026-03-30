@@ -114,11 +114,11 @@ export default function CommentSection({ postId }: { postId: number }) {
       <div className="space-y-3">
         {comments.filter((c: Comment) => !c.commentIsDeleted).map((comment: Comment) => (
           <div key={comment.id} className={`p-2 rounded-lg group ${comment.parentCommentId ? 
-                                            "ml-8 bg-slate-50 border-l-2 border-blue-200" 
+                                            "ml-8 bg-slate-50 border-l-2 border-gray-200" 
                                             : "bg-white border"}`}>
             <div className="flex justify-between items-start">
               <div className="text-xs">
-                <span className="font-bold text-blue-600"> {comment.employeeEmail} </span>
+                <span className="font-bold text-gray-600"> {comment.employeeEmail} </span>
 
                 {comment.parentCommentId && (
                       <span className="text-[10px] text-slate-400">replied to #{comment.parentCommentEmployeeEmail}</span>
@@ -139,7 +139,7 @@ export default function CommentSection({ postId }: { postId: number }) {
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
                       onClick={() => handleReplyClick(comment)}
-                      className="text-slate-400 hover:text-blue-600"
+                      className="text-slate-400 hover:text-gray-600"
                     >
                       <Reply size={12} />
                 </button>
@@ -150,7 +150,7 @@ export default function CommentSection({ postId }: { postId: number }) {
                       setIsDialogOpen(true);
                       setDeletingCommentId(comment.id);
                     }}
-                    className="flex opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
+                    className="flex opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 transition-opacity"
                   >
                     <Trash2 size={12} />
                     {removeCommentMutation.isPending && removeCommentMutation.variables?.commentId === comment.id ? <span className="text-[10px] text-red-600"> Deleting...</span> : null}
@@ -163,7 +163,7 @@ export default function CommentSection({ postId }: { postId: number }) {
       </div>
 
       <div className="space-y-2">
-        {replyTo && (<div className="flex items-center justify-between bg-blue-50 px-2 py-1 rounded text-[10px] text-blue-700">
+        {replyTo && (<div className="flex items-center justify-between bg-gray-50 px-2 py-1 rounded text-[10px] text-gray-700">
             <span>Replying to {replyTo.name}</span>
             <X size={12} className="cursor-pointer" onClick={() => setReplyTo(null)} />
             </div>

@@ -107,7 +107,7 @@ return (
                                     setShowForm(true);
                                     setEditGameTypeId(g.id);
                                 }}>
-                                    <Edit size={14} className="text-blue-600"/>
+                                    <Edit size={14} className="text-gray-600"/>
                                 </Button>
                             </div>
                         </TableCell>

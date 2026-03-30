@@ -14,7 +14,7 @@ const Notifications = ({ children, kind, onClose, className = "" }: Notification
     success: "bg-green-50 border-green-500 text-green-800",
     error: "bg-red-50 border-red-500 text-red-800",
     warning: "bg-yellow-50 border-yellow-500 text-yellow-800",
-    info: "bg-blue-50 border-blue-500 text-blue-800",
+    info: "bg-gray-50 border-gray-500 text-gray-800",
   };
 
   const selectedStyle = variantStyles[kind] || variantStyles.info;

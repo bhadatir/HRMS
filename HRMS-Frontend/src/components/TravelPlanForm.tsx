@@ -272,10 +272,10 @@ const getMutation = useMutation({
                   <div className="travel"> 
                     <button
                         key={emp.id}
-                        className="w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors"                                 
+                        className="users w-full text-left px-4 py-2 flex items-center gap-3 border-b last:border-none transition-colors"                                 
                         onClick={() => handleSelectEmployee(emp)}
                     >
-                        <User size={14} className="text-blue-600" />
+                        <User size={14} className="text-gray-600" />
                         <div className="flex flex-col">
                             <span className="text-sm font-medium">{emp.employeeFirstName} {emp.employeeLastName}</span>
                         </div>

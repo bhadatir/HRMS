@@ -179,7 +179,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
             <div className="space-y-2">
               <label className="text-sm font-medium">Gender</label>
               <select 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-gray-500"
                 {...register("gender" )}
               >
                 <option value="male">Male</option>
@@ -229,7 +229,7 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
             </div>
             <Button 
               type="submit" 
-              className="md:col-span-2 w-full h-11 bg-blue-600 hover:bg-blue-700 text-black font-bold mt-4"
+              className="md:col-span-2 w-full h-11 bg-gray-600 hover:bg-gray-700 text-black font-bold mt-4"
               disabled={registerMutation.isPending || !watch("firstName")?.trim() || !watch("lastName")?.trim() || !watch("email")?.trim() || (!editUserEmail && !watch("password")) || !watch("dob") || !watch("hireDate") || !watch("salary") || !watch("departmentId") || !watch("roleId") || !watch("positionId")}
             >
               {registerMutation.isPending ? editUserEmail ? "Updating User..." : "Registering User..." : "Submit User Data"}

@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { travelService } from "../api/travelService";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import { useAppDebounce } from "@/hooks/useAppDebounce.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
 import { ConformationDialog } from "@/components/ConformationDialog.tsx";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 type Plan = {
   id: number;
@@ -45,6 +46,7 @@ type EmployeeTravelPlanResponse = {
 }
 
 export default function TravelPlan() {
+  const isMobile = useIsMobile();
   const toast = useToast();
   const { token, user, unreadNotifications } = useAuth(); 
   const queryClient = useQueryClient();
@@ -165,8 +167,8 @@ export default function TravelPlan() {
       <AppSidebar />
       <SidebarInset className="bg-slate-50">
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
-          <div className="flex items-center gap-2">
-            {/* <SidebarTrigger /> */}
+          <div className="flex items-center gap-2 pr-2">
+            <SidebarTrigger />
             <h3 className="text-lg font-bold text-slate-800">Travel Management</h3>
             {(debouncedSearchTerm && debouncedSearchTerm.length > 0) ? (
               <Badge variant="outline">{filteredPlans.length} results</Badge>
@@ -177,7 +179,7 @@ export default function TravelPlan() {
             )}
           </div>
           {user?.roleName !== "ADMIN" && 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pr-2">
             <select className="border rounded-md px-2 py-1 text-sm" 
               value={travelPlanType} onChange={(e) => setTravelPlanType(Number(e.target.value))}>
                 <option value="0">All Travel Plan</option>
@@ -189,7 +191,7 @@ export default function TravelPlan() {
             </select>
           </div>}
 
-          <div className="relative max-w-sm w-full">
+          <div className="relative max-w-sm w-full pr-2">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search Travel Plans (e.g. 'ti')..." 
@@ -202,12 +204,12 @@ export default function TravelPlan() {
             />
           </div>
 
-          <div className="travel">
+          <div className="travel pr-2">
             {user?.roleName === "HR" && (
               <Button title="Create New Travel Plan"
                 onClick={() => setShowForm(true)} className="gap-2 text-gray-600">
                 <Plus size={18} />
-                New Plan
+                {!isMobile ? "New Plan" : ""}
               </Button>
             )}
           </div>
@@ -216,7 +218,7 @@ export default function TravelPlan() {
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
-              className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+              className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
             />
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
@@ -307,7 +309,7 @@ export default function TravelPlan() {
         </div>
         )}
 
-        <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
+        <main className="p-6 space-y-6 w-full">
           <div className="travel grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPlans.length > 0 ? (
               filteredPlans.sort((a: Plan, b: Plan) => new Date(b.travelPlanStartDate).getTime() 
@@ -319,7 +321,7 @@ export default function TravelPlan() {
                   className="hover:shadow-md transition-shadow border-slate-200 cursor-pointer">
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-xl font-bold text-blue-600">{plan.travelPlanName}</CardTitle>
+                      <CardTitle className="text-xl font-bold text-gray-600">{plan.travelPlanName}</CardTitle>
                       <div className="flex items-center gap-1">  
                         <Badge variant="outline">{plan.travelPlanIsReturn ? "Return" : "One-Way"}</Badge>
                         <Badge variant="outline">{plan.travelPlanIsDeleted ? "Deleted" : "Active"}</Badge>
@@ -421,7 +423,7 @@ export default function TravelPlan() {
                               setIsDialogOpen(true);
                               setDeletingTravelPlanId(plan.id);
                             }}
-                            className="text-red-500 hover:text-red-700 right-0 mt-2"
+                            className="text-gray-500 hover:text-gray-700 right-0 mt-2"
                           >
                             <Trash2 size={14} />
                             {deleteTravelPlanMutation.isPending && deleteTravelPlanMutation.variables.travelPlanId === plan.id ? (

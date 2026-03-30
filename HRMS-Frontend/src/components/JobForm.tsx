@@ -135,7 +135,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
         <div className="space-y-1">
           <label className="text-xs font-bold text-slate-500 uppercase">Job Category</label>
           <select
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-gray-500"
             {...register("fkJobTypeId")}
           >
             <option value="">Select job category</option>
@@ -159,7 +159,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
             {editJobId ? "Upload new JD to replace existing file (Optional)" : "Upload job description (Required)"}
           </p>
           {
-          watch("file") && <p className="text-xs text-blue-600 font-medium">{watch("file")?.[0]?.name}</p>}
+          watch("file") && <p className="text-xs text-gray-600 font-medium">{watch("file")?.[0]?.name}</p>}
         </div>
 
         <Button

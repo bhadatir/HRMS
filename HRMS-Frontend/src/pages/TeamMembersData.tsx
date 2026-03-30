@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { X, Bell, Search} from "lucide-react";
@@ -90,7 +90,7 @@ export default function TeamMemberData() {
       <SidebarInset className="bg-slate-50">
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-2">
-            {/* <SidebarTrigger /> */}
+            <SidebarTrigger />
             <h3 className="text-lg font-bold text-slate-800">Team Members Data</h3>
           </div>
 
@@ -109,7 +109,7 @@ export default function TeamMemberData() {
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
-              className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+              className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
             />
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
@@ -132,7 +132,7 @@ export default function TeamMemberData() {
           </div>
         )}
 
-        <main className="p-6 max-w-7xl mx-auto space-y-6 w-250">       
+        <main className="p-6 space-y-6 w-full">       
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredData?.map((org: OrgData) => (
                 <Card 
@@ -142,13 +142,13 @@ export default function TeamMemberData() {
                   <CardHeader className="flex flex-row items-center gap-4">
                     <Avatar className="h-16 w-16 border-2 border-black-500">
                       <AvatarImage src={org.employeeProfileUrl} />
-                      <AvatarFallback className="bg-blue-600 text-white">
+                      <AvatarFallback className="bg-gray-600 text-white">
                         {org.firstName.charAt(0)}{org.lastName.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <CardTitle className="text-xl font-bold">{org.firstName} {org.lastName}</CardTitle>
-                      <p className="text-blue-600 font-bold text-sm">{org.employeeEmail}</p>
+                      <p className="text-gray-600 font-bold text-sm">{org.employeeEmail}</p>
                     </div>
                   </CardHeader>
                   

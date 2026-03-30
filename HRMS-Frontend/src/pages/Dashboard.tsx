@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   SidebarInset,
   SidebarProvider,
+  SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { Input } from "@/components/ui/input.tsx";
@@ -192,7 +193,7 @@ export default function Dashboard() {
   return (
     isFirstLogin === "yes" ? (
       <div className="w-314">
-        <Card className="w-full max-w-md shadow-xl border-t-4 border-blue-600 mx-auto">
+        <Card className="w-full max-w-md shadow-xl border-t-4 border-black mx-auto">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">Update Your Password!</CardTitle>
           </CardHeader>
@@ -219,17 +220,17 @@ export default function Dashboard() {
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset className="bg-slate-50">
-          <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
+          <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 sticky top-0 z-10">
             
             <div className="flex items-center gap-2">
-              {/* <SidebarTrigger /> */}
+              <SidebarTrigger />
               <h3 className="text-lg font-bold text-slate-800">My Dashboard</h3>
             </div>
             <div className="relative inline-block">
               <Bell 
                 size={25} 
                 onClick={() => setShowNotification(true)} 
-                className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+                className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
               />
               {unreadNotifications > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
@@ -238,25 +239,26 @@ export default function Dashboard() {
               )}
             </div>
           </header>
-          <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
-            
-            {/* Notifications */}
-            {showNotification && (
-              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
-                  <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
-                    setShowNotification(false);
-                  }}><X /></Button>
-                  <Notifications />
-                </div>
+          
+          {/* Notifications */}
+          {showNotification && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl max-w-3xl w-full relative max-h-150 overflow-y-auto">
+                <Button variant="ghost" className="absolute right-2 top-2" onClick={() => {
+                  setShowNotification(false);
+                }}><X /></Button>
+                <Notifications />
               </div>
-            )}
+            </div>
+          )}
 
+          <main className="p-6 w-full space-y-6">
+            
             <div className="rounded p-8 text-black">
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <Avatar title="edit profile image" className="h-16 w-16 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                   <AvatarImage src={user.employeeProfileUrl} />
-                  <AvatarFallback className="bg-blue-600 text-white">
+                  <AvatarFallback className="bg-gray-600 text-white">
                     {user.employeeFirstName.charAt(0)}{user.employeeLastName.charAt(0)}
                   </AvatarFallback>
                   <Input type="file" accept=".jpg,.jpeg,.png" className="hidden" onChange={(e) => e.target.files && profilePicMutation.mutate(e.target.files[0])} ref={fileInputRef} />
@@ -277,7 +279,7 @@ export default function Dashboard() {
                 </div>
               </div>
               
-              <div className="absolute top-[-10%] right-[-5%] w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
+              <div className="absolute top-[-10%] right-[-5%] w-64 h-64 bg-gray-500/10 rounded-full blur-3xl"></div>
             </div>
 
 
@@ -286,7 +288,7 @@ export default function Dashboard() {
               
               <Card className="shadow-sm border-slate-200">
                 <CardHeader className="flex flex-row items-center space-x-2 pb-2">
-                  <Mail className="w-4 h-4 text-blue-600" />
+                  <Mail className="w-4 h-4 text-gray-600" />
                   <CardTitle className="text-sm font-medium">Contact Information</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -298,7 +300,7 @@ export default function Dashboard() {
 
               <Card className="shadow-sm border-slate-200">
                 <CardHeader className="flex flex-row items-center space-x-2 pb-2">
-                  <Building className="w-4 h-4 text-blue-600" />
+                  <Building className="w-4 h-4 text-gray-600" />
                   <CardTitle className="text-sm font-medium">Department & Position</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -318,7 +320,7 @@ export default function Dashboard() {
 
               <Card className="shadow-sm border-slate-200">
                 <CardHeader className="flex flex-row items-center space-x-2 pb-2">
-                  <IndianRupee className="w-4 h-4 text-green-600" />
+                  <IndianRupee className="w-4 h-4 text-gray-600" />
                   <CardTitle className="text-sm font-medium">Salary Overview</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -369,9 +371,9 @@ export default function Dashboard() {
                     dayEvents?.dayTravel.map((p: TravelPlan) => (
                       <div key={p.id} 
                         onClick={() => navigate(`/travel-plan?travelPlanId=${p.id}`)}
-                        className="p-3 bg-blue-50 border-l-4 border-blue-500 rounded text-sm cursor-pointer">
-                        <p className="font-bold text-blue-800">✈️ {p.travelPlanName}</p>
-                        <p className="text-blue-600 text-xs">{p.travelPlanFrom} → {p.travelPlanTo}</p>
+                        className="p-3 bg-gray-50 border-l-4 border-gray-500 rounded text-sm cursor-pointer">
+                        <p className="font-bold text-gray-800">✈️ {p.travelPlanName}</p>
+                        <p className="text-gray-600 text-xs">{p.travelPlanFrom} → {p.travelPlanTo}</p>
                       </div>
                     ))
                   ) : null}
@@ -428,7 +430,7 @@ export default function Dashboard() {
                   />
                   <div className="mt-4 flex gap-4 text-xs p-2 border-t">
                     <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 border-1 border-blue-400 rounded" /> Travel
+                      <div className="w-3 h-3 border-1 border-gray-400 rounded" /> Travel
                     </div>
                     <div className="flex items-center gap-1">
                       <div className="w-3 h-3 border-1 border-green-500 rounded" /> Game

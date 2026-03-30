@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { jobService } from "../api/jobService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
 import { ConformationDialog } from "@/components/ConformationDialog.tsx";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 type Job = {
   id: number;
@@ -34,6 +35,7 @@ type Job = {
 };
 
 export default function JobManagement() {
+  const isMobile = useIsMobile();
   const toast = useToast();
   const { token, user, unreadNotifications } = useAuth();
   const [showForm, setShowForm] = useState(false);
@@ -121,8 +123,8 @@ export default function JobManagement() {
       <AppSidebar />
       <SidebarInset className="bg-slate-50">
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
-          <div className="flex items-center gap-2">
-            {/* <SidebarTrigger /> */}
+          <div className="flex items-center gap-2 pr-2">
+            <SidebarTrigger />
             <h3 className="text-lg font-bold text-slate-800">Job Board</h3>
             {(debouncedSearchTerm && debouncedSearchTerm.length > 0) ? (
               <Badge variant="outline">{allJobs.length} results</Badge>
@@ -154,11 +156,11 @@ export default function JobManagement() {
             />
           </div>
 
-          <div className="job">
+          <div className="job pr-2">
             {( user?.roleName === "HR" || user?.roleName === "ADMIN" ) && (
               <Button title="Post New Job" onClick={() => setShowForm(true)} className="gap-2 text-gray-700">
                 <Plus size={18} />
-                Post New Job
+                {!isMobile ? "Post New Job" : ""}
               </Button>
             )}
           </div>
@@ -167,7 +169,7 @@ export default function JobManagement() {
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
-              className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+              className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
             />
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
@@ -266,7 +268,7 @@ export default function JobManagement() {
           </div>
         )}
 
-        <main className="p-6 max-w-7xl mx-auto space-y-6 w-254">
+        <main className="p-6 space-y-6 w-full">
           <div className="job grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allJobs.length > 0 ? (
               allJobs.map((job: Job) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (
@@ -277,7 +279,7 @@ export default function JobManagement() {
                 >
                   <CardHeader>
                     <div className="flex flex-row items-center justify-between">
-                      <div className="flex items-center gap-2 justify-between">
+                      <div className="flex items-center gap-2 justify-between pr-2">
                         <CardTitle className="text-lg font-bold">{job.jobTitle}</CardTitle>
                         <Badge variant="outline" 
                           className={job.jobIsActive ? "border-green-500 text-green-500" : "border-red-500 text-red-500"} >
@@ -307,7 +309,7 @@ export default function JobManagement() {
                               }}
                               className="text-gray-600"
                             >
-                              <Trash size={14} className="text-red-500" />
+                              <Trash size={14} className="text-gray-500" />
                             </Button>
                           </div>
                           }
@@ -334,7 +336,7 @@ export default function JobManagement() {
                         onClick={(e) => e.stopPropagation()}
                         target="_blank" 
                         rel="noreferrer"
-                        className="text-blue-600 flex items-center gap-1 text-xs"
+                        className="text-gray-600 flex items-center gap-1 text-xs"
                     ><BookOpenIcon size={12} className="mr-1" />View Job Description</a>
 
                     {user?.id != job.employeeId && <p className="text-xs text-slate-500 mt-1">Created by : {job.employeeEmail}</p>}

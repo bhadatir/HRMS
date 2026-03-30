@@ -44,11 +44,11 @@ export default function ResetPassword() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 w-318">
-      <Card className="w-full max-w-md shadow-2xl border-t-4 border-blue-600 transition-all duration-300">
+      <Card className="w-full max-w-md shadow-2xl border-t-4 border-gray-600 transition-all duration-300">
         <CardHeader className="text-center">
-          <div className="mx-auto bg-blue-50 w-12 h-12 rounded-full flex items-center justify-center mb-2">
-            {step === 1 && <MailCheck className="text-blue-600" />}
-            {step === 2 && <ShieldCheck className="text-blue-600" />}
+          <div className="mx-auto bg-gray-50 w-12 h-12 rounded-full flex items-center justify-center mb-2">
+            {step === 1 && <MailCheck className="text-gray-600" />}
+            {step === 2 && <ShieldCheck className="text-gray-600" />}
             {step === 3 && <ShieldCheck className="text-green-600" />}
           </div>
           <CardTitle className="text-2xl font-bold">

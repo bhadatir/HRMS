@@ -185,7 +185,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <div>
             <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <Briefcase className="text-blue-600" /> {job?.jobTitle}
+              <Briefcase className="text-gray-600" /> {job?.jobTitle}
             </CardTitle>
             <CardDescription className="mt-1 flex">
               <div>
@@ -245,10 +245,10 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                         <div className="job">  
                           <button
                             key={emp.id}
-                            className="w-full text-left px-4 py-3 hover:bg-slate-100 flex items-center gap-3 border-b last:border-none"
+                            className="users w-full text-left px-4 py-3 hover:bg-slate-100 flex items-center gap-3 border-b last:border-none"
                             onClick={() => handleSelectUser(emp.id)}
                           >
-                              <User size={14} className="text-blue-600" />
+                              <User size={14} className="text-gray-600" />
                               <div>
                               <p className="text-sm font-semibold text-slate-900">{emp.employeeFirstName} {emp.employeeLastName}</p>
                               </div>
@@ -295,7 +295,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                     <TableCell className="text-xs max-w-[120px] truncate" title={ref.employeeEmail}>{ref.employeeEmail}</TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
-                        <a href={ref.referFriendCvUrl} target="_blank" rel="noreferrer" className="text-blue-600 flex items-center gap-1 text-xs">
+                        <a href={ref.referFriendCvUrl} target="_blank" rel="noreferrer" className="text-gray-600 flex items-center gap-1 text-xs">
                           <ExternalLink size={12} /> CV
                         </a>
                       </div>
@@ -362,7 +362,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
           ) : (
             <div className="space-y-2">
               <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                <UserCheck size={16} className="text-blue-600" /> Assigned Reviewers
+                <UserCheck size={16} className="text-gray-600" /> Assigned Reviewers
               </h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">                   
                 {job?.cvReviewerResponses?.map((rev: CvReviewerResponse) => (
