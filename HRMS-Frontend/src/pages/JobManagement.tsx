@@ -122,16 +122,16 @@ export default function JobManagement() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="bg-slate-50">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 text-white sticky top-0 z-10">
           <div className="flex items-center gap-2 pr-2">
-            <SidebarTrigger />
-            <h3 className="text-lg font-bold text-slate-800">Job Board</h3>
+            <SidebarTrigger/>
+            <h3 className="text-lg font-bold">Job Board</h3>
             {(debouncedSearchTerm && debouncedSearchTerm.length > 0) ? (
-              <Badge variant="outline">{allJobs.length} results</Badge>
+              <Badge variant="outline" className="text-white">{allJobs.length} results</Badge>
             ) : jobType ? (
-              <Badge variant="outline">{allJobsData?.pages[0]?.totalElements} results</Badge>
+              <Badge variant="outline" className="text-white">{allJobsData?.pages[0]?.totalElements} results</Badge>
             ) : (
-              <Badge variant="outline">No filter</Badge>
+              <Badge variant="outline" className="text-white">No filter</Badge>
             )}
           </div>
 
@@ -169,7 +169,7 @@ export default function JobManagement() {
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
-              className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
+              className="text-white cursor-pointer"
             />
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">

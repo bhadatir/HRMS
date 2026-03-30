@@ -208,27 +208,27 @@ export default function GameManagement() {
             <AppSidebar />
             <SidebarInset className="bg-slate-50">
                 <header className="flex h-16 items-center justify-between border-b px-6 bg-white sticky top-0 z-10 w-full">
-                    <div className="flex items-center gap-2 pr-2">
-                        <SidebarTrigger />
-                        <h3 className="font-bold">Game Zone</h3>
+                    <div className="flex items-center gap-2 pr-2 text-white">
+                        <SidebarTrigger/>
+                        <h3 className="text-lg font-bold">Game Zone</h3>
                         {(debouncedBookingSearchTerm && debouncedBookingSearchTerm.length > 0) ? (
-                        <Badge variant="outline">{filteredBookings.length} results</Badge>
+                        <Badge variant="outline" className="text-white">{filteredBookings.length} results</Badge>
                         ) : (debouncedWaitingListSearchTerm && debouncedWaitingListSearchTerm.length > 0) ? (
-                        <Badge variant="outline">{filteredWaitingList.length} results</Badge>
+                        <Badge variant="outline" className="text-white">{filteredWaitingList.length} results</Badge>
                         ) : (debouncedAllBookingsSearchTerm && debouncedAllBookingsSearchTerm.length > 0) ? (
-                        <Badge variant="outline">{filteredAllBookings.length} results</Badge>
+                        <Badge variant="outline" className="text-white">{filteredAllBookings.length} results</Badge>
                         ) : gameBookingStatusId ? (
-                        <Badge variant="outline">{bookingsByEmpId?.pages[0]?.totalElements} results</Badge>
+                        <Badge variant="outline" className="text-white">{bookingsByEmpId?.pages[0]?.totalElements} results</Badge>
                         ) : gameType ? ( 
                             viewMode == "My Bookings" ? (
-                            <Badge variant="outline">{bookingsByEmpId?.pages[0]?.totalElements} results</Badge>
+                            <Badge variant="outline" className="text-white">{bookingsByEmpId?.pages[0]?.totalElements} results</Badge>
                             ) : viewMode == "Waiting List" ? (
-                            <Badge variant="outline">{WaitingListByEmpId.length} results</Badge>
+                            <Badge variant="outline" className="text-white">{WaitingListByEmpId.length} results</Badge>
                             ) : (
-                            <Badge variant="outline">{bookings?.pages[0]?.totalElements} results</Badge>
+                            <Badge variant="outline" className="text-white">{bookings?.pages[0]?.totalElements} results</Badge>
                             )
                         ) : (
-                        <Badge variant="outline">No filter</Badge>
+                        <Badge variant="outline" className="text-white">No filter</Badge>
                         )}
                         <select className="border rounded-md px-2 py-1 text-sm" value={gameType || 0} onChange={(e) => setGameType(Number(e.target.value))}>
                             <option value="0">All Games</option>
@@ -252,7 +252,7 @@ export default function GameManagement() {
                             <Bell 
                             size={25} 
                             onClick={() => setShowNotification(true)} 
-                            className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
+                            className="text-white cursor-pointer "
                             />
                             {unreadNotifications > 0 && (
                             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">

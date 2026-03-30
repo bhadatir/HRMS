@@ -105,7 +105,7 @@ export default function OrganizationChart() {
     <SidebarProvider className="w-full">
       <AppSidebar />
       <SidebarInset className="flex flex-1 flex-col w-full bg-slate-50">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-20">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 text-white sticky top-0 z-20">
           <div className="flex items-center gap-2">
             <SidebarTrigger />
             <h3 className="text-lg font-bold">Managerial Chain</h3>
@@ -153,7 +153,7 @@ export default function OrganizationChart() {
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
-              className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
+              className="text-white cursor-pointer"
             />
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">

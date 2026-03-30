@@ -124,13 +124,13 @@ export default function PostManagement() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="bg-slate-50">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 bg-white sticky top-0 z-10">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 text-white sticky top-0 z-10">
           <div className="flex items-center gap-2 w-150">
             <SidebarTrigger />
-            <h3 className="text-lg font-bold text-slate-800">Company Feed</h3>
+            <h3 className="text-lg font-bold">Company Feed</h3>
             {(debouncedSearch && debouncedSearch.length > 0) ?(
-              <Badge variant="outline">{filteredPosts.length} results</Badge>
-            ) : (<Badge variant="outline">No filter</Badge>)
+              <Badge variant="outline" className="text-white">{filteredPosts.length} results</Badge>
+            ) : (<Badge variant="outline" className="text-white">No filter</Badge>)
             }
           </div>
 
@@ -147,7 +147,7 @@ export default function PostManagement() {
             />
           </div>
           <div className="post">
-            <Button onClick={() => setShowForm(true)} className="gap-2 mr-2 text-black">
+            <Button onClick={() => setShowForm(true)} className="gap-2 mr-2 text-gray-600">
               <Plus size={18} /> {!isMobile ? "New Post" : ""}
             </Button>
           </div>
@@ -155,7 +155,7 @@ export default function PostManagement() {
             <Bell 
               size={25} 
               onClick={() => setShowNotification(true)} 
-              className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
+              className="text-white cursor-pointer"
             />
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">

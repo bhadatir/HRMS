@@ -220,17 +220,17 @@ export default function Dashboard() {
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset className="bg-slate-50">
-          <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 sticky top-0 z-10">
+          <header className="flex h-16 items-center justify-between border-b px-6 sticky top-0 z-10 text-white">
             
             <div className="flex items-center gap-2">
               <SidebarTrigger />
-              <h3 className="text-lg font-bold text-slate-800">My Dashboard</h3>
+              <h3 className="text-lg font-bold">My Dashboard</h3>
             </div>
             <div className="relative inline-block">
               <Bell 
                 size={25} 
                 onClick={() => setShowNotification(true)} 
-                className="text-gray-600 cursor-pointer hover:text-gray-600 transition-colors"
+                className="text-white cursor-pointer"
               />
               {unreadNotifications > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
