@@ -222,8 +222,10 @@ export default function GameManagement() {
                         ) : gameType ? ( 
                             viewMode == "My Bookings" ? (
                             <Badge variant="outline">{bookingsByEmpId?.pages[0]?.totalElements} results</Badge>
-                            ) : (
+                            ) : viewMode == "Waiting List" ? (
                             <Badge variant="outline">{WaitingListByEmpId.length} results</Badge>
+                            ) : (
+                            <Badge variant="outline">{bookings?.pages[0]?.totalElements} results</Badge>
                             )
                         ) : (
                         <Badge variant="outline">No filter</Badge>
