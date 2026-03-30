@@ -1,7 +1,8 @@
-import { Home, Plane, LogOut, Network, Briefcase, Mail, Building, ShieldCheck, Building2 } from "lucide-react"
+import { Plane, LogOut, Network, Briefcase, Mail, Building, ShieldCheck, Building2 } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import { useLocation, useNavigate } from "react-router-dom"
 import roimaLogo from "@/assets/roima_logo.png"
+import roimaFavicon from "@/assets/roima_favicon.png"
 import {
   Sidebar,
   SidebarContent,
@@ -10,13 +11,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 export function AppSidebar() {
   const { logout, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { state } = useSidebar();
 
   const items = [
     { title: "Organization Chart", icon: Network, url: "/organization-chart" },
@@ -34,10 +36,11 @@ export function AppSidebar() {
 
       <SidebarHeader className={`justify-between font-bold text-lg items-center gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2`}>
         <img
-          src={roimaLogo}
+          src={state === "collapsed" ? roimaFavicon : roimaLogo}
           alt="Roima logo"
           onClick={() => navigate("/dashboard")}
-          className="cursor-pointer h-12 w-auto object-contain group-data-[collapsible=icon]:h-7"
+          className="shrink-0 cursor-pointer h-12 w-auto object-contain"
+          title="Dashboard Page"
         />
         {/* <SidebarTrigger className="bg-slate-50 text-black"/> */}
       </SidebarHeader>
