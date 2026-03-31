@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
+import { Spinner } from "@/components/ui/spinner.tsx";
 
 type TravelPlan = {
     id: number;
@@ -110,19 +111,19 @@ export default function Dashboard() {
     }
   });
   
-  const { data: travelPlans, isError: travelPlansError } = useQuery({
+  const { data: travelPlans, isLoading: isTravelPlansLoading, isError: travelPlansError } = useQuery({
     queryKey: ["travelPlanByEmpId", user?.id],
     queryFn: () => travelService.findTravelPlanByEmployeeId(user?.id || 0, "", 0, 0, 100, token || ""),
     enabled: !!token && !!user?.id,
   });
 
-  const { data: gameBookings, isError: gameBookingsError } = useQuery({
+  const { data: gameBookings, isLoading: isGameBookingsLoading, isError: gameBookingsError } = useQuery({
     queryKey: ["gameBookings", user?.id],
     queryFn: () => gameService.findGameBookingByUserId(user?.id || 0, "", 0, 0, 0, 100, token || ""), 
     enabled: !!token && !!user?.id,
   });
 
-  const { data: WaitingList, isError: waitingListError } = useQuery({ 
+  const { data: WaitingList, isLoading: isWaitingListLoading, isError: waitingListError } = useQuery({ 
       queryKey: ["WaitingList", user?.id], 
       queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id || 0, 0, token!) 
   });
@@ -251,6 +252,8 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+
+          {( updatePasswordMutation.isPending || profilePicMutation.isPending || isWaitingListLoading || isGameBookingsLoading || isTravelPlansLoading ) && <Spinner />}
 
           <main className="p-6 w-full space-y-6">
             

@@ -5,12 +5,13 @@ import { useAuth } from "../context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { CheckCheck, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useInView } from "react-intersection-observer";
 import { useGetUserNotifications } from "@/hooks/useInfinite";
 import { useToast } from "@/context/ToastContext";
 import { ConformationDialog } from "./ConformationDialog";
+import { Spinner } from "./ui/spinner";
 
 type Notification = {
   id: number;
@@ -32,6 +33,7 @@ export default function Notifications() {
     hasNextPage,
     isFetchingNextPage,
     isError: notificationsError,
+    isLoading: notificationsLoading,
   } = useGetUserNotifications(searchTerm, token || "");
   const notifications = notificationsData?.pages.flatMap(page => page.content) || [];
 
@@ -77,6 +79,8 @@ export default function Notifications() {
 
 return (
     <main className="p-4 w-full">
+
+      {( notificationsLoading || markAllReadMutation.isPending || markReadMutation.isPending ) && <Spinner />}
 
       {/* Confirmation Dialog */}
       {isDialogOpen && (

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { apiService } from "@/api/apiService";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "@/components/ui/spinner";
 
 type LoginData = {
   email: string;
@@ -47,7 +48,8 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 w-318">
+    <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 w-full">
+      {loginMutation.isPending && <Spinner />}
       <Card className="w-full max-w-md shadow-xl border-t-4 border-gray-600">
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold text-center">Login</CardTitle>

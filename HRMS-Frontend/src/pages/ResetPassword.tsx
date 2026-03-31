@@ -43,7 +43,7 @@ export default function ResetPassword() {
   });
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 w-318">
+    <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 w-full">
       <Card className="w-full max-w-md shadow-2xl border-t-4 border-gray-600 transition-all duration-300">
         <CardHeader className="text-center">
           <div className="mx-auto bg-gray-50 w-12 h-12 rounded-full flex items-center justify-center mb-2">

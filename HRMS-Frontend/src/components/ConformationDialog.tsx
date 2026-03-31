@@ -52,7 +52,7 @@ export function ConformationDialog({ onConfirm, onClose, iteam, action }: Confor
               />
             )}
           </div>
-          <div className="gameType manager job user game post notification sub travel flex justify-end space-x-2">
+          <div className="relative gameType manager job user game post notification sub travel flex justify-end space-x-2">
             <Button variant="ghost" onClick={onClose} className="h-9">
                 Close
             </Button>

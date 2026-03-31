@@ -19,6 +19,7 @@ import { useEmployeeSearch } from "../hooks/useInfinite";
 import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
+import { Spinner } from "@/components/ui/spinner.tsx";
 
 type Employee = {
   id: number;
@@ -58,11 +59,12 @@ export default function OrganizationChart() {
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage,
-    isError: searchError 
+    isError: searchError,
+    isLoading: searchLoading, 
   } = useEmployeeSearch(searchTerm, 0, token || "");
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
-  const { data: orgData, isLoading, isError: orgDataError } = useQuery({
+  const { data: orgData, isLoading: orgDataLoading, isError: orgDataError } = useQuery({
     queryKey: ["orgChart", selectedId],
     queryFn: () => apiService.fetchOrgChart(selectedId, token || ""),
     enabled: !!selectedId,
@@ -163,6 +165,8 @@ export default function OrganizationChart() {
           </div>
         </header>
 
+        {( searchLoading || orgDataLoading ) && <Spinner />}
+
         {/* Notifications */}
         {showNotification && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -177,9 +181,7 @@ export default function OrganizationChart() {
 
 
         <div className="p-6 space-y-8 w-full">
-          {isLoading ? (
-            <div className="p-10 text-center text-slate-500 font-medium">Loading employee data...</div>
-          ) : orgDataError ? (
+          {orgDataError ? (
             <div className="p-10 text-center text-red-500 font-medium">Employee data could not be retrieved.</div>
           ) : (
             <>
@@ -208,20 +210,20 @@ export default function OrganizationChart() {
                 <Card className="w-full max-w-sm border-2 border-gray-500 shadow-xl ring-4 ring-gray-50">
                   <CardHeader className="flex flex-row items-center gap-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={orgData.employeeProfileUrl} />
+                      <AvatarImage src={orgData?.employeeProfileUrl} />
                       <AvatarFallback className="bg-gray-600 text-white">
-                        {orgData.firstName.charAt(0)}{orgData.lastName.charAt(0)}
+                        {orgData?.firstName.charAt(0)}{orgData?.lastName.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <CardTitle className="text -xl font -bold">{orgData.firstName} {orgData.lastName}</CardTitle>
-                      <p className="text-gray-600 font-bold text-sm uppercase">{orgData.positionName}</p>
+                      <CardTitle className="text -xl font -bold">{orgData?.firstName} {orgData?.lastName}</CardTitle>
+                      <p className="text-gray-600 font-bold text-sm uppercase">{orgData?.positionName}</p>
                     </div>
                   </CardHeader>
                   <CardContent className="bg-slate-50/50 border-t p-4 flex justify-between items-center">
-                    <p className="text-xs font-medium text-slate-500">Department: <span className="text-slate-900">{orgData.departmentName}</span></p>
+                    <p className="text-xs font-medium text-slate-500">Department: <span className="text-slate-900">{orgData?.departmentName}</span></p>
                     
-                    <Badge variant="secondary" className="bg-gray-100 text-gray-700">{orgData.employeeEmail}</Badge>
+                    <Badge variant="secondary" className="bg-gray-100 text-gray-700">{orgData?.employeeEmail}</Badge>
                   </CardContent>
                 </Card>
               </section>
@@ -233,7 +235,7 @@ export default function OrganizationChart() {
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  {orgData.directReports?.map((report: OrganizationReport) => (
+                  {orgData?.directReports?.map((report: OrganizationReport) => (
                     <Card 
                       key={report.employeeId} 
                       className="cursor-pointer hover:border-gray-400 transition-all"
