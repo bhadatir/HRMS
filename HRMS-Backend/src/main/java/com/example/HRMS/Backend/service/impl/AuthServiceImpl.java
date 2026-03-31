@@ -97,22 +97,22 @@ public class AuthServiceImpl implements AuthService {
         if (auth != null) {
             String email = auth.getName();
             AuthAudit log = authAuditRepository.findAuditAuthByUserEmailAndLogoutTimestampIsNull(email);
-            log.setLogoutTimestamp(Instant.now());
-
-            log.setActiveMin((int) Duration.between(log.getLoginTimestamp(), Instant.now()).toSeconds());
-            authAuditRepository.save(log);
-
+            if(log != null) {
+                log.setLogoutTimestamp(Instant.now());
+                log.setActiveMin((int) Duration.between(log.getLoginTimestamp(), Instant.now()).toSeconds());
+                authAuditRepository.save(log);
+            }
             SecurityContextHolder.clearContext();
         }
     }
 
-    @Scheduled(cron = "0 */10 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     @Transactional
     public void isTokenExpire(){
         List<AuthAudit> authAudits = authAuditRepository.findAll();
         for(AuthAudit authAudit : authAudits){
-            if(authAudit.getExpirationTime().before(new Date())){
-                AuthAudit log = authAuditRepository.findAuditAuthByUserEmailAndLogoutTimestampIsNull(authAudit.getUserEmail());
+            AuthAudit log = authAuditRepository.findAuditAuthByUserEmailAndLogoutTimestampIsNull(authAudit.getUserEmail());
+            if(authAudit.getExpirationTime().before(new Date()) && log != null){
                 log.setLogoutTimestamp(Instant.now());
                 log.setActiveMin((int) Duration.between(log.getLoginTimestamp(), Instant.now()).toSeconds());
                 authAuditRepository.save(log);

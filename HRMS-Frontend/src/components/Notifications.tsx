@@ -50,6 +50,7 @@ export default function Notifications() {
     mutationFn: (id: number) => apiService.markNotificationRead(id, token || ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast?.success("Notification marked as read");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -124,18 +125,10 @@ return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {notifications?.length > 0 ? (
             notifications?.map((notif: Notification) => (
-              <div className="relative flex-1">
+              <div title="Mark as read" className="cursor-pointer relative flex-1" onClick={() => markReadMutation.mutate(notif.id)} key={notif.id}>
                 <p className="text-sm text-gray-500">
                   <div dangerouslySetInnerHTML={{ __html: notif.message }} />
                 </p>
-                <Button 
-                  variant="link" 
-                  title="Mark as read"
-                  className="text-xs text-gray-600 absolute right-2 top-2"
-                  onClick={() => markReadMutation.mutate(notif.id)}
-                >
-                <CheckCheck />
-                </Button>
               </div>
             )
           )) : (

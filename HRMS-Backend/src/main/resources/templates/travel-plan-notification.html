@@ -11,7 +11,10 @@
 
     <div style="margin: 5px 0;">
         <a th:href="${link}"
-           style="color: #536ae1; cursor: pointer;">
+           style="color: #757575; cursor: pointer; text-decoration: underline;"
+           onclick="event.stopPropagation();"
+           onmouseover="this.style.color='#808080'; this.style.fontWeight='bold';"
+           onmouseout="this.style.color='#757575'; this.style.fontWeight='normal';">
             View Travel Plan
         </a>
     </div>

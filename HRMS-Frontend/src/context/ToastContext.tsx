@@ -24,7 +24,7 @@ export const ToastProvider = ({ children } : { children: React.ReactNode }) => {
   }, []);
 
   const addToast = useCallback(
-    (message: string, type = "info", duration = message.length * 200) => {
+    (message: string, type = "info", duration = message.length * 100) => {
       const id = Date.now() + Math.random();
       const newToast = {
         id,

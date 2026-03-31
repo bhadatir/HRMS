@@ -74,7 +74,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       const data = error.response?.data;  
-      if (error.response?.status === 401 || error.response?.status === 403) return;
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.clear();
+        localStorage.removeItem("token");
+        queryClient.clear();
+        setUnreadNotifications(0);
+        setIsFirstLogin("no");
+        return;
+      }
       const detailedError = typeof data === 'object' 
       ? JSON.stringify(data, null, 2) 
       : data || error.message;
