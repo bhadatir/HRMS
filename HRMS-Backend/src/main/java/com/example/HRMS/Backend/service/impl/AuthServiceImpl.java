@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,10 +32,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +81,12 @@ public class AuthServiceImpl implements AuthService {
         employee.setLastLoginAt(Instant.now());
         employeeRepository.save(employee);
 
+        AuthAudit log = new AuthAudit();
+        log.setUserEmail(employee.getEmployeeEmail());
+        log.setExpirationTime(jwtUtil.getExpirationTime(jwt));
+        log.setUserRoleName(employee.getFkRole().getRoleName());
+        authAuditRepository.save(log);
+
         return new AuthResponse(jwt, isFirstLogin);
     }
 
@@ -99,6 +103,20 @@ public class AuthServiceImpl implements AuthService {
             authAuditRepository.save(log);
 
             SecurityContextHolder.clearContext();
+        }
+    }
+
+    @Scheduled(cron = "0 */10 * * * *")
+    @Transactional
+    public void isTokenExpire(){
+        List<AuthAudit> authAudits = authAuditRepository.findAll();
+        for(AuthAudit authAudit : authAudits){
+            if(authAudit.getExpirationTime().before(new Date())){
+                AuthAudit log = authAuditRepository.findAuditAuthByUserEmailAndLogoutTimestampIsNull(authAudit.getUserEmail());
+                log.setLogoutTimestamp(Instant.now());
+                log.setActiveMin((int) Duration.between(log.getLoginTimestamp(), Instant.now()).toSeconds());
+                authAuditRepository.save(log);
+            }
         }
     }
 

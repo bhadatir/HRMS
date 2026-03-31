@@ -105,25 +105,25 @@ public class AuditLoggingAspect {
         }
     }
 
-    @AfterReturning(
-            pointcut = "execution(* com.example.HRMS.Backend.service.impl.AuthServiceImpl.login(..))"
-    )
-    public void loginAuthAction(JoinPoint joinPoint) {
-        Object[] args = joinPoint.getArgs();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
-        if(args.length>0){
-            Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
-                    () -> new RuntimeException("employee not found")
-            );
-
-            AuthAudit log = new AuthAudit();
-            log.setUserEmail(employee.getEmployeeEmail());
-            log.setUserRoleName(employee.getFkRole().getRoleName());
-            authAuditRepository.save(log);
-        }
-    }
+//    @AfterReturning(
+//            pointcut = "execution(* com.example.HRMS.Backend.service.impl.AuthServiceImpl.login(..))"
+//    )
+//    public void loginAuthAction(JoinPoint joinPoint) {
+//        Object[] args = joinPoint.getArgs();
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = authentication.getName();
+//
+//        if(args.length>0){
+//            Employee employee = employeeRepository.findEmployeeByEmployeeEmail(email).orElseThrow(
+//                    () -> new RuntimeException("employee not found")
+//            );
+//
+//            AuthAudit log = new AuthAudit();
+//            log.setUserEmail(employee.getEmployeeEmail());
+//            log.setUserRoleName(employee.getFkRole().getRoleName());
+//            authAuditRepository.save(log);
+//        }
+//    }
 
     @AfterReturning(
             pointcut = "execution(* com.example.HRMS.Backend.service.impl.TravelPlanServiceImpl.addTravelPlan(..))"

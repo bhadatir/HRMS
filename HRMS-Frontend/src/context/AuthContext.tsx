@@ -74,6 +74,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       const data = error.response?.data;  
+      if (error.response?.status === 401 || error.response?.status === 403) return;
       const detailedError = typeof data === 'object' 
       ? JSON.stringify(data, null, 2) 
       : data || error.message;
@@ -121,7 +122,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("token");
       toast?.error("Session expired or failed to load user data. Please log in again.");
     }
-  }, [userError, notificationsError, logout]);
+  }, [userError, notificationsError]);
 
   return (
     <AuthContext.Provider 

@@ -2,10 +2,10 @@ package com.example.HRMS.Backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.Instant;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -33,5 +33,8 @@ public class AuthAudit {
 
     @Column(name = "auth_audit_active_min")
     private Integer activeMin;
+
+    @Column(name = "auth_audit_expiration_time")
+    private Date expirationTime;
 }
 
