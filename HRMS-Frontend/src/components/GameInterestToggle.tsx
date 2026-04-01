@@ -45,7 +45,10 @@ export default function GameInterestToggle() {
                 return gameService.addEmployeeGameInterest(user?.id || 0, gameTypeId, token!);
             }
         }, 
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["myInterests", user?.id]}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["myInterests", user?.id] });
+            toast?.success("Game interest updated successfully!");
+        },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
             const data = error.response?.data;  

@@ -53,6 +53,7 @@ export default function CommentSection({ postId }: { postId: number }) {
       setReplyTo(null);
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
+      toast?.success("Comment added successfully!");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -74,6 +75,7 @@ export default function CommentSection({ postId }: { postId: number }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
+      toast?.success("Comment removed successfully!");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

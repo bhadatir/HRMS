@@ -43,6 +43,7 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
       queryClient.invalidateQueries({ queryKey: ["postTags", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
       setShowTagInput(false);
+      toast?.success("Tag added successfully!");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -55,7 +56,10 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
 
   const removeTagMutation = useMutation({
     mutationFn: (tagId: number) => postService.removePostTagFromPost(postId, tagId, token || ""),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["postTags", postId] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["postTags", postId] });
+      toast?.success("Tag removed successfully!");
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       const data = error.response?.data;  

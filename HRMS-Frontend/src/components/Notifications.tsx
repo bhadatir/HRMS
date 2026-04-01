@@ -67,6 +67,7 @@ export default function Notifications() {
     mutationFn: () => apiService.markAllNotificationsRead(user?.id || 0, token || ""),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast?.success("All notifications marked as read");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

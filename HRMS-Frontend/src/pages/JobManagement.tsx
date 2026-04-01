@@ -85,6 +85,7 @@ export default function JobManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allJobs"] });
       queryClient.invalidateQueries({ queryKey: ["jobDetail"] });
+      toast?.success("Job status updated successfully!");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

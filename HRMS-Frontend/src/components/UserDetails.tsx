@@ -39,6 +39,7 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", userEmail] });
       queryClient.invalidateQueries({ queryKey: ["searchEmployees"] });
+      toast?.success("User inactivated successfully!");   
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -82,7 +83,10 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
               onClick={() => {
               setShowEditUserForm(false);
             }}><X /></Button>
-            <AddUser editUserEmail={userData?.employeeEmail || null} onSuccess={() => setShowEditUserForm(false)} />
+            <AddUser editUserEmail={userData?.employeeEmail || null} onSuccess={() => {
+              setShowEditUserForm(false);
+              toast?.success("User details updated successfully!");
+            }} />
           </div>
         </div>
       )}

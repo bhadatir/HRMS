@@ -87,8 +87,10 @@ export default function PostManagement() {
         return postService.removePostByEmp(postId, reason, token || "");
       }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["allPosts"] }),
-    
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allPosts"] });
+      toast?.success("Post deleted successfully!");
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       const data = error.response?.data;  

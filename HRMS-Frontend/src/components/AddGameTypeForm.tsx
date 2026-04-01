@@ -45,6 +45,7 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
                 gameSlotDuration: data.gameSlotDuration,
                 gameMaxPlayerPerSlot: data.gameMaxPlayerPerSlot
             });
+            toast?.success("Game details loaded successfully!");
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
@@ -70,6 +71,7 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["allGameTypes"] });
+          toast?.success(`Game type ${editGameTypeId ? "updated" : "added"} successfully!`);
           onSuccess();
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

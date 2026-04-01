@@ -53,6 +53,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
         fkJobTypeId: data.jobTypeId,
         fkJobOwnerEmployeeId: data.employeeId
       });
+      toast?.success("Job details loaded. You can now edit the fields and submit to update the job.");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

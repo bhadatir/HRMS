@@ -154,7 +154,10 @@ export default function GameManagement() {
     const statusMutation = useMutation({
         mutationFn: ({ id, status, reason }: { id: number, status: number, reason: string }) => 
             gameService.updateBookingStatus(id, status, reason, token!),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Bookings"] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["Bookings"] });
+            toast?.success("Booking status updated successfully!");
+        },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
             const data = error.response?.data;  
@@ -167,7 +170,10 @@ export default function GameManagement() {
 
     const removeWaitingListMutation = useMutation({
         mutationFn: (id: number) => gameService.deleteWaitingList(id, token!),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["WaitingList", user?.id] });
+            toast?.success("Waiting list item removed successfully!");
+        },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
             const data = error.response?.data;  

@@ -103,6 +103,8 @@ const getMutation = useMutation({
       travelMaxExpenseAmountPerDay: data.travelMaxExpenseAmountPerDay,
       employeesInTravelPlanId: existingEmps.map((e: { id: number }) => e.id)
     });
+
+    toast?.success("Travel plan details loaded successfully!");
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onError: (error: any) => {
@@ -160,6 +162,7 @@ const getMutation = useMutation({
       reset();
       setSelectedEmployees([]);
       setShowDropdown(false);
+      toast?.success(editTravelPlanId ? "Travel plan updated successfully!" : "Travel plan created successfully!");
       onSuccess();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

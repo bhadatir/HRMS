@@ -55,6 +55,7 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
       queryClient.invalidateQueries({ queryKey: commentId ? ["commentLikes", commentId] : ["postLikes", postId] });
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
       queryClient.invalidateQueries({ queryKey: ["allPosts"] });
+      toast?.success("Like status updated successfully!");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

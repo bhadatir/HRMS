@@ -17,7 +17,10 @@ export default function ResetPassword() {
 
   const forgotMutation = useMutation({
     mutationFn: () => apiService.forgotPassword(email),
-    onSuccess: () => setStep(2),
+    onSuccess: () => {
+      setStep(2)
+      toast?.success("Password reset token sent to your email!");
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       const data = error.response?.data;  

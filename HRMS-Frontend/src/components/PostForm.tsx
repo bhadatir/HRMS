@@ -57,6 +57,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
         fkPostEmployeeId: data.employeeId,
         fkPostVisibilityId: data.postVisibilityId
       });
+      toast?.success("Post details loaded successfully!");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
