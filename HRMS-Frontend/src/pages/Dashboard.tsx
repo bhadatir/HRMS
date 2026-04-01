@@ -192,8 +192,9 @@ export default function Dashboard() {
   }
 
   return (
-    isFirstLogin === "yes" ? (
-      <div className="w-314">
+    <>
+    { isFirstLogin === "yes" ? (
+      <div className="w-full">
         <Card className="w-full max-w-md shadow-xl border-t-4 border-black mx-auto">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">Update Your Password!</CardTitle>
@@ -220,10 +221,10 @@ export default function Dashboard() {
     ) : (
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="bg-slate-50">
-          <header className="flex h-16 items-center justify-between border-b px-6 sticky top-0 z-10 text-white">
+        <SidebarInset className="bg-slate-50 overflow-x-hidden">
+          <header className="flex h-16 items-center justify-between border-b px-6 sticky top-0 z-10 text-white w-full bg-slate-900">
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ">
               <SidebarTrigger />
               <h3 className="text-lg font-bold">My Dashboard</h3>
             </div>
@@ -255,9 +256,9 @@ export default function Dashboard() {
 
           {( updatePasswordMutation.isPending || profilePicMutation.isPending || isWaitingListLoading || isGameBookingsLoading || isTravelPlansLoading ) && <Spinner />}
 
-          <main className="p-6 w-full space-y-6">
+          <main className="p-6 w-full max-w-full space-y-6 overflow-x-hidden">
             
-            <div className="rounded p-8 text-black">
+            <div className="relative rounded p-8 text-black overflow-hidden">
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <Avatar title="edit profile image" className="h-16 w-16 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                   <AvatarImage src={user.employeeProfileUrl} />
@@ -282,7 +283,7 @@ export default function Dashboard() {
                 </div>
               </div>
               
-              <div className="absolute top-[-10%] right-[-5%] w-64 h-64 bg-gray-500/10 rounded-full blur-3xl"></div>
+              <div className="absolute top-[-10%] right-[-5%] w-64 h-64 bg-gray-500/10 rounded-full blur-3xl pointer-events-none"></div>
             </div>
 
 
@@ -420,9 +421,9 @@ export default function Dashboard() {
                   Schedule Overview : {selectedDate ? selectedDate.toLocaleDateString() : "Select a date"}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-col md:flex-row gap-8">
+              <CardContent className="flex flex-col md:flex-row gap-8 justify-center">
                 
-                <div className="border rounded-md p-2 bg-white ml-10">
+                <div className="border rounded-md p-2 bg-white flex flex-col justify-center items-center w-full">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
@@ -454,6 +455,7 @@ export default function Dashboard() {
           </main>
         </SidebarInset>
       </SidebarProvider>
-    )
+    )}
+    </>
   );
 }
