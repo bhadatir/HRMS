@@ -10,6 +10,7 @@ import { gameService } from "@/api/gameService";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/context/ToastContext";
 import { ConformationDialog } from "./ConformationDialog";
+import { Spinner } from "./ui/spinner";
 
 type Booking = {
     id: number;
@@ -41,7 +42,7 @@ export default function BookingCard({ booking, onStatusChange }: { booking: Book
     const toast = useToast();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const { data: gameBookingStatusOptions = [], isError: gameBookingStatusOptionsError } = useQuery({
+    const { data: gameBookingStatusOptions = [], isLoading: gameBookingStatusOptionsLoading, isError: gameBookingStatusOptionsError } = useQuery({
         queryKey: ["gameBookingStatusOptions"],
         queryFn: () => gameService.getAllGameBookingStatus(token!)
     });
@@ -50,6 +51,8 @@ export default function BookingCard({ booking, onStatusChange }: { booking: Book
 
     return (
         <>
+        {( gameBookingStatusOptionsLoading ) && <Spinner />} 
+        
         {/* Confirmation Dialog */}
         {isDialogOpen && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

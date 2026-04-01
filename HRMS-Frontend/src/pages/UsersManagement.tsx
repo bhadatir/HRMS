@@ -19,6 +19,7 @@ import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { useToast } from "@/context/ToastContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Spinner } from "@/components/ui/spinner";
 
 type Employee = { 
   id: number;
@@ -48,7 +49,8 @@ export default function JobManagement() {
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage,
-    isError: allEmpError 
+    isError: allEmpError ,
+    isLoading: allEmpLoading,
   } = useEmployeeSearch(searchTerm, employeeType, token || "");
   const allEmp = allEmpData?.pages.flatMap(page => page.content) || [];
 
@@ -147,6 +149,8 @@ export default function JobManagement() {
           </div>
         </header>
 
+        {( allEmpLoading ) && <Spinner />}
+        
         {/* Add user */}
         {showAddUserForm && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

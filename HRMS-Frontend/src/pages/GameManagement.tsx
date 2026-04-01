@@ -23,6 +23,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { useToast } from "@/context/ToastContext";
 import { ConformationDialog } from "@/components/ConformationDialog";
+import { Spinner } from "@/components/ui/spinner";
 
 type GameType = {
     id: number;
@@ -93,22 +94,22 @@ export default function GameManagement() {
     const debouncedWaitingListSearchTerm = useAppDebounce(waitingListSearchTerm);
     const debouncedAllBookingsSearchTerm = useAppDebounce(allBookingsSearchTerm);
 
-    const { data: gameTypes = [], isError: gameTypesOnError } = useQuery({
+    const { data: gameTypes = [], isLoading: gameTypesLoading, isError: gameTypesOnError } = useQuery({
         queryKey: ["gameTypes"],
         queryFn: () => gameService.getAllGames(token!)
     });
 
-    const { data: gameBookingStatusOptions = [], isError: gameBookingStatusOptionsOnError } = useQuery({
+    const { data: gameBookingStatusOptions = [], isLoading: gameBookingStatusOptionsLoading, isError: gameBookingStatusOptionsOnError } = useQuery({
         queryKey: ["gameBookingStatusOptions"],
         queryFn: () => gameService.getAllGameBookingStatus(token!)
     });
 
-    const { data: upcomingBookings = [], isError: upcomingBookingsOnError } = useQuery({
+    const { data: upcomingBookings = [], isLoading: upcomingBookingsLoading, isError: upcomingBookingsOnError } = useQuery({
         queryKey: ["upcomingBookings"],
         queryFn: () => gameService.upcommingBookings(token!)
     });
 
-    const { data: WaitingListByEmpId = [], isError: waitingListByEmpIdOnError } = useQuery({ 
+    const { data: WaitingListByEmpId = [], isLoading: waitingListByEmpIdLoading, isError: waitingListByEmpIdOnError } = useQuery({ 
         queryKey: ["WaitingList", user?.id, gameType], 
         queryFn: () => gameService.findGameBookingWaitingListByEmpId(user?.id || 0, gameType, token!) 
     });
@@ -119,6 +120,7 @@ export default function GameManagement() {
         hasNextPage: hasNextPageByEmpId,
         isFetchingNextPage: isFetchingNextPageByEmpId,
         isError: bookingsByEmpIdOnError,
+        isLoading: isBookingsByEmpIdLoading,
     } = useFindGameBookingByUserId(bookingSearchTerm, gameType, gameBookingStatusId, token || "");
     const filteredBookings = bookingsByEmpId?.pages.flatMap(page => page.content) || [];
 
@@ -128,6 +130,7 @@ export default function GameManagement() {
         hasNextPage: hasNextPageBookings,
         isFetchingNextPage: isFetchingNextPageBookings,
         isError: bookingsOnError,
+        isLoading: isBookingsLoading,
     } = useFindGameBookings(allBookingsSearchTerm, gameType, gameBookingStatusId, token || "");
     const filteredAllBookings = bookings?.pages.flatMap(page => page.content) || [];
     
@@ -262,6 +265,8 @@ export default function GameManagement() {
                         </div>  
                     </div>
                 </header>
+
+                {( isBookingsByEmpIdLoading || isBookingsLoading || waitingListByEmpIdLoading || removeWaitingListMutation.isPending || statusMutation.isPending || gameTypesLoading || gameBookingStatusOptionsLoading || upcomingBookingsLoading ) && <Spinner />}
 
                 {/* Confirmation Dialog */}
                 {isDialogOpen && (

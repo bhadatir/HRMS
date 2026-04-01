@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useInView } from "react-intersection-observer";
 import { useSearchAvailableEmployeeForTravel } from "../hooks/useInfinite";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type TravelPlanFormInputs = {
   travelPlanName: string;
@@ -66,7 +67,8 @@ const {
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
-  isError: employeeSearchError
+  isError: employeeSearchError,
+  isLoading: employeeSearchLoading
 } = useSearchAvailableEmployeeForTravel(searchTerm, token || "", startDate, endDate);
 const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
 
@@ -193,6 +195,9 @@ const getMutation = useMutation({
         <CardTitle>{editTravelPlanId ? `Update Plan (Created: ${createdAt})` : "Create New Trip"}</CardTitle>
       </CardHeader>
       <CardContent>
+        
+        {( travelPlanMutation.isPending || employeeSearchLoading ) && <Spinner />} 
+        
         <form onSubmit={handleSubmit(data => travelPlanMutation.mutate(data))} className="md:col-span-2 space-y-4">
         <div className="gap-5 flex">
           <Input placeholder="Plan Name"

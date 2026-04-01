@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { useEffect, useState } from "react";
 import AddGameTypeForm from "./AddGameTypeForm";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type GameType = {
     id: number;
@@ -24,7 +25,7 @@ export default function GameTypeManager() {
     const [showForm, setShowForm] = useState(false);
     const [editGameTypeId, setEditGameTypeId] = useState<number | null>(null);
 
-    const { data: games = [], isError: gamesError } = useQuery({
+    const { data: games = [], isLoading, isError: gamesError } = useQuery({
         queryKey: ["allGameTypes"],
         queryFn: () => gameService.getAllGames(token!)
     });
@@ -47,6 +48,8 @@ export default function GameTypeManager() {
     if(gamesError) toast?.error("Failed to load game types: " + gamesError);
 return (
     <>
+    {( isLoading ) && <Spinner />} 
+    
     {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="game gameType bg-white rounded-xl max-w-lg w-full relative p-3 max-h-150 overflow-y-auto">

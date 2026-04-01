@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UploadCloud, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 
 type ReferFriendFormInputs ={
@@ -72,6 +73,9 @@ export default function ReferFriend({ jobId, onSuccess }: { jobId: number, onSuc
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        
+        {( referMutation.isPending ) && <Spinner />} 
+
         <form onSubmit={handleSubmit(data => referMutation.mutate(data))} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input 

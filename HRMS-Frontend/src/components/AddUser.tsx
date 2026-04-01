@@ -7,6 +7,7 @@ import { apiService } from "@/api/apiService";
 import { useAuth } from "@/context/AuthContext";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type AddUserFormInputs = {
   firstName: string;
@@ -58,19 +59,19 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
     }
   });
 
-  const { data: allRoles, isError: allRolesError } = useQuery({
+  const { data: allRoles, isLoading: allRolesLoading, isError: allRolesError } = useQuery({
     queryKey: ["allRoles"],
     queryFn: () => apiService.getAllRoles(token || ""),
     enabled: !!token,
   });
 
-  const { data: allDepartments, isError: allDepartmentsError } = useQuery({
+  const { data: allDepartments, isLoading: allDepartmentsLoading, isError: allDepartmentsError } = useQuery({
     queryKey: ["allDepartments"],
     queryFn: () => apiService.getAllDepartments(token || ""),
     enabled: !!token,
   });
 
-  const { data: allPositions, isError: allPositionsError } = useQuery({
+  const { data: allPositions, isLoading: allPositionsLoading, isError: allPositionsError } = useQuery({
     queryKey: ["allPositions"],
     queryFn: () => apiService.getAllPositions(token || ""),
     enabled: !!token,
@@ -142,6 +143,8 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
         <CardTitle>{editUserEmail ? "Edit User" : "Create New User"}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-400">
+        {( allRolesLoading || allDepartmentsLoading || allPositionsLoading || getMutation.isPending || registerMutation.isPending ) && <Spinner />} 
+                
           <form onSubmit={handleSubmit(data => registerMutation.mutate(data))} className="grid grid-cols-1 md:grid-cols-2 gap-6">                    
             <div className="space-y-4 md:col-span-2 border-b pb-2">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Personal Information</h3>

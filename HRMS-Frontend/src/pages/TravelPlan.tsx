@@ -23,6 +23,7 @@ import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
 import { ConformationDialog } from "@/components/ConformationDialog.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
+import { Spinner } from "@/components/ui/spinner.tsx";
 
 type Plan = {
   id: number;
@@ -74,6 +75,7 @@ export default function TravelPlan() {
     hasNextPage: hasAllTravelPlansNextPage,
     isFetchingNextPage: isFetchingAllTravelPlansNextPage,
     isError: allTravelPlansError,
+    isLoading: isTravelPlansLoading,
   } = useGetAllTravelPlans(searchTerm, token || "");
 
   const {
@@ -82,6 +84,7 @@ export default function TravelPlan() {
     hasNextPage: hasTravelPlanByEmpIdNextPage,
     isFetchingNextPage: isFetchingTravelPlanByEmpIdNextPage,
     isError: travelPlanByEmpIdError,
+    isLoading: isTravelPlanByEmpIdLoading,
   } = useFindTravelPlanByEmployeeId(searchTerm, travelPlanType, token || "");
 
   const allTravelPlans = useMemo(
@@ -234,6 +237,8 @@ export default function TravelPlan() {
           </div>
 
         </header>
+
+        {( isTravelPlanByEmpIdLoading || isTravelPlansLoading || deleteTravelPlanMutation.isPending ) && <Spinner />}
 
         {/* Confirmation Dialog */}
         {isDialogOpen && (

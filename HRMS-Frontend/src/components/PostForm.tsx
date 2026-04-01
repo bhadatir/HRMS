@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { UploadCloud, Eye } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/context/ToastContext.tsx";
+import { Spinner } from "./ui/spinner.tsx";
 
 type PostFormInputs ={
   postTitle: string;
@@ -28,7 +29,7 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
   const queryClient = useQueryClient();
   const toast = useToast();
   
-  const { data: allVisibilities = [], isError: allVisibilitiesError } = useQuery({
+  const { data: allVisibilities = [], isLoading: allVisibilitiesLoading, isError: allVisibilitiesError } = useQuery({
     queryKey: ["allVisibilities"],
     queryFn: () => postService.getAllVisibilities(token || ""),
     enabled: !!token,
@@ -121,6 +122,9 @@ export default function PostForm({ editPostId, onSuccess }: { editPostId: number
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+
+        {( postMutation.isPending || allVisibilitiesLoading || getPostMutation.isPending ) && <Spinner />} 
+        
         <form onSubmit={handleSubmit(data => postMutation.mutate(data))} className="space-y-4">
         <Input 
           placeholder="Catchy Title" 

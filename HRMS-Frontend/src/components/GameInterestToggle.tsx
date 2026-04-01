@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type GameType = {
     id: number;
@@ -24,12 +25,12 @@ export default function GameInterestToggle() {
     const { token, user } = useAuth();
     const queryClient = useQueryClient();
 
-    const { data: allGames = [], isError: allGamesError } = useQuery({ 
+    const { data: allGames = [], isLoading: allGamesLoading, isError: allGamesError } = useQuery({ 
         queryKey: ["gameTypes"], 
         queryFn: () => gameService.getAllGames(token!) 
     });
 
-    const { data: myInterests = [], isError: myInterestsError } = useQuery({
+    const { data: myInterests = [], isLoading: myInterestsLoading, isError: myInterestsError } = useQuery({
         queryKey: ["myInterests", user?.id],
         queryFn: () => gameService.getEmployeeGameInterests(user?.id || 0, token!),
         enabled: !!user?.id
@@ -60,6 +61,8 @@ export default function GameInterestToggle() {
     return (
         <Card className="bg-slate-50 border-dashed">
             <CardContent className="p-4">
+                {( allGamesLoading || myInterestsLoading || mutation.isPending ) && <Spinner />} 
+                
                 <p className="text-xs font-bold text-slate-500 mb-3 uppercase flex items-center gap-2">
                     <Heart size={14} className="text-red-500 fill-red-500" /> Mark Your Interests
                 </p>

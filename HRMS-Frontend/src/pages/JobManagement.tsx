@@ -22,6 +22,7 @@ import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
 import { ConformationDialog } from "@/components/ConformationDialog.tsx";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
+import { Spinner } from "@/components/ui/spinner.tsx";
 
 type Job = {
   id: number;
@@ -63,6 +64,7 @@ export default function JobManagement() {
     hasNextPage,
     isFetchingNextPage,
     isError: allJobsOnError,
+    isLoading: isJobsLoading,
   } = useGetAllJobs(searchTerm, jobType, token || "");
   const allJobs = allJobsData?.pages.flatMap(page => page.content) || [];
 
@@ -179,6 +181,8 @@ export default function JobManagement() {
           </div>
         </header>
 
+        {( jobStatusmutation.isPending || isJobsLoading ) && <Spinner />}
+        
         {/* Confirmation Dialog */}
         {isDialogOpen && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

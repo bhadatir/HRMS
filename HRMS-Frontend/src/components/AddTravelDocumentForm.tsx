@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type TagType = {
   id: number;
@@ -23,13 +24,13 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
   const [docFile, setDocFile] = useState<File>(null as any);
   const [docType, setDocType] = useState<number>(1);
 
-  const { data: employeeTravelPlanId, isError: employeeTravelPlanError } = useQuery({
+  const { data: employeeTravelPlanId, isLoading: employeeTravelPlanLoading, isError: employeeTravelPlanError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
     queryFn: () => travelService.findEmployeeTravelPlanId(user?.id || 0, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
   });
 
-  const { data: allTagTypes = [], isError: allTagTypesError } = useQuery({
+  const { data: allTagTypes = [], isLoading: allTagTypesLoading, isError: allTagTypesError } = useQuery({
     queryKey: ["allTravelDocTypes"],
     queryFn: () => travelService.getAllTravelDocTypes(token || ""),
     enabled: !!token,
@@ -71,7 +72,8 @@ export default function AddTravelDocumentForm({ travelPlanId, onSuccess }: { tra
     <Card className="border-none shadow-none">
       <CardHeader><CardTitle className="text-xl">Submit Travel Document</CardTitle></CardHeader>
       <CardContent className="space-y-4">
-
+        {( employeeTravelPlanLoading || allTagTypesLoading || expenseMutation.isPending ) && <Spinner />} 
+                
         <div className="border-2 border-dashed rounded-lg p-6 text-center space-y-2 border-slate-200">
           <UploadCloud className="mx-auto text-slate-400" size={32} />
           <Input type="file" accept=".jpg,.jpeg,.png,.pdf,.docx,.doc" multiple className="cursor-pointer" onChange={(e) => e.target.files && setDocFile(Array.from(e.target.files)[0])} />

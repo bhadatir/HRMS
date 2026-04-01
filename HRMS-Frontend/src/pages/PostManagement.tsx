@@ -22,6 +22,7 @@ import { GlobalSearch } from "@/components/GlobalSearch";
 import { useToast } from "@/context/ToastContext";
 import { ConformationDialog } from "@/components/ConformationDialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Spinner } from "@/components/ui/spinner";
 
 type Post = {
   id: number;
@@ -67,6 +68,7 @@ export default function PostManagement() {
     hasNextPage,
     isFetchingNextPage,
     isError: allPostsError,
+    isLoading: isAllPostsLoading,
   } = useShowAllPosts(searchTerm, token || "");
   const filteredPosts = allPosts?.pages.flatMap(page => page.content) || [];
   
@@ -164,6 +166,8 @@ export default function PostManagement() {
             )}
           </div>
         </header>
+
+        {( isAllPostsLoading || removePost.isPending ) && <Spinner />}
 
         {/* Confirmation Dialog */}
         {isDialogOpen && (

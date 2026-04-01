@@ -8,6 +8,7 @@ import { Reply, Send, Trash2, X } from "lucide-react";
 import LikeButton from "./LikeButton";
 import { useToast } from "@/context/ToastContext";
 import { ConformationDialog } from "./ConformationDialog";
+import { Spinner } from "./ui/spinner";
 
 type Comment = {
   id: number;
@@ -31,7 +32,7 @@ export default function CommentSection({ postId }: { postId: number }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState<number>(0);
 
-  const { data: comments = [], isError: commentsError } = useQuery({
+  const { data: comments = [], isLoading: commentsLoading, isError: commentsError } = useQuery({
     queryKey: ["postComments", postId],
     queryFn: () => postService.getCommentsById(postId, token || ""),
     enabled: !!postId,
@@ -96,6 +97,8 @@ export default function CommentSection({ postId }: { postId: number }) {
 
   return (
     <div className="mt-4 space-y-4 pt-4 border-t">
+
+      {( commentsLoading || removeCommentMutation.isPending || addCommentMutation.isPending ) && <Spinner />} 
 
       {/* Confirmation Dialog */}
       {isDialogOpen && (

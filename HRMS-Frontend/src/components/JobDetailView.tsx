@@ -25,6 +25,7 @@ import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useInView } from "react-intersection-observer";
 import { useToast } from "@/context/ToastContext";
 import { ConformationDialog } from "./ConformationDialog";
+import { Spinner } from "./ui/spinner";
 
 type Referral = {
   id: number;
@@ -68,7 +69,8 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage,
-    isError: searchError 
+    isError: searchError,
+    isLoading: searchLoading
   } = useEmployeeSearch(searchTerm, 0, token || "");
   const suggestions = infiniteData?.pages.flatMap(page => page.content) || [];
   
@@ -159,12 +161,9 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
     return () => document.removeEventListener("click", clickOutside);
   }, [showDropdown]);
 
-  const isLoadingData = jobLoading || (viewMode === "REFERRALS" && referralsLoading);
-
-  if (isLoadingData) return <div className="p-10 text-center text-slate-500">Loading Job Data...</div>;
-
   return (
     <div>
+      {( jobLoading || referralsLoading || searchLoading || updateCvStatusMutation.isPending || addReviewerMutation.isPending ) && <Spinner />}
       {/* Confirmation Dialog */}
       {isDialogOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

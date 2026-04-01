@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Delete, Plus, Tag as TagIcon } from "lucide-react";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type Tag = {
   id: number;
@@ -24,13 +25,13 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
   const [showTagInput, setShowTagInput] = useState(false);
   const toast = useToast();
 
-  const { data: tags = [], isError: tagsError } = useQuery({
+  const { data: tags = [], isLoading: tagsLoading, isError: tagsError } = useQuery({
     queryKey: ["postTags", postId],
     queryFn: () => postService.getPostTagsById(postId, token || ""),
     enabled: !!postId,
   });
 
-  const { data: allTagTypes = [], isError: allTagTypesError } = useQuery({
+  const { data: allTagTypes = [], isLoading: allTagTypesLoading, isError: allTagTypesError } = useQuery({
     queryKey: ["allTagTypes"],
     queryFn: () => postService.getAllTagTypes(token || ""),
     enabled: !!token,
@@ -68,6 +69,9 @@ export default function PostTags({ postId, isOwner }: { postId: number; isOwner:
   
   return (
     <div className="flex flex-wrap gap-2 items-center mt-2">
+      
+      {( tagsLoading || allTagTypesLoading || addTagMutation.isPending || removeTagMutation.isPending ) && <Spinner />} 
+
       <TagIcon size={14} className="text-slate-400" />
       {tags.map((tag: Tag) => (
         <Badge key={tag.id} variant="secondary" className="text-[10px] bg-slate-100">

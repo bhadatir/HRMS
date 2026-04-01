@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useGlobalSearch } from "@/hooks/useInfinite";
 import { User, Plane, Loader2, X, Search } from "lucide-react"; 
 import { Button } from "./ui/button";
+import { Spinner } from "./ui/spinner";
 
 type Employee = {
   id: number;
@@ -87,6 +88,7 @@ export function GlobalSearch() {
     data: globalSearchResults,
     isFetching,
     isError,
+    isLoading
   } = useGlobalSearch(search, token || "");
 
   if(isError) alert("Failed to perform global search: " + isError);
@@ -117,6 +119,9 @@ export function GlobalSearch() {
   };
 
   return (
+  <>
+    {( isLoading ) && <Spinner />} 
+    
     <Command.Dialog open={open} onOpenChange={setOpen} label="Global Search"
       contentClassName="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] bg-black/50 p-4"
       className="bg-white rounded-xl border w-full max-w-3xl overflow-hidden p-4">
@@ -295,6 +300,7 @@ export function GlobalSearch() {
         </div>
       </Command.List>
     </Command.Dialog>
+  </>
   );
 }
 

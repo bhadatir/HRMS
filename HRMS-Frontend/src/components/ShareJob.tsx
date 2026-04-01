@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type ShareJobFormInputs = {
     fkJobShareEmployeeId: number;
@@ -57,6 +58,9 @@ export default function ShareJob({ jobId, onSuccess }: { jobId: number, onSucces
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        
+        {( shareMutation.isPending ) && <Spinner />} 
+        
         <form onSubmit={handleSubmit(data => shareMutation.mutate(data))} className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-500">Recipient Emails (Comma separated)</label>

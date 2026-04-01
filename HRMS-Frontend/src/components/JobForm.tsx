@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import { UploadCloud } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type JobFormInputs ={
     jobTitle: string;
@@ -28,7 +29,7 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
   const [createdAt, setCreatedAt] = useState("");
   const toast = useToast();
 
-  const { data: allJobTypes = [], isError: allJobTypesError } = useQuery({
+  const { data: allJobTypes = [], isLoading: allJobTypesLoading, isError: allJobTypesError } = useQuery({
     queryKey: ["allJobTypes"],
     queryFn: () => jobService.getAllJobTypes(token || ""),
     enabled: !!token,
@@ -111,6 +112,8 @@ export default function JobForm({ editJobId, onSuccess }: { editJobId: number | 
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {( jobMutation.isPending || allJobTypesLoading || getJobMutation.isPending ) && <Spinner />} 
+        
         <form onSubmit={handleSubmit(data => jobMutation.mutate(data))} className="space-y-4">
         <div className="space-y-1">
           <label className="text-xs font-bold text-slate-500 uppercase">Job Title</label>

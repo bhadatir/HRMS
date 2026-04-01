@@ -3,6 +3,7 @@ import { postService } from "../api/postService";
 import { useAuth } from "../context/AuthContext";
 import { Heart } from "lucide-react";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type Like = {
   id: number;
@@ -16,7 +17,7 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const { data: likes = [], isError: likesError } = useQuery({
+  const { data: likes = [], isLoading: likesLoading, isError: likesError } = useQuery({
     queryKey: commentId ? ["commentLikes", commentId] : ["postLikes", postId],
     queryFn: () => commentId ? postService.getLikeByCommentId(commentId, token || "") 
                                 : postService.getLikeByPostId(postId, token || ""),
@@ -66,6 +67,8 @@ export default function LikeButton({ postId, commentId }: { postId: number, comm
 
   return (
     <>
+      {( likesLoading || likeMutation.isPending ) && <Spinner />} 
+      
       <Heart className="text-gray-500" size={18} fill={isLiked ? "red" : "none"} onClick={() => likeMutation.mutate()}/>
       <span className="text-xs text-gray-500 font-bold">{likes.length}</span>
     </>

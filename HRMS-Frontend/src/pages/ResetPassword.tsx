@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { apiService } from "../api/apiService";
 import { MailCheck, ShieldCheck } from "lucide-react"; 
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function ResetPassword() {
   const toast = useToast();
@@ -44,6 +45,7 @@ export default function ResetPassword() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 w-full">
+      {( forgotMutation.isPending || resetMutation.isPending ) && <Spinner />} 
       <Card className="w-full max-w-md shadow-2xl border-t-4 border-gray-600 transition-all duration-300">
         <CardHeader className="text-center">
           <div className="mx-auto bg-gray-50 w-12 h-12 rounded-full flex items-center justify-center mb-2">
@@ -61,7 +63,7 @@ export default function ResetPassword() {
             {step === 2 && "Check your email and enter the token below."}
             {step === 3 && "Your password has been successfully updated."}
           </CardDescription>
-        </CardHeader>
+        </CardHeader>             
 
         <CardContent className="space-y-4">
           {step === 1 && (

@@ -9,6 +9,7 @@ import { Input } from "./ui/input";
 import { useState } from "react";
 import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type WaitingList = {
   id: number;
@@ -33,13 +34,13 @@ export default function WaitingList({waitingListId}: {waitingListId: number, onS
   const [waitingListSearchTerm, setWaitingListSearchTerm] = useState("");  
   const debouncedSearch = useAppDebounce(waitingListSearchTerm);
 
-  const { data: waitingList,isError: waitingListError } = useQuery({
+  const { data: waitingList, isLoading: waitingListLoading, isError: waitingListError } = useQuery({
     queryKey: ["waitingList", waitingListId],
     queryFn: () => gameService.getWaitingListById(waitingListId, token || ""),
     enabled: !!waitingListId && !!token,
   });
 
-  const { data: waitingListSeq, isError: waitingListSeqError } = useQuery({
+  const { data: waitingListSeq, isLoading: waitingListSeqLoading, isError: waitingListSeqError } = useQuery({
     queryKey: ["waitingListSeq", waitingListId],
     queryFn: () => gameService.getWaitingListSeqById(waitingListId, token || ""),
     enabled: !!waitingListId && !!token,
@@ -57,6 +58,9 @@ export default function WaitingList({waitingListId}: {waitingListId: number, onS
 
   return (
         <>
+        
+        {( waitingListLoading || waitingListSeqLoading ) && <Spinner />} 
+        
         <Card className="border-none shadow-none">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>

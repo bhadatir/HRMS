@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useInView } from "react-intersection-observer";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type GameType = {
     id: number;
@@ -68,11 +69,11 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
 
     const { register, handleSubmit, watch, formState: { errors } } = useForm<GameBookingFormInputs>();
 
-    const { data: gameTypes = [], isError: gameTypesError } = useQuery({ 
+    const { data: gameTypes = [], isLoading: gameTypesLoading, isError: gameTypesError } = useQuery({ 
         queryKey: ["allGameTypes"], 
         queryFn: () => gameService.getAllGames(token!) });
 
-    const { data: myInterests = [], isError: myInterestsError } = useQuery({
+    const { data: myInterests = [], isLoading: myInterestsLoading, isError: myInterestsError } = useQuery({
         queryKey: ["myInterests", user?.id],
         queryFn: () => gameService.getEmployeeGameInterests(user?.id || 0, token!),
         enabled: !!user?.id
@@ -82,7 +83,7 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
     const gameTypeId = Number(watch("gameTypeId"));
     const date = watch("date");
 
-    const { data: slots = [], isError: slotsError } = useQuery({
+    const { data: slots = [], isLoading: slotsLoading, isError: slotsError } = useQuery({
         queryKey: ["availableSlots", gameTypeId, date],
         queryFn: () => gameService.getAvalaibleSlots(gameTypeId, user?.id || 0, date, token!),
         enabled: !!gameTypeId && !!date
@@ -125,7 +126,8 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-        isError: employeeSearchError
+        isError: employeeSearchError,
+        isLoading: employeeSearchLoading
     } = useInfiniteQuery({
         queryKey: ["employeeSearchInfinite", debouncedSearchTerm, slotStartDateTime, selectedGameId],
         queryFn: ({ pageParam = 0 }) => 
@@ -197,6 +199,8 @@ export default function GameBookingForm({ editBookingId, onSuccess }: { editBook
         <Card className="border-none shadow-none">
             <CardHeader><CardTitle>{editBookingId ? "Edit Booking" : "Book a Game Slot"}</CardTitle></CardHeader>
             <CardContent>
+            {( gameTypesLoading || myInterestsLoading || slotsLoading || employeeSearchLoading || mutation.isPending ) && <Spinner />} 
+                
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-2">
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">

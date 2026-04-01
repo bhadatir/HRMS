@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import { UploadCloud, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type ProofEntry = {
   file: File;
@@ -44,7 +45,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
     }
   ); 
   
-  const { data: employeeTravelPlanId, isLoading, isError: employeeTravelPlanError } = useQuery({
+  const { data: employeeTravelPlanId, isLoading: employeeTravelPlanLoading, isError: employeeTravelPlanError } = useQuery({
     queryKey: ["employeeTravelPlan", user?.id, travelPlanId],
     queryFn: () => travelService.findEmployeeTravelPlanId(user?.id || 0, travelPlanId, token || ""),
     enabled: !!travelPlanId && !!user?.id && !!token,
@@ -56,7 +57,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
     enabled: !!travelPlanId && !!token,
   });
 
-  const { data: expenseTypes, isError: expenseTypesError } = useQuery({
+  const { data: expenseTypes, isLoading: expenseTypesLoading, isError: expenseTypesError } = useQuery({
     queryKey: ["expenseTypes"],
     queryFn: () => travelService.getAllExpenseTypes(token || ""),
     enabled: !!token,
@@ -84,7 +85,7 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const selectedDate = watch("expenseDate");
-  const { data: alreadySpent } = useQuery({
+  const { data: alreadySpent, isLoading: alreadySpentLoading } = useQuery({
     queryKey: ["dailyExpenseTotal", travelPlanId, user?.id, selectedDate],
     queryFn: () => travelService.getTotalSpentByDate(travelPlanId, user?.id || 0, selectedDate, token || ""),
     enabled: !!selectedDate && !!token,
@@ -142,13 +143,14 @@ export default function AddExpenseForm({ travelPlanId, onSuccess }: { travelPlan
   }
   });
 
-  if (isLoading || planLoading) return <div>Loading...</div>;
   if (employeeTravelPlanError || expenseTypesError || planError) toast?.error("Failed to load data: " + (employeeTravelPlanError || expenseTypesError || planError));
 
   return (
     <Card className="border-none shadow-none">
       <CardHeader><CardTitle className="text-xl">Submit Expense Claim</CardTitle></CardHeader>
       <CardContent className="space-y-4">
+        {( employeeTravelPlanLoading || expenseTypesLoading || alreadySpentLoading || expenseMutation.isPending || planLoading ) && <Spinner />} 
+                
         <form onSubmit={handleSubmit(data => expenseMutation.mutate(data))} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">

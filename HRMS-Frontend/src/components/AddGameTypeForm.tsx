@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "./ui/spinner";
 
 type GameTypeInputs = {
     gameName: string;
@@ -88,6 +89,8 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
             </CardTitle>
         </CardHeader>
         <CardContent className="space-y-400">
+        {( getMutation.isPending || gameTypeMutation.isPending ) && <Spinner />} 
+                    
         { (user?.roleName === "HR" || user?.roleName === "ADMIN") && (
             <form onSubmit={handleSubmit((data) => gameTypeMutation.mutate(data))} 
                 className="bg-white p-4 rounded-xl border items-end">

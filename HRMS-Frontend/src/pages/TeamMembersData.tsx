@@ -15,6 +15,7 @@ import { useAppDebounce } from "@/hooks/useAppDebounce";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { useToast } from "@/context/ToastContext";
+import { Spinner } from "@/components/ui/spinner";
 
 type OrgData = {
   id: number;
@@ -49,7 +50,7 @@ export default function TeamMemberData() {
   });
   const debouncedSearch = useAppDebounce(searchTerm);
 
-  const { data: orgData, isError: orgDataError } = useQuery({
+  const { data: orgData, isLoading: orgDataLoading, isError: orgDataError } = useQuery({
     queryKey: ["orgChart", user?.id],
     queryFn: () => apiService.fetchOrgChart(user?.id || 0, token || ""),
     enabled: !!user?.id,
@@ -119,6 +120,8 @@ export default function TeamMemberData() {
           </div>
         </header>
 
+        {( orgDataLoading ) && <Spinner />}
+        
         {/* Notifications */}
         {showNotification && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

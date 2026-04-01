@@ -12,6 +12,7 @@ import { Input } from "./ui/input";
 import { useAppDebounce } from "../hooks/useAppDebounce";
 import { useToast } from "@/context/ToastContext";
 import { ConformationDialog } from "./ConformationDialog";
+import { Spinner } from "./ui/spinner";
 
 export default function TravelPlanDetails({travelPlan } : {travelPlan: number| null; onSuccess: () => void }) {
   const toast = useToast();
@@ -86,14 +87,15 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
   });
 
   if (planError || docsError) toast?.error("Failed to load travel plan details: " + (planError || docsError));
-  if (isLoadingData) return <div className="p-10">Loading Details...</div>;
-
+  
   const handleExpenseStatusUpdate = (reason: string) => {
     approveMutation.mutate({ expenseId, statusId, reason });
   };
 
   return (
         <>
+        {( isLoadingData || approveMutation.isPending ) && <Spinner />} 
+        
         {/* Confirmation Dialog */}
         {isDialogOpen && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

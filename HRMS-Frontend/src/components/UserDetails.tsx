@@ -13,6 +13,7 @@ import { apiService } from "@/api/apiService";
 import AddUser from "./AddUser";
 import { useToast } from "@/context/ToastContext";
 import { ConformationDialog } from "./ConformationDialog";
+import { Spinner } from "./ui/spinner";
 
 export default function UserDetails({ userEmail }: { userEmail: string | null}) {
   const { token, user } = useAuth();
@@ -21,13 +22,13 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showEditUserForm, setShowEditUserForm] = useState(false); 
     
-  const { data: userData, isLoading, isError } = useQuery({
+  const { data: userData, isLoading: userLoading, isError } = useQuery({
     queryKey: ["user", userEmail],
     queryFn: () => apiService.getUserByEmail(userEmail!, token!),
     enabled: !!token && !!userEmail,
   });
 
-  const { data: activeTime } = useQuery({
+  const { data: activeTime, isLoading: activeTimeLoading } = useQuery({
     queryKey: ["activeTime", userEmail],
     queryFn: () => apiService.getActiveTimeByUserEmail(userEmail!, token!),
     enabled: !!token && !!userEmail,
@@ -52,11 +53,12 @@ export default function UserDetails({ userEmail }: { userEmail: string | null}) 
     inactivateMutation.mutate(reason);
   };
 
-  if (isLoading) return <div className="p-10 text-center text-slate-500">Loading User Data...</div>;
   if (isError) toast?.error("Failed to load user data: " + isError);
 
   return (
     <div>
+      
+      {( userLoading || activeTimeLoading || inactivateMutation.isPending ) && <Spinner />} 
 
       {/* Confirmation Dialog */}
       {isDialogOpen && (
