@@ -125,9 +125,9 @@ export default function JobManagement() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
-        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
-          <div className="flex items-center gap-2 pr-2">
-            <SidebarTrigger/>
+        <header className="sticky top-0 z-30 gap-2 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
+          <div className="flex items-center gap-2 pr-2 w-full">
+            { isMobile && <SidebarTrigger /> }
             <h3 className="text-lg font-bold">Job Board</h3>
             {(debouncedSearchTerm && debouncedSearchTerm.length > 0) ? (
               <Badge variant="outline" className="text-white">{allJobs.length} results</Badge>
@@ -138,6 +138,17 @@ export default function JobManagement() {
             )}
           </div>
 
+          <div className="job relative max-w-sm w-full">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+            <Input 
+              placeholder="Search by title or department..." 
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              autoFocus
+            />
+          </div>
+          
           <div className="flex items-center gap-2">
             <select className="border rounded-md px-2 py-1 text-sm" 
               value={jobType} onChange={(e) => setJobType(Number(e.target.value))}>
@@ -148,18 +159,7 @@ export default function JobManagement() {
             </select>
           </div>
 
-          <div className="job relative max-w-sm w-full mx-4">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-            <Input 
-              placeholder="Search by title or department..." 
-              className="pl-9"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              autoFocus
-            />
-          </div>
-
-          <div className="job pr-2">
+          <div className="job">
             {( user?.roleName === "HR" || user?.roleName === "ADMIN" ) && (
               <Button title="Post New Job" onClick={() => setShowForm(true)} className="gap-2 text-gray-700">
                 <Plus size={18} />
@@ -382,7 +382,7 @@ export default function JobManagement() {
             )}
           </div>
           <div ref={ref} className="h-10 flex justify-center items-center">
-            { isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+            { isFetchingNextPage ? <Spinner /> : null}
           </div>
           
           <ScrollToTop />

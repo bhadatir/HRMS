@@ -20,6 +20,7 @@ import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 type Employee = {
   id: number;
@@ -53,6 +54,7 @@ export default function OrganizationChart() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);  
   const [showNotification, setShowNotification] = useState(false);
+  const isMobile = useIsMobile();
   
   const { 
     data: infiniteData, 
@@ -108,8 +110,8 @@ export default function OrganizationChart() {
       <AppSidebar />
       <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
         <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger />
+          <div className="flex items-center gap-2 w-full">
+            { isMobile && <SidebarTrigger /> }
             <h3 className="text-lg font-bold">Managerial Chain</h3>
           </div>
 
@@ -127,7 +129,6 @@ export default function OrganizationChart() {
                 onFocus={() => setShowDropdown(true)}
               />
             </div>
-
             {showDropdown && suggestions.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
                 {suggestions.map((emp: Employee) => (
@@ -144,9 +145,8 @@ export default function OrganizationChart() {
                     </div>
                   </button>
                 ))}
-
                 <div ref={ref} className="h-10 flex justify-center items-center">
-                  {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+                  {isFetchingNextPage ? <Spinner /> : null}
                 </div>
               </div>
             )}

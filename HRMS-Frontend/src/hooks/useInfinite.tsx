@@ -13,7 +13,7 @@ export function useEmployeeSearch(searchTerm: string, employeeType: number, toke
   const query = useInfiniteQuery({
     queryKey: ["searchEmployees", debouncedSearch, employeeType],
     queryFn: ({ pageParam = 0 }) =>
-      apiService.searchEmployees(debouncedSearch, employeeType, pageParam, 5, token),
+      apiService.searchEmployees(debouncedSearch, employeeType, pageParam, 15, token),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token,
@@ -32,7 +32,7 @@ export function useGlobalSearch(searchTerm: string, token: string) {
   const query = useInfiniteQuery({
     queryKey: ["globalSearch", debouncedSearch],
     queryFn: ({ pageParam = 0 }) =>
-      apiService.globalSearch(debouncedSearch, pageParam, 10, token || ""),
+      apiService.globalSearch(debouncedSearch, pageParam, 15, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token,
@@ -52,7 +52,7 @@ export function useFindTravelPlanByEmployeeId(searchTerm: string, travelPlanType
   const query = useInfiniteQuery({
     queryKey: ["travelPlanByEmpId", debouncedSearch, travelPlanType],
     queryFn: ({ pageParam = 0 }) => 
-      travelService.findTravelPlanByEmployeeId(user?.id || 0, debouncedSearch, travelPlanType, pageParam, 3, token || ""),
+      travelService.findTravelPlanByEmployeeId(user?.id || 0, debouncedSearch, travelPlanType, pageParam, 15, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token && !!user?.id,
@@ -71,7 +71,7 @@ export function useGetAllTravelPlans(searchTerm: string, token: string) {
   const query = useInfiniteQuery({
     queryKey: ["allTravelPlans", debouncedSearch],
     queryFn: ({ pageParam = 0 }) => 
-      travelService.getAllTravelPlans(debouncedSearch, pageParam, 9, token || ""),
+      travelService.getAllTravelPlans(debouncedSearch, pageParam, 15, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token,
@@ -90,7 +90,7 @@ export function useSearchAvailableEmployeeForTravel(searchTerm: string, token: s
   const query = useInfiniteQuery({
   queryKey: ["searchAvailableEmployeeForTravel", debouncedSearch, startDate, endDate],
   queryFn: ({ pageParam = 0 }) => 
-    apiService.searchAvailableEmployeeForTravel(debouncedSearch, pageParam, 5, startDate, endDate, token),
+    apiService.searchAvailableEmployeeForTravel(debouncedSearch, pageParam, 15, startDate, endDate, token),
   initialPageParam: 0,
   getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
   enabled: debouncedSearch.length >= 1 && !!startDate && !!endDate,
@@ -110,7 +110,7 @@ export function useGetAllJobs(searchTerm: string, jobType: number, token: string
   const query = useInfiniteQuery({
     queryKey: ["allJobs", debouncedSearch, jobType],
     queryFn: ({ pageParam = 0 }) => 
-      jobService.getAllJobs(debouncedSearch, jobType, pageParam, 3, token || ""),
+      jobService.getAllJobs(debouncedSearch, jobType, pageParam, 15, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token && !!user?.id,
@@ -129,7 +129,7 @@ export function useShowAllPosts(searchTerm: string, token: string) {
   const query = useInfiniteQuery({
     queryKey: ["allPosts", debouncedSearch],
     queryFn: ({ pageParam = 0 }) => 
-      postService.showAllPosts(debouncedSearch, pageParam, 2, token || ""),
+      postService.showAllPosts(debouncedSearch, pageParam, 15, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token,
@@ -149,7 +149,7 @@ export function useFindGameBookingByUserId(searchTerm: string, gameType: number,
   const query = useInfiniteQuery({
     queryKey: ["Bookings", user?.id, debouncedSearch, gameType, gameBookingStatusId],
     queryFn: ({ pageParam = 0 }) => 
-      gameService.findGameBookingByUserId(user?.id || 0, debouncedSearch, gameType, gameBookingStatusId, pageParam, 4, token || ""),
+      gameService.findGameBookingByUserId(user?.id || 0, debouncedSearch, gameType, gameBookingStatusId, pageParam, 15, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token && !!user?.id,
@@ -169,7 +169,7 @@ export function useFindGameBookings(searchTerm: string, gameType: number, gameBo
   const query = useInfiniteQuery({
     queryKey: ["Bookings", debouncedSearch, gameType, gameBookingStatusId],
     queryFn: ({ pageParam = 0 }) => 
-      gameService.showAllBookings(debouncedSearch, gameType, gameBookingStatusId, pageParam, 4, token || ""),
+      gameService.showAllBookings(debouncedSearch, gameType, gameBookingStatusId, pageParam, 15, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token && !!user?.id,
@@ -189,7 +189,7 @@ export function useGetUserNotifications(searchTerm: string, token: string) {
   const query = useInfiniteQuery({
     queryKey: ["notifications", user?.id, debouncedSearch],
     queryFn: ({ pageParam = 0 }) => 
-      apiService.getUserNotifications(user?.id || 0, debouncedSearch, pageParam, 4, token || ""),
+      apiService.getUserNotifications(user?.id || 0, debouncedSearch, pageParam, 15, token || ""),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1),
     enabled: !!token && !!user?.id,

@@ -257,7 +257,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                       })} 
 
                       <div ref={ref} className="h-10 flex justify-center items-center">
-                        {isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+                        {isFetchingNextPage ? <Spinner /> : null}
                       </div>
                     </div>
                   )}
@@ -280,7 +280,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                   <TableHead className="text-center">Referred By</TableHead>
                   <TableHead className="text-center">CV</TableHead>
                   <TableHead className="text-center">Status</TableHead>
-                  {((user?.id === job.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive && <TableHead className="text-center">Actions</TableHead>}
+                  {((user?.id === job?.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive && <TableHead className="text-center">Actions</TableHead>}
                   {<TableHead className="text-left">Reason</TableHead>}
                 </TableRow>
               </TableHeader>
@@ -305,7 +305,7 @@ export default function JobDetailView({ jobId }: { jobId: number | null; onSucce
                         {ref.cvStatusTypeName}
                       </Badge>
                     </TableCell>
-                    {((user?.id === job.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive && (
+                    {((user?.id === job?.employeeId && user?.roleName === "HR") || user?.roleName === "ADMIN") && job?.jobIsActive && (
                       <TableCell className="text-right space-x-2">
                         {ref.cvStatusTypeName === "PENDING" ? (
                         <>

@@ -16,6 +16,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { useToast } from "@/context/ToastContext";
 import { Spinner } from "@/components/ui/spinner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type OrgData = {
   id: number;
@@ -48,7 +49,8 @@ export default function TeamMemberData() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get("teamMemberId") || "";
   });
-  const debouncedSearch = useAppDebounce(searchTerm);
+  const debouncedSearch = useAppDebounce(searchTerm);  
+  const isMobile = useIsMobile();
 
   const { data: orgData, isLoading: orgDataLoading, isError: orgDataError } = useQuery({
     queryKey: ["orgChart", user?.id],
@@ -90,8 +92,8 @@ export default function TeamMemberData() {
       <AppSidebar />
       <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
         <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger />
+          <div className="flex items-center gap-2 w-full">
+            { isMobile && <SidebarTrigger /> }
             <h3 className="text-lg font-bold">Team Members Data</h3>
           </div>
 

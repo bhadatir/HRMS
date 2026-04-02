@@ -217,8 +217,8 @@ export default function GameManagement() {
             <AppSidebar />
             <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
                 <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
-                    <div className="flex items-center gap-2 pr-2 text-white">
-                        <SidebarTrigger/>
+                    <div className="flex items-center gap-2 pr-2 text-white w-full">
+                    { isMobile && <SidebarTrigger /> }
                         <h3 className="text-lg font-bold">Game Zone</h3>
                         {(debouncedBookingSearchTerm && debouncedBookingSearchTerm.length > 0) ? (
                         <Badge variant="outline" className="text-white">{filteredBookings.length} results</Badge>
@@ -428,7 +428,7 @@ export default function GameManagement() {
                         )}
                         </div>
                         <div ref={ref} className="h-10 flex justify-center items-center">
-                            { isFetchingNextPageByEmpId ? <p className="text-xs">Loading more...</p> : null}
+                            { isFetchingNextPageByEmpId ? <Spinner /> : null}
                         </div>
                     </div>
                     )}
@@ -520,7 +520,7 @@ export default function GameManagement() {
                         )}
                         </div>
                         <div ref={ref} className="h-10 flex justify-center items-center">
-                            { isFetchingNextPageBookings ? <p className="text-xs">Loading more...</p> : null}
+                            { isFetchingNextPageBookings ? <Spinner /> : null}
                         </div>
                     </div>
                     )}

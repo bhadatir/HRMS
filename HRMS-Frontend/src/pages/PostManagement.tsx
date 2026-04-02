@@ -129,8 +129,8 @@ export default function PostManagement() {
       <AppSidebar />
       <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
         <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
-          <div className="flex items-center gap-2 w-150">
-            <SidebarTrigger />
+          <div className="flex items-center gap-2 w-full">
+              { isMobile && <SidebarTrigger /> }
             <h3 className="text-lg font-bold">Company Feed</h3>
             {(debouncedSearch && debouncedSearch.length > 0) ?(
               <Badge variant="outline" className="text-white">{filteredPosts.length} results</Badge>
@@ -324,7 +324,7 @@ export default function PostManagement() {
 
           </div>
           <div ref={ref} className="h-10 flex justify-center items-center">
-            { isFetchingNextPage ? <p className="text-xs">Loading more...</p> : null}
+            { isFetchingNextPage ? <Spinner /> : null}
           </div>
           
           <ScrollToTop />

@@ -1,6 +1,6 @@
 import { Plane, LogOut, Network, Briefcase, Mail, Building, ShieldCheck, Building2 } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
-import { useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import roimaLogo from "@/assets/roima_logo.png"
 import roimaFavicon from "@/assets/roima_loader.png"
 import {
@@ -19,7 +19,7 @@ export function AppSidebar() {
   const { logout, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const { state } = useSidebar();
+  const { state, setOpen } = useSidebar();
   const isMobile = useIsMobile();
 
   const items = [
@@ -34,17 +34,27 @@ export function AppSidebar() {
   ]
 
   return (
-    <Sidebar collapsible="icon" className="px-2 bg-sidebar text-inherit">
+    <Sidebar
+      collapsible="icon"
+      className="px-2 bg-sidebar text-inherit"
+      onMouseEnter={() => {
+        if (!isMobile) setOpen(true)
+      }}
+      onMouseLeave={() => {
+        if (!isMobile) setOpen(false)
+      }}
+    >
 
-      <SidebarHeader className={`justify-between font-bold text-lg items-center gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2`}>
+      <SidebarHeader className={`cursor-pointer justify-between font-bold text-lg items-center gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2`} 
+          onClick={() => navigate("/dashboard")}
+        >
         <img
           src={state === "collapsed" ? !isMobile ? roimaFavicon : roimaLogo : roimaLogo}
           alt="Roima logo"
-          onClick={() => navigate("/dashboard")}
-          className={`shrink-0 cursor-pointer ${ state === "collapsed" && !isMobile ? "h-8 mt-2" : "h-12"} w-auto object-contain`}
+          className={`shrink-0 ${ state === "collapsed" && !isMobile ? "h-8 mt-2" : "h-12"} w-auto object-contain`}
           title="Dashboard Page"
         />
-        {/* <SidebarTrigger className="bg-slate-50 text-black"/> */}
+        {/* <SidebarTrigger className="bg-slate-50 text-black group-data-[collapsible=icon]:hidden" /> */}
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
@@ -56,10 +66,10 @@ export function AppSidebar() {
                 tooltip={item.title}
                 className="group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:[&>svg]:size-5 data-[active=true]:border data-[active=true]:border-sidebar-primary-foreground data-[active=true]:border-l-4"
               >
-                <a href={item.url} className="text-inherit hover:text-inherit [&>*]:text-inherit">
+                <Link to={item.url} className="text-inherit hover:text-inherit hover:border hover:border-sidebar-primary-foreground hover:border-l-4 [&>*]:text-inherit">
                   <item.icon className="shrink-0" />
                   <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

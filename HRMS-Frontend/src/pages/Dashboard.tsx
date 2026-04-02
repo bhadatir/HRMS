@@ -24,6 +24,7 @@ import { ScrollToTop } from "@/components/ScrollToTop.tsx";
 import { GlobalSearch } from "@/components/GlobalSearch.tsx";
 import { useToast } from "@/context/ToastContext.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import { useIsMobile } from "@/hooks/use-mobile.ts";
 
 type TravelPlan = {
     id: number;
@@ -67,6 +68,7 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const navigate = useNavigate();
   const toast = useToast();
+  const isMobile = useIsMobile();
 
   if (!isAuthenticated) {
     navigate("/login");
@@ -224,8 +226,8 @@ export default function Dashboard() {
         <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
           <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
             
-            <div className="flex items-center gap-2 ">
-              <SidebarTrigger />
+            <div className="flex items-center gap-2 w-full">
+              { isMobile && <SidebarTrigger /> }
               <h3 className="text-lg font-bold">My Dashboard</h3>
             </div>
             <div className="relative inline-block">

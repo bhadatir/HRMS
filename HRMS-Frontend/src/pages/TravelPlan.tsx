@@ -169,9 +169,9 @@ export default function TravelPlan() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
-        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
-          <div className="flex items-center gap-2 pr-2">
-            <SidebarTrigger />
+        <header className="sticky top-0 z-30 flex gap-2 h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
+          <div className="flex items-center gap-2 pr-2 w-full">
+            { isMobile && <SidebarTrigger /> }
             <h3 className="text-lg font-bold">Travel Management</h3>
             {(debouncedSearchTerm && debouncedSearchTerm.length > 0) ? (
               <Badge variant="outline" className="text-white">
@@ -187,20 +187,8 @@ export default function TravelPlan() {
               </Badge>
             )}
           </div>
-          {user?.roleName !== "ADMIN" && 
-          <div className="flex items-center gap-2 pr-2">
-            <select className="border rounded-md px-2 py-1 text-sm" 
-              value={travelPlanType} onChange={(e) => setTravelPlanType(Number(e.target.value))}>
-                <option value="0">All Travel Plan</option>
-                <option value="1">Active</option>
-                <option value="2">Deleted Plan</option>
-                <option value="3">Removed By Hr</option>
-                <option value="4">Return</option>
-                <option value="5">One-Way</option>
-            </select>
-          </div>}
-
-          <div className="relative max-w-sm w-full pr-2">
+          
+          <div className="relative max-w-sm w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search Travel Plans (e.g. 'ti')..." 
@@ -213,7 +201,20 @@ export default function TravelPlan() {
             />
           </div>
 
-          <div className="travel pr-2">
+          {user?.roleName !== "ADMIN" && 
+          <div className="flex items-center gap-2">
+            <select className="border rounded-md px-2 py-1 text-sm" 
+              value={travelPlanType} onChange={(e) => setTravelPlanType(Number(e.target.value))}>
+                <option value="0">All Travel Plan</option>
+                <option value="1">Active</option>
+                <option value="2">Deleted Plan</option>
+                <option value="3">Removed By Hr</option>
+                <option value="4">Return</option>
+                <option value="5">One-Way</option>
+            </select>
+          </div>}
+
+          <div className="travel">
             {user?.roleName === "HR" && (
               <Button title="Create New Travel Plan"
                 onClick={() => setShowForm(true)} className="gap-2 text-gray-600">
@@ -455,7 +456,7 @@ export default function TravelPlan() {
           </div>
           
           <div ref={ref} className="h-10 flex justify-center items-center">
-            {( isFetchingAllTravelPlansNextPage || isFetchingTravelPlanByEmpIdNextPage )? <p className="text-xs">Loading more...</p> : null}
+            {( isFetchingAllTravelPlansNextPage || isFetchingTravelPlanByEmpIdNextPage )? <Spinner /> : null}
           </div>
           
           <ScrollToTop />

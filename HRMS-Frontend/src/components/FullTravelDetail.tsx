@@ -228,7 +228,7 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
                         <TableHead className="text-center">Amount</TableHead>
                         <TableHead className="text-center">Proofs</TableHead>
                         <TableHead className="text-center">Status</TableHead>
-                        {((user?.roleName === "HR" && plan.employeeId === user?.id) || user?.roleName === "ADMIN") && !plan?.travelPlanIsDeleted && <TableHead className="text-center">Actions</TableHead>}
+                        {((user?.roleName === "HR" && plan?.employeeId === user?.id) || user?.roleName === "ADMIN") && !plan?.travelPlanIsDeleted && <TableHead className="text-center">Actions</TableHead>}
                         {<TableHead className="text-left">Reason</TableHead>}
                       </>
                     ) : (
@@ -273,7 +273,7 @@ export default function TravelPlanDetails({travelPlan } : {travelPlan: number| n
                           {exp.expenseExpenseStatusName}
                         </Badge>
                       </TableCell>
-                      {((user?.roleName === "HR" && plan.employeeId === user?.id) || user?.roleName === "ADMIN") && !plan?.travelPlanIsDeleted && (
+                      {((user?.roleName === "HR" && plan?.employeeId === user?.id) || user?.roleName === "ADMIN") && !plan?.travelPlanIsDeleted && (
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             {exp.expenseExpenseStatusName === "PENDING" ? (
