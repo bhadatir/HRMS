@@ -94,7 +94,6 @@ export default function AddUser({editUserEmail, onSuccess}: {editUserEmail: stri
         positionId: data.positionId,
         roleId: data.roleId
       });
-      toast?.success("User details loaded successfully!");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

@@ -221,8 +221,8 @@ export default function Dashboard() {
     ) : (
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="bg-slate-50 overflow-x-hidden">
-          <header className="flex h-16 items-center justify-between border-b px-6 sticky top-0 z-10 text-white w-full bg-slate-900">
+        <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
+          <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
             
             <div className="flex items-center gap-2 ">
               <SidebarTrigger />
@@ -256,7 +256,7 @@ export default function Dashboard() {
 
           {( updatePasswordMutation.isPending || profilePicMutation.isPending || isWaitingListLoading || isGameBookingsLoading || isTravelPlansLoading ) && <Spinner />}
 
-          <main className="p-6 w-full max-w-full space-y-6 overflow-x-hidden">
+          <main className="flex-1 w-full max-w-full space-y-6 overflow-x-hidden p-6">
             
             <div className="relative rounded p-8 text-black overflow-hidden">
               <div className="flex flex-col md:flex-row items-center gap-6">

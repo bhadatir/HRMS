@@ -45,7 +45,6 @@ export default function AddGameTypeForm({ editGameTypeId ,onSuccess}: { editGame
                 gameSlotDuration: data.gameSlotDuration,
                 gameMaxPlayerPerSlot: data.gameMaxPlayerPerSlot
             });
-            toast?.success("Game details loaded successfully!");
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {

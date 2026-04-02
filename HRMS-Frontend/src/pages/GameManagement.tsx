@@ -215,8 +215,8 @@ export default function GameManagement() {
     return (
         <SidebarProvider>
             <AppSidebar />
-            <SidebarInset className="bg-slate-50">
-                <header className="flex h-16 items-center justify-between border-b px-6 bg-white sticky top-0 z-10 w-full">
+            <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
+                <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
                     <div className="flex items-center gap-2 pr-2 text-white">
                         <SidebarTrigger/>
                         <h3 className="text-lg font-bold">Game Zone</h3>
@@ -348,7 +348,7 @@ export default function GameManagement() {
                   </div>
                 )}                
 
-                <main className="p-6 space-y-6 w-full">                  
+                <main className="flex-1 w-full max-w-full space-y-6 overflow-x-hidden p-6">                
 
                     {/* upcomming games */}
                     <div className="game grid grid-cols-1 md:grid-cols-2 gap-4">

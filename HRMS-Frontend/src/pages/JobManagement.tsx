@@ -124,8 +124,8 @@ export default function JobManagement() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="bg-slate-50">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b px-6 text-white sticky top-0 z-10">
+      <SidebarInset className="bg-slate-50 h-svh overflow-y-auto overflow-x-hidden">
+        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-slate-900 px-6 text-white">
           <div className="flex items-center gap-2 pr-2">
             <SidebarTrigger/>
             <h3 className="text-lg font-bold">Job Board</h3>
@@ -273,7 +273,7 @@ export default function JobManagement() {
           </div>
         )}
 
-        <main className="p-6 space-y-6 w-full">
+        <main className="flex-1 w-full max-w-full space-y-6 overflow-x-hidden p-6">
           <div className="job grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allJobs.length > 0 ? (
               allJobs.map((job: Job) => ((job.jobIsActive || user?.roleName === "HR" || user?.roleName === "ADMIN") && (

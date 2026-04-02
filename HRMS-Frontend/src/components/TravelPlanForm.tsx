@@ -104,7 +104,6 @@ const getMutation = useMutation({
       employeesInTravelPlanId: existingEmps.map((e: { id: number }) => e.id)
     });
 
-    toast?.success("Travel plan details loaded successfully!");
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onError: (error: any) => {
